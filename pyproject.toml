@@ -1,0 +1,35 @@
+[project]
+name = "servekit"
+version = "0.1.0"
+description = "Exercises and experiments written while studying inference engineering"
+readme = "README.md"
+authors = [
+    { name = "Mike Reese", email = "mike.reese1212@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+    "pandas>=3.0.6",
+    "prometheus-client>=0.26.0",
+    "scipy>=1.18.1",
+    "torch==2.14.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
