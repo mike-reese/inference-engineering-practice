@@ -1,0 +1,773 @@
+{
+  "configuration": {
+    "python": "3.12.14",
+    "torch": "2.14.0+cu126",
+    "transformers": "5.20.2",
+    "safetensors": "0.8.0",
+    "httpx": "0.28.1",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "dtype": "float32",
+    "device": "cpu",
+    "cpu": "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
+    "torch_threads": 8,
+    "hf_hub_offline": "1",
+    "docker_run": "docker run -d --rm --name i01a-8a8f6cf1 --gpus all --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools -v /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32:/models:ro -p 127.0.0.1::8080 telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4 -m /models/Qwen2.5-0.5B-Instruct-f32.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096 --parallel 1 --n-gpu-layers 99 --jinja",
+    "server_build_info": "b6500-a7a98e0fffed+firstfit"
+  },
+  "template": {
+    "rendered": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nWhy does decode slow down as the KV cache grows?<|im_end|>\n<|im_start|>assistant\n",
+    "specials": [
+      [
+        0,
+        "<|im_start|>"
+      ],
+      [
+        69,
+        "<|im_end|>"
+      ],
+      [
+        80,
+        "<|im_start|>"
+      ],
+      [
+        145,
+        "<|im_end|>"
+      ],
+      [
+        156,
+        "<|im_start|>"
+      ]
+    ],
+    "generation_prompt": "<|im_start|>assistant\n",
+    "user_only": "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n<|im_start|>user\nWhy does decode slow down as the KV cache grows?<|im_end|>\n<|im_start|>assistant\n",
+    "branch": [
+      "{%- if messages[0]['role'] == 'system' %}",
+      "        {{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}",
+      "    {%- else %}",
+      "        {{- '<|im_start|>system\\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\\n' }}",
+      "    {%- endif %}"
+    ],
+    "llama_render_equal": true,
+    "template_equal": true,
+    "template_chars": 2507
+  },
+  "tokens": {
+    "ids": [
+      151644,
+      8948,
+      198,
+      2610,
+      525,
+      264,
+      63594,
+      17847,
+      369,
+      458,
+      44378,
+      2083,
+      13,
+      151645,
+      198,
+      151644,
+      872,
+      198,
+      10234,
+      1558,
+      16895,
+      6301,
+      1495,
+      438,
+      279,
+      84648,
+      6500,
+      27715,
+      30,
+      151645,
+      198,
+      151644,
+      77091,
+      198
+    ],
+    "hf_pieces": [
+      "<|im_start|>",
+      "system",
+      "Ċ",
+      "You",
+      "Ġare",
+      "Ġa",
+      "Ġconcise",
+      "Ġassistant",
+      "Ġfor",
+      "Ġan",
+      "Ġinference",
+      "Ġteam",
+      ".",
+      "<|im_end|>",
+      "Ċ",
+      "<|im_start|>",
+      "user",
+      "Ċ",
+      "Why",
+      "Ġdoes",
+      "Ġdecode",
+      "Ġslow",
+      "Ġdown",
+      "Ġas",
+      "Ġthe",
+      "ĠKV",
+      "Ġcache",
+      "Ġgrows",
+      "?",
+      "<|im_end|>",
+      "Ċ",
+      "<|im_start|>",
+      "assistant",
+      "Ċ"
+    ],
+    "llama_pieces": [
+      "<|im_start|>",
+      "system",
+      "\n",
+      "You",
+      " are",
+      " a",
+      " concise",
+      " assistant",
+      " for",
+      " an",
+      " inference",
+      " team",
+      ".",
+      "<|im_end|>",
+      "\n",
+      "<|im_start|>",
+      "user",
+      "\n",
+      "Why",
+      " does",
+      " decode",
+      " slow",
+      " down",
+      " as",
+      " the",
+      " KV",
+      " cache",
+      " grows",
+      "?",
+      "<|im_end|>",
+      "\n",
+      "<|im_start|>",
+      "assistant",
+      "\n"
+    ],
+    "llama_ids_equal": true,
+    "special_counts": {
+      "151644": 3,
+      "151645": 2
+    },
+    "as_text_ids": {
+      "transformers": [
+        27,
+        91,
+        318,
+        4906,
+        91,
+        29,
+        8948,
+        198,
+        2610,
+        525,
+        264,
+        63594,
+        17847,
+        369,
+        458,
+        44378,
+        2083,
+        15757,
+        91,
+        318,
+        6213,
+        91,
+        397,
+        27,
+        91,
+        318,
+        4906,
+        91,
+        29,
+        872,
+        198,
+        10234,
+        1558,
+        16895,
+        6301,
+        1495,
+        438,
+        279,
+        84648,
+        6500,
+        27715,
+        75414,
+        91,
+        318,
+        6213,
+        91,
+        397,
+        27,
+        91,
+        318,
+        4906,
+        91,
+        29,
+        77091,
+        198
+      ],
+      "llama.cpp": [
+        27,
+        91,
+        318,
+        4906,
+        91,
+        29,
+        8948,
+        198,
+        2610,
+        525,
+        264,
+        63594,
+        17847,
+        369,
+        458,
+        44378,
+        2083,
+        15757,
+        91,
+        318,
+        6213,
+        91,
+        397,
+        27,
+        91,
+        318,
+        4906,
+        91,
+        29,
+        872,
+        198,
+        10234,
+        1558,
+        16895,
+        6301,
+        1495,
+        438,
+        279,
+        84648,
+        6500,
+        27715,
+        75414,
+        91,
+        318,
+        6213,
+        91,
+        397,
+        27,
+        91,
+        318,
+        4906,
+        91,
+        29,
+        77091,
+        198
+      ]
+    }
+  },
+  "config": {
+    "header_bytes": 32280,
+    "tensors": 290,
+    "dtype_counts": {
+      "BF16": 290
+    },
+    "metadata": {
+      "format": "pt"
+    },
+    "layers": 24,
+    "lm_head_present": false,
+    "shapes": {
+      "model.embed_tokens.weight": [
+        151936,
+        896
+      ],
+      "model.layers.0.self_attn.q_proj.weight": [
+        896,
+        896
+      ],
+      "model.layers.0.self_attn.k_proj.weight": [
+        128,
+        896
+      ],
+      "model.layers.0.self_attn.v_proj.weight": [
+        128,
+        896
+      ],
+      "model.layers.0.self_attn.o_proj.weight": [
+        896,
+        896
+      ],
+      "model.layers.0.self_attn.q_proj.bias": [
+        896
+      ],
+      "model.layers.0.self_attn.k_proj.bias": [
+        128
+      ],
+      "model.layers.0.mlp.gate_proj.weight": [
+        4864,
+        896
+      ],
+      "model.layers.0.mlp.down_proj.weight": [
+        896,
+        4864
+      ]
+    },
+    "safe_open_equal": true,
+    "parameters": 494032768,
+    "data_bytes": 988065536,
+    "file_bytes": 988097824,
+    "head_dim": 64
+  },
+  "kv_cache": {
+    "tokens": 34,
+    "logits_shape": [
+      1,
+      34,
+      151936
+    ],
+    "logits_dtype": "torch.float32",
+    "embedding_rows": 151936,
+    "tokenizer_len": 151665,
+    "layers": [
+      {
+        "layer": 0,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 1,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 2,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 3,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 4,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 5,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 6,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 7,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 8,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 9,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 10,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 11,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 12,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 13,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 14,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 15,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 16,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 17,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 18,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 19,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 20,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 21,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 22,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      },
+      {
+        "layer": 23,
+        "keys": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "values": [
+          1,
+          2,
+          34,
+          64
+        ],
+        "dtype": "torch.float32",
+        "bytes": 34816
+      }
+    ],
+    "total_bytes": 835584,
+    "bytes_per_token": 24576,
+    "predicted": {
+      "layer_shape": [
+        1,
+        2,
+        34,
+        64
+      ],
+      "bytes_per_layer": 34816,
+      "bytes_per_token": 24576,
+      "total_bytes": 835584
+    }
+  }
+}

@@ -1,0 +1,153 @@
+== Configuration
+python             3.12.14
+torch              2.14.0+cu126
+transformers       5.20.2
+safetensors        0.8.0
+httpx              0.28.1
+model              Qwen/Qwen2.5-0.5B-Instruct
+revision           7ae557604adf67be50417f59c2c2f167def9a775
+dtype              float32
+device             cpu
+cpu                Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz
+torch_threads      8
+hf_hub_offline     1
+docker_run         docker run -d --rm --name i01a-8a8f6cf1 --gpus all --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools -v /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32:/models:ro -p 127.0.0.1::8080 telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4 -m /models/Qwen2.5-0.5B-Instruct-f32.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096 --parallel 1 --n-gpu-layers 99 --jinja
+server_build_info  b6500-a7a98e0fffed+firstfit
+
+== Point 1: the rendered string
+178 characters:
+  '<|im_start|>system\n'
+  'You are a concise assistant for an inference team.<|im_end|>\n'
+  '<|im_start|>user\n'
+  'Why does decode slow down as the KV cache grows?<|im_end|>\n'
+  '<|im_start|>assistant\n'
+special tokens (character position, token):
+     0  <|im_start|>
+    69  <|im_end|>
+    80  <|im_start|>
+   145  <|im_end|>
+   156  <|im_start|>
+generation prompt (render minus no-generation render): '<|im_start|>assistant\n'
+user-only render:
+  '<|im_start|>system\n'
+  'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n'
+  '<|im_start|>user\n'
+  'Why does decode slow down as the KV cache grows?<|im_end|>\n'
+  '<|im_start|>assistant\n'
+the template branch that adds the default system message (inside `{%- else %}` of `{%- if tools %}`):
+  {%- if messages[0]['role'] == 'system' %}
+          {{- '<|im_start|>system\n' + messages[0]['content'] + '<|im_end|>\n' }}
+      {%- else %}
+          {{- '<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n' }}
+      {%- endif %}
+second source, llama.cpp:
+  /apply-template == transformers render:  True
+  /props chat_template == tokenizer's:     True (2,507 and 2,507 characters)
+  user-only render has the default, both:  True
+
+== Point 2: 34 tokens
+index      ID  transformers piece    llama.cpp piece
+    0  151644  '<|im_start|>'        '<|im_start|>'
+    1    8948  'system'              'system'
+    2     198  'Ċ'                   '\n'
+    3    2610  'You'                 'You'
+    4     525  'Ġare'                ' are'
+    5     264  'Ġa'                  ' a'
+    6   63594  'Ġconcise'            ' concise'
+    7   17847  'Ġassistant'          ' assistant'
+    8     369  'Ġfor'                ' for'
+    9     458  'Ġan'                 ' an'
+   10   44378  'Ġinference'          ' inference'
+   11    2083  'Ġteam'               ' team'
+   12      13  '.'                   '.'
+   13  151645  '<|im_end|>'          '<|im_end|>'
+   14     198  'Ċ'                   '\n'
+   15  151644  '<|im_start|>'        '<|im_start|>'
+   16     872  'user'                'user'
+   17     198  'Ċ'                   '\n'
+   18   10234  'Why'                 'Why'
+   19    1558  'Ġdoes'               ' does'
+   20   16895  'Ġdecode'             ' decode'
+   21    6301  'Ġslow'               ' slow'
+   22    1495  'Ġdown'               ' down'
+   23     438  'Ġas'                 ' as'
+   24     279  'Ġthe'                ' the'
+   25   84648  'ĠKV'                 ' KV'
+   26    6500  'Ġcache'              ' cache'
+   27   27715  'Ġgrows'              ' grows'
+   28      30  '?'                   '?'
+   29  151645  '<|im_end|>'          '<|im_end|>'
+   30     198  'Ċ'                   '\n'
+   31  151644  '<|im_start|>'        '<|im_start|>'
+   32   77091  'assistant'           'assistant'
+   33     198  'Ċ'                   '\n'
+special tokens (ID, token, count):
+  151644  <|im_start|>  x3
+  151645  <|im_end|>  x2
+second source, llama.cpp /tokenize:  same 34 IDs: True
+the hazard, specials parsed as text: transformers 55 IDs, llama.cpp 55 IDs; highest ID 84648 and 84648 (first special ID 151643)
+  starts: ['<', '|', 'im', '_start', '|', '>']
+
+== Point 3: the config against the stored tensors
+config.json:
+  num_hidden_layers        24
+  num_attention_heads      14
+  num_key_value_heads      2
+  hidden_size              896
+  intermediate_size        4864
+  vocab_size               151936
+  max_position_embeddings  32768
+  tie_word_embeddings      True
+  torch_dtype              bfloat16
+  head_dim                 None -> 64 (hidden_size // num_attention_heads)
+safetensors header: first 8 bytes = 32,280 (header length); 290 tensors; dtypes {'BF16': 290}; __metadata__ {'format': 'pt'}
+  layer indices 0-23 (24 layers); lm_head.weight present: False
+  tensor                                     stored shape     predicted from config.json
+  model.embed_tokens.weight                  [151936, 896]    [vocab_size, hidden_size] = [151936, 896]
+  model.layers.0.self_attn.q_proj.weight     [896, 896]       [attention heads x head size, hidden] = [896, 896]
+  model.layers.0.self_attn.k_proj.weight     [128, 896]       [KV heads x head size, hidden] = [128, 896]
+  model.layers.0.self_attn.v_proj.weight     [128, 896]       [KV heads x head size, hidden] = [128, 896]
+  model.layers.0.self_attn.o_proj.weight     [896, 896]       [hidden, attention heads x head size] = [896, 896]
+  model.layers.0.self_attn.q_proj.bias       [896]            [attention heads x head size] = [896]
+  model.layers.0.self_attn.k_proj.bias       [128]            [KV heads x head size] = [128]
+  model.layers.0.mlp.gate_proj.weight        [4864, 896]      [intermediate, hidden] = [4864, 896]
+  model.layers.0.mlp.down_proj.weight        [896, 4864]      [hidden, intermediate] = [896, 4864]
+  safe_open reads the same shapes: True
+parameters (header): 494,032,768; data bytes 988,065,536 = 2 bytes x parameters
+file size 988,097,824 = 8 + 32,280 + 988,065,536: True
+
+== Point 4: one prefill forward call on 34 tokens
+model dtype torch.float32, device cpu
+logits (1, 34, 151936) torch.float32: one score per vocabulary row at each of the 34 positions
+  embedding rows 151,936 - len(tokenizer) 151,665 = 271 rows with no token
+KV cache: DynamicCache, 24 layers
+  layer  keys              values            dtype           bytes (K + V)
+      0  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      1  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      2  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      3  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      4  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      5  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      6  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      7  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      8  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+      9  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     10  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     11  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     12  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     13  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     14  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     15  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     16  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     17  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     18  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     19  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     20  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     21  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     22  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+     23  (1, 2, 34, 64)    (1, 2, 34, 64)    torch.float32   34,816
+  measured:   total 835,584 bytes = 24,576 bytes per token x 34 tokens
+  predicted:  kv_cache_shape(config, 34, dtype_bytes=4) -> layer shape (1, 2, 34, 64), 34,816 per layer, 24,576 per token, 835,584 total
+  equal: True
+
+server: stopped i01a-8a8f6cf1 in 0.48 s (exit 0)
