@@ -1,0 +1,151 @@
+== Configuration
+python             3.12.14
+torch              2.14.0+cu126
+transformers       5.20.2
+safetensors        0.8.0
+httpx              0.28.1
+model              Qwen/Qwen2.5-0.5B-Instruct
+revision           7ae557604adf67be50417f59c2c2f167def9a775
+dtype              float32
+device             cpu
+cpu                Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz
+torch_threads      8
+hf_hub_offline     1
+docker_run         docker run -d --rm --name i01b-rep-f6c7b127 --gpus all --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools -v /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32:/models:ro -p 127.0.0.1::8080 telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4 -m /models/Qwen2.5-0.5B-Instruct-f32.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096 --parallel 1 --n-gpu-layers 99 --jinja
+server_build_info  b6500-a7a98e0fffed+firstfit
+gpu_name_driver    NVIDIA GeForce GTX 1080 Ti, 580.178.04
+engine_image       telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4
+engine_image_id    sha256:8cbe0ac473189ff807a993929ecc952cbf224e17fed15c063bbc5cdfd205b070
+gguf_path          /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32/Qwen2.5-0.5B-Instruct-f32.gguf
+gguf_bytes         1982078784
+gguf_sha256        5398ce9e21beb102f3bac22625596fa8e1a3333a99696a84a6cde43a3c60c53f
+huggingface_hub    2.3.0
+tokenizer_revision 7ae557604adf67be50417f59c2c2f167def9a775
+messages           [{'role': 'system', 'content': 'You are a concise assistant for an inference team.'}, {'role': 'user', 'content': 'The KV cache grows during decode. Why does decode slow down?'}]
+sampling           {'do_sample': True, 'temperature': 0.7, 'top_k': 20, 'top_p': 0.8, 'repetition_penalty': 1.0}
+output_fields      {'max_new_tokens': 1, 'output_logits': True, 'output_scores': True, 'return_dict_in_generate': True}
+seed               2
+
+== Point 1: checkpoint fields
+Field: raw file | loaded defaults | resolved request
+bos_token_id: 151643 | 151643 | 151643
+pad_token_id: 151643 | 151643 | 151643
+do_sample: True | True | True
+eos_token_id: [151645, 151643] | [151645, 151643] | [151645, 151643]
+repetition_penalty: 1.1 | 1.1 | 1.0
+temperature: 0.7 | 0.7 | 0.7
+top_p: 0.8 | 0.8 | 0.8
+top_k: 20 | 20 | 20
+transformers_version: '4.37.0' | '4.37.0' | '4.37.0'
+Loaded checkpoint fields match raw file: True
+Processors in execution order:
+1. TemperatureLogitsWarper: {'temperature': 0.7}
+2. TopKLogitsWarper: {'top_k': 20, 'filter_value': '-inf', 'min_tokens_to_keep': 1}
+3. TopPLogitsWarper: {'top_p': 0.8, 'filter_value': '-inf', 'min_tokens_to_keep': 1}
+
+== Generation output
+prompt_length: 36
+prompt_ids: [151644, 8948, 198, 2610, 525, 264, 63594, 17847, 369, 458, 44378, 2083, 13, 151645, 198, 151644, 872, 198, 785, 84648, 6500, 27715, 2337, 16895, 13, 8429, 1558, 16895, 6301, 1495, 30, 151645, 198, 151644, 77091, 198]
+sequences: {'shape': [1, 37], 'dtype': 'torch.int64', 'ids': [151644, 8948, 198, 2610, 525, 264, 63594, 17847, 369, 458, 44378, 2083, 13, 151645, 198, 151644, 872, 198, 785, 84648, 6500, 27715, 2337, 16895, 13, 8429, 1558, 16895, 6301, 1495, 30, 151645, 198, 151644, 77091, 198, 4498]}
+logits: {'step_count': 1, 'step_1_shape': [1, 151936], 'step_1_dtype': 'torch.float32'}
+scores: {'step_count': 1, 'step_1_shape': [1, 151936], 'step_1_dtype': 'torch.float32'}
+cache_type: DynamicCache
+cache_length: 36
+prompt_prefix_matches: True
+
+== Point 2: processors applied one at a time
+1. TemperatureLogitsWarper: finite_entries=151936, largest_token_id=785, largest_score=28.917743682861328
+2. TopKLogitsWarper: finite_entries=20, largest_token_id=785, largest_score=28.917743682861328
+3. TopPLogitsWarper: finite_entries=2, largest_token_id=785, largest_score=28.917743682861328
+Replayed processors equal generate scores: True
+
+== Point 2: surviving tokens
+ID | piece | logit | score | probability
+785 | 'The' | 20.242420196533203 | 28.917743682861328 | 0.8297855854034424
+4498 | 'When' | 19.133544921875 | 27.333635330200195 | 0.1702144294977188
+Top-20 of 151936 vocabulary entries; remainder omitted
+rank | ID | piece | logit | probability in top-k | cumulative | kept
+1 | 785 | 'The' | 20.242420196533203 | 0.7118911743164062 | 0.7118911743164062 | True
+2 | 4498 | 'When' | 19.133544921875 | 0.14603067934513092 | 0.857921838760376 | True
+3 | 32564 | 'Decode' | 18.40959930419922 | 0.05191513150930405 | 0.909837007522583 | False
+4 | 16014 | 'During' | 18.303442001342773 | 0.044609956443309784 | 0.9544469118118286 | False
+5 | 641 | 'In' | 17.714929580688477 | 0.01924448274075985 | 0.9736914038658142 | False
+6 | 4900 | 'Dec' | 17.502225875854492 | 0.014201689511537552 | 0.9878931045532227 | False
+7 | 82707 | 'KV' | 16.604915618896484 | 0.0039412155747413635 | 0.9918343424797058 | False
+8 | 20732 | 'Decoder' | 16.490100860595703 | 0.0033450063783675432 | 0.9951793551445007 | False
+9 | 18196 | 'decode' | 15.795745849609375 | 0.0012405227171257138 | 0.9964198470115662 | False
+10 | 7983 | 'While' | 15.518954277038574 | 0.0008353676530532539 | 0.9972552061080933 | False
+11 | 8233 | 'Cache' | 15.475615501403809 | 0.0007852163980714977 | 0.9980404376983643 | False
+12 | 42 | 'K' | 15.19668960571289 | 0.0005271542468108237 | 0.9985675811767578 | False
+13 | 2121 | 'As' | 14.873611450195312 | 0.0003322717093396932 | 0.9988998770713806 | False
+14 | 1249 | 'To' | 14.823943138122559 | 0.0003095122810918838 | 0.9992094039916992 | False
+15 | 1912 | 'De' | 14.361499786376953 | 0.00015987058577593416 | 0.9993692636489868 | False
+16 | 3862 | 'There' | 14.331449508666992 | 0.00015315276687033474 | 0.9995223879814148 | False
+17 | 10642 | 'Memory' | 14.309834480285645 | 0.0001484959793742746 | 0.9996709227561951 | False
+18 | 2132 | 'It' | 14.177803993225098 | 0.0001229702029377222 | 0.9997938871383667 | False
+19 | 32535 | 'Encode' | 14.159892082214355 | 0.00011986366007477045 | 0.99991375207901 | False
+20 | 1986 | 'This' | 13.929581642150879 | 8.625769260106608e-05 | 1.0 | False
+Top-p threshold: 0.8; retained tokens: 2
+Recomputed survivors: {'ids': [785, 4498], 'pieces': ['The', 'When'], 'probabilities': [0.8297855854034424, 0.1702144294977188]}
+Surviving IDs match: True
+Maximum probability difference at recomputed IDs: 0.0
+IDs and probabilities match within 1e-6: True
+Temperature-last survivors: {'ids': [785, 4498, 32564, 16014], 'pieces': ['The', 'When', 'Decode', 'During'], 'probabilities': [0.7458677291870117, 0.15300031006336212, 0.054392892867326736, 0.046739064157009125]}
+Temperature-last IDs differ from library IDs: True
+
+== Point 2: llama.cpp comparison
+Sampler order: ['penalties', 'dry', 'top_n_sigma', 'top_k', 'typ_p', 'top_p', 'min_p', 'xtc', 'temperature']
+Default temperature: 0.800000011920929
+Default top_k: 40
+Default top_p: 0.949999988079071
+Default min_p: 0.05000000074505806
+Default repeat_penalty: 1.0
+Default repeat_last_n: 64
+ID | piece | engine probability | temperature-last probability | generate probability
+785 | 'The' | 0.7449563145637512 | 0.7458677291870117 | 0.8297855854034424
+4498 | 'When' | 0.1534322202205658 | 0.15300031006336212 | 0.1702144294977188
+16014 | 'During' | 0.046798110008239746 | 0.046739064157009125 | 0.0
+32564 | 'Decode' | 0.05481332913041115 | 0.054392892867326736 | 0.0
+Temperature is last in server chain: True
+Engine IDs match temperature-last IDs: True
+Maximum surviving-probability difference: 0.000911414623260498
+IDs and probabilities match within 0.02: True
+Surviving counts, engine/generate: 4/2
+Engine IDs differ from generate IDs: True
+Echoed generation settings: {'n_predict': 1, 'seed': 2, 'temperature': 0.699999988079071, 'dynatemp_range': 0.0, 'dynatemp_exponent': 1.0, 'top_k': 20, 'top_p': 0.800000011920929, 'min_p': 0.0, 'top_n_sigma': -1.0, 'xtc_probability': 0.0, 'xtc_threshold': 0.10000000149011612, 'typical_p': 1.0, 'repeat_last_n': 64, 'repeat_penalty': 1.0, 'presence_penalty': 0.0, 'frequency_penalty': 0.0, 'dry_multiplier': 0.0, 'dry_base': 1.75, 'dry_allowed_length': 2, 'dry_penalty_last_n': 4096, 'dry_sequence_breakers': ['\n', ':', '"', '*'], 'mirostat': 0, 'mirostat_tau': 5.0, 'mirostat_eta': 0.10000000149011612, 'stop': [], 'max_tokens': 1, 'n_keep': 0, 'n_discard': 0, 'ignore_eos': False, 'stream': False, 'logit_bias': [], 'n_probs': 20, 'min_keep': 0, 'grammar': '', 'grammar_lazy': False, 'grammar_triggers': [], 'preserved_tokens': [], 'chat_format': 'Content-only', 'reasoning_format': 'auto', 'reasoning_in_content': False, 'thinking_forced_open': False, 'samplers': ['penalties', 'dry', 'top_n_sigma', 'top_k', 'typ_p', 'top_p', 'min_p', 'xtc', 'temperature'], 'speculative.n_max': 16, 'speculative.n_min': 0, 'speculative.p_min': 0.75, 'timings_per_token': False, 'post_sampling_probs': True, 'lora': []}
+Pre-sampling log-probabilities: first 5 of 20 engine candidates
+{'rank': 1, 'id': 785, 'piece': 'The', 'engine_logprob': -0.6712297797203064, 'transformers_logprob': -0.6698607162834515, 'engine_minus_transformers': -0.0013690634368549448}
+{'rank': 2, 'id': 4498, 'piece': 'When', 'engine_logprob': -1.7772763967514038, 'transformers_logprob': -1.7787359909416547, 'engine_minus_transformers': 0.0014595941902508791}
+{'rank': 3, 'id': 32564, 'piece': 'Decode', 'engine_logprob': -2.4978041648864746, 'transformers_logprob': -2.502681608617436, 'engine_minus_transformers': 0.004877443730961328}
+{'rank': 4, 'id': 16014, 'piece': 'During', 'engine_logprob': -2.608468532562256, 'transformers_logprob': -2.6088389114738813, 'engine_minus_transformers': 0.00037037891162539083}
+{'rank': 5, 'id': 641, 'piece': 'In', 'engine_logprob': -3.1992239952087402, 'transformers_logprob': -3.197351332128178, 'engine_minus_transformers': -0.0018726630805621092}
+Maximum absolute log-probability difference over all candidates: 0.007519121587406197
+
+== Point 3: the drawn token and same-seed rerun
+seed: 2
+token_id: 4498
+piece: When
+rank_by_processed_score: 2
+probability: 0.1702144294977188
+in_surviving_set: True
+rerun_token_id: 4498
+rerun_token_matches: True
+rerun_logits_match: True
+rerun_scores_match: True
+
+== Hazard: checkpoint repetition penalty
+request_sampling_fields: {'do_sample': True, 'temperature': 0.7, 'top_k': 20, 'top_p': 0.8}
+checkpoint_repetition_penalty: 1.1
+processors: [{'position': 1, 'class': 'RepetitionPenaltyLogitsProcessor', 'parameters': {'penalty': 1.1, 'prompt_ignore_length': None, 'logits_indices': None, 'cu_seq_lens_q': None}}, {'position': 2, 'class': 'TemperatureLogitsWarper', 'parameters': {'temperature': 0.7}}, {'position': 3, 'class': 'TopKLogitsWarper', 'parameters': {'top_k': 20, 'filter_value': '-inf', 'min_tokens_to_keep': 1}}, {'position': 4, 'class': 'TopPLogitsWarper', 'parameters': {'top_p': 0.8, 'filter_value': '-inf', 'min_tokens_to_keep': 1}}]
+raw_logits_match_baseline: True
+processed_scores_match_baseline: False
+survivors: [{'id': 4498, 'piece': 'When', 'probability': 0.49682971835136414}, {'id': 32564, 'piece': 'Decode', 'probability': 0.17662712931632996}, {'id': 785, 'piece': 'The', 'probability': 0.17476992309093475}, {'id': 16014, 'piece': 'During', 'probability': 0.15177325904369354}]
+drawn_token_id: 16014
+drawn_piece: During
+baseline_token_id: 4498
+recomputed_without_penalty: [{'id': 785, 'piece': 'The', 'probability': 0.8297855854034424}, {'id': 4498, 'piece': 'When', 'probability': 0.1702144294977188}]
+surviving_ids_differ_from_recomputation: True
+draw_in_recomputed_set: False
+server: stopped i01b-rep-f6c7b127 in 0.50 s (exit 0)
+Results JSON: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01B-L1_sampler_inspection/results/record.json
+Printed output: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01B-L1_sampler_inspection/results/output.txt

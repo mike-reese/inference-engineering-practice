@@ -1,0 +1,1467 @@
+{
+  "configuration": {
+    "python": "3.12.14",
+    "torch": "2.14.0+cu126",
+    "transformers": "5.20.2",
+    "safetensors": "0.8.0",
+    "httpx": "0.28.1",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "dtype": "float32",
+    "device": "cpu",
+    "cpu": "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
+    "torch_threads": 8,
+    "hf_hub_offline": "1",
+    "docker_run": "docker run -d --rm --name i01b-rep-f6c7b127 --gpus all --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools -v /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32:/models:ro -p 127.0.0.1::8080 telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4 -m /models/Qwen2.5-0.5B-Instruct-f32.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096 --parallel 1 --n-gpu-layers 99 --jinja",
+    "server_build_info": "b6500-a7a98e0fffed+firstfit",
+    "gpu_name_driver": "NVIDIA GeForce GTX 1080 Ti, 580.178.04",
+    "engine_image": "telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4",
+    "engine_image_id": "sha256:8cbe0ac473189ff807a993929ecc952cbf224e17fed15c063bbc5cdfd205b070",
+    "gguf_path": "/home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32/Qwen2.5-0.5B-Instruct-f32.gguf",
+    "gguf_bytes": 1982078784,
+    "gguf_sha256": "5398ce9e21beb102f3bac22625596fa8e1a3333a99696a84a6cde43a3c60c53f",
+    "huggingface_hub": "2.3.0",
+    "tokenizer_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a concise assistant for an inference team."
+      },
+      {
+        "role": "user",
+        "content": "The KV cache grows during decode. Why does decode slow down?"
+      }
+    ],
+    "sampling": {
+      "do_sample": true,
+      "temperature": 0.7,
+      "top_k": 20,
+      "top_p": 0.8,
+      "repetition_penalty": 1.0
+    },
+    "output_fields": {
+      "max_new_tokens": 1,
+      "output_logits": true,
+      "output_scores": true,
+      "return_dict_in_generate": true
+    },
+    "seed": 2
+  },
+  "processor_list": {
+    "raw_generation_config": {
+      "bos_token_id": 151643,
+      "pad_token_id": 151643,
+      "do_sample": true,
+      "eos_token_id": [
+        151645,
+        151643
+      ],
+      "repetition_penalty": 1.1,
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "transformers_version": "4.37.0"
+    },
+    "loaded_checkpoint_fields": {
+      "bos_token_id": 151643,
+      "pad_token_id": 151643,
+      "do_sample": true,
+      "eos_token_id": [
+        151645,
+        151643
+      ],
+      "repetition_penalty": 1.1,
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "transformers_version": "4.37.0"
+    },
+    "resolved_checkpoint_fields": {
+      "bos_token_id": 151643,
+      "pad_token_id": 151643,
+      "do_sample": true,
+      "eos_token_id": [
+        151645,
+        151643
+      ],
+      "repetition_penalty": 1.0,
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "transformers_version": "4.37.0"
+    },
+    "defaults_match": true,
+    "processors": [
+      {
+        "position": 1,
+        "class": "TemperatureLogitsWarper",
+        "parameters": {
+          "temperature": 0.7
+        }
+      },
+      {
+        "position": 2,
+        "class": "TopKLogitsWarper",
+        "parameters": {
+          "top_k": 20,
+          "filter_value": "-inf",
+          "min_tokens_to_keep": 1
+        }
+      },
+      {
+        "position": 3,
+        "class": "TopPLogitsWarper",
+        "parameters": {
+          "top_p": 0.8,
+          "filter_value": "-inf",
+          "min_tokens_to_keep": 1
+        }
+      }
+    ]
+  },
+  "generation_output": {
+    "prompt_length": 36,
+    "prompt_ids": [
+      151644,
+      8948,
+      198,
+      2610,
+      525,
+      264,
+      63594,
+      17847,
+      369,
+      458,
+      44378,
+      2083,
+      13,
+      151645,
+      198,
+      151644,
+      872,
+      198,
+      785,
+      84648,
+      6500,
+      27715,
+      2337,
+      16895,
+      13,
+      8429,
+      1558,
+      16895,
+      6301,
+      1495,
+      30,
+      151645,
+      198,
+      151644,
+      77091,
+      198
+    ],
+    "sequences": {
+      "shape": [
+        1,
+        37
+      ],
+      "dtype": "torch.int64",
+      "ids": [
+        151644,
+        8948,
+        198,
+        2610,
+        525,
+        264,
+        63594,
+        17847,
+        369,
+        458,
+        44378,
+        2083,
+        13,
+        151645,
+        198,
+        151644,
+        872,
+        198,
+        785,
+        84648,
+        6500,
+        27715,
+        2337,
+        16895,
+        13,
+        8429,
+        1558,
+        16895,
+        6301,
+        1495,
+        30,
+        151645,
+        198,
+        151644,
+        77091,
+        198,
+        4498
+      ]
+    },
+    "logits": {
+      "step_count": 1,
+      "step_1_shape": [
+        1,
+        151936
+      ],
+      "step_1_dtype": "torch.float32"
+    },
+    "scores": {
+      "step_count": 1,
+      "step_1_shape": [
+        1,
+        151936
+      ],
+      "step_1_dtype": "torch.float32"
+    },
+    "cache_type": "DynamicCache",
+    "cache_length": 36,
+    "prompt_prefix_matches": true
+  },
+  "processor_steps": {
+    "steps": [
+      {
+        "position": 1,
+        "class": "TemperatureLogitsWarper",
+        "finite_entries": 151936,
+        "largest_token_id": 785,
+        "largest_score": 28.917743682861328
+      },
+      {
+        "position": 2,
+        "class": "TopKLogitsWarper",
+        "finite_entries": 20,
+        "largest_token_id": 785,
+        "largest_score": 28.917743682861328
+      },
+      {
+        "position": 3,
+        "class": "TopPLogitsWarper",
+        "finite_entries": 2,
+        "largest_token_id": 785,
+        "largest_score": 28.917743682861328
+      }
+    ],
+    "matches_generate_scores": true
+  },
+  "surviving_set": {
+    "library_survivors": [
+      {
+        "id": 785,
+        "piece": "The",
+        "logit": 20.242420196533203,
+        "score": 28.917743682861328,
+        "probability": 0.8297855854034424
+      },
+      {
+        "id": 4498,
+        "piece": "When",
+        "logit": 19.133544921875,
+        "score": 27.333635330200195,
+        "probability": 0.1702144294977188
+      }
+    ],
+    "top_k_table": [
+      {
+        "rank": 1,
+        "id": 785,
+        "piece": "The",
+        "logit": 20.242420196533203,
+        "probability_in_top_k": 0.7118911743164062,
+        "cumulative_probability": 0.7118911743164062,
+        "kept": true
+      },
+      {
+        "rank": 2,
+        "id": 4498,
+        "piece": "When",
+        "logit": 19.133544921875,
+        "probability_in_top_k": 0.14603067934513092,
+        "cumulative_probability": 0.857921838760376,
+        "kept": true
+      },
+      {
+        "rank": 3,
+        "id": 32564,
+        "piece": "Decode",
+        "logit": 18.40959930419922,
+        "probability_in_top_k": 0.05191513150930405,
+        "cumulative_probability": 0.909837007522583,
+        "kept": false
+      },
+      {
+        "rank": 4,
+        "id": 16014,
+        "piece": "During",
+        "logit": 18.303442001342773,
+        "probability_in_top_k": 0.044609956443309784,
+        "cumulative_probability": 0.9544469118118286,
+        "kept": false
+      },
+      {
+        "rank": 5,
+        "id": 641,
+        "piece": "In",
+        "logit": 17.714929580688477,
+        "probability_in_top_k": 0.01924448274075985,
+        "cumulative_probability": 0.9736914038658142,
+        "kept": false
+      },
+      {
+        "rank": 6,
+        "id": 4900,
+        "piece": "Dec",
+        "logit": 17.502225875854492,
+        "probability_in_top_k": 0.014201689511537552,
+        "cumulative_probability": 0.9878931045532227,
+        "kept": false
+      },
+      {
+        "rank": 7,
+        "id": 82707,
+        "piece": "KV",
+        "logit": 16.604915618896484,
+        "probability_in_top_k": 0.0039412155747413635,
+        "cumulative_probability": 0.9918343424797058,
+        "kept": false
+      },
+      {
+        "rank": 8,
+        "id": 20732,
+        "piece": "Decoder",
+        "logit": 16.490100860595703,
+        "probability_in_top_k": 0.0033450063783675432,
+        "cumulative_probability": 0.9951793551445007,
+        "kept": false
+      },
+      {
+        "rank": 9,
+        "id": 18196,
+        "piece": "decode",
+        "logit": 15.795745849609375,
+        "probability_in_top_k": 0.0012405227171257138,
+        "cumulative_probability": 0.9964198470115662,
+        "kept": false
+      },
+      {
+        "rank": 10,
+        "id": 7983,
+        "piece": "While",
+        "logit": 15.518954277038574,
+        "probability_in_top_k": 0.0008353676530532539,
+        "cumulative_probability": 0.9972552061080933,
+        "kept": false
+      },
+      {
+        "rank": 11,
+        "id": 8233,
+        "piece": "Cache",
+        "logit": 15.475615501403809,
+        "probability_in_top_k": 0.0007852163980714977,
+        "cumulative_probability": 0.9980404376983643,
+        "kept": false
+      },
+      {
+        "rank": 12,
+        "id": 42,
+        "piece": "K",
+        "logit": 15.19668960571289,
+        "probability_in_top_k": 0.0005271542468108237,
+        "cumulative_probability": 0.9985675811767578,
+        "kept": false
+      },
+      {
+        "rank": 13,
+        "id": 2121,
+        "piece": "As",
+        "logit": 14.873611450195312,
+        "probability_in_top_k": 0.0003322717093396932,
+        "cumulative_probability": 0.9988998770713806,
+        "kept": false
+      },
+      {
+        "rank": 14,
+        "id": 1249,
+        "piece": "To",
+        "logit": 14.823943138122559,
+        "probability_in_top_k": 0.0003095122810918838,
+        "cumulative_probability": 0.9992094039916992,
+        "kept": false
+      },
+      {
+        "rank": 15,
+        "id": 1912,
+        "piece": "De",
+        "logit": 14.361499786376953,
+        "probability_in_top_k": 0.00015987058577593416,
+        "cumulative_probability": 0.9993692636489868,
+        "kept": false
+      },
+      {
+        "rank": 16,
+        "id": 3862,
+        "piece": "There",
+        "logit": 14.331449508666992,
+        "probability_in_top_k": 0.00015315276687033474,
+        "cumulative_probability": 0.9995223879814148,
+        "kept": false
+      },
+      {
+        "rank": 17,
+        "id": 10642,
+        "piece": "Memory",
+        "logit": 14.309834480285645,
+        "probability_in_top_k": 0.0001484959793742746,
+        "cumulative_probability": 0.9996709227561951,
+        "kept": false
+      },
+      {
+        "rank": 18,
+        "id": 2132,
+        "piece": "It",
+        "logit": 14.177803993225098,
+        "probability_in_top_k": 0.0001229702029377222,
+        "cumulative_probability": 0.9997938871383667,
+        "kept": false
+      },
+      {
+        "rank": 19,
+        "id": 32535,
+        "piece": "Encode",
+        "logit": 14.159892082214355,
+        "probability_in_top_k": 0.00011986366007477045,
+        "cumulative_probability": 0.99991375207901,
+        "kept": false
+      },
+      {
+        "rank": 20,
+        "id": 1986,
+        "piece": "This",
+        "logit": 13.929581642150879,
+        "probability_in_top_k": 8.625769260106608e-05,
+        "cumulative_probability": 1.0,
+        "kept": false
+      }
+    ],
+    "top_p": 0.8,
+    "retained_count": 2,
+    "recomputed": {
+      "ids": [
+        785,
+        4498
+      ],
+      "pieces": [
+        "The",
+        "When"
+      ],
+      "probabilities": [
+        0.8297855854034424,
+        0.1702144294977188
+      ]
+    },
+    "ids_match": true,
+    "max_probability_difference_at_recomputed_ids": 0.0,
+    "probability_tolerance": 1e-06,
+    "probabilities_match": true,
+    "temperature_last": {
+      "ids": [
+        785,
+        4498,
+        32564,
+        16014
+      ],
+      "pieces": [
+        "The",
+        "When",
+        "Decode",
+        "During"
+      ],
+      "probabilities": [
+        0.7458677291870117,
+        0.15300031006336212,
+        0.054392892867326736,
+        0.046739064157009125
+      ]
+    },
+    "temperature_last_ids_differ": true
+  },
+  "engine": {
+    "server_props": {
+      "default_generation_settings": {
+        "id": 0,
+        "id_task": -1,
+        "n_ctx": 4096,
+        "speculative": false,
+        "is_processing": false,
+        "params": {
+          "n_predict": -1,
+          "seed": 4294967295,
+          "temperature": 0.800000011920929,
+          "dynatemp_range": 0.0,
+          "dynatemp_exponent": 1.0,
+          "top_k": 40,
+          "top_p": 0.949999988079071,
+          "min_p": 0.05000000074505806,
+          "top_n_sigma": -1.0,
+          "xtc_probability": 0.0,
+          "xtc_threshold": 0.10000000149011612,
+          "typical_p": 1.0,
+          "repeat_last_n": 64,
+          "repeat_penalty": 1.0,
+          "presence_penalty": 0.0,
+          "frequency_penalty": 0.0,
+          "dry_multiplier": 0.0,
+          "dry_base": 1.75,
+          "dry_allowed_length": 2,
+          "dry_penalty_last_n": 4096,
+          "dry_sequence_breakers": [
+            "\n",
+            ":",
+            "\"",
+            "*"
+          ],
+          "mirostat": 0,
+          "mirostat_tau": 5.0,
+          "mirostat_eta": 0.10000000149011612,
+          "stop": [],
+          "max_tokens": -1,
+          "n_keep": 0,
+          "n_discard": 0,
+          "ignore_eos": false,
+          "stream": true,
+          "logit_bias": [],
+          "n_probs": 0,
+          "min_keep": 0,
+          "grammar": "",
+          "grammar_lazy": false,
+          "grammar_triggers": [],
+          "preserved_tokens": [],
+          "chat_format": "Content-only",
+          "reasoning_format": "none",
+          "reasoning_in_content": false,
+          "thinking_forced_open": false,
+          "samplers": [
+            "penalties",
+            "dry",
+            "top_n_sigma",
+            "top_k",
+            "typ_p",
+            "top_p",
+            "min_p",
+            "xtc",
+            "temperature"
+          ],
+          "speculative.n_max": 16,
+          "speculative.n_min": 0,
+          "speculative.p_min": 0.75,
+          "timings_per_token": false,
+          "post_sampling_probs": false,
+          "lora": []
+        },
+        "prompt": "",
+        "next_token": {
+          "has_next_token": true,
+          "has_new_line": false,
+          "n_remain": -1,
+          "n_decoded": 0,
+          "stopping_word": ""
+        }
+      },
+      "total_slots": 1,
+      "model_path": "/models/Qwen2.5-0.5B-Instruct-f32.gguf",
+      "modalities": {
+        "vision": false,
+        "audio": false
+      },
+      "endpoint_slots": true,
+      "endpoint_props": false,
+      "endpoint_metrics": false,
+      "webui": true,
+      "chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- messages[0]['content'] }}\n    {%- else %}\n        {{- 'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.' }}\n    {%- endif %}\n    {{- \"\\n\\n# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}\n    {%- else %}\n        {{- '<|im_start|>system\\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) or (message.role == \"assistant\" and not message.tool_calls) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {{- '<|im_start|>' + message.role }}\n        {%- if message.content %}\n            {{- '\\n' + message.content }}\n        {%- endif %}\n        {%- for tool_call in message.tool_calls %}\n            {%- if tool_call.function is defined %}\n                {%- set tool_call = tool_call.function %}\n            {%- endif %}\n            {{- '\\n<tool_call>\\n{\"name\": \"' }}\n            {{- tool_call.name }}\n            {{- '\", \"arguments\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- '}\\n</tool_call>' }}\n        {%- endfor %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n{%- endif %}\n",
+      "bos_token": "<|endoftext|>",
+      "eos_token": "<|im_end|>",
+      "build_info": "b6500-a7a98e0fffed+firstfit"
+    },
+    "request": {
+      "prompt": [
+        151644,
+        8948,
+        198,
+        2610,
+        525,
+        264,
+        63594,
+        17847,
+        369,
+        458,
+        44378,
+        2083,
+        13,
+        151645,
+        198,
+        151644,
+        872,
+        198,
+        785,
+        84648,
+        6500,
+        27715,
+        2337,
+        16895,
+        13,
+        8429,
+        1558,
+        16895,
+        6301,
+        1495,
+        30,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ],
+      "n_predict": 1,
+      "temperature": 0.7,
+      "top_k": 20,
+      "top_p": 0.8,
+      "min_p": 0.0,
+      "n_probs": 20,
+      "post_sampling_probs": true,
+      "seed": 2,
+      "cache_prompt": false
+    },
+    "completion": {
+      "index": 0,
+      "content": "The",
+      "tokens": [],
+      "id_slot": 0,
+      "stop": true,
+      "model": "gpt-3.5-turbo",
+      "tokens_predicted": 1,
+      "tokens_evaluated": 36,
+      "generation_settings": {
+        "n_predict": 1,
+        "seed": 2,
+        "temperature": 0.699999988079071,
+        "dynatemp_range": 0.0,
+        "dynatemp_exponent": 1.0,
+        "top_k": 20,
+        "top_p": 0.800000011920929,
+        "min_p": 0.0,
+        "top_n_sigma": -1.0,
+        "xtc_probability": 0.0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1.0,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.0,
+        "dry_multiplier": 0.0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 4096,
+        "dry_sequence_breakers": [
+          "\n",
+          ":",
+          "\"",
+          "*"
+        ],
+        "mirostat": 0,
+        "mirostat_tau": 5.0,
+        "mirostat_eta": 0.10000000149011612,
+        "stop": [],
+        "max_tokens": 1,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "logit_bias": [],
+        "n_probs": 20,
+        "min_keep": 0,
+        "grammar": "",
+        "grammar_lazy": false,
+        "grammar_triggers": [],
+        "preserved_tokens": [],
+        "chat_format": "Content-only",
+        "reasoning_format": "auto",
+        "reasoning_in_content": false,
+        "thinking_forced_open": false,
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.n_max": 16,
+        "speculative.n_min": 0,
+        "speculative.p_min": 0.75,
+        "timings_per_token": false,
+        "post_sampling_probs": true,
+        "lora": []
+      },
+      "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nThe KV cache grows during decode. Why does decode slow down?<|im_end|>\n<|im_start|>assistant\n",
+      "has_new_line": false,
+      "truncated": false,
+      "stop_type": "limit",
+      "stopping_word": "",
+      "tokens_cached": 36,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 36,
+        "prompt_ms": 22.861,
+        "prompt_per_token_ms": 0.6350277777777777,
+        "prompt_per_second": 1574.7342635930186,
+        "predicted_n": 1,
+        "predicted_ms": 0.011,
+        "predicted_per_token_ms": 0.011,
+        "predicted_per_second": 90909.09090909091
+      },
+      "completion_probabilities": [
+        {
+          "id": 785,
+          "token": "The",
+          "bytes": [
+            84,
+            104,
+            101
+          ],
+          "prob": 0.7449563145637512,
+          "top_probs": [
+            {
+              "id": 785,
+              "token": "The",
+              "bytes": [
+                84,
+                104,
+                101
+              ],
+              "prob": 0.7449563145637512
+            },
+            {
+              "id": 4498,
+              "token": "When",
+              "bytes": [
+                87,
+                104,
+                101,
+                110
+              ],
+              "prob": 0.1534322202205658
+            },
+            {
+              "id": 32564,
+              "token": "Decode",
+              "bytes": [
+                68,
+                101,
+                99,
+                111,
+                100,
+                101
+              ],
+              "prob": 0.05481332913041115
+            },
+            {
+              "id": 16014,
+              "token": "During",
+              "bytes": [
+                68,
+                117,
+                114,
+                105,
+                110,
+                103
+              ],
+              "prob": 0.046798110008239746
+            }
+          ]
+        }
+      ]
+    },
+    "comparison_rows": [
+      {
+        "id": 785,
+        "piece": "The",
+        "engine_probability": 0.7449563145637512,
+        "temperature_last_probability": 0.7458677291870117,
+        "generate_probability": 0.8297855854034424
+      },
+      {
+        "id": 4498,
+        "piece": "When",
+        "engine_probability": 0.1534322202205658,
+        "temperature_last_probability": 0.15300031006336212,
+        "generate_probability": 0.1702144294977188
+      },
+      {
+        "id": 16014,
+        "piece": "During",
+        "engine_probability": 0.046798110008239746,
+        "temperature_last_probability": 0.046739064157009125,
+        "generate_probability": 0.0
+      },
+      {
+        "id": 32564,
+        "piece": "Decode",
+        "engine_probability": 0.05481332913041115,
+        "temperature_last_probability": 0.054392892867326736,
+        "generate_probability": 0.0
+      }
+    ],
+    "temperature_is_last": true,
+    "temperature_last_ids_match": true,
+    "max_probability_difference": 0.000911414623260498,
+    "probability_tolerance": 0.02,
+    "probabilities_match": true,
+    "engine_differs_from_generate": true,
+    "raw_logprob_request": {
+      "prompt": [
+        151644,
+        8948,
+        198,
+        2610,
+        525,
+        264,
+        63594,
+        17847,
+        369,
+        458,
+        44378,
+        2083,
+        13,
+        151645,
+        198,
+        151644,
+        872,
+        198,
+        785,
+        84648,
+        6500,
+        27715,
+        2337,
+        16895,
+        13,
+        8429,
+        1558,
+        16895,
+        6301,
+        1495,
+        30,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ],
+      "n_predict": 1,
+      "temperature": 0.0,
+      "top_k": 20,
+      "top_p": 0.8,
+      "min_p": 0.0,
+      "n_probs": 20,
+      "post_sampling_probs": false,
+      "seed": 2,
+      "cache_prompt": false
+    },
+    "raw_logprob_completion": {
+      "index": 0,
+      "content": "The",
+      "tokens": [],
+      "id_slot": 0,
+      "stop": true,
+      "model": "gpt-3.5-turbo",
+      "tokens_predicted": 1,
+      "tokens_evaluated": 36,
+      "generation_settings": {
+        "n_predict": 1,
+        "seed": 2,
+        "temperature": 0.0,
+        "dynatemp_range": 0.0,
+        "dynatemp_exponent": 1.0,
+        "top_k": 20,
+        "top_p": 0.800000011920929,
+        "min_p": 0.0,
+        "top_n_sigma": -1.0,
+        "xtc_probability": 0.0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1.0,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.0,
+        "dry_multiplier": 0.0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 4096,
+        "dry_sequence_breakers": [
+          "\n",
+          ":",
+          "\"",
+          "*"
+        ],
+        "mirostat": 0,
+        "mirostat_tau": 5.0,
+        "mirostat_eta": 0.10000000149011612,
+        "stop": [],
+        "max_tokens": 1,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "logit_bias": [],
+        "n_probs": 20,
+        "min_keep": 0,
+        "grammar": "",
+        "grammar_lazy": false,
+        "grammar_triggers": [],
+        "preserved_tokens": [],
+        "chat_format": "Content-only",
+        "reasoning_format": "auto",
+        "reasoning_in_content": false,
+        "thinking_forced_open": false,
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.n_max": 16,
+        "speculative.n_min": 0,
+        "speculative.p_min": 0.75,
+        "timings_per_token": false,
+        "post_sampling_probs": false,
+        "lora": []
+      },
+      "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nThe KV cache grows during decode. Why does decode slow down?<|im_end|>\n<|im_start|>assistant\n",
+      "has_new_line": false,
+      "truncated": false,
+      "stop_type": "limit",
+      "stopping_word": "",
+      "tokens_cached": 36,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 36,
+        "prompt_ms": 11.985,
+        "prompt_per_token_ms": 0.33291666666666664,
+        "prompt_per_second": 3003.7546933667086,
+        "predicted_n": 1,
+        "predicted_ms": 8.17,
+        "predicted_per_token_ms": 8.17,
+        "predicted_per_second": 122.39902080783354
+      },
+      "completion_probabilities": [
+        {
+          "id": 785,
+          "token": "The",
+          "bytes": [
+            84,
+            104,
+            101
+          ],
+          "logprob": -0.6712297797203064,
+          "top_logprobs": [
+            {
+              "id": 785,
+              "token": "The",
+              "bytes": [
+                84,
+                104,
+                101
+              ],
+              "logprob": -0.6712297797203064
+            },
+            {
+              "id": 4498,
+              "token": "When",
+              "bytes": [
+                87,
+                104,
+                101,
+                110
+              ],
+              "logprob": -1.7772763967514038
+            },
+            {
+              "id": 32564,
+              "token": "Decode",
+              "bytes": [
+                68,
+                101,
+                99,
+                111,
+                100,
+                101
+              ],
+              "logprob": -2.4978041648864746
+            },
+            {
+              "id": 16014,
+              "token": "During",
+              "bytes": [
+                68,
+                117,
+                114,
+                105,
+                110,
+                103
+              ],
+              "logprob": -2.608468532562256
+            },
+            {
+              "id": 641,
+              "token": "In",
+              "bytes": [
+                73,
+                110
+              ],
+              "logprob": -3.1992239952087402
+            },
+            {
+              "id": 4900,
+              "token": "Dec",
+              "bytes": [
+                68,
+                101,
+                99
+              ],
+              "logprob": -3.4055838584899902
+            },
+            {
+              "id": 82707,
+              "token": "KV",
+              "bytes": [
+                75,
+                86
+              ],
+              "logprob": -4.307971477508545
+            },
+            {
+              "id": 20732,
+              "token": "Decoder",
+              "bytes": [
+                68,
+                101,
+                99,
+                111,
+                100,
+                101,
+                114
+              ],
+              "logprob": -4.419839382171631
+            },
+            {
+              "id": 18196,
+              "token": "decode",
+              "bytes": [
+                100,
+                101,
+                99,
+                111,
+                100,
+                101
+              ],
+              "logprob": -5.116818904876709
+            },
+            {
+              "id": 7983,
+              "token": "While",
+              "bytes": [
+                87,
+                104,
+                105,
+                108,
+                101
+              ],
+              "logprob": -5.390293598175049
+            },
+            {
+              "id": 8233,
+              "token": "Cache",
+              "bytes": [
+                67,
+                97,
+                99,
+                104,
+                101
+              ],
+              "logprob": -5.433143138885498
+            },
+            {
+              "id": 42,
+              "token": "K",
+              "bytes": [
+                75
+              ],
+              "logprob": -5.710397243499756
+            },
+            {
+              "id": 2121,
+              "token": "As",
+              "bytes": [
+                65,
+                115
+              ],
+              "logprob": -6.034230709075928
+            },
+            {
+              "id": 1249,
+              "token": "To",
+              "bytes": [
+                84,
+                111
+              ],
+              "logprob": -6.094482898712158
+            },
+            {
+              "id": 1912,
+              "token": "De",
+              "bytes": [
+                68,
+                101
+              ],
+              "logprob": -6.543262004852295
+            },
+            {
+              "id": 3862,
+              "token": "There",
+              "bytes": [
+                84,
+                104,
+                101,
+                114,
+                101
+              ],
+              "logprob": -6.582515239715576
+            },
+            {
+              "id": 10642,
+              "token": "Memory",
+              "bytes": [
+                77,
+                101,
+                109,
+                111,
+                114,
+                121
+              ],
+              "logprob": -6.60276460647583
+            },
+            {
+              "id": 2132,
+              "token": "It",
+              "bytes": [
+                73,
+                116
+              ],
+              "logprob": -6.734553813934326
+            },
+            {
+              "id": 32535,
+              "token": "Encode",
+              "bytes": [
+                69,
+                110,
+                99,
+                111,
+                100,
+                101
+              ],
+              "logprob": -6.75068998336792
+            },
+            {
+              "id": 1986,
+              "token": "This",
+              "bytes": [
+                84,
+                104,
+                105,
+                115
+              ],
+              "logprob": -6.980767726898193
+            }
+          ]
+        }
+      ]
+    },
+    "logprob_comparison_rows": [
+      {
+        "rank": 1,
+        "id": 785,
+        "piece": "The",
+        "engine_logprob": -0.6712297797203064,
+        "transformers_logprob": -0.6698607162834515,
+        "engine_minus_transformers": -0.0013690634368549448
+      },
+      {
+        "rank": 2,
+        "id": 4498,
+        "piece": "When",
+        "engine_logprob": -1.7772763967514038,
+        "transformers_logprob": -1.7787359909416547,
+        "engine_minus_transformers": 0.0014595941902508791
+      },
+      {
+        "rank": 3,
+        "id": 32564,
+        "piece": "Decode",
+        "engine_logprob": -2.4978041648864746,
+        "transformers_logprob": -2.502681608617436,
+        "engine_minus_transformers": 0.004877443730961328
+      },
+      {
+        "rank": 4,
+        "id": 16014,
+        "piece": "During",
+        "engine_logprob": -2.608468532562256,
+        "transformers_logprob": -2.6088389114738813,
+        "engine_minus_transformers": 0.00037037891162539083
+      },
+      {
+        "rank": 5,
+        "id": 641,
+        "piece": "In",
+        "engine_logprob": -3.1992239952087402,
+        "transformers_logprob": -3.197351332128178,
+        "engine_minus_transformers": -0.0018726630805621092
+      },
+      {
+        "rank": 6,
+        "id": 4900,
+        "piece": "Dec",
+        "engine_logprob": -3.4055838584899902,
+        "transformers_logprob": -3.4100550369621625,
+        "engine_minus_transformers": 0.004471178472172266
+      },
+      {
+        "rank": 7,
+        "id": 82707,
+        "piece": "KV",
+        "engine_logprob": -4.307971477508545,
+        "transformers_logprob": -4.30736529392017,
+        "engine_minus_transformers": -0.0006061835883750533
+      },
+      {
+        "rank": 8,
+        "id": 20732,
+        "piece": "Decoder",
+        "engine_logprob": -4.419839382171631,
+        "transformers_logprob": -4.422180052220951,
+        "engine_minus_transformers": 0.0023406700493202592
+      },
+      {
+        "rank": 9,
+        "id": 18196,
+        "piece": "decode",
+        "engine_logprob": -5.116818904876709,
+        "transformers_logprob": -5.116535063207279,
+        "engine_minus_transformers": -0.00028384166942974076
+      },
+      {
+        "rank": 10,
+        "id": 7983,
+        "piece": "While",
+        "engine_logprob": -5.390293598175049,
+        "transformers_logprob": -5.39332663577808,
+        "engine_minus_transformers": 0.0030330376030311967
+      },
+      {
+        "rank": 11,
+        "id": 8233,
+        "piece": "Cache",
+        "engine_logprob": -5.433143138885498,
+        "transformers_logprob": -5.436665411412846,
+        "engine_minus_transformers": 0.003522272527347603
+      },
+      {
+        "rank": 12,
+        "id": 42,
+        "piece": "K",
+        "engine_logprob": -5.710397243499756,
+        "transformers_logprob": -5.715591307103764,
+        "engine_minus_transformers": 0.005194063604007759
+      },
+      {
+        "rank": 13,
+        "id": 2121,
+        "piece": "As",
+        "engine_logprob": -6.034230709075928,
+        "transformers_logprob": -6.038669462621342,
+        "engine_minus_transformers": 0.004438753545414009
+      },
+      {
+        "rank": 14,
+        "id": 1249,
+        "piece": "To",
+        "engine_logprob": -6.094482898712158,
+        "transformers_logprob": -6.088337774694096,
+        "engine_minus_transformers": -0.006145124018062553
+      },
+      {
+        "rank": 15,
+        "id": 1912,
+        "piece": "De",
+        "engine_logprob": -6.543262004852295,
+        "transformers_logprob": -6.550781126439701,
+        "engine_minus_transformers": 0.007519121587406197
+      },
+      {
+        "rank": 16,
+        "id": 3862,
+        "piece": "There",
+        "engine_logprob": -6.582515239715576,
+        "transformers_logprob": -6.580831404149662,
+        "engine_minus_transformers": -0.0016838355659141158
+      },
+      {
+        "rank": 17,
+        "id": 10642,
+        "piece": "Memory",
+        "engine_logprob": -6.60276460647583,
+        "transformers_logprob": -6.60244643253101,
+        "engine_minus_transformers": -0.00031817394482036576
+      },
+      {
+        "rank": 18,
+        "id": 2132,
+        "piece": "It",
+        "engine_logprob": -6.734553813934326,
+        "transformers_logprob": -6.734476919591557,
+        "engine_minus_transformers": -7.689434276958451e-05
+      },
+      {
+        "rank": 19,
+        "id": 32535,
+        "piece": "Encode",
+        "engine_logprob": -6.75068998336792,
+        "transformers_logprob": -6.752388830602299,
+        "engine_minus_transformers": 0.001698847234378853
+      },
+      {
+        "rank": 20,
+        "id": 1986,
+        "piece": "This",
+        "engine_logprob": -6.980767726898193,
+        "transformers_logprob": -6.982699270665775,
+        "engine_minus_transformers": 0.001931543767581978
+      }
+    ],
+    "max_absolute_logprob_difference": 0.007519121587406197
+  },
+  "draw": {
+    "seed": 2,
+    "token_id": 4498,
+    "piece": "When",
+    "rank_by_processed_score": 2,
+    "probability": 0.1702144294977188,
+    "in_surviving_set": true,
+    "rerun_token_id": 4498,
+    "rerun_token_matches": true,
+    "rerun_logits_match": true,
+    "rerun_scores_match": true
+  },
+  "repetition_penalty": {
+    "request_sampling_fields": {
+      "do_sample": true,
+      "temperature": 0.7,
+      "top_k": 20,
+      "top_p": 0.8
+    },
+    "checkpoint_repetition_penalty": 1.1,
+    "processors": [
+      {
+        "position": 1,
+        "class": "RepetitionPenaltyLogitsProcessor",
+        "parameters": {
+          "penalty": 1.1,
+          "prompt_ignore_length": null,
+          "logits_indices": null,
+          "cu_seq_lens_q": null
+        }
+      },
+      {
+        "position": 2,
+        "class": "TemperatureLogitsWarper",
+        "parameters": {
+          "temperature": 0.7
+        }
+      },
+      {
+        "position": 3,
+        "class": "TopKLogitsWarper",
+        "parameters": {
+          "top_k": 20,
+          "filter_value": "-inf",
+          "min_tokens_to_keep": 1
+        }
+      },
+      {
+        "position": 4,
+        "class": "TopPLogitsWarper",
+        "parameters": {
+          "top_p": 0.8,
+          "filter_value": "-inf",
+          "min_tokens_to_keep": 1
+        }
+      }
+    ],
+    "raw_logits_match_baseline": true,
+    "processed_scores_match_baseline": false,
+    "survivors": [
+      {
+        "id": 4498,
+        "piece": "When",
+        "probability": 0.49682971835136414
+      },
+      {
+        "id": 32564,
+        "piece": "Decode",
+        "probability": 0.17662712931632996
+      },
+      {
+        "id": 785,
+        "piece": "The",
+        "probability": 0.17476992309093475
+      },
+      {
+        "id": 16014,
+        "piece": "During",
+        "probability": 0.15177325904369354
+      }
+    ],
+    "drawn_token_id": 16014,
+    "drawn_piece": "During",
+    "baseline_token_id": 4498,
+    "recomputed_without_penalty": [
+      {
+        "id": 785,
+        "piece": "The",
+        "probability": 0.8297855854034424
+      },
+      {
+        "id": 4498,
+        "piece": "When",
+        "probability": 0.1702144294977188
+      }
+    ],
+    "surviving_ids_differ_from_recomputation": true,
+    "draw_in_recomputed_set": false
+  }
+}
