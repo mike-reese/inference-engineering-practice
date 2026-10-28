@@ -1,0 +1,1413 @@
+{
+  "machine_state_before_start": {
+    "sm_clock_mhz": 1493,
+    "temperature_c": 36,
+    "free_mib": 9391,
+    "load_average": [
+      0.69482421875,
+      0.53515625,
+      0.54248046875
+    ]
+  },
+  "configuration": {
+    "python": "3.12.14",
+    "httpx": "0.28.1",
+    "prometheus-client": "0.26.0",
+    "transformers": "5.20.2",
+    "huggingface_hub": "2.3.0",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "hf_hub_offline": "1",
+    "docker_run": "docker run -d --rm --name i01c-rep-315530da --gpus all --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools -v /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32:/models:ro -p 127.0.0.1::8080 telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4 -m /models/Qwen2.5-0.5B-Instruct-f32.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096 --parallel 1 --temp 0 --seed 0 --n-gpu-layers 99 --metrics",
+    "build_info": "b6500-a7a98e0fffed+firstfit",
+    "eos_token": "<|im_end|>",
+    "total_slots": 1,
+    "gpu_name_driver": "NVIDIA GeForce GTX 1080 Ti, 580.178.04",
+    "engine_image": "telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4",
+    "engine_image_id": "sha256:8cbe0ac473189ff807a993929ecc952cbf224e17fed15c063bbc5cdfd205b070",
+    "gguf_path": "/home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32/Qwen2.5-0.5B-Instruct-f32.gguf",
+    "gguf_bytes": 1982078784,
+    "gguf_sha256": "5398ce9e21beb102f3bac22625596fa8e1a3333a99696a84a6cde43a3c60c53f"
+  },
+  "kv_at_load": {
+    "log_lines": [
+      "llama_kv_cache:      CUDA0 KV buffer size =    48.00 MiB",
+      "llama_kv_cache: size =   48.00 MiB (  4096 cells,  24 layers,  1/1 seqs), K (f16):   24.00 MiB, V (f16):   24.00 MiB",
+      "llama_context: Flash Attention was auto, set to enabled"
+    ],
+    "engine": {
+      "size_mib": 48.0,
+      "cells": 4096,
+      "layers": 24,
+      "k_type": "f16",
+      "k_mib": 24.0,
+      "v_type": "f16",
+      "v_mib": 24.0
+    },
+    "predicted": {
+      "layer_shape": [
+        1,
+        2,
+        4096,
+        64
+      ],
+      "bytes_per_layer": 2097152,
+      "bytes_per_token": 12288,
+      "total_bytes": 50331648,
+      "size_mib": 48.0,
+      "k_mib": 24.0
+    },
+    "predicted_at_4_bytes_mib": 96.0,
+    "num_hidden_layers": 24
+  },
+  "prompts": {
+    "rendered": {
+      "A": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nIn one short sentence, what does the KV cache store?<|im_end|>\n<|im_start|>assistant\n",
+      "B": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nWhy does decode slow down as the KV cache grows?<|im_end|>\n<|im_start|>assistant\n"
+    },
+    "ids": {
+      "A": [
+        151644,
+        8948,
+        198,
+        2610,
+        525,
+        264,
+        63594,
+        17847,
+        369,
+        458,
+        44378,
+        2083,
+        13,
+        151645,
+        198,
+        151644,
+        872,
+        198,
+        641,
+        825,
+        2805,
+        11652,
+        11,
+        1128,
+        1558,
+        279,
+        84648,
+        6500,
+        3553,
+        30,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ],
+      "B": [
+        151644,
+        8948,
+        198,
+        2610,
+        525,
+        264,
+        63594,
+        17847,
+        369,
+        458,
+        44378,
+        2083,
+        13,
+        151645,
+        198,
+        151644,
+        872,
+        198,
+        10234,
+        1558,
+        16895,
+        6301,
+        1495,
+        438,
+        279,
+        84648,
+        6500,
+        27715,
+        30,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ]
+    },
+    "counts": {
+      "A": 35,
+      "B": 34
+    },
+    "shared_prefix": 18,
+    "eos_token": "<|im_end|>",
+    "eos_id": 151645
+  },
+  "metrics_before": {
+    "llamacpp:prompt_tokens_total": 0,
+    "llamacpp:prompt_seconds_total": 0,
+    "llamacpp:tokens_predicted_total": 0,
+    "llamacpp:tokens_predicted_seconds_total": 0,
+    "llamacpp:n_decode_total": 0,
+    "llamacpp:n_past_max_total": 0,
+    "llamacpp:n_busy_slots_per_decode_total": 0,
+    "llamacpp:prompt_tokens_seconds": 0,
+    "llamacpp:predicted_tokens_seconds": 0,
+    "llamacpp:requests_processing": 0,
+    "llamacpp:requests_deferred": 0
+  },
+  "requests": {
+    "A": {
+      "body": {
+        "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nIn one short sentence, what does the KV cache store?<|im_end|>\n<|im_start|>assistant\n",
+        "n_predict": 64,
+        "cache_prompt": false
+      },
+      "headers_ms": 2.317896,
+      "events": [
+        {
+          "ms": 25.415271,
+          "event": {
+            "index": 0,
+            "content": "The",
+            "tokens": [
+              785
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 1,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 32.314345,
+          "event": {
+            "index": 0,
+            "content": " KV",
+            "tokens": [
+              84648
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 2,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 38.890227,
+          "event": {
+            "index": 0,
+            "content": " cache",
+            "tokens": [
+              6500
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 3,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 45.456491,
+          "event": {
+            "index": 0,
+            "content": " stores",
+            "tokens": [
+              10533
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 4,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 52.022762,
+          "event": {
+            "index": 0,
+            "content": " key",
+            "tokens": [
+              1376
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 5,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 58.573468,
+          "event": {
+            "index": 0,
+            "content": "-value",
+            "tokens": [
+              19083
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 6,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 65.17107,
+          "event": {
+            "index": 0,
+            "content": " pairs",
+            "tokens": [
+              13530
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 7,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 71.739035,
+          "event": {
+            "index": 0,
+            "content": " in",
+            "tokens": [
+              304
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 8,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 78.314803,
+          "event": {
+            "index": 0,
+            "content": " memory",
+            "tokens": [
+              4938
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 9,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 84.886618,
+          "event": {
+            "index": 0,
+            "content": " for",
+            "tokens": [
+              369
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 10,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 91.452684,
+          "event": {
+            "index": 0,
+            "content": " quick",
+            "tokens": [
+              3974
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 11,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 98.019423,
+          "event": {
+            "index": 0,
+            "content": " access",
+            "tokens": [
+              2615
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 12,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 104.585458,
+          "event": {
+            "index": 0,
+            "content": " to",
+            "tokens": [
+              311
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 13,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 111.143939,
+          "event": {
+            "index": 0,
+            "content": " data",
+            "tokens": [
+              821
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 14,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 117.727656,
+          "event": {
+            "index": 0,
+            "content": ".",
+            "tokens": [
+              13
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 15,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 124.328445,
+          "event": {
+            "index": 0,
+            "content": "",
+            "tokens": [
+              151645
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 16,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 124.387623,
+          "event": {
+            "index": 0,
+            "content": "",
+            "tokens": [],
+            "id_slot": 0,
+            "stop": true,
+            "model": "gpt-3.5-turbo",
+            "tokens_predicted": 16,
+            "tokens_evaluated": 35,
+            "generation_settings": {
+              "n_predict": 64,
+              "seed": 0,
+              "temperature": 0.0,
+              "dynatemp_range": 0.0,
+              "dynatemp_exponent": 1.0,
+              "top_k": 40,
+              "top_p": 0.949999988079071,
+              "min_p": 0.05000000074505806,
+              "top_n_sigma": -1.0,
+              "xtc_probability": 0.0,
+              "xtc_threshold": 0.10000000149011612,
+              "typical_p": 1.0,
+              "repeat_last_n": 64,
+              "repeat_penalty": 1.0,
+              "presence_penalty": 0.0,
+              "frequency_penalty": 0.0,
+              "dry_multiplier": 0.0,
+              "dry_base": 1.75,
+              "dry_allowed_length": 2,
+              "dry_penalty_last_n": 4096,
+              "dry_sequence_breakers": [
+                "\n",
+                ":",
+                "\"",
+                "*"
+              ],
+              "mirostat": 0,
+              "mirostat_tau": 5.0,
+              "mirostat_eta": 0.10000000149011612,
+              "stop": [],
+              "max_tokens": 64,
+              "n_keep": 0,
+              "n_discard": 0,
+              "ignore_eos": false,
+              "stream": true,
+              "logit_bias": [],
+              "n_probs": 0,
+              "min_keep": 0,
+              "grammar": "",
+              "grammar_lazy": false,
+              "grammar_triggers": [],
+              "preserved_tokens": [],
+              "chat_format": "Content-only",
+              "reasoning_format": "auto",
+              "reasoning_in_content": false,
+              "thinking_forced_open": false,
+              "samplers": [
+                "penalties",
+                "dry",
+                "top_n_sigma",
+                "top_k",
+                "typ_p",
+                "top_p",
+                "min_p",
+                "xtc",
+                "temperature"
+              ],
+              "speculative.n_max": 16,
+              "speculative.n_min": 0,
+              "speculative.p_min": 0.75,
+              "timings_per_token": false,
+              "post_sampling_probs": false,
+              "lora": []
+            },
+            "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nIn one short sentence, what does the KV cache store?<|im_end|>\n<|im_start|>assistant\n",
+            "has_new_line": false,
+            "truncated": false,
+            "stop_type": "eos",
+            "stopping_word": "",
+            "tokens_cached": 50,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 35,
+              "prompt_ms": 23.069,
+              "prompt_per_token_ms": 0.6591142857142857,
+              "prompt_per_second": 1517.187567731588,
+              "predicted_n": 16,
+              "predicted_ms": 98.991,
+              "predicted_per_token_ms": 6.1869375,
+              "predicted_per_second": 161.63085533028254
+            }
+          }
+        }
+      ],
+      "record": {
+        "tokens": [
+          785,
+          84648,
+          6500,
+          10533,
+          1376,
+          19083,
+          13530,
+          304,
+          4938,
+          369,
+          3974,
+          2615,
+          311,
+          821,
+          13,
+          151645
+        ],
+        "contents": [
+          "The",
+          " KV",
+          " cache",
+          " stores",
+          " key",
+          "-value",
+          " pairs",
+          " in",
+          " memory",
+          " for",
+          " quick",
+          " access",
+          " to",
+          " data",
+          ".",
+          ""
+        ],
+        "chunk_ms": [
+          25.415271,
+          32.314345,
+          38.890227,
+          45.456491,
+          52.022762,
+          58.573468,
+          65.17107,
+          71.739035,
+          78.314803,
+          84.886618,
+          91.452684,
+          98.019423,
+          104.585458,
+          111.143939,
+          117.727656,
+          124.328445
+        ],
+        "n_chunks": 16,
+        "ttft_ms": 25.415271,
+        "e2e_ms": 124.387623,
+        "stop_type": "eos",
+        "stopping_word": "",
+        "truncated": false,
+        "tokens_evaluated": 35,
+        "tokens_predicted": 16,
+        "tokens_cached": 50,
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 35,
+          "prompt_ms": 23.069,
+          "prompt_per_token_ms": 0.6591142857142857,
+          "prompt_per_second": 1517.187567731588,
+          "predicted_n": 16,
+          "predicted_ms": 98.991,
+          "predicted_per_token_ms": 6.1869375,
+          "predicted_per_second": 161.63085533028254
+        }
+      },
+      "tokenizer_count": 35,
+      "remainders_ms": {
+        "ttft_minus_prompt_ms": 2.3462710000000015,
+        "e2e_minus_both_ms": 2.3276230000000027
+      },
+      "metrics_delta": {
+        "llamacpp:prompt_tokens_total": 35,
+        "llamacpp:tokens_predicted_total": 16,
+        "llamacpp:prompt_seconds_total": 0.023,
+        "llamacpp:tokens_predicted_seconds_total": 0.098,
+        "llamacpp:n_decode_total": 16
+      },
+      "metrics_after": {
+        "llamacpp:prompt_tokens_total": 35,
+        "llamacpp:prompt_seconds_total": 0.023,
+        "llamacpp:tokens_predicted_total": 16,
+        "llamacpp:tokens_predicted_seconds_total": 0.098,
+        "llamacpp:n_decode_total": 16,
+        "llamacpp:n_past_max_total": 50,
+        "llamacpp:n_busy_slots_per_decode_total": 1,
+        "llamacpp:prompt_tokens_seconds": 1521.74,
+        "llamacpp:predicted_tokens_seconds": 163.265,
+        "llamacpp:requests_processing": 0,
+        "llamacpp:requests_deferred": 0
+      }
+    },
+    "B": {
+      "body": {
+        "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nWhy does decode slow down as the KV cache grows?<|im_end|>\n<|im_start|>assistant\n",
+        "n_predict": 12,
+        "cache_prompt": false
+      },
+      "headers_ms": 2.262084,
+      "events": [
+        {
+          "ms": 15.048345,
+          "event": {
+            "index": 0,
+            "content": "When",
+            "tokens": [
+              4498
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 1,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 22.13757,
+          "event": {
+            "index": 0,
+            "content": " the",
+            "tokens": [
+              279
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 2,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 28.756629,
+          "event": {
+            "index": 0,
+            "content": " KV",
+            "tokens": [
+              84648
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 3,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 35.367734,
+          "event": {
+            "index": 0,
+            "content": " (",
+            "tokens": [
+              320
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 4,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 41.94077,
+          "event": {
+            "index": 0,
+            "content": "Key",
+            "tokens": [
+              1592
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 5,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 48.514839,
+          "event": {
+            "index": 0,
+            "content": "-",
+            "tokens": [
+              12
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 6,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 55.113483,
+          "event": {
+            "index": 0,
+            "content": "Value",
+            "tokens": [
+              1130
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 7,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 61.693381,
+          "event": {
+            "index": 0,
+            "content": ")",
+            "tokens": [
+              8
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 8,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 68.267351,
+          "event": {
+            "index": 0,
+            "content": " cache",
+            "tokens": [
+              6500
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 9,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 74.822561,
+          "event": {
+            "index": 0,
+            "content": " grows",
+            "tokens": [
+              27715
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 10,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 81.398984,
+          "event": {
+            "index": 0,
+            "content": ",",
+            "tokens": [
+              11
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 11,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 87.959042,
+          "event": {
+            "index": 0,
+            "content": " the",
+            "tokens": [
+              279
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 12,
+            "tokens_evaluated": 34
+          }
+        },
+        {
+          "ms": 88.084847,
+          "event": {
+            "index": 0,
+            "content": "",
+            "tokens": [],
+            "id_slot": 0,
+            "stop": true,
+            "model": "gpt-3.5-turbo",
+            "tokens_predicted": 12,
+            "tokens_evaluated": 34,
+            "generation_settings": {
+              "n_predict": 12,
+              "seed": 0,
+              "temperature": 0.0,
+              "dynatemp_range": 0.0,
+              "dynatemp_exponent": 1.0,
+              "top_k": 40,
+              "top_p": 0.949999988079071,
+              "min_p": 0.05000000074505806,
+              "top_n_sigma": -1.0,
+              "xtc_probability": 0.0,
+              "xtc_threshold": 0.10000000149011612,
+              "typical_p": 1.0,
+              "repeat_last_n": 64,
+              "repeat_penalty": 1.0,
+              "presence_penalty": 0.0,
+              "frequency_penalty": 0.0,
+              "dry_multiplier": 0.0,
+              "dry_base": 1.75,
+              "dry_allowed_length": 2,
+              "dry_penalty_last_n": 4096,
+              "dry_sequence_breakers": [
+                "\n",
+                ":",
+                "\"",
+                "*"
+              ],
+              "mirostat": 0,
+              "mirostat_tau": 5.0,
+              "mirostat_eta": 0.10000000149011612,
+              "stop": [],
+              "max_tokens": 12,
+              "n_keep": 0,
+              "n_discard": 0,
+              "ignore_eos": false,
+              "stream": true,
+              "logit_bias": [],
+              "n_probs": 0,
+              "min_keep": 0,
+              "grammar": "",
+              "grammar_lazy": false,
+              "grammar_triggers": [],
+              "preserved_tokens": [],
+              "chat_format": "Content-only",
+              "reasoning_format": "auto",
+              "reasoning_in_content": false,
+              "thinking_forced_open": false,
+              "samplers": [
+                "penalties",
+                "dry",
+                "top_n_sigma",
+                "top_k",
+                "typ_p",
+                "top_p",
+                "min_p",
+                "xtc",
+                "temperature"
+              ],
+              "speculative.n_max": 16,
+              "speculative.n_min": 0,
+              "speculative.p_min": 0.75,
+              "timings_per_token": false,
+              "post_sampling_probs": false,
+              "lora": []
+            },
+            "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nWhy does decode slow down as the KV cache grows?<|im_end|>\n<|im_start|>assistant\n",
+            "has_new_line": false,
+            "truncated": false,
+            "stop_type": "limit",
+            "stopping_word": "",
+            "tokens_cached": 45,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 34,
+              "prompt_ms": 12.77,
+              "prompt_per_token_ms": 0.3755882352941176,
+              "prompt_per_second": 2662.490211433046,
+              "predicted_n": 12,
+              "predicted_ms": 72.967,
+              "predicted_per_token_ms": 6.080583333333333,
+              "predicted_per_second": 164.45790562857184
+            }
+          }
+        }
+      ],
+      "record": {
+        "tokens": [
+          4498,
+          279,
+          84648,
+          320,
+          1592,
+          12,
+          1130,
+          8,
+          6500,
+          27715,
+          11,
+          279
+        ],
+        "contents": [
+          "When",
+          " the",
+          " KV",
+          " (",
+          "Key",
+          "-",
+          "Value",
+          ")",
+          " cache",
+          " grows",
+          ",",
+          " the"
+        ],
+        "chunk_ms": [
+          15.048345,
+          22.13757,
+          28.756629,
+          35.367734,
+          41.94077,
+          48.514839,
+          55.113483,
+          61.693381,
+          68.267351,
+          74.822561,
+          81.398984,
+          87.959042
+        ],
+        "n_chunks": 12,
+        "ttft_ms": 15.048345,
+        "e2e_ms": 88.084847,
+        "stop_type": "limit",
+        "stopping_word": "",
+        "truncated": false,
+        "tokens_evaluated": 34,
+        "tokens_predicted": 12,
+        "tokens_cached": 45,
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 34,
+          "prompt_ms": 12.77,
+          "prompt_per_token_ms": 0.3755882352941176,
+          "prompt_per_second": 2662.490211433046,
+          "predicted_n": 12,
+          "predicted_ms": 72.967,
+          "predicted_per_token_ms": 6.080583333333333,
+          "predicted_per_second": 164.45790562857184
+        }
+      },
+      "tokenizer_count": 34,
+      "remainders_ms": {
+        "ttft_minus_prompt_ms": 2.278345,
+        "e2e_minus_both_ms": 2.3478470000000016
+      },
+      "metrics_delta": {
+        "llamacpp:prompt_tokens_total": 34,
+        "llamacpp:tokens_predicted_total": 12,
+        "llamacpp:prompt_seconds_total": 0.012000000000000004,
+        "llamacpp:tokens_predicted_seconds_total": 0.07200000000000001,
+        "llamacpp:n_decode_total": 12
+      },
+      "metrics_after": {
+        "llamacpp:prompt_tokens_total": 69,
+        "llamacpp:prompt_seconds_total": 0.035,
+        "llamacpp:tokens_predicted_total": 28,
+        "llamacpp:tokens_predicted_seconds_total": 0.17,
+        "llamacpp:n_decode_total": 28,
+        "llamacpp:n_past_max_total": 50,
+        "llamacpp:n_busy_slots_per_decode_total": 1,
+        "llamacpp:prompt_tokens_seconds": 1971.43,
+        "llamacpp:predicted_tokens_seconds": 164.706,
+        "llamacpp:requests_processing": 0,
+        "llamacpp:requests_deferred": 0
+      }
+    },
+    "hazard": {
+      "body": {
+        "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nIn one short sentence, what does the KV cache store?<|im_end|>\n<|im_start|>assistant\n",
+        "n_predict": 64
+      },
+      "headers_ms": 2.300921,
+      "events": [
+        {
+          "ms": 13.553423,
+          "event": {
+            "index": 0,
+            "content": "The",
+            "tokens": [
+              785
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 1,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 20.456645,
+          "event": {
+            "index": 0,
+            "content": " KV",
+            "tokens": [
+              84648
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 2,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 27.056827,
+          "event": {
+            "index": 0,
+            "content": " cache",
+            "tokens": [
+              6500
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 3,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 33.636452,
+          "event": {
+            "index": 0,
+            "content": " stores",
+            "tokens": [
+              10533
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 4,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 40.236835,
+          "event": {
+            "index": 0,
+            "content": " key",
+            "tokens": [
+              1376
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 5,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 46.81728,
+          "event": {
+            "index": 0,
+            "content": "-value",
+            "tokens": [
+              19083
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 6,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 53.388967,
+          "event": {
+            "index": 0,
+            "content": " pairs",
+            "tokens": [
+              13530
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 7,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 59.974573,
+          "event": {
+            "index": 0,
+            "content": " in",
+            "tokens": [
+              304
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 8,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 66.89795,
+          "event": {
+            "index": 0,
+            "content": " memory",
+            "tokens": [
+              4938
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 9,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 73.481591,
+          "event": {
+            "index": 0,
+            "content": " for",
+            "tokens": [
+              369
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 10,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 80.063354,
+          "event": {
+            "index": 0,
+            "content": " quick",
+            "tokens": [
+              3974
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 11,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 87.013959,
+          "event": {
+            "index": 0,
+            "content": " access",
+            "tokens": [
+              2615
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 12,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 93.689804,
+          "event": {
+            "index": 0,
+            "content": " to",
+            "tokens": [
+              311
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 13,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 100.357161,
+          "event": {
+            "index": 0,
+            "content": " data",
+            "tokens": [
+              821
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 14,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 107.045088,
+          "event": {
+            "index": 0,
+            "content": ".",
+            "tokens": [
+              13
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 15,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 113.744842,
+          "event": {
+            "index": 0,
+            "content": "",
+            "tokens": [
+              151645
+            ],
+            "stop": false,
+            "id_slot": -1,
+            "tokens_predicted": 16,
+            "tokens_evaluated": 35
+          }
+        },
+        {
+          "ms": 113.796193,
+          "event": {
+            "index": 0,
+            "content": "",
+            "tokens": [],
+            "id_slot": 0,
+            "stop": true,
+            "model": "gpt-3.5-turbo",
+            "tokens_predicted": 16,
+            "tokens_evaluated": 35,
+            "generation_settings": {
+              "n_predict": 64,
+              "seed": 0,
+              "temperature": 0.0,
+              "dynatemp_range": 0.0,
+              "dynatemp_exponent": 1.0,
+              "top_k": 40,
+              "top_p": 0.949999988079071,
+              "min_p": 0.05000000074505806,
+              "top_n_sigma": -1.0,
+              "xtc_probability": 0.0,
+              "xtc_threshold": 0.10000000149011612,
+              "typical_p": 1.0,
+              "repeat_last_n": 64,
+              "repeat_penalty": 1.0,
+              "presence_penalty": 0.0,
+              "frequency_penalty": 0.0,
+              "dry_multiplier": 0.0,
+              "dry_base": 1.75,
+              "dry_allowed_length": 2,
+              "dry_penalty_last_n": 4096,
+              "dry_sequence_breakers": [
+                "\n",
+                ":",
+                "\"",
+                "*"
+              ],
+              "mirostat": 0,
+              "mirostat_tau": 5.0,
+              "mirostat_eta": 0.10000000149011612,
+              "stop": [],
+              "max_tokens": 64,
+              "n_keep": 0,
+              "n_discard": 0,
+              "ignore_eos": false,
+              "stream": true,
+              "logit_bias": [],
+              "n_probs": 0,
+              "min_keep": 0,
+              "grammar": "",
+              "grammar_lazy": false,
+              "grammar_triggers": [],
+              "preserved_tokens": [],
+              "chat_format": "Content-only",
+              "reasoning_format": "auto",
+              "reasoning_in_content": false,
+              "thinking_forced_open": false,
+              "samplers": [
+                "penalties",
+                "dry",
+                "top_n_sigma",
+                "top_k",
+                "typ_p",
+                "top_p",
+                "min_p",
+                "xtc",
+                "temperature"
+              ],
+              "speculative.n_max": 16,
+              "speculative.n_min": 0,
+              "speculative.p_min": 0.75,
+              "timings_per_token": false,
+              "post_sampling_probs": false,
+              "lora": []
+            },
+            "prompt": "<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nIn one short sentence, what does the KV cache store?<|im_end|>\n<|im_start|>assistant\n",
+            "has_new_line": false,
+            "truncated": false,
+            "stop_type": "eos",
+            "stopping_word": "",
+            "tokens_cached": 50,
+            "timings": {
+              "cache_n": 18,
+              "prompt_n": 17,
+              "prompt_ms": 11.238,
+              "prompt_per_token_ms": 0.6610588235294117,
+              "prompt_per_second": 1512.7246841074925,
+              "predicted_n": 16,
+              "predicted_ms": 100.217,
+              "predicted_per_token_ms": 6.2635625,
+              "predicted_per_second": 159.65355179261005
+            }
+          }
+        }
+      ],
+      "record": {
+        "tokens": [
+          785,
+          84648,
+          6500,
+          10533,
+          1376,
+          19083,
+          13530,
+          304,
+          4938,
+          369,
+          3974,
+          2615,
+          311,
+          821,
+          13,
+          151645
+        ],
+        "contents": [
+          "The",
+          " KV",
+          " cache",
+          " stores",
+          " key",
+          "-value",
+          " pairs",
+          " in",
+          " memory",
+          " for",
+          " quick",
+          " access",
+          " to",
+          " data",
+          ".",
+          ""
+        ],
+        "chunk_ms": [
+          13.553423,
+          20.456645,
+          27.056827,
+          33.636452,
+          40.236835,
+          46.81728,
+          53.388967,
+          59.974573,
+          66.89795,
+          73.481591,
+          80.063354,
+          87.013959,
+          93.689804,
+          100.357161,
+          107.045088,
+          113.744842
+        ],
+        "n_chunks": 16,
+        "ttft_ms": 13.553423,
+        "e2e_ms": 113.796193,
+        "stop_type": "eos",
+        "stopping_word": "",
+        "truncated": false,
+        "tokens_evaluated": 35,
+        "tokens_predicted": 16,
+        "tokens_cached": 50,
+        "timings": {
+          "cache_n": 18,
+          "prompt_n": 17,
+          "prompt_ms": 11.238,
+          "prompt_per_token_ms": 0.6610588235294117,
+          "prompt_per_second": 1512.7246841074925,
+          "predicted_n": 16,
+          "predicted_ms": 100.217,
+          "predicted_per_token_ms": 6.2635625,
+          "predicted_per_second": 159.65355179261005
+        }
+      },
+      "tokenizer_count": 35,
+      "remainders_ms": {
+        "ttft_minus_prompt_ms": 2.315423000000001,
+        "e2e_minus_both_ms": 2.341193000000004
+      },
+      "metrics_delta": {
+        "llamacpp:prompt_tokens_total": 17,
+        "llamacpp:tokens_predicted_total": 16,
+        "llamacpp:prompt_seconds_total": 0.010999999999999996,
+        "llamacpp:tokens_predicted_seconds_total": 0.1,
+        "llamacpp:n_decode_total": 16
+      },
+      "metrics_after": {
+        "llamacpp:prompt_tokens_total": 86,
+        "llamacpp:prompt_seconds_total": 0.046,
+        "llamacpp:tokens_predicted_total": 44,
+        "llamacpp:tokens_predicted_seconds_total": 0.27,
+        "llamacpp:n_decode_total": 44,
+        "llamacpp:n_past_max_total": 50,
+        "llamacpp:n_busy_slots_per_decode_total": 1,
+        "llamacpp:prompt_tokens_seconds": 1869.57,
+        "llamacpp:predicted_tokens_seconds": 162.963,
+        "llamacpp:requests_processing": 0,
+        "llamacpp:requests_deferred": 0
+      }
+    }
+  },
+  "machine_state_after_requests": {
+    "sm_clock_mhz": 1987,
+    "temperature_c": 45,
+    "free_mib": 6993,
+    "load_average": [
+      0.7197265625,
+      0.54296875,
+      0.54541015625
+    ]
+  },
+  "hazard": {
+    "prompt_n": 17,
+    "tokenizer_count": 35,
+    "cache_n": 18,
+    "shared_prefix": 18,
+    "tokens_evaluated": 35,
+    "delta_prompt_tokens_total": 17,
+    "reply_matches_a": true,
+    "totals_after_b": {
+      "llamacpp:prompt_tokens_total": 69,
+      "llamacpp:tokens_predicted_total": 28,
+      "llamacpp:prompt_seconds_total": 0.035,
+      "llamacpp:tokens_predicted_seconds_total": 0.17,
+      "llamacpp:n_decode_total": 28
+    }
+  }
+}

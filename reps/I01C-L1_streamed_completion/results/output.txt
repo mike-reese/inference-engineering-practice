@@ -1,0 +1,144 @@
+== Configuration
+python             3.12.14
+httpx              0.28.1
+prometheus-client  0.26.0
+transformers       5.20.2
+huggingface_hub    2.3.0
+model              Qwen/Qwen2.5-0.5B-Instruct
+revision           7ae557604adf67be50417f59c2c2f167def9a775
+hf_hub_offline     1
+docker_run         docker run -d --rm --name i01c-rep-315530da --gpus all --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools -v /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32:/models:ro -p 127.0.0.1::8080 telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4 -m /models/Qwen2.5-0.5B-Instruct-f32.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096 --parallel 1 --temp 0 --seed 0 --n-gpu-layers 99 --metrics
+build_info         b6500-a7a98e0fffed+firstfit
+eos_token          <|im_end|>
+total_slots        1
+gpu_name_driver    NVIDIA GeForce GTX 1080 Ti, 580.178.04
+engine_image       telos-llama:b6500-firstfit-cuda12.4-sm61-nsys2023.4.4
+engine_image_id    sha256:8cbe0ac473189ff807a993929ecc952cbf224e17fed15c063bbc5cdfd205b070
+gguf_path          /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32/Qwen2.5-0.5B-Instruct-f32.gguf
+gguf_bytes         1982078784
+gguf_sha256        5398ce9e21beb102f3bac22625596fa8e1a3333a99696a84a6cde43a3c60c53f
+
+== Point 1: KV buffer at load
+llama_kv_cache:      CUDA0 KV buffer size =    48.00 MiB
+llama_kv_cache: size =   48.00 MiB (  4096 cells,  24 layers,  1/1 seqs), K (f16):   24.00 MiB, V (f16):   24.00 MiB
+llama_context: Flash Attention was auto, set to enabled
+kv_cache_shape(config, 4096, dtype_bytes=2): KVCacheShape(layer_shape=(1, 2, 4096, 64), bytes_per_layer=2097152, bytes_per_token=12288, total_bytes=50331648)
+size MiB: engine 48.00 | predicted 48.00 | difference 0.0000
+K MiB:    engine 24.00 | predicted 24.00 | difference 0.0000
+cells 4096 vs --ctx-size 4096; layers 24 vs num_hidden_layers 24
+K and V dtype: f16, f16; at the weights' 4 bytes the model predicts 96.00 MiB
+
+== Prompts (second sources)
+token counts: A 35, B 34; shared prefix 18
+eos_token '<|im_end|>' -> ID 151645
+
+== Request A: points 2-4
+headers arrive: 2.32 ms after send (17 data: events)
+index | ID | content | ms since send | tokens_predicted
+1 | 785 | 'The' | 25.42 | 1
+2 | 84648 | ' KV' | 32.31 | 2
+3 | 6500 | ' cache' | 38.89 | 3
+4 | 10533 | ' stores' | 45.46 | 4
+5 | 1376 | ' key' | 52.02 | 5
+6 | 19083 | '-value' | 58.57 | 6
+7 | 13530 | ' pairs' | 65.17 | 7
+8 | 304 | ' in' | 71.74 | 8
+9 | 4938 | ' memory' | 78.31 | 9
+10 | 369 | ' for' | 84.89 | 10
+11 | 3974 | ' quick' | 91.45 | 11
+12 | 2615 | ' access' | 98.02 | 12
+13 | 311 | ' to' | 104.59 | 13
+14 | 821 | ' data' | 111.14 | 14
+15 | 13 | '.' | 117.73 | 15
+16 | 151645 | '' | 124.33 | 16
+value | second source(s):
+  chunks | tokens_predicted | predicted_n: 16 | 16 | 16
+  stop_type | last ID | eos ID: 'eos' | 151645 | 151645
+  tokens_evaluated | tokenizer count: 35 | 35
+  tokens_cached | count + chunks - 1: 50 | 50
+  stopping_word | truncated: '' | False
+  cache_n | prompt_n: 0 | 35
+  TTFT | prompt_ms | remainder: 25.415 | 23.069 | 2.346
+  e2e | prompt_ms + predicted_ms | remainder: 124.388 | 122.060 | 2.328
+  Δprompt_tokens_total | prompt_n: 35 | 35
+  Δtokens_predicted_total | predicted_n: 16 | 16
+  Δprompt_seconds_total×1000 | prompt_ms: 23.000 | 23.069
+  Δtokens_predicted_seconds_total×1000 | predicted_ms: 98.000 | 98.991
+timings: {'cache_n': 0, 'prompt_n': 35, 'prompt_ms': 23.069, 'prompt_per_token_ms': 0.6591142857142857, 'prompt_per_second': 1517.187567731588, 'predicted_n': 16, 'predicted_ms': 98.991, 'predicted_per_token_ms': 6.1869375, 'predicted_per_second': 161.63085533028254}
+
+== Request B: points 2-4
+headers arrive: 2.26 ms after send (13 data: events)
+index | ID | content | ms since send | tokens_predicted
+1 | 4498 | 'When' | 15.05 | 1
+2 | 279 | ' the' | 22.14 | 2
+3 | 84648 | ' KV' | 28.76 | 3
+4 | 320 | ' (' | 35.37 | 4
+5 | 1592 | 'Key' | 41.94 | 5
+6 | 12 | '-' | 48.51 | 6
+7 | 1130 | 'Value' | 55.11 | 7
+8 | 8 | ')' | 61.69 | 8
+9 | 6500 | ' cache' | 68.27 | 9
+10 | 27715 | ' grows' | 74.82 | 10
+11 | 11 | ',' | 81.40 | 11
+12 | 279 | ' the' | 87.96 | 12
+value | second source(s):
+  chunks | tokens_predicted | predicted_n: 12 | 12 | 12
+  stop_type | last ID | eos ID: 'limit' | 279 | 151645
+  tokens_evaluated | tokenizer count: 34 | 34
+  tokens_cached | count + chunks - 1: 45 | 45
+  stopping_word | truncated: '' | False
+  cache_n | prompt_n: 0 | 34
+  TTFT | prompt_ms | remainder: 15.048 | 12.770 | 2.278
+  e2e | prompt_ms + predicted_ms | remainder: 88.085 | 85.737 | 2.348
+  Δprompt_tokens_total | prompt_n: 34 | 34
+  Δtokens_predicted_total | predicted_n: 12 | 12
+  Δprompt_seconds_total×1000 | prompt_ms: 12.000 | 12.770
+  Δtokens_predicted_seconds_total×1000 | predicted_ms: 72.000 | 72.967
+timings: {'cache_n': 0, 'prompt_n': 34, 'prompt_ms': 12.77, 'prompt_per_token_ms': 0.3755882352941176, 'prompt_per_second': 2662.490211433046, 'predicted_n': 12, 'predicted_ms': 72.967, 'predicted_per_token_ms': 6.080583333333333, 'predicted_per_second': 164.45790562857184}
+
+== Request hazard: points 2-4
+headers arrive: 2.30 ms after send (17 data: events)
+index | ID | content | ms since send | tokens_predicted
+1 | 785 | 'The' | 13.55 | 1
+2 | 84648 | ' KV' | 20.46 | 2
+3 | 6500 | ' cache' | 27.06 | 3
+4 | 10533 | ' stores' | 33.64 | 4
+5 | 1376 | ' key' | 40.24 | 5
+6 | 19083 | '-value' | 46.82 | 6
+7 | 13530 | ' pairs' | 53.39 | 7
+8 | 304 | ' in' | 59.97 | 8
+9 | 4938 | ' memory' | 66.90 | 9
+10 | 369 | ' for' | 73.48 | 10
+11 | 3974 | ' quick' | 80.06 | 11
+12 | 2615 | ' access' | 87.01 | 12
+13 | 311 | ' to' | 93.69 | 13
+14 | 821 | ' data' | 100.36 | 14
+15 | 13 | '.' | 107.05 | 15
+16 | 151645 | '' | 113.74 | 16
+value | second source(s):
+  chunks | tokens_predicted | predicted_n: 16 | 16 | 16
+  stop_type | last ID | eos ID: 'eos' | 151645 | 151645
+  tokens_evaluated | tokenizer count: 35 | 35
+  tokens_cached | count + chunks - 1: 50 | 50
+  stopping_word | truncated: '' | False
+  cache_n | prompt_n: 18 | 17
+  TTFT | prompt_ms | remainder: 13.553 | 11.238 | 2.315
+  e2e | prompt_ms + predicted_ms | remainder: 113.796 | 111.455 | 2.341
+  Δprompt_tokens_total | prompt_n: 17 | 17
+  Δtokens_predicted_total | predicted_n: 16 | 16
+  Δprompt_seconds_total×1000 | prompt_ms: 11.000 | 11.238
+  Δtokens_predicted_seconds_total×1000 | predicted_ms: 100.000 | 100.217
+timings: {'cache_n': 18, 'prompt_n': 17, 'prompt_ms': 11.238, 'prompt_per_token_ms': 0.6610588235294117, 'prompt_per_second': 1512.7246841074925, 'predicted_n': 16, 'predicted_ms': 100.217, 'predicted_per_token_ms': 6.2635625, 'predicted_per_second': 159.65355179261005}
+
+== Hazard: a cached prefix counted as prefill
+prompt_n 17 (the wrong reading of prompt length) | tokenizer count 35
+cache_n 18 | shared prefix of A and B 18
+tokens_evaluated 35; Δprompt_tokens_total 17
+reply IDs equal request A's: True
+/metrics totals after B (the wrong method, not per request): {'llamacpp:prompt_tokens_total': 69, 'llamacpp:tokens_predicted_total': 28, 'llamacpp:prompt_seconds_total': 0.035, 'llamacpp:tokens_predicted_seconds_total': 0.17, 'llamacpp:n_decode_total': 28}
+
+machine state before start: {'sm_clock_mhz': 1493, 'temperature_c': 36, 'free_mib': 9391, 'load_average': (0.69482421875, 0.53515625, 0.54248046875)}
+machine state after requests: {'sm_clock_mhz': 1987, 'temperature_c': 45, 'free_mib': 6993, 'load_average': (0.7197265625, 0.54296875, 0.54541015625)}
+server: stopped i01c-rep-315530da in 0.49 s (exit 0)
+Results JSON: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01C-L1_streamed_completion/results/record.json
+Printed output: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01C-L1_streamed_completion/results/output.txt
