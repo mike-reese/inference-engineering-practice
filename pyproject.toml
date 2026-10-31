@@ -8,18 +8,22 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "cuda-python>=13.4,<14",
+    "flash-attn-4[cu13]==4.0.0b37",
+    "flashinfer-python[cu13,b12x]==0.7.2.post1",
     "genai-bench==0.0.5",
     "httpx>=0.28.1",
     "jinja2==3.1.6",
     "locust==2.47.0",
     "matplotlib>=3.11.2",
     "numpy>=2.5.4",
+    "nvtx",
     "openai==3.35.1",
     "pandas>=3.0.6",
     "prometheus-client>=0.26.0",
     "safetensors==0.8.0",
     "scipy>=1.18.1",
-    "torch==2.14.0",
+    "torch==2.15.0+cu134",
     "transformers==5.20.2",
 ]
 
@@ -33,9 +37,9 @@ dev = [
 ]
 
 [[tool.uv.index]]
-name = "pytorch-cu126"
-url = "https://download.pytorch.org/whl/cu126"
+name = "pytorch-cu134"
+url = "https://download.pytorch.org/whl/cu134"
 explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu126" }
+torch = { index = "pytorch-cu134" }
