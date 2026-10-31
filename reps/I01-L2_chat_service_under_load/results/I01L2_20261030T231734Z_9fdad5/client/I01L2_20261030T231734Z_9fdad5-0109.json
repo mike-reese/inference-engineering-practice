@@ -1,0 +1,41 @@
+{
+  "request_id": "I01L2_20261030T231734Z_9fdad5-0109",
+  "headers_ns": null,
+  "first_content_ns": null,
+  "protocol_complete_ns": null,
+  "close_ns": 184123724540976,
+  "status": null,
+  "events": [],
+  "usage": null,
+  "timings": null,
+  "finish_reason": null,
+  "error": {
+    "type": "APIConnectionError",
+    "message": "Connection error."
+  },
+  "body_reads": [],
+  "transport_trace": [
+    {
+      "ns": 184123723331203,
+      "name": "connection.connect_tcp.started"
+    },
+    {
+      "ns": 184123724488168,
+      "name": "connection.connect_tcp.failed"
+    }
+  ],
+  "diagnostic": false,
+  "detail": true,
+  "anchor_pair": {
+    "utc_ns": 1793402407618489147,
+    "monotonic_ns": 184123722460915
+  },
+  "send_ns": 184123722461622,
+  "complete": false,
+  "phase": "failure",
+  "isl": 64,
+  "block": null,
+  "control": "failure",
+  "pair": null,
+  "condition": "server_down"
+}

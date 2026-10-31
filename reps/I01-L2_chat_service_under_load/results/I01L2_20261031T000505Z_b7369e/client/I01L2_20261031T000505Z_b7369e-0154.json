@@ -1,0 +1,45 @@
+{
+  "request_id": "I01L2_20261031T000505Z_b7369e-0154",
+  "headers_ns": 186884923215485,
+  "first_content_ns": 186884955231432,
+  "protocol_complete_ns": 186885174560622,
+  "close_ns": 186885174563570,
+  "status": 200,
+  "events": [],
+  "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 256,
+    "total_tokens": 288,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": null
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 256,
+    "prompt_ms": 31.44,
+    "prompt_per_token_ms": 0.1228125,
+    "prompt_per_second": 8142.493638676844,
+    "predicted_n": 32,
+    "predicted_ms": 218.84,
+    "predicted_per_token_ms": 6.83875,
+    "predicted_per_second": 146.22555291537196
+  },
+  "finish_reason": "length",
+  "error": null,
+  "body_reads": [],
+  "transport_trace": [],
+  "diagnostic": false,
+  "detail": false,
+  "anchor_pair": {
+    "utc_ns": 1793405168813726492,
+    "monotonic_ns": 186884917698358
+  },
+  "send_ns": 186884917699791,
+  "complete": true,
+  "phase": "control",
+  "isl": 256,
+  "block": null,
+  "control": "observer",
+  "pair": 1,
+  "condition": "off"
+}

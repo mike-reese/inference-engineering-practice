@@ -1,0 +1,6565 @@
+{
+  "server_start": 0,
+  "offset_ns_interval": [
+    1793402257966703105,
+    1793402257966772646
+  ],
+  "offset_ns_used": 1793402257966737875,
+  "offset_half_width_ms": 0.0347705,
+  "joined": 78,
+  "decomposed": 63,
+  "rows": [
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0000",
+      "phase": "warmup",
+      "isl": 64,
+      "block": 0,
+      "control": null,
+      "condition": null,
+      "task": 2,
+      "n_prompt": 64,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 39.48891
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.892101
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.144729
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.231
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.127
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 38.186
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.076471
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 7.360875
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.3095
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 39.48891
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.892101
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.144729
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.231
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.127
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 38.186
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 223.7
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.762918
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 2.586562
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0001",
+      "phase": "normal",
+      "isl": 64,
+      "block": 0,
+      "control": null,
+      "condition": null,
+      "task": 35,
+      "n_prompt": 64,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.746731
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.858726
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.055217
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.614
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.5
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 21.128
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 1.677144
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.089711
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.221817
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.746731
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.858726
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.055217
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.614
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.5
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 21.128
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 228.388
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 1.264645
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.442351
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0002",
+      "phase": "warmup",
+      "isl": 256,
+      "block": 0,
+      "control": null,
+      "condition": null,
+      "task": 69,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.405559
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.755436
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.064832
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.588
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.159
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.659
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.250574
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.452075
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.148321
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.405559
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.755436
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.064832
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.588
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.159
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.659
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 223.486
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.696344
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.662491
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0003",
+      "phase": "normal",
+      "isl": 256,
+      "block": 0,
+      "control": null,
+      "condition": null,
+      "task": 102,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 2.07712
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.862031
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.064468
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.179
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.17
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 34.088
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 2.16901
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.461004
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.140496
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 2.07712
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.862031
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.064468
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.179
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.17
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 34.088
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 225.758
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.131416
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.242267
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0004",
+      "phase": "warmup",
+      "isl": 1024,
+      "block": 0,
+      "control": null,
+      "condition": null,
+      "task": 135,
+      "n_prompt": 1024,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.03831
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.599742
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.064531
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 6.225
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.238
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 111.427
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.047649
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.450704
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.225793
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.03831
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.599742
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.064531
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 6.225
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.238
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 111.427
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 232.781
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.146274
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.116744
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0005",
+      "phase": "normal",
+      "isl": 1024,
+      "block": 0,
+      "control": null,
+      "condition": null,
+      "task": 169,
+      "n_prompt": 1024,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.349777
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.692701
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.220282
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.288
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.163
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 108.05
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.082757
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.486767
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.375436
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.349777
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.692701
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.220282
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.288
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.163
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 108.05
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 224.114
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.129995
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.763252
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0006",
+      "phase": "warmup",
+      "isl": 256,
+      "block": 1,
+      "control": null,
+      "condition": null,
+      "task": 202,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.488432
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.865414
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 1.057594
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.409
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.528
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 36.431
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.326207
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.551836
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.191189
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.488432
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.865414
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 1.057594
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.409
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.528
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 36.431
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 224.432
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.599533
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.620518
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0007",
+      "phase": "normal",
+      "isl": 256,
+      "block": 1,
+      "control": null,
+      "condition": null,
+      "task": 236,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.459961
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.172957
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.053851
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.502
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 1.815
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.641
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.111838
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.487034
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.191704
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.459961
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.172957
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.053851
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.502
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 1.815
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.641
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 228.13
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.119414
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.77136
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0008",
+      "phase": "warmup",
+      "isl": 1024,
+      "block": 1,
+      "control": null,
+      "condition": null,
+      "task": 269,
+      "n_prompt": 1024,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.391688
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 2.738628
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.856373
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 7.499
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.263
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 109.328
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.103034
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 1.944932
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.173703
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.391688
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 2.738628
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.856373
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 7.499
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.263
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 109.328
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 226.714
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.808689
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.551167
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0009",
+      "phase": "normal",
+      "isl": 1024,
+      "block": 1,
+      "control": null,
+      "condition": null,
+      "task": 302,
+      "n_prompt": 1024,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.46424
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.767899
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.227507
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.674
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.212
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 108.701
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.454529
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.124946
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.128865
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.46424
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.767899
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.227507
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.674
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.212
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 108.701
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 232.253
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.686838
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.696694
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0010",
+      "phase": "warmup",
+      "isl": 64,
+      "block": 1,
+      "control": null,
+      "condition": null,
+      "task": 336,
+      "n_prompt": 64,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.145106
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.928392
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.349487
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.805
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.141
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 21.012
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.361054
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.307354
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.198149
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.145106
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.928392
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.349487
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.805
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.141
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 21.012
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 227.35
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.727045
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.666967
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0011",
+      "phase": "normal",
+      "isl": 64,
+      "block": 1,
+      "control": null,
+      "condition": null,
+      "task": 369,
+      "n_prompt": 64,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 2.299233
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.853819
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051546
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.93
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.155
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 22.18
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.844778
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.081723
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.214299
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 2.299233
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.853819
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051546
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.93
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.155
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 22.18
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 226.238
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.740821
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.711737
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0012",
+      "phase": "warmup",
+      "isl": 1024,
+      "block": 2,
+      "control": null,
+      "condition": null,
+      "task": 402,
+      "n_prompt": 1024,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.438661
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.317224
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.233687
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.956
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.246
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 108.55
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.090353
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.472601
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.168103
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.438661
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.317224
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.233687
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.956
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.246
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 108.55
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 232.508
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.162811
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.755857
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0013",
+      "phase": "normal",
+      "isl": 1024,
+      "block": 2,
+      "control": null,
+      "condition": null,
+      "task": 436,
+      "n_prompt": 1024,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.631841
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.772843
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.206439
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 5.021
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.386
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 109.647
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.089188
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.406473
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.16758
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.631841
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.772843
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.206439
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 5.021
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.386
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 109.647
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 225.629
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.127317
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.123689
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0014",
+      "phase": "warmup",
+      "isl": 64,
+      "block": 2,
+      "control": null,
+      "condition": null,
+      "task": 469,
+      "n_prompt": 64,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.126919
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.627864
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044829
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.315
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.132
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 21.115
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 2.692789
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.070556
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.198009
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.126919
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.627864
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044829
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.315
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.132
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 21.115
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 222.729
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.249131
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.209989
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0015",
+      "phase": "normal",
+      "isl": 64,
+      "block": 2,
+      "control": null,
+      "condition": null,
+      "task": 502,
+      "n_prompt": 64,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.491799
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.041837
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.057837
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.191
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.141
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 20.738
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.33792
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.562561
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.206941
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.491799
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.041837
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.057837
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.191
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.141
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 20.738
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 224.373
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.125825
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.138757
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0016",
+      "phase": "warmup",
+      "isl": 256,
+      "block": 2,
+      "control": null,
+      "condition": null,
+      "task": 536,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.349788
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.53289
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.046664
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.058
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.181
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.697
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.651613
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 1.009897
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.192192
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.349788
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.53289
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.046664
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.058
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.181
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.697
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 226.054
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.142829
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 5.587527
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0017",
+      "phase": "normal",
+      "isl": 256,
+      "block": 2,
+      "control": null,
+      "condition": null,
+      "task": 569,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.532569
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.829876
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049534
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.919
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.175
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.439
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.206895
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.452852
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.203863
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.532569
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.829876
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049534
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.919
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.175
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.439
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 219.44
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.57275
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.555106
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0018",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 606,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.328236
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 2.190389
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.059193
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.955
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.711
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.78
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.627535
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.072257
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 1.085128
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.328236
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 2.190389
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.059193
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.955
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.711
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.78
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 559.595
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.164072
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.055067
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0019",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 639,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.997309
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.921218
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051917
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.255
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.457
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 42.54
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.129647
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.538645
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.22281
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.997309
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.921218
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051917
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.255
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.457
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 42.54
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 550.772
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.658076
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.608648
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0020",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 673,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.339868
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 5.073481
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.565099
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.157
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.206
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.613
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.112751
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.48755
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.257088
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.339868
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 5.073481
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.565099
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.157
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.206
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.613
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 553.999
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.137315
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.982695
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0021",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 707,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.499234
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.808146
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.262072
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.369
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.165
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 42.519
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.120606
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.470136
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.218729
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.499234
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.808146
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.262072
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.369
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.165
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 42.519
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 546.4
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.179394
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.957603
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0022",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 740,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.209216
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.705898
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.055238
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.44
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.144
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.337
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.075628
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.368952
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.152577
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.209216
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.705898
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.055238
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.44
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.144
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.337
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 553.136
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.15204
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.066577
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0023",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 774,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.49479
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.638982
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044009
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.431
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.201
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 33.394
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.091753
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.549176
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.171208
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.49479
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.638982
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044009
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.431
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.201
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 33.394
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 226.607
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.233003
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.027842
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0024",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 807,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.459402
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.944731
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.0494
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.125
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.163
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 33.874
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 1.567681
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.154848
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.225561
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.459402
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.944731
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.0494
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.125
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.163
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 33.874
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 225.022
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.149979
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.524627
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0025",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 841,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.145192
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.677253
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050843
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.108
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.162
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.174
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.124491
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.611787
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.199196
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.145192
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.677253
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050843
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.108
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.162
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.174
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 224.809
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.151245
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.106826
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0026",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 874,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.405117
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.765238
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050673
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.952
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.342
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.214
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.457165
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.588435
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.177868
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.405117
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.765238
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050673
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.952
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.342
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.214
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 234.715
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.293211
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.078309
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0027",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 907,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.432499
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.638488
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.057114
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.268
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.166
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.163
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.115695
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.391345
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.121421
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.432499
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.638488
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.057114
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.268
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.166
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.163
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 227.871
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.193794
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.863675
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0028",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 940,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.382914
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.975297
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.136557
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.145
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.139
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 35.208
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.093093
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.435253
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.182872
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.382914
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.975297
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.136557
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.145
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.139
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 35.208
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 221.248
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.145455
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.025967
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0029",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 974,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.30321
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.132749
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.211208
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.364
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.146
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 34.563
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.102996
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.485317
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.199241
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.30321
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.132749
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.211208
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.364
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.146
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 34.563
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 224.828
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.561848
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.734348
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0030",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1007,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.513077
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.828939
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.056313
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.669
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.157
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.291
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.105074
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.455163
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.176979
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.513077
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.828939
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.056313
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.669
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.157
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.291
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 229.193
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.090552
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.99681
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0031",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1040,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.500119
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.765627
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.057987
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.409
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.159
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.351
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.129535
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.482294
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.201563
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.500119
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.765627
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.057987
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.409
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.159
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.351
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 225.619
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.144693
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.277859
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0032",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1074,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.787146
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.168973
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.137254
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.073
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.177
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 36.379
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 2.491916
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.083408
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.200335
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.787146
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.168973
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.137254
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 4.073
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.177
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 36.379
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 226.249
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.141652
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.058533
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0033",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1107,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.470811
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.187239
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.203083
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.275
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.182
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 47.137
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.702873
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.072768
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.198192
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.470811
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.187239
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.203083
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.275
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.182
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 47.137
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 554.059
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.717717
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.704254
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0034",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1141,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.356797
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.616481
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050421
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.308
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.19
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 42.675
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.108095
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.550698
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.214109
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.356797
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.616481
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050421
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.308
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.19
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 42.675
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 564.076
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.128171
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.013668
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0035",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1174,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.414576
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.610785
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051017
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.152
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.131
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 46.751
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.099965
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.338506
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.142604
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.414576
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.610785
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051017
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.152
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.131
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 46.751
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 548.841
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.139392
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.783245
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0036",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1208,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.057686
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.590192
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.053936
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.696
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.174
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 40.727
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.138632
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.390114
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.146088
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.057686
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.590192
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.053936
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.696
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.174
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 40.727
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 544.945
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.164476
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.814769
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0037",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1242,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.332427
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.681577
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.053356
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.74
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.154
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 45.909
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.135338
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.570426
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.165977
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.332427
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.681577
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.053356
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.74
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.154
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 45.909
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 537.913
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.153168
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.017865
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0038",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1275,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.213938
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.628351
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050189
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.856
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.155
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 44.918
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.101943
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.367002
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.174277
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.213938
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.628351
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050189
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.856
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.155
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 44.918
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 548.916
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.104025
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.678084
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0039",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1309,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.87219
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.525114
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044643
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.058
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.15
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 39.439
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.062181
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.270596
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.140595
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.87219
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.525114
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044643
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.058
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.15
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 39.439
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 543.663
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.88321
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.39985
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0040",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1343,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.208731
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.804466
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.153745
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.818
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.175
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.972
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.122702
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.704343
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.332621
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.208731
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.804466
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.153745
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.818
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.175
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 41.972
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 498.824
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.109413
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.589282
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0041",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1376,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.844219
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.490188
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.06754
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.063
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.146
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 39.104
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.072033
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.241521
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.13317
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.844219
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.490188
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.06754
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.063
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.146
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 39.104
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 482.543
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.098316
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.662129
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0042",
+      "phase": "diagnostic",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "diagnostic",
+      "task": 1410,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.846863
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.483773
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049953
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.048
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.143
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 39.412
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.084897
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.292885
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.145444
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.846863
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.483773
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049953
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.048
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.143
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 39.412
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 483.907
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.164197
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.06676
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0043",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1443,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.06437
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.943176
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.055712
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.525
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.186
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.568
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.081735
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.488162
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.174833
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.06437
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.943176
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.055712
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.525
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.186
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.568
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 225.378
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.226866
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.990852
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0044",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1477,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.123529
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.70433
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050459
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.183
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.162
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.722
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.090531
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.472068
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.185917
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.123529
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.70433
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.050459
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.183
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.162
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.722
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 217.887
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.101332
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.566095
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0045",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1510,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.843943
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.493453
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.048204
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.13
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.159
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.681
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.070052
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.314667
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.109664
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.843943
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.493453
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.048204
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.13
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.159
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.681
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 209.512
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.0844
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.651082
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0046",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1543,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.824729
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.448277
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.047151
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.04
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.139
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.654
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.077281
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.299304
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.110631
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.824729
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.448277
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.047151
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.04
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.139
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.654
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 214.433
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.104686
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.561963
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0047",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "diagnostic",
+      "condition": "normal",
+      "task": 1576,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.839233
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.489957
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044105
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.033
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.132
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.746
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.063562
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.241669
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.110009
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.839233
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.489957
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.044105
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.033
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.132
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.746
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 212.128
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.115982
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.549735
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0048",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 1610,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.86267
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.503504
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.052545
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.073
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.149
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.744
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.064459
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.301269
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.112103
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.86267
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.503504
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.052545
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.073
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.149
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.744
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 212.65
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.088283
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.5861
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0049",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 1643,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.468416
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.493274
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.046321
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.366
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.286
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 35.365
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.079142
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.464121
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.124982
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.468416
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 1.493274
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.046321
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.366
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.286
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 35.365
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 229.409
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.137959
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.908343
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0050",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 1676,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.441804
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.847461
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.052371
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.637
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.174
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.478
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.569362
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.059907
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.176282
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.441804
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.847461
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.052371
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.637
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.174
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.478
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 226.199
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.112385
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 1.019818
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0051",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 1710,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.323909
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.631694
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049594
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.226
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.14
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.177
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.365782
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.374253
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.18743
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.323909
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.631694
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049594
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.226
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.14
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.177
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 214.869
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.099999
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.598358
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0052",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 1743,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.84199
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.518832
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.047904
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.077
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.142
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 34.495
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.06278
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.31203
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.110203
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.84199
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.518832
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.047904
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.077
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.142
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 34.495
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 213.199
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.097639
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.564203
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0063",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2107,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.40425
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.796244
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.056119
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.149
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.158
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.096
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.979964
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.06823
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.190206
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.40425
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.796244
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.056119
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 3.149
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.158
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.096
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 219.594
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.137881
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.533348
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0064",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2140,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.882605
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.52243
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.05163
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.061
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.142
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.185
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.058631
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.420182
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.119119
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.882605
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.52243
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.05163
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.061
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.142
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 32.185
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 211.914
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.09339
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.647
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0065",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2174,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.851791
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.536284
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.059458
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.059
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.154
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.857
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.061861
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.289028
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.111701
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.851791
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.536284
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.059458
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.059
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.154
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.857
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 213.334
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.107497
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.641173
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0066",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2207,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.844178
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.486809
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.06189
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.038
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.132
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.768
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.066238
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.279701
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.112482
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.844178
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.486809
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.06189
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.038
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.132
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.768
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 213.443
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.109407
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.620445
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0067",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2240,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.858438
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.494994
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049811
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.05
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.134
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.176
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.049281
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.296638
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.112889
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.858438
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.494994
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049811
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.05
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.134
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.176
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 214.854
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.078734
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.58457
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0068",
+      "phase": "warmup",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2274,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.10536
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.747759
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049729
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.923
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.145
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.557
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.101943
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.476389
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.190967
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 1.10536
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.747759
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.049729
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.923
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.145
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 31.557
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 224.813
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.673883
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.710383
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0069",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2307,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.875678
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.521721
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.05142
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.057
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.142
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.617
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.066052
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.281753
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.111688
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.875678
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.521721
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.05142
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.057
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.142
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.617
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 213.564
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.067335
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.692411
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0070",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2340,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.826246
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.525372
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.04906
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.031
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.109
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.88
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.034771
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.262862
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.118066
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.826246
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.525372
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.04906
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.031
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.109
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.88
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 224.386
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.053093
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.608632
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0071",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2374,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.869072
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.464883
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051247
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.045
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.129
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 35.584
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.080818
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.314112
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.118015
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.869072
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.464883
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.051247
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.045
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.129
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 35.584
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 207.269
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.073619
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.580859
+        }
+      ]
+    },
+    {
+      "request_id": "I01L2_20261030T231734Z_9fdad5-0072",
+      "phase": "control",
+      "isl": 256,
+      "block": null,
+      "control": "observer",
+      "condition": "on",
+      "task": 2407,
+      "n_prompt": 256,
+      "ttft": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.88262
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.479379
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.042915
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.392
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.135
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.648
+        },
+        {
+          "name": "server_send",
+          "clock": "log->pcap",
+          "ms": 0.060725
+        },
+        {
+          "name": "network_to_client",
+          "clock": "pcap->client",
+          "ms": 0.331918
+        },
+        {
+          "name": "client_parse",
+          "clock": "client",
+          "ms": 0.110005
+        }
+      ],
+      "e2e": [
+        {
+          "name": "client_before_connect",
+          "clock": "client",
+          "ms": 0.88262
+        },
+        {
+          "name": "network_to_server",
+          "clock": "client->pcap",
+          "ms": 0.479379
+        },
+        {
+          "name": "server_receive",
+          "clock": "pcap->log",
+          "ms": 0.042915
+        },
+        {
+          "name": "template_tokenize",
+          "clock": "log",
+          "ms": 2.392
+        },
+        {
+          "name": "queue",
+          "clock": "log",
+          "ms": 0.135
+        },
+        {
+          "name": "launch_to_first_result",
+          "clock": "log",
+          "ms": 30.648
+        },
+        {
+          "name": "decode",
+          "clock": "log",
+          "ms": 228.389
+        },
+        {
+          "name": "server_send_rest",
+          "clock": "log->pcap",
+          "ms": 0.113785
+        },
+        {
+          "name": "network_and_client_rest",
+          "clock": "pcap->client",
+          "ms": 0.57621
+        }
+      ]
+    }
+  ]
+}

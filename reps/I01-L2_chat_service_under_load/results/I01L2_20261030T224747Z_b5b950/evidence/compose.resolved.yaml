@@ -1,0 +1,264 @@
+name: ie-i01-l2
+services:
+  capture:
+    cap_add:
+      - NET_RAW
+    cap_drop:
+      - ALL
+    command:
+      - tcpdump
+      - -i
+      - eth0
+      - -p
+      - -n
+      - -s
+      - "0"
+      - -U
+      - --time-stamp-precision=nano
+      - -w
+      - /cap/I01L2_20261030T224747Z_b5b950_s7.pcap
+      - tcp port 8080
+    image: ie-capture:alpine3.20
+    mem_limit: "268435456"
+    network_mode: service:server
+    volumes:
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01-L2_chat_service_under_load/results/I01L2_20261030T224747Z_b5b950
+        target: /cap
+        bind: {}
+    build:
+      context: /home/mike/Work/Code/Personal/inference-engineering-practice/deploy/capture
+      dockerfile: Dockerfile
+    depends_on:
+      server:
+        condition: service_started
+        required: true
+  client:
+    environment:
+      CONTROL_DIR: /control
+      RECORDS_DIR: /records
+      SERVER_BASE_URL: http://server:8080/v1
+    image: ie-client:i01-l2
+    mem_limit: "536870912"
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01-L2_chat_service_under_load/results/I01L2_20261030T224747Z_b5b950/control
+        target: /control
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01-L2_chat_service_under_load/results/I01L2_20261030T224747Z_b5b950/client
+        target: /records
+        bind: {}
+    build:
+      context: /home/mike/Work/Code/Personal/inference-engineering-practice
+      dockerfile: deploy/client/Dockerfile
+    depends_on:
+      server:
+        condition: service_healthy
+        required: true
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 9410
+        protocol: tcp
+  dcgm:
+    command:
+      - -c
+      - "1000"
+      - -f
+      - /etc/dcgm-exporter/selected.csv
+    devices:
+      - source: /dev/nvidia-uvm
+        target: /dev/nvidia-uvm
+        permissions: rwm
+      - source: /dev/nvidia-uvm-tools
+        target: /dev/nvidia-uvm-tools
+        permissions: rwm
+    gpus:
+      - count: -1
+    image: nvidia/dcgm-exporter:4.3.1-4.4.1-ubuntu22.04@sha256:64f322a826599664a1fe5ea4e3f76b7b0984142050e7047d63ae1d6687b4b1aa
+    mem_limit: "1073741824"
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/monitoring/dcgm.csv
+        target: /etc/dcgm-exporter/selected.csv
+        read_only: true
+        bind: {}
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 9400
+        protocol: tcp
+  grafana:
+    environment:
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
+    image: grafana/grafana:13.3.0@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205
+    mem_limit: "1073741824"
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/monitoring/grafana/provisioning/datasources
+        target: /etc/grafana/provisioning/datasources
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/monitoring/grafana/provisioning/dashboards
+        target: /etc/grafana/provisioning/dashboards
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/monitoring/grafana/dashboards
+        target: /var/lib/grafana/dashboards
+        read_only: true
+        bind: {}
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 3000
+        protocol: tcp
+  node:
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/host/root
+      - --collector.disable-defaults
+      - --collector.cpu
+      - --collector.meminfo
+      - --collector.loadavg
+      - --collector.uname
+      - --collector.stat
+    image: prom/node-exporter:v1.12.1@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+    mem_limit: "134217728"
+    networks:
+      default: null
+    pid: host
+    uts: host
+    volumes:
+      - type: bind
+        source: /proc
+        target: /host/proc
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /sys
+        target: /host/sys
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /
+        target: /host/root
+        read_only: true
+        bind:
+          propagation: rslave
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 9100
+        protocol: tcp
+  prometheus:
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=2h
+      - --storage.tsdb.retention.size=128MB
+    image: prom/prometheus:v3.13.5@sha256:aafa9d694e6a883c02db516d9f6e5b84e14195f49a2a6456a4cca815edda72b9
+    mem_limit: "536870912"
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/monitoring/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/monitoring/rules.yml
+        target: /etc/prometheus/rules.yml
+        read_only: true
+        bind: {}
+      - type: volume
+        source: prometheus-data
+        target: /prometheus
+        volume: {}
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 9090
+        protocol: tcp
+  server:
+    command:
+      - --model
+      - /model/model.gguf
+      - --port
+      - "8080"
+      - --host
+      - 0.0.0.0
+      - --ctx-size
+      - "4096"
+      - --parallel
+      - "1"
+      - --temp
+      - "0"
+      - --seed
+      - "0"
+      - --n-gpu-layers
+      - "99"
+      - --metrics
+      - -lv
+      - "1"
+      - --log-timestamps
+      - --log-prefix
+      - --log-file
+      - /logs/I01L2_20261030T224747Z_b5b950_s7.log
+    devices:
+      - source: /dev/nvidia-uvm
+        target: /dev/nvidia-uvm
+        permissions: rwm
+      - source: /dev/nvidia-uvm-tools
+        target: /dev/nvidia-uvm-tools
+        permissions: rwm
+    gpus:
+      - count: -1
+    image: ie-llama-cpp-server:b6500-cuda12.4-sm61
+    mem_limit: "8589934592"
+    networks:
+      default: null
+    pull_policy: never
+    volumes:
+      - type: bind
+        source: /home/mike/.local/share/telos-models/qwen2.5-0.5b-instruct-f32/Qwen2.5-0.5B-Instruct-f32.gguf
+        target: /model/model.gguf
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I01-L2_chat_service_under_load/results/I01L2_20261030T224747Z_b5b950
+        target: /logs
+        bind: {}
+    healthcheck:
+      timeout: 2s
+      interval: 2s
+      retries: 30
+      start_period: 5s
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 8080
+        protocol: tcp
+networks:
+  default:
+    name: ie-i01-l2_default
+volumes:
+  prometheus-data:
+    name: ie-i01-l2_prometheus-data

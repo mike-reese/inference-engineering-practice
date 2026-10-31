@@ -1,0 +1,20 @@
+{
+  "step": 10,
+  "ok": true,
+  "locust": [
+    {
+      "name": "normal isl=256",
+      "num_requests": 8,
+      "num_failures": 0,
+      "median_ms": 260,
+      "p95_ms": 280,
+      "response_times": {
+        "240": 3,
+        "260": 2,
+        "280": 1,
+        "250": 1,
+        "270": 1
+      }
+    }
+  ]
+}

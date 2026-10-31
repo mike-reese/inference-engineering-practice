@@ -1,0 +1,17 @@
+{
+  "step": 5,
+  "ok": true,
+  "locust": [
+    {
+      "name": "warmup isl=256",
+      "num_requests": 3,
+      "num_failures": 0,
+      "median_ms": 258.432326,
+      "p95_ms": 260,
+      "response_times": {
+        "260": 2,
+        "240": 1
+      }
+    }
+  ]
+}

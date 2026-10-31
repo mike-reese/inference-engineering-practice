@@ -1,0 +1,480 @@
+{
+  "meta": {
+    "type": "db",
+    "canSave": false,
+    "canEdit": false,
+    "canAdmin": false,
+    "canStar": false,
+    "canDelete": false,
+    "slug": "i01-l2-chat-service",
+    "url": "/d/i01-l2/i01-l2-chat-service",
+    "expires": "0001-01-01T00:00:00Z",
+    "created": "2026-10-30T22:51:39Z",
+    "updated": "2026-10-30T22:51:39Z",
+    "updatedBy": "Anonymous",
+    "createdBy": "Anonymous",
+    "version": 1,
+    "hasAcl": false,
+    "isFolder": false,
+    "apiVersion": "v0alpha1",
+    "folderId": 0,
+    "folderUid": "",
+    "folderTitle": "General",
+    "folderUrl": "",
+    "provisioned": true,
+    "provisionedExternalId": "i01_l2.json",
+    "annotationsPermissions": {
+      "dashboard": {
+        "canAdd": false,
+        "canEdit": false,
+        "canDelete": false
+      }
+    }
+  },
+  "dashboard": {
+    "id": 4113813041848320,
+    "panels": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "targets": [
+          {
+            "expr": "sum by (phase) (rate(ie_client_requests_total[1m]))",
+            "legendFormat": "{{phase}}",
+            "refId": "A"
+          }
+        ],
+        "title": "Traffic: requests/s by phase",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "id": 2,
+        "targets": [
+          {
+            "expr": "sum by (phase) (rate(ie_client_tokens_total{direction=\"input\"}[5m])) / sum by (phase) (rate(ie_client_requests_total{outcome=\"complete\"}[5m]))",
+            "legendFormat": "input {{phase}}",
+            "refId": "A"
+          },
+          {
+            "expr": "sum by (phase) (rate(ie_client_tokens_total{direction=\"output\"}[5m])) / sum by (phase) (rate(ie_client_requests_total{outcome=\"complete\"}[5m]))",
+            "legendFormat": "output {{phase}}",
+            "refId": "B"
+          }
+        ],
+        "title": "Sequence lengths: mean tokens per complete request",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "id": 3,
+        "targets": [
+          {
+            "expr": "sum by (phase, outcome) (increase(ie_client_requests_total[1m]))",
+            "legendFormat": "{{phase}} {{outcome}}",
+            "refId": "A"
+          }
+        ],
+        "title": "Responses / errors: finished requests by outcome",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "id": 4,
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, sum by (le, phase) (rate(ie_client_ttft_seconds_bucket[30s])))",
+            "legendFormat": "P50 {{phase}}",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum by (le, phase) (rate(ie_client_ttft_seconds_bucket[30s])))",
+            "legendFormat": "P95 {{phase}}",
+            "refId": "B"
+          }
+        ],
+        "title": "Latency: client TTFT P50 / P95 by phase",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "id": 5,
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, sum by (le, phase) (rate(ie_client_e2e_seconds_bucket[30s])))",
+            "legendFormat": "P50 {{phase}}",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum by (le, phase) (rate(ie_client_e2e_seconds_bucket[30s])))",
+            "legendFormat": "P95 {{phase}}",
+            "refId": "B"
+          }
+        ],
+        "title": "Latency: client e2e P50 / P95 by phase",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
+        "id": 6,
+        "targets": [
+          {
+            "expr": "up",
+            "legendFormat": "{{job}}",
+            "refId": "A"
+          }
+        ],
+        "title": "Readiness: scrape targets up",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 24
+        },
+        "id": 7,
+        "targets": [
+          {
+            "expr": "ALERTS{alertname=\"InferenceServerDown\"}",
+            "legendFormat": "{{alertstate}}",
+            "refId": "A"
+          }
+        ],
+        "title": "Readiness: InferenceServerDown alert",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "A"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "percent"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "B"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "rotmhz"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "C"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "watt"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "D"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "celsius"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 24
+        },
+        "id": 8,
+        "targets": [
+          {
+            "expr": "DCGM_FI_DEV_GPU_UTIL",
+            "legendFormat": "util GPU {{gpu}}",
+            "refId": "A"
+          },
+          {
+            "expr": "DCGM_FI_DEV_SM_CLOCK",
+            "legendFormat": "SM clock GPU {{gpu}}",
+            "refId": "B"
+          },
+          {
+            "expr": "DCGM_FI_DEV_POWER_USAGE",
+            "legendFormat": "power GPU {{gpu}}",
+            "refId": "C"
+          },
+          {
+            "expr": "DCGM_FI_DEV_GPU_TEMP",
+            "legendFormat": "temp GPU {{gpu}}",
+            "refId": "D"
+          }
+        ],
+        "title": "Utilization: GPU (util %, SM clock, power, temperature)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "A"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "percentunit"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "B"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "bytes"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 32
+        },
+        "id": 9,
+        "targets": [
+          {
+            "expr": "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[1m]))",
+            "legendFormat": "CPU busy",
+            "refId": "A"
+          },
+          {
+            "expr": "node_memory_MemAvailable_bytes",
+            "legendFormat": "memory available",
+            "refId": "B"
+          }
+        ],
+        "title": "Utilization: host CPU busy and memory available",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 32
+        },
+        "id": 10,
+        "targets": [
+          {
+            "expr": "llamacpp:requests_processing",
+            "legendFormat": "server processing",
+            "refId": "A"
+          },
+          {
+            "expr": "llamacpp:requests_deferred",
+            "legendFormat": "server deferred",
+            "refId": "B"
+          },
+          {
+            "expr": "sum by (phase) (ie_client_in_flight)",
+            "legendFormat": "client in flight {{phase}}",
+            "refId": "C"
+          }
+        ],
+        "title": "Queue depth: server processing / deferred, client in flight",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-local"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 40
+        },
+        "id": 11,
+        "targets": [
+          {
+            "expr": "rate(llamacpp:prompt_seconds_total[5m]) / rate(llamacpp:prompt_tokens_total[5m])",
+            "legendFormat": "per prompt token",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(llamacpp:tokens_predicted_seconds_total[5m]) / rate(llamacpp:tokens_predicted_total[5m])",
+            "legendFormat": "per generated token",
+            "refId": "B"
+          }
+        ],
+        "title": "Phase timings: engine seconds per prompt / generated token",
+        "type": "timeseries"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 39,
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "title": "I01-L2 chat service",
+    "uid": "i01-l2",
+    "version": 1
+  }
+}

@@ -1,0 +1,2837 @@
+0.00.000.437 I build: 6500 (a7a98e0ff) with cc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 for x86_64-linux-gnu
+0.00.000.466 I system info: n_threads = 8, n_threads_batch = 8, total_threads = 16
+0.00.000.498 I 
+0.00.000.532 I system_info: n_threads = 8 (n_threads_batch = 8) / 16 | CUDA : ARCHS = 610 | USE_GRAPHS = 1 | PEER_MAX_BATCH_SIZE = 128 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | BMI2 = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | 
+0.00.000.533 I 
+0.00.000.585 I main: binding port with default address family
+0.00.001.837 I main: HTTP server is listening, hostname: 0.0.0.0, port: 8080, http threads: 15
+0.00.001.848 I main: loading model
+0.00.001.856 I srv    load_model: loading model '/model/model.gguf'
+0.00.042.725 I llama_model_load_from_file_impl: using device CUDA0 (NVIDIA GeForce GTX 1080 Ti) (0000:01:00.0) - 10189 MiB free
+0.00.066.877 I llama_model_loader: loaded meta data with 25 key-value pairs and 290 tensors from /model/model.gguf (version GGUF V3 (latest))
+0.00.066.897 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.00.066.908 I llama_model_loader: - kv   0:                       general.architecture str              = qwen2
+0.00.066.908 I llama_model_loader: - kv   1:                               general.type str              = model
+0.00.066.910 I llama_model_loader: - kv   2:                               general.name str              = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.066.913 I llama_model_loader: - kv   3:                           general.finetune str              = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.066.913 I llama_model_loader: - kv   4:                         general.size_label str              = 494M
+0.00.066.916 I llama_model_loader: - kv   5:                          qwen2.block_count u32              = 24
+0.00.066.917 I llama_model_loader: - kv   6:                       qwen2.context_length u32              = 32768
+0.00.066.918 I llama_model_loader: - kv   7:                     qwen2.embedding_length u32              = 896
+0.00.066.919 I llama_model_loader: - kv   8:                  qwen2.feed_forward_length u32              = 4864
+0.00.066.919 I llama_model_loader: - kv   9:                 qwen2.attention.head_count u32              = 14
+0.00.066.920 I llama_model_loader: - kv  10:              qwen2.attention.head_count_kv u32              = 2
+0.00.066.929 I llama_model_loader: - kv  11:                       qwen2.rope.freq_base f32              = 1000000.000000
+0.00.066.931 I llama_model_loader: - kv  12:     qwen2.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.00.066.931 I llama_model_loader: - kv  13:                          general.file_type u32              = 0
+0.00.066.932 I llama_model_loader: - kv  14:               general.quantization_version u32              = 2
+0.00.066.932 I llama_model_loader: - kv  15:                       tokenizer.ggml.model str              = gpt2
+0.00.066.933 I llama_model_loader: - kv  16:                         tokenizer.ggml.pre str              = qwen2
+0.00.087.751 I llama_model_loader: - kv  17:                      tokenizer.ggml.tokens arr[str,151936]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+0.00.092.855 I llama_model_loader: - kv  18:                  tokenizer.ggml.token_type arr[i32,151936]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.00.115.513 I llama_model_loader: - kv  19:                      tokenizer.ggml.merges arr[str,151387]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+0.00.115.524 I llama_model_loader: - kv  20:                tokenizer.ggml.eos_token_id u32              = 151645
+0.00.115.525 I llama_model_loader: - kv  21:            tokenizer.ggml.padding_token_id u32              = 151643
+0.00.115.526 I llama_model_loader: - kv  22:                tokenizer.ggml.bos_token_id u32              = 151643
+0.00.115.526 I llama_model_loader: - kv  23:               tokenizer.ggml.add_bos_token bool             = false
+0.00.115.530 I llama_model_loader: - kv  24:                    tokenizer.chat_template str              = {%- if tools %}\n    {{- '<|im_start|>...
+0.00.115.534 I llama_model_loader: - type  f32:  290 tensors
+0.00.115.537 I print_info: file format = GGUF V3 (latest)
+0.00.115.537 I print_info: file type   = all F32
+0.00.115.542 I print_info: file size   = 1.84 GiB (32.00 BPW) 
+0.00.219.410 D init_tokenizer: initializing tokenizer for type 2
+0.00.241.575 D load: control token: 151660 '<|fim_middle|>' is not marked as EOG
+0.00.241.579 D load: control token: 151659 '<|fim_prefix|>' is not marked as EOG
+0.00.241.580 D load: control token: 151653 '<|vision_end|>' is not marked as EOG
+0.00.241.581 D load: control token: 151648 '<|box_start|>' is not marked as EOG
+0.00.241.581 D load: control token: 151646 '<|object_ref_start|>' is not marked as EOG
+0.00.241.733 D load: control token: 151649 '<|box_end|>' is not marked as EOG
+0.00.243.807 D load: control token: 151655 '<|image_pad|>' is not marked as EOG
+0.00.244.090 D load: control token: 151651 '<|quad_end|>' is not marked as EOG
+0.00.247.518 D load: control token: 151647 '<|object_ref_end|>' is not marked as EOG
+0.00.247.734 I srv  log_server_r: request: GET /metrics 172.18.0.2 503
+0.00.247.738 D srv  log_server_r: request:  
+0.00.247.738 D srv  log_server_r: response: {"error":{"code":503,"message":"Loading model","type":"unavailable_error"}}
+0.00.252.339 D load: control token: 151652 '<|vision_start|>' is not marked as EOG
+0.00.257.632 D load: control token: 151654 '<|vision_pad|>' is not marked as EOG
+0.00.261.549 D load: control token: 151656 '<|video_pad|>' is not marked as EOG
+0.00.262.242 D load: control token: 151644 '<|im_start|>' is not marked as EOG
+0.00.263.494 D load: control token: 151661 '<|fim_suffix|>' is not marked as EOG
+0.00.264.660 D load: control token: 151650 '<|quad_start|>' is not marked as EOG
+0.00.279.912 I load: printing all EOG tokens:
+0.00.279.916 I load:   - 151643 ('<|endoftext|>')
+0.00.279.916 I load:   - 151645 ('<|im_end|>')
+0.00.279.917 I load:   - 151662 ('<|fim_pad|>')
+0.00.279.917 I load:   - 151663 ('<|repo_name|>')
+0.00.279.917 I load:   - 151664 ('<|file_sep|>')
+0.00.280.424 I load: special tokens cache size = 22
+0.00.337.897 I load: token to piece cache size = 0.9310 MB
+0.00.337.921 I print_info: arch             = qwen2
+0.00.337.922 I print_info: vocab_only       = 0
+0.00.337.922 I print_info: n_ctx_train      = 32768
+0.00.337.923 I print_info: n_embd           = 896
+0.00.337.923 I print_info: n_layer          = 24
+0.00.337.934 I print_info: n_head           = 14
+0.00.337.937 I print_info: n_head_kv        = 2
+0.00.337.938 I print_info: n_rot            = 64
+0.00.337.938 I print_info: n_swa            = 0
+0.00.337.939 I print_info: is_swa_any       = 0
+0.00.337.940 I print_info: n_embd_head_k    = 64
+0.00.337.940 I print_info: n_embd_head_v    = 64
+0.00.337.942 I print_info: n_gqa            = 7
+0.00.337.944 I print_info: n_embd_k_gqa     = 128
+0.00.337.946 I print_info: n_embd_v_gqa     = 128
+0.00.337.947 I print_info: f_norm_eps       = 0.0e+00
+0.00.337.948 I print_info: f_norm_rms_eps   = 1.0e-06
+0.00.337.948 I print_info: f_clamp_kqv      = 0.0e+00
+0.00.337.949 I print_info: f_max_alibi_bias = 0.0e+00
+0.00.337.949 I print_info: f_logit_scale    = 0.0e+00
+0.00.337.950 I print_info: f_attn_scale     = 0.0e+00
+0.00.337.952 I print_info: n_ff             = 4864
+0.00.337.952 I print_info: n_expert         = 0
+0.00.337.952 I print_info: n_expert_used    = 0
+0.00.337.953 I print_info: causal attn      = 1
+0.00.337.953 I print_info: pooling type     = -1
+0.00.337.953 I print_info: rope type        = 2
+0.00.337.954 I print_info: rope scaling     = linear
+0.00.337.955 I print_info: freq_base_train  = 1000000.0
+0.00.337.956 I print_info: freq_scale_train = 1
+0.00.337.956 I print_info: n_ctx_orig_yarn  = 32768
+0.00.337.956 I print_info: rope_finetuned   = unknown
+0.00.337.957 I print_info: model type       = 1B
+0.00.337.958 I print_info: model params     = 494.03 M
+0.00.337.959 I print_info: general.name     = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.337.962 I print_info: vocab type       = BPE
+0.00.337.963 I print_info: n_vocab          = 151936
+0.00.337.963 I print_info: n_merges         = 151387
+0.00.337.964 I print_info: BOS token        = 151643 '<|endoftext|>'
+0.00.337.964 I print_info: EOS token        = 151645 '<|im_end|>'
+0.00.337.965 I print_info: EOT token        = 151645 '<|im_end|>'
+0.00.337.965 I print_info: PAD token        = 151643 '<|endoftext|>'
+0.00.337.966 I print_info: LF token         = 198 'Ċ'
+0.00.337.966 I print_info: FIM PRE token    = 151659 '<|fim_prefix|>'
+0.00.337.966 I print_info: FIM SUF token    = 151661 '<|fim_suffix|>'
+0.00.337.966 I print_info: FIM MID token    = 151660 '<|fim_middle|>'
+0.00.337.967 I print_info: FIM PAD token    = 151662 '<|fim_pad|>'
+0.00.337.967 I print_info: FIM REP token    = 151663 '<|repo_name|>'
+0.00.337.967 I print_info: FIM SEP token    = 151664 '<|file_sep|>'
+0.00.337.968 I print_info: EOG token        = 151643 '<|endoftext|>'
+0.00.337.968 I print_info: EOG token        = 151645 '<|im_end|>'
+0.00.337.969 I print_info: EOG token        = 151662 '<|fim_pad|>'
+0.00.337.969 I print_info: EOG token        = 151663 '<|repo_name|>'
+0.00.337.969 I print_info: EOG token        = 151664 '<|file_sep|>'
+0.00.337.970 I print_info: max token length = 256
+0.00.337.971 I load_tensors: loading model tensors, this can take a while... (mmap = true)
+0.00.338.076 D load_tensors: layer   0 assigned to device CUDA0, is_swa = 0
+0.00.338.076 D load_tensors: layer   1 assigned to device CUDA0, is_swa = 0
+0.00.338.077 D load_tensors: layer   2 assigned to device CUDA0, is_swa = 0
+0.00.338.077 D load_tensors: layer   3 assigned to device CUDA0, is_swa = 0
+0.00.338.078 D load_tensors: layer   4 assigned to device CUDA0, is_swa = 0
+0.00.338.078 D load_tensors: layer   5 assigned to device CUDA0, is_swa = 0
+0.00.338.078 D load_tensors: layer   6 assigned to device CUDA0, is_swa = 0
+0.00.338.079 D load_tensors: layer   7 assigned to device CUDA0, is_swa = 0
+0.00.338.079 D load_tensors: layer   8 assigned to device CUDA0, is_swa = 0
+0.00.338.079 D load_tensors: layer   9 assigned to device CUDA0, is_swa = 0
+0.00.338.080 D load_tensors: layer  10 assigned to device CUDA0, is_swa = 0
+0.00.338.080 D load_tensors: layer  11 assigned to device CUDA0, is_swa = 0
+0.00.338.080 D load_tensors: layer  12 assigned to device CUDA0, is_swa = 0
+0.00.338.081 D load_tensors: layer  13 assigned to device CUDA0, is_swa = 0
+0.00.338.081 D load_tensors: layer  14 assigned to device CUDA0, is_swa = 0
+0.00.338.082 D load_tensors: layer  15 assigned to device CUDA0, is_swa = 0
+0.00.338.082 D load_tensors: layer  16 assigned to device CUDA0, is_swa = 0
+0.00.338.082 D load_tensors: layer  17 assigned to device CUDA0, is_swa = 0
+0.00.338.083 D load_tensors: layer  18 assigned to device CUDA0, is_swa = 0
+0.00.338.083 D load_tensors: layer  19 assigned to device CUDA0, is_swa = 0
+0.00.338.084 D load_tensors: layer  20 assigned to device CUDA0, is_swa = 0
+0.00.338.084 D load_tensors: layer  21 assigned to device CUDA0, is_swa = 0
+0.00.338.084 D load_tensors: layer  22 assigned to device CUDA0, is_swa = 0
+0.00.338.085 D load_tensors: layer  23 assigned to device CUDA0, is_swa = 0
+0.00.338.085 D load_tensors: layer  24 assigned to device CUDA0, is_swa = 0
+0.00.338.140 D create_tensor: loading tensor token_embd.weight
+0.00.338.160 D create_tensor: loading tensor output_norm.weight
+0.00.338.177 D create_tensor: loading tensor token_embd.weight
+0.00.338.190 D create_tensor: loading tensor blk.0.attn_norm.weight
+0.00.338.198 D create_tensor: loading tensor blk.0.attn_q.weight
+0.00.338.207 D create_tensor: loading tensor blk.0.attn_k.weight
+0.00.338.215 D create_tensor: loading tensor blk.0.attn_v.weight
+0.00.338.229 D create_tensor: loading tensor blk.0.attn_output.weight
+0.00.338.238 D create_tensor: loading tensor blk.0.attn_q.bias
+0.00.338.245 D create_tensor: loading tensor blk.0.attn_k.bias
+0.00.338.253 D create_tensor: loading tensor blk.0.attn_v.bias
+0.00.338.262 D create_tensor: loading tensor blk.0.ffn_norm.weight
+0.00.338.272 D create_tensor: loading tensor blk.0.ffn_gate.weight
+0.00.338.279 D create_tensor: loading tensor blk.0.ffn_down.weight
+0.00.338.286 D create_tensor: loading tensor blk.0.ffn_up.weight
+0.00.338.293 D create_tensor: loading tensor blk.1.attn_norm.weight
+0.00.338.300 D create_tensor: loading tensor blk.1.attn_q.weight
+0.00.338.307 D create_tensor: loading tensor blk.1.attn_k.weight
+0.00.338.314 D create_tensor: loading tensor blk.1.attn_v.weight
+0.00.338.321 D create_tensor: loading tensor blk.1.attn_output.weight
+0.00.338.327 D create_tensor: loading tensor blk.1.attn_q.bias
+0.00.338.333 D create_tensor: loading tensor blk.1.attn_k.bias
+0.00.338.339 D create_tensor: loading tensor blk.1.attn_v.bias
+0.00.338.349 D create_tensor: loading tensor blk.1.ffn_norm.weight
+0.00.338.355 D create_tensor: loading tensor blk.1.ffn_gate.weight
+0.00.338.362 D create_tensor: loading tensor blk.1.ffn_down.weight
+0.00.338.369 D create_tensor: loading tensor blk.1.ffn_up.weight
+0.00.338.376 D create_tensor: loading tensor blk.2.attn_norm.weight
+0.00.338.383 D create_tensor: loading tensor blk.2.attn_q.weight
+0.00.338.391 D create_tensor: loading tensor blk.2.attn_k.weight
+0.00.338.398 D create_tensor: loading tensor blk.2.attn_v.weight
+0.00.338.404 D create_tensor: loading tensor blk.2.attn_output.weight
+0.00.338.411 D create_tensor: loading tensor blk.2.attn_q.bias
+0.00.338.418 D create_tensor: loading tensor blk.2.attn_k.bias
+0.00.338.428 D create_tensor: loading tensor blk.2.attn_v.bias
+0.00.338.434 D create_tensor: loading tensor blk.2.ffn_norm.weight
+0.00.338.441 D create_tensor: loading tensor blk.2.ffn_gate.weight
+0.00.338.448 D create_tensor: loading tensor blk.2.ffn_down.weight
+0.00.338.454 D create_tensor: loading tensor blk.2.ffn_up.weight
+0.00.338.463 D create_tensor: loading tensor blk.3.attn_norm.weight
+0.00.338.470 D create_tensor: loading tensor blk.3.attn_q.weight
+0.00.338.477 D create_tensor: loading tensor blk.3.attn_k.weight
+0.00.338.484 D create_tensor: loading tensor blk.3.attn_v.weight
+0.00.338.491 D create_tensor: loading tensor blk.3.attn_output.weight
+0.00.338.498 D create_tensor: loading tensor blk.3.attn_q.bias
+0.00.338.508 D create_tensor: loading tensor blk.3.attn_k.bias
+0.00.338.514 D create_tensor: loading tensor blk.3.attn_v.bias
+0.00.338.521 D create_tensor: loading tensor blk.3.ffn_norm.weight
+0.00.338.528 D create_tensor: loading tensor blk.3.ffn_gate.weight
+0.00.338.535 D create_tensor: loading tensor blk.3.ffn_down.weight
+0.00.338.542 D create_tensor: loading tensor blk.3.ffn_up.weight
+0.00.338.550 D create_tensor: loading tensor blk.4.attn_norm.weight
+0.00.338.558 D create_tensor: loading tensor blk.4.attn_q.weight
+0.00.338.564 D create_tensor: loading tensor blk.4.attn_k.weight
+0.00.338.571 D create_tensor: loading tensor blk.4.attn_v.weight
+0.00.338.579 D create_tensor: loading tensor blk.4.attn_output.weight
+0.00.338.589 D create_tensor: loading tensor blk.4.attn_q.bias
+0.00.338.596 D create_tensor: loading tensor blk.4.attn_k.bias
+0.00.338.603 D create_tensor: loading tensor blk.4.attn_v.bias
+0.00.338.612 D create_tensor: loading tensor blk.4.ffn_norm.weight
+0.00.338.619 D create_tensor: loading tensor blk.4.ffn_gate.weight
+0.00.338.626 D create_tensor: loading tensor blk.4.ffn_down.weight
+0.00.338.633 D create_tensor: loading tensor blk.4.ffn_up.weight
+0.00.338.641 D create_tensor: loading tensor blk.5.attn_norm.weight
+0.00.338.648 D create_tensor: loading tensor blk.5.attn_q.weight
+0.00.338.657 D create_tensor: loading tensor blk.5.attn_k.weight
+0.00.338.665 D create_tensor: loading tensor blk.5.attn_v.weight
+0.00.338.676 D create_tensor: loading tensor blk.5.attn_output.weight
+0.00.338.684 D create_tensor: loading tensor blk.5.attn_q.bias
+0.00.338.691 D create_tensor: loading tensor blk.5.attn_k.bias
+0.00.338.698 D create_tensor: loading tensor blk.5.attn_v.bias
+0.00.338.706 D create_tensor: loading tensor blk.5.ffn_norm.weight
+0.00.338.713 D create_tensor: loading tensor blk.5.ffn_gate.weight
+0.00.338.721 D create_tensor: loading tensor blk.5.ffn_down.weight
+0.00.338.729 D create_tensor: loading tensor blk.5.ffn_up.weight
+0.00.338.737 D create_tensor: loading tensor blk.6.attn_norm.weight
+0.00.338.745 D create_tensor: loading tensor blk.6.attn_q.weight
+0.00.338.753 D create_tensor: loading tensor blk.6.attn_k.weight
+0.00.338.760 D create_tensor: loading tensor blk.6.attn_v.weight
+0.00.338.769 D create_tensor: loading tensor blk.6.attn_output.weight
+0.00.338.776 D create_tensor: loading tensor blk.6.attn_q.bias
+0.00.338.784 D create_tensor: loading tensor blk.6.attn_k.bias
+0.00.338.791 D create_tensor: loading tensor blk.6.attn_v.bias
+0.00.338.799 D create_tensor: loading tensor blk.6.ffn_norm.weight
+0.00.338.806 D create_tensor: loading tensor blk.6.ffn_gate.weight
+0.00.338.813 D create_tensor: loading tensor blk.6.ffn_down.weight
+0.00.338.820 D create_tensor: loading tensor blk.6.ffn_up.weight
+0.00.338.841 D create_tensor: loading tensor blk.7.attn_norm.weight
+0.00.338.848 D create_tensor: loading tensor blk.7.attn_q.weight
+0.00.338.855 D create_tensor: loading tensor blk.7.attn_k.weight
+0.00.338.866 D create_tensor: loading tensor blk.7.attn_v.weight
+0.00.338.873 D create_tensor: loading tensor blk.7.attn_output.weight
+0.00.338.880 D create_tensor: loading tensor blk.7.attn_q.bias
+0.00.338.887 D create_tensor: loading tensor blk.7.attn_k.bias
+0.00.338.894 D create_tensor: loading tensor blk.7.attn_v.bias
+0.00.338.901 D create_tensor: loading tensor blk.7.ffn_norm.weight
+0.00.338.908 D create_tensor: loading tensor blk.7.ffn_gate.weight
+0.00.338.915 D create_tensor: loading tensor blk.7.ffn_down.weight
+0.00.338.923 D create_tensor: loading tensor blk.7.ffn_up.weight
+0.00.338.931 D create_tensor: loading tensor blk.8.attn_norm.weight
+0.00.338.938 D create_tensor: loading tensor blk.8.attn_q.weight
+0.00.338.949 D create_tensor: loading tensor blk.8.attn_k.weight
+0.00.338.957 D create_tensor: loading tensor blk.8.attn_v.weight
+0.00.338.965 D create_tensor: loading tensor blk.8.attn_output.weight
+0.00.338.973 D create_tensor: loading tensor blk.8.attn_q.bias
+0.00.338.982 D create_tensor: loading tensor blk.8.attn_k.bias
+0.00.338.989 D create_tensor: loading tensor blk.8.attn_v.bias
+0.00.338.996 D create_tensor: loading tensor blk.8.ffn_norm.weight
+0.00.339.004 D create_tensor: loading tensor blk.8.ffn_gate.weight
+0.00.339.011 D create_tensor: loading tensor blk.8.ffn_down.weight
+0.00.339.019 D create_tensor: loading tensor blk.8.ffn_up.weight
+0.00.339.027 D create_tensor: loading tensor blk.9.attn_norm.weight
+0.00.339.040 D create_tensor: loading tensor blk.9.attn_q.weight
+0.00.339.048 D create_tensor: loading tensor blk.9.attn_k.weight
+0.00.339.057 D create_tensor: loading tensor blk.9.attn_v.weight
+0.00.339.065 D create_tensor: loading tensor blk.9.attn_output.weight
+0.00.339.072 D create_tensor: loading tensor blk.9.attn_q.bias
+0.00.339.077 D create_tensor: loading tensor blk.9.attn_k.bias
+0.00.339.082 D create_tensor: loading tensor blk.9.attn_v.bias
+0.00.339.086 D create_tensor: loading tensor blk.9.ffn_norm.weight
+0.00.339.092 D create_tensor: loading tensor blk.9.ffn_gate.weight
+0.00.339.097 D create_tensor: loading tensor blk.9.ffn_down.weight
+0.00.339.102 D create_tensor: loading tensor blk.9.ffn_up.weight
+0.00.339.109 D create_tensor: loading tensor blk.10.attn_norm.weight
+0.00.339.113 D create_tensor: loading tensor blk.10.attn_q.weight
+0.00.339.117 D create_tensor: loading tensor blk.10.attn_k.weight
+0.00.339.121 D create_tensor: loading tensor blk.10.attn_v.weight
+0.00.339.126 D create_tensor: loading tensor blk.10.attn_output.weight
+0.00.339.130 D create_tensor: loading tensor blk.10.attn_q.bias
+0.00.339.135 D create_tensor: loading tensor blk.10.attn_k.bias
+0.00.339.139 D create_tensor: loading tensor blk.10.attn_v.bias
+0.00.339.144 D create_tensor: loading tensor blk.10.ffn_norm.weight
+0.00.339.148 D create_tensor: loading tensor blk.10.ffn_gate.weight
+0.00.339.152 D create_tensor: loading tensor blk.10.ffn_down.weight
+0.00.339.157 D create_tensor: loading tensor blk.10.ffn_up.weight
+0.00.339.161 D create_tensor: loading tensor blk.11.attn_norm.weight
+0.00.339.165 D create_tensor: loading tensor blk.11.attn_q.weight
+0.00.339.168 D create_tensor: loading tensor blk.11.attn_k.weight
+0.00.339.172 D create_tensor: loading tensor blk.11.attn_v.weight
+0.00.339.176 D create_tensor: loading tensor blk.11.attn_output.weight
+0.00.339.179 D create_tensor: loading tensor blk.11.attn_q.bias
+0.00.339.183 D create_tensor: loading tensor blk.11.attn_k.bias
+0.00.339.186 D create_tensor: loading tensor blk.11.attn_v.bias
+0.00.339.190 D create_tensor: loading tensor blk.11.ffn_norm.weight
+0.00.339.193 D create_tensor: loading tensor blk.11.ffn_gate.weight
+0.00.339.198 D create_tensor: loading tensor blk.11.ffn_down.weight
+0.00.339.201 D create_tensor: loading tensor blk.11.ffn_up.weight
+0.00.339.205 D create_tensor: loading tensor blk.12.attn_norm.weight
+0.00.339.209 D create_tensor: loading tensor blk.12.attn_q.weight
+0.00.339.213 D create_tensor: loading tensor blk.12.attn_k.weight
+0.00.339.217 D create_tensor: loading tensor blk.12.attn_v.weight
+0.00.339.221 D create_tensor: loading tensor blk.12.attn_output.weight
+0.00.339.224 D create_tensor: loading tensor blk.12.attn_q.bias
+0.00.339.227 D create_tensor: loading tensor blk.12.attn_k.bias
+0.00.339.231 D create_tensor: loading tensor blk.12.attn_v.bias
+0.00.339.235 D create_tensor: loading tensor blk.12.ffn_norm.weight
+0.00.339.239 D create_tensor: loading tensor blk.12.ffn_gate.weight
+0.00.339.243 D create_tensor: loading tensor blk.12.ffn_down.weight
+0.00.339.246 D create_tensor: loading tensor blk.12.ffn_up.weight
+0.00.339.250 D create_tensor: loading tensor blk.13.attn_norm.weight
+0.00.339.253 D create_tensor: loading tensor blk.13.attn_q.weight
+0.00.339.257 D create_tensor: loading tensor blk.13.attn_k.weight
+0.00.339.260 D create_tensor: loading tensor blk.13.attn_v.weight
+0.00.339.263 D create_tensor: loading tensor blk.13.attn_output.weight
+0.00.339.267 D create_tensor: loading tensor blk.13.attn_q.bias
+0.00.339.270 D create_tensor: loading tensor blk.13.attn_k.bias
+0.00.339.274 D create_tensor: loading tensor blk.13.attn_v.bias
+0.00.339.277 D create_tensor: loading tensor blk.13.ffn_norm.weight
+0.00.339.281 D create_tensor: loading tensor blk.13.ffn_gate.weight
+0.00.339.285 D create_tensor: loading tensor blk.13.ffn_down.weight
+0.00.339.288 D create_tensor: loading tensor blk.13.ffn_up.weight
+0.00.339.292 D create_tensor: loading tensor blk.14.attn_norm.weight
+0.00.339.296 D create_tensor: loading tensor blk.14.attn_q.weight
+0.00.339.299 D create_tensor: loading tensor blk.14.attn_k.weight
+0.00.339.303 D create_tensor: loading tensor blk.14.attn_v.weight
+0.00.339.306 D create_tensor: loading tensor blk.14.attn_output.weight
+0.00.339.310 D create_tensor: loading tensor blk.14.attn_q.bias
+0.00.339.313 D create_tensor: loading tensor blk.14.attn_k.bias
+0.00.339.317 D create_tensor: loading tensor blk.14.attn_v.bias
+0.00.339.322 D create_tensor: loading tensor blk.14.ffn_norm.weight
+0.00.339.325 D create_tensor: loading tensor blk.14.ffn_gate.weight
+0.00.339.329 D create_tensor: loading tensor blk.14.ffn_down.weight
+0.00.339.332 D create_tensor: loading tensor blk.14.ffn_up.weight
+0.00.339.335 D create_tensor: loading tensor blk.15.attn_norm.weight
+0.00.339.339 D create_tensor: loading tensor blk.15.attn_q.weight
+0.00.339.342 D create_tensor: loading tensor blk.15.attn_k.weight
+0.00.339.346 D create_tensor: loading tensor blk.15.attn_v.weight
+0.00.339.349 D create_tensor: loading tensor blk.15.attn_output.weight
+0.00.339.352 D create_tensor: loading tensor blk.15.attn_q.bias
+0.00.339.356 D create_tensor: loading tensor blk.15.attn_k.bias
+0.00.339.360 D create_tensor: loading tensor blk.15.attn_v.bias
+0.00.339.364 D create_tensor: loading tensor blk.15.ffn_norm.weight
+0.00.339.367 D create_tensor: loading tensor blk.15.ffn_gate.weight
+0.00.339.370 D create_tensor: loading tensor blk.15.ffn_down.weight
+0.00.339.374 D create_tensor: loading tensor blk.15.ffn_up.weight
+0.00.339.378 D create_tensor: loading tensor blk.16.attn_norm.weight
+0.00.339.381 D create_tensor: loading tensor blk.16.attn_q.weight
+0.00.339.385 D create_tensor: loading tensor blk.16.attn_k.weight
+0.00.339.388 D create_tensor: loading tensor blk.16.attn_v.weight
+0.00.339.392 D create_tensor: loading tensor blk.16.attn_output.weight
+0.00.339.395 D create_tensor: loading tensor blk.16.attn_q.bias
+0.00.339.400 D create_tensor: loading tensor blk.16.attn_k.bias
+0.00.339.404 D create_tensor: loading tensor blk.16.attn_v.bias
+0.00.339.407 D create_tensor: loading tensor blk.16.ffn_norm.weight
+0.00.339.411 D create_tensor: loading tensor blk.16.ffn_gate.weight
+0.00.339.414 D create_tensor: loading tensor blk.16.ffn_down.weight
+0.00.339.418 D create_tensor: loading tensor blk.16.ffn_up.weight
+0.00.339.421 D create_tensor: loading tensor blk.17.attn_norm.weight
+0.00.339.425 D create_tensor: loading tensor blk.17.attn_q.weight
+0.00.339.428 D create_tensor: loading tensor blk.17.attn_k.weight
+0.00.339.432 D create_tensor: loading tensor blk.17.attn_v.weight
+0.00.339.436 D create_tensor: loading tensor blk.17.attn_output.weight
+0.00.339.440 D create_tensor: loading tensor blk.17.attn_q.bias
+0.00.339.443 D create_tensor: loading tensor blk.17.attn_k.bias
+0.00.339.447 D create_tensor: loading tensor blk.17.attn_v.bias
+0.00.339.450 D create_tensor: loading tensor blk.17.ffn_norm.weight
+0.00.339.454 D create_tensor: loading tensor blk.17.ffn_gate.weight
+0.00.339.457 D create_tensor: loading tensor blk.17.ffn_down.weight
+0.00.339.461 D create_tensor: loading tensor blk.17.ffn_up.weight
+0.00.339.464 D create_tensor: loading tensor blk.18.attn_norm.weight
+0.00.339.468 D create_tensor: loading tensor blk.18.attn_q.weight
+0.00.339.472 D create_tensor: loading tensor blk.18.attn_k.weight
+0.00.339.475 D create_tensor: loading tensor blk.18.attn_v.weight
+0.00.339.480 D create_tensor: loading tensor blk.18.attn_output.weight
+0.00.339.483 D create_tensor: loading tensor blk.18.attn_q.bias
+0.00.339.487 D create_tensor: loading tensor blk.18.attn_k.bias
+0.00.339.490 D create_tensor: loading tensor blk.18.attn_v.bias
+0.00.339.494 D create_tensor: loading tensor blk.18.ffn_norm.weight
+0.00.339.497 D create_tensor: loading tensor blk.18.ffn_gate.weight
+0.00.339.502 D create_tensor: loading tensor blk.18.ffn_down.weight
+0.00.339.507 D create_tensor: loading tensor blk.18.ffn_up.weight
+0.00.339.514 D create_tensor: loading tensor blk.19.attn_norm.weight
+0.00.339.521 D create_tensor: loading tensor blk.19.attn_q.weight
+0.00.339.528 D create_tensor: loading tensor blk.19.attn_k.weight
+0.00.339.584 D create_tensor: loading tensor blk.19.attn_v.weight
+0.00.339.591 D create_tensor: loading tensor blk.19.attn_output.weight
+0.00.339.598 D create_tensor: loading tensor blk.19.attn_q.bias
+0.00.339.604 D create_tensor: loading tensor blk.19.attn_k.bias
+0.00.339.610 D create_tensor: loading tensor blk.19.attn_v.bias
+0.00.339.617 D create_tensor: loading tensor blk.19.ffn_norm.weight
+0.00.339.624 D create_tensor: loading tensor blk.19.ffn_gate.weight
+0.00.339.630 D create_tensor: loading tensor blk.19.ffn_down.weight
+0.00.339.638 D create_tensor: loading tensor blk.19.ffn_up.weight
+0.00.339.645 D create_tensor: loading tensor blk.20.attn_norm.weight
+0.00.339.652 D create_tensor: loading tensor blk.20.attn_q.weight
+0.00.339.660 D create_tensor: loading tensor blk.20.attn_k.weight
+0.00.339.670 D create_tensor: loading tensor blk.20.attn_v.weight
+0.00.339.677 D create_tensor: loading tensor blk.20.attn_output.weight
+0.00.339.684 D create_tensor: loading tensor blk.20.attn_q.bias
+0.00.339.690 D create_tensor: loading tensor blk.20.attn_k.bias
+0.00.339.694 D create_tensor: loading tensor blk.20.attn_v.bias
+0.00.339.697 D create_tensor: loading tensor blk.20.ffn_norm.weight
+0.00.339.701 D create_tensor: loading tensor blk.20.ffn_gate.weight
+0.00.339.705 D create_tensor: loading tensor blk.20.ffn_down.weight
+0.00.339.709 D create_tensor: loading tensor blk.20.ffn_up.weight
+0.00.339.713 D create_tensor: loading tensor blk.21.attn_norm.weight
+0.00.339.717 D create_tensor: loading tensor blk.21.attn_q.weight
+0.00.339.724 D create_tensor: loading tensor blk.21.attn_k.weight
+0.00.339.730 D create_tensor: loading tensor blk.21.attn_v.weight
+0.00.339.734 D create_tensor: loading tensor blk.21.attn_output.weight
+0.00.339.737 D create_tensor: loading tensor blk.21.attn_q.bias
+0.00.339.741 D create_tensor: loading tensor blk.21.attn_k.bias
+0.00.339.745 D create_tensor: loading tensor blk.21.attn_v.bias
+0.00.339.749 D create_tensor: loading tensor blk.21.ffn_norm.weight
+0.00.339.753 D create_tensor: loading tensor blk.21.ffn_gate.weight
+0.00.339.757 D create_tensor: loading tensor blk.21.ffn_down.weight
+0.00.339.762 D create_tensor: loading tensor blk.21.ffn_up.weight
+0.00.339.766 D create_tensor: loading tensor blk.22.attn_norm.weight
+0.00.339.772 D create_tensor: loading tensor blk.22.attn_q.weight
+0.00.339.776 D create_tensor: loading tensor blk.22.attn_k.weight
+0.00.339.783 D create_tensor: loading tensor blk.22.attn_v.weight
+0.00.339.790 D create_tensor: loading tensor blk.22.attn_output.weight
+0.00.339.797 D create_tensor: loading tensor blk.22.attn_q.bias
+0.00.339.804 D create_tensor: loading tensor blk.22.attn_k.bias
+0.00.339.811 D create_tensor: loading tensor blk.22.attn_v.bias
+0.00.339.819 D create_tensor: loading tensor blk.22.ffn_norm.weight
+0.00.339.833 D create_tensor: loading tensor blk.22.ffn_gate.weight
+0.00.339.840 D create_tensor: loading tensor blk.22.ffn_down.weight
+0.00.339.848 D create_tensor: loading tensor blk.22.ffn_up.weight
+0.00.339.859 D create_tensor: loading tensor blk.23.attn_norm.weight
+0.00.339.867 D create_tensor: loading tensor blk.23.attn_q.weight
+0.00.339.875 D create_tensor: loading tensor blk.23.attn_k.weight
+0.00.339.883 D create_tensor: loading tensor blk.23.attn_v.weight
+0.00.339.892 D create_tensor: loading tensor blk.23.attn_output.weight
+0.00.339.900 D create_tensor: loading tensor blk.23.attn_q.bias
+0.00.339.909 D create_tensor: loading tensor blk.23.attn_k.bias
+0.00.339.916 D create_tensor: loading tensor blk.23.attn_v.bias
+0.00.339.924 D create_tensor: loading tensor blk.23.ffn_norm.weight
+0.00.339.933 D create_tensor: loading tensor blk.23.ffn_gate.weight
+0.00.339.942 D create_tensor: loading tensor blk.23.ffn_down.weight
+0.00.339.953 D create_tensor: loading tensor blk.23.ffn_up.weight
+0.00.339.962 D load_tensors: tensor 'token_embd.weight' (f32) (and 0 others) cannot be used with preferred buffer type CUDA_Host, using CPU instead
+0.00.376.407 I load_tensors: offloading 24 repeating layers to GPU
+0.00.376.413 I load_tensors: offloading output layer to GPU
+0.00.376.414 I load_tensors: offloaded 25/25 layers to GPU
+0.00.376.421 I load_tensors:        CUDA0 model buffer size =  1884.59 MiB
+0.00.376.423 I load_tensors:   CPU_Mapped model buffer size =   519.31 MiB
+...........................................................
+0.00.667.082 I llama_context: constructing llama_context
+0.00.667.089 I llama_context: n_seq_max     = 1
+0.00.667.089 I llama_context: n_ctx         = 4096
+0.00.667.090 I llama_context: n_ctx_per_seq = 4096
+0.00.667.090 I llama_context: n_batch       = 2048
+0.00.667.090 I llama_context: n_ubatch      = 512
+0.00.667.091 I llama_context: causal_attn   = 1
+0.00.667.092 I llama_context: flash_attn    = auto
+0.00.667.093 I llama_context: kv_unified    = false
+0.00.667.097 I llama_context: freq_base     = 1000000.0
+0.00.667.098 I llama_context: freq_scale    = 1
+0.00.667.099 W llama_context: n_ctx_per_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+0.00.667.116 D set_abort_callback: call
+0.00.667.928 I llama_context:  CUDA_Host  output buffer size =     0.58 MiB
+0.00.667.936 D create_memory: n_ctx = 4096 (padded)
+0.00.667.955 D llama_kv_cache: layer   0: dev = CUDA0
+0.00.667.975 D llama_kv_cache: layer   1: dev = CUDA0
+0.00.667.978 D llama_kv_cache: layer   2: dev = CUDA0
+0.00.667.979 D llama_kv_cache: layer   3: dev = CUDA0
+0.00.667.981 D llama_kv_cache: layer   4: dev = CUDA0
+0.00.667.983 D llama_kv_cache: layer   5: dev = CUDA0
+0.00.667.984 D llama_kv_cache: layer   6: dev = CUDA0
+0.00.667.986 D llama_kv_cache: layer   7: dev = CUDA0
+0.00.667.987 D llama_kv_cache: layer   8: dev = CUDA0
+0.00.667.989 D llama_kv_cache: layer   9: dev = CUDA0
+0.00.667.991 D llama_kv_cache: layer  10: dev = CUDA0
+0.00.667.993 D llama_kv_cache: layer  11: dev = CUDA0
+0.00.667.994 D llama_kv_cache: layer  12: dev = CUDA0
+0.00.667.995 D llama_kv_cache: layer  13: dev = CUDA0
+0.00.667.998 D llama_kv_cache: layer  14: dev = CUDA0
+0.00.667.999 D llama_kv_cache: layer  15: dev = CUDA0
+0.00.668.001 D llama_kv_cache: layer  16: dev = CUDA0
+0.00.668.004 D llama_kv_cache: layer  17: dev = CUDA0
+0.00.668.006 D llama_kv_cache: layer  18: dev = CUDA0
+0.00.668.007 D llama_kv_cache: layer  19: dev = CUDA0
+0.00.668.008 D llama_kv_cache: layer  20: dev = CUDA0
+0.00.668.010 D llama_kv_cache: layer  21: dev = CUDA0
+0.00.668.011 D llama_kv_cache: layer  22: dev = CUDA0
+0.00.668.013 D llama_kv_cache: layer  23: dev = CUDA0
+0.00.668.153 I llama_kv_cache:      CUDA0 KV buffer size =    48.00 MiB
+0.00.668.301 I llama_kv_cache: size =   48.00 MiB (  4096 cells,  24 layers,  1/1 seqs), K (f16):   24.00 MiB, V (f16):   24.00 MiB
+0.00.668.305 D llama_context: enumerating backends
+0.00.668.312 D llama_context: backend_ptrs.size() = 2
+0.00.668.314 D llama_context: max_nodes = 2328
+0.00.668.493 D llama_context: reserving full memory module
+0.00.668.501 D llama_context: worst-case: n_tokens = 512, n_seqs = 1, n_outputs = 1
+0.00.668.503 D graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
+0.00.668.987 I llama_context: Flash Attention was auto, set to enabled
+0.00.668.992 D graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
+0.00.673.290 D graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
+0.00.674.140 D graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
+0.00.674.854 I llama_context:      CUDA0 compute buffer size =   310.01 MiB
+0.00.674.859 I llama_context:  CUDA_Host compute buffer size =     9.76 MiB
+0.00.674.860 I llama_context: graph nodes  = 823
+0.00.674.860 I llama_context: graph splits = 2
+0.00.674.866 D clear_adapter_lora: call
+0.00.676.104 I common_init_from_params: added <|endoftext|> logit bias = -inf
+0.00.676.109 I common_init_from_params: added <|im_end|> logit bias = -inf
+0.00.676.109 I common_init_from_params: added <|fim_pad|> logit bias = -inf
+0.00.676.110 I common_init_from_params: added <|repo_name|> logit bias = -inf
+0.00.676.110 I common_init_from_params: added <|file_sep|> logit bias = -inf
+0.00.676.113 I common_init_from_params: setting dry_penalty_last_n to ctx_size = 4096
+0.00.676.114 W common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+0.00.676.116 D set_warmup: value = 1
+0.00.696.252 D set_warmup: value = 0
+0.00.710.072 I srv          init: initializing slots, n_slots = 1
+0.00.710.074 I slot         init: id  0 | task -1 | new slot n_ctx_slot = 4096
+0.00.710.075 D slot        reset: id  0 | task -1 | 
+0.00.710.201 I srv          init: Enable thinking? 0
+0.00.710.204 I main: model loaded
+0.00.710.235 I main: chat template, chat_template: {%- if tools %}
+    {{- '<|im_start|>system\n' }}
+    {%- if messages[0]['role'] == 'system' %}
+        {{- messages[0]['content'] }}
+    {%- else %}
+        {{- 'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.' }}
+    {%- endif %}
+    {{- "\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>" }}
+    {%- for tool in tools %}
+        {{- "\n" }}
+        {{- tool | tojson }}
+    {%- endfor %}
+    {{- "\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n" }}
+{%- else %}
+    {%- if messages[0]['role'] == 'system' %}
+        {{- '<|im_start|>system\n' + messages[0]['content'] + '<|im_end|>\n' }}
+    {%- else %}
+        {{- '<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n' }}
+    {%- endif %}
+{%- endif %}
+{%- for message in messages %}
+    {%- if (message.role == "user") or (message.role == "system" and not loop.first) or (message.role == "assistant" and not message.tool_calls) %}
+        {{- '<|im_start|>' + message.role + '\n' + message.content + '<|im_end|>' + '\n' }}
+    {%- elif message.role == "assistant" %}
+        {{- '<|im_start|>' + message.role }}
+        {%- if message.content %}
+            {{- '\n' + message.content }}
+        {%- endif %}
+        {%- for tool_call in message.tool_calls %}
+            {%- if tool_call.function is defined %}
+                {%- set tool_call = tool_call.function %}
+            {%- endif %}
+            {{- '\n<tool_call>\n{"name": "' }}
+            {{- tool_call.name }}
+            {{- '", "arguments": ' }}
+            {{- tool_call.arguments | tojson }}
+            {{- '}\n</tool_call>' }}
+        {%- endfor %}
+        {{- '<|im_end|>\n' }}
+    {%- elif message.role == "tool" %}
+        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != "tool") %}
+            {{- '<|im_start|>user' }}
+        {%- endif %}
+        {{- '\n<tool_response>\n' }}
+        {{- message.content }}
+        {{- '\n</tool_response>' }}
+        {%- if loop.last or (messages[loop.index0 + 1].role != "tool") %}
+            {{- '<|im_end|>\n' }}
+        {%- endif %}
+    {%- endif %}
+{%- endfor %}
+{%- if add_generation_prompt %}
+    {{- '<|im_start|>assistant\n' }}
+{%- endif %}
+, example_format: '<|im_start|>system
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+Hello<|im_end|>
+<|im_start|>assistant
+Hi there<|im_end|>
+<|im_start|>user
+How are you?<|im_end|>
+<|im_start|>assistant
+'
+0.00.710.238 I main: server is listening on http://0.0.0.0:8080 - starting the main loop
+0.00.710.240 D que    start_loop: processing new tasks
+0.00.710.240 D que    start_loop: update slots
+0.00.710.241 I srv  update_slots: all slots are idle
+0.00.710.241 D srv  kv_cache_cle: clearing KV cache
+0.00.710.397 D que    start_loop: waiting for new tasks
+0.01.246.331 D srv  add_waiting_: add task 0 to waiting list. current waiting = 0 (before add)
+0.01.246.335 D que          post: new task, id = 0, front = 1
+0.01.246.343 D que    start_loop: processing new tasks
+0.01.246.346 D que    start_loop: processing task, id = 0
+0.01.246.401 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.01.246.403 D srv          send: sending result for task id = 0
+0.01.246.404 D srv          send: task id = 0 pushed to result queue
+0.01.246.411 D que    start_loop: update slots
+0.01.246.412 I srv  update_slots: all slots are idle
+0.01.246.412 D que    start_loop: waiting for new tasks
+0.01.246.415 D srv  remove_waiti: remove task 0 from waiting list. current waiting = 1 (before remove)
+0.01.246.540 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.01.246.543 D srv  log_server_r: request:  
+0.01.246.552 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.02.246.426 D srv  add_waiting_: add task 1 to waiting list. current waiting = 0 (before add)
+0.02.246.429 D que          post: new task, id = 1, front = 1
+0.02.246.439 D que    start_loop: processing new tasks
+0.02.246.441 D que    start_loop: processing task, id = 1
+0.02.246.495 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.02.246.498 D srv          send: sending result for task id = 1
+0.02.246.498 D srv          send: task id = 1 pushed to result queue
+0.02.246.501 D que    start_loop: update slots
+0.02.246.502 I srv  update_slots: all slots are idle
+0.02.246.502 D que    start_loop: waiting for new tasks
+0.02.246.508 D srv  remove_waiti: remove task 1 from waiting list. current waiting = 1 (before remove)
+0.02.246.629 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.02.246.631 D srv  log_server_r: request:  
+0.02.246.638 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.03.246.108 D srv  add_waiting_: add task 2 to waiting list. current waiting = 0 (before add)
+0.03.246.111 D que          post: new task, id = 2, front = 1
+0.03.246.144 D que    start_loop: processing new tasks
+0.03.246.146 D que    start_loop: processing task, id = 2
+0.03.246.181 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.03.246.183 D srv          send: sending result for task id = 2
+0.03.246.183 D srv          send: task id = 2 pushed to result queue
+0.03.246.185 D que    start_loop: update slots
+0.03.246.185 I srv  update_slots: all slots are idle
+0.03.246.185 D que    start_loop: waiting for new tasks
+0.03.246.213 D srv  remove_waiti: remove task 2 from waiting list. current waiting = 1 (before remove)
+0.03.246.304 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.03.246.305 D srv  log_server_r: request:  
+0.03.246.310 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.04.245.918 D srv  add_waiting_: add task 3 to waiting list. current waiting = 0 (before add)
+0.04.245.921 D que          post: new task, id = 3, front = 1
+0.04.245.956 D que    start_loop: processing new tasks
+0.04.245.957 D que    start_loop: processing task, id = 3
+0.04.245.993 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.04.245.995 D srv          send: sending result for task id = 3
+0.04.245.995 D srv          send: task id = 3 pushed to result queue
+0.04.245.996 D que    start_loop: update slots
+0.04.245.997 I srv  update_slots: all slots are idle
+0.04.245.997 D que    start_loop: waiting for new tasks
+0.04.246.003 D srv  remove_waiti: remove task 3 from waiting list. current waiting = 1 (before remove)
+0.04.246.103 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.04.246.104 D srv  log_server_r: request:  
+0.04.246.109 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.04.778.794 I srv  log_server_r: request: GET /health 127.0.0.1 200
+0.04.778.796 D srv  log_server_r: request:  
+0.04.778.796 D srv  log_server_r: response: {"status":"ok"}
+0.05.246.054 D srv  add_waiting_: add task 4 to waiting list. current waiting = 0 (before add)
+0.05.246.057 D que          post: new task, id = 4, front = 1
+0.05.246.065 D que    start_loop: processing new tasks
+0.05.246.067 D que    start_loop: processing task, id = 4
+0.05.246.123 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.05.246.126 D srv          send: sending result for task id = 4
+0.05.246.126 D srv          send: task id = 4 pushed to result queue
+0.05.246.130 D que    start_loop: update slots
+0.05.246.131 I srv  update_slots: all slots are idle
+0.05.246.131 D que    start_loop: waiting for new tasks
+0.05.246.133 D srv  remove_waiti: remove task 4 from waiting list. current waiting = 1 (before remove)
+0.05.246.245 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.05.246.247 D srv  log_server_r: request:  
+0.05.246.252 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.06.246.854 D srv  add_waiting_: add task 5 to waiting list. current waiting = 0 (before add)
+0.06.246.856 D que          post: new task, id = 5, front = 1
+0.06.246.864 D que    start_loop: processing new tasks
+0.06.246.866 D que    start_loop: processing task, id = 5
+0.06.246.907 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.06.246.907 D srv          send: sending result for task id = 5
+0.06.246.907 D srv          send: task id = 5 pushed to result queue
+0.06.246.910 D que    start_loop: update slots
+0.06.246.911 I srv  update_slots: all slots are idle
+0.06.246.911 D que    start_loop: waiting for new tasks
+0.06.246.939 D srv  remove_waiti: remove task 5 from waiting list. current waiting = 1 (before remove)
+0.06.247.026 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.06.247.027 D srv  log_server_r: request:  
+0.06.247.032 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.06.818.122 I srv  log_server_r: request: GET /health 127.0.0.1 200
+0.06.818.125 D srv  log_server_r: request:  
+0.06.818.125 D srv  log_server_r: response: {"status":"ok"}
+0.07.246.000 D srv  add_waiting_: add task 6 to waiting list. current waiting = 0 (before add)
+0.07.246.003 D que          post: new task, id = 6, front = 1
+0.07.246.012 D que    start_loop: processing new tasks
+0.07.246.013 D que    start_loop: processing task, id = 6
+0.07.246.060 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.07.246.062 D srv          send: sending result for task id = 6
+0.07.246.062 D srv          send: task id = 6 pushed to result queue
+0.07.246.065 D que    start_loop: update slots
+0.07.246.066 I srv  update_slots: all slots are idle
+0.07.246.066 D que    start_loop: waiting for new tasks
+0.07.246.070 D srv  remove_waiti: remove task 6 from waiting list. current waiting = 1 (before remove)
+0.07.246.193 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.07.246.195 D srv  log_server_r: request:  
+0.07.246.203 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.08.246.904 D srv  add_waiting_: add task 7 to waiting list. current waiting = 0 (before add)
+0.08.246.907 D que          post: new task, id = 7, front = 1
+0.08.246.916 D que    start_loop: processing new tasks
+0.08.246.917 D que    start_loop: processing task, id = 7
+0.08.246.951 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.08.246.953 D srv          send: sending result for task id = 7
+0.08.246.953 D srv          send: task id = 7 pushed to result queue
+0.08.246.955 D que    start_loop: update slots
+0.08.246.956 I srv  update_slots: all slots are idle
+0.08.246.956 D que    start_loop: waiting for new tasks
+0.08.246.979 D srv  remove_waiti: remove task 7 from waiting list. current waiting = 1 (before remove)
+0.08.247.067 I srv  log_server_r: request: GET /metrics 172.18.0.2 200
+0.08.247.068 D srv  log_server_r: request:  
+0.08.247.073 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.08.353.622 D srv  add_waiting_: add task 8 to waiting list. current waiting = 0 (before add)
+0.08.353.624 D que          post: new task, id = 8, front = 1
+0.08.353.651 D que    start_loop: processing new tasks
+0.08.353.653 D que    start_loop: processing task, id = 8
+0.08.353.689 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.08.353.691 D srv          send: sending result for task id = 8
+0.08.353.691 D srv          send: task id = 8 pushed to result queue
+0.08.353.693 D que    start_loop: update slots
+0.08.353.693 I srv  update_slots: all slots are idle
+0.08.353.693 D que    start_loop: waiting for new tasks
+0.08.353.698 D srv  remove_waiti: remove task 8 from waiting list. current waiting = 1 (before remove)
+0.08.353.797 I srv  log_server_r: request: GET /metrics 172.18.0.1 200
+0.08.353.799 D srv  log_server_r: request:  
+0.08.353.805 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.08.441.365 D request: {"model":"local","stream":true,"messages":[{"role":"system","content":"You are a concise assistant for an inference team."},{"role":"user","content":"Read these words: red red red red red red red red red red red red red red red red red red red red red red red red red red red red\nWrite a numbered list with ten observations."}],"logprobs":false,"max_tokens":512,"seed":0,"stream_options":{"include_usage":true},"temperature":0,"cache_prompt":false,"ignore_eos":true}
+0.08.443.255 D srv  params_from_: Grammar: 
+0.08.443.257 D srv  params_from_: Grammar lazy: false
+0.08.443.258 I srv  params_from_: Chat format: Content-only
+0.08.443.264 D srv  add_waiting_: add task 9 to waiting list. current waiting = 0 (before add)
+0.08.443.265 D que          post: new task, id = 9/1, front = 0
+0.08.443.272 D que    start_loop: processing new tasks
+0.08.443.274 D que    start_loop: processing task, id = 9
+0.08.443.275 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.08.443.276 D slot        reset: id  0 | task -1 | 
+0.08.443.355 D slot launch_slot_: id  0 | task 9 | launching slot : {"id":0,"id_task":9,"n_ctx":4096,"speculative":false,"is_processing":false,"params":{"n_predict":512,"seed":0,"temperature":0.0,"dynatemp_range":0.0,"dynatemp_exponent":1.0,"top_k":40,"top_p":0.949999988079071,"min_p":0.05000000074505806,"top_n_sigma":-1.0,"xtc_probability":0.0,"xtc_threshold":0.10000000149011612,"typical_p":1.0,"repeat_last_n":64,"repeat_penalty":1.0,"presence_penalty":0.0,"frequency_penalty":0.0,"dry_multiplier":0.0,"dry_base":1.75,"dry_allowed_length":2,"dry_penalty_last_n":4096,"dry_sequence_breakers":["\n",":","\"","*"],"mirostat":0,"mirostat_tau":5.0,"mirostat_eta":0.10000000149011612,"stop":[],"max_tokens":512,"n_keep":0,"n_discard":0,"ignore_eos":true,"stream":true,"logit_bias":[{"bias":null,"token":151643},{"bias":null,"token":151645},{"bias":null,"token":151662},{"bias":null,"token":151663},{"bias":null,"token":151664}],"n_probs":0,"min_keep":0,"grammar":"","grammar_lazy":false,"grammar_triggers":[],"preserved_tokens":[],"chat_format":"Content-only","reasoning_format":"auto","reasoning_in_content":false,"thinking_forced_open":false,"samplers":["penalties","dry","top_n_sigma","top_k","typ_p","top_p","min_p","xtc","temperature"],"speculative.n_max":16,"speculative.n_min":0,"speculative.p_min":0.75,"timings_per_token":false,"post_sampling_probs":false,"lora":[]},"prompt":"<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nRead these words: red red red red red red red red red red red red red red red red red red red red red red red red red red red red\nWrite a numbered list with ten observations.<|im_end|>\n<|im_start|>assistant\n","next_token":{"has_next_token":true,"has_new_line":false,"n_remain":-1,"n_decoded":0,"stopping_word":""}}
+0.08.443.377 I slot launch_slot_: id  0 | task 9 | processing task
+0.08.443.379 D que    start_loop: update slots
+0.08.443.380 D srv  update_slots: posting NEXT_RESPONSE
+0.08.443.381 D que          post: new task, id = 10, front = 0
+0.08.443.386 I slot update_slots: id  0 | task 9 | new prompt, n_ctx_slot = 4096, n_keep = 0, n_prompt_tokens = 64
+0.08.443.392 I slot update_slots: id  0 | task 9 | kv cache rm [0, end)
+0.08.443.398 I slot update_slots: id  0 | task 9 | prompt processing progress, n_past = 64, n_tokens = 64, progress = 1.000000
+0.08.443.415 I slot update_slots: id  0 | task 9 | prompt done, n_past = 64, n_tokens = 64
+0.08.443.415 D srv  update_slots: decoding batch, n_tokens = 64
+0.08.443.417 D clear_adapter_lora: call
+0.08.443.419 D set_embeddings: value = 0
+0.08.449.085 D srv  add_waiting_: add task 11 to waiting list. current waiting = 1 (before add)
+0.08.449.088 D que          post: new task, id = 11, front = 1
+0.08.475.197 D srv  update_chat_: Parsing chat message: 1
+0.08.475.200 D Parsing input with format Content-only: 1
+0.08.475.203 D srv          send: sending result for task id = 9
+0.08.475.203 D srv          send: task id = 9 pushed to result queue
+0.08.475.207 D slot process_toke: id  0 | task 9 | n_decoded = 1, n_remaining = 511, next token:    16 '1'
+0.08.475.207 D srv  update_slots: run slots completed
+0.08.475.208 D que    start_loop: waiting for new tasks
+0.08.475.208 D que    start_loop: processing new tasks
+0.08.475.209 D que    start_loop: processing task, id = 11
+0.08.475.244 D srv  process_sing: n_idle_slots = 0, n_processing_slots = 1
+0.08.475.245 D srv          send: sending result for task id = 11
+0.08.475.245 D srv          send: task id = 11 pushed to result queue
+0.08.475.250 D que    start_loop: processing task, id = 10
+0.08.475.250 D que    start_loop: update slots
+0.08.475.250 D srv  update_slots: posting NEXT_RESPONSE
+0.08.475.251 D que          post: new task, id = 12, front = 0
+0.08.475.253 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 65, n_cache_tokens = 65, truncated = 0
+0.08.475.254 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.475.255 D clear_adapter_lora: call
+0.08.475.255 D set_embeddings: value = 0
+0.08.475.269 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.475.285 D srv  remove_waiti: remove task 11 from waiting list. current waiting = 2 (before remove)
+0.08.475.315 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"1"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.475.390 I srv  log_server_r: request: GET /metrics 172.18.0.1 200
+0.08.475.392 D srv  log_server_r: request:  
+0.08.475.396 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 64
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0.031
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 1
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 64
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 1
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 2064.52
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 1
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.08.482.404 D srv  update_chat_: Parsing chat message: 1.
+0.08.482.407 D Parsing input with format Content-only: 1.
+0.08.482.408 D srv          send: sending result for task id = 9
+0.08.482.408 D srv          send: task id = 9 pushed to result queue
+0.08.482.410 D slot process_toke: id  0 | task 9 | n_decoded = 2, n_remaining = 510, next token:    13 '.'
+0.08.482.411 D srv  update_slots: run slots completed
+0.08.482.411 D que    start_loop: waiting for new tasks
+0.08.482.411 D que    start_loop: processing new tasks
+0.08.482.412 D que    start_loop: processing task, id = 12
+0.08.482.412 D que    start_loop: update slots
+0.08.482.413 D srv  update_slots: posting NEXT_RESPONSE
+0.08.482.413 D que          post: new task, id = 13, front = 0
+0.08.482.415 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 66, n_cache_tokens = 66, truncated = 0
+0.08.482.416 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.482.416 D clear_adapter_lora: call
+0.08.482.417 D set_embeddings: value = 0
+0.08.482.448 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.489.031 D srv  update_chat_: Parsing chat message: 1. Red
+0.08.489.034 D Parsing input with format Content-only: 1. Red
+0.08.489.035 D srv          send: sending result for task id = 9
+0.08.489.035 D srv          send: task id = 9 pushed to result queue
+0.08.489.037 D slot process_toke: id  0 | task 9 | n_decoded = 3, n_remaining = 509, next token:  3731 ' Red'
+0.08.489.038 D srv  update_slots: run slots completed
+0.08.489.038 D que    start_loop: waiting for new tasks
+0.08.489.038 D que    start_loop: processing new tasks
+0.08.489.039 D que    start_loop: processing task, id = 13
+0.08.489.040 D que    start_loop: update slots
+0.08.489.040 D srv  update_slots: posting NEXT_RESPONSE
+0.08.489.041 D que          post: new task, id = 14, front = 0
+0.08.489.043 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 67, n_cache_tokens = 67, truncated = 0
+0.08.489.043 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.489.044 D clear_adapter_lora: call
+0.08.489.044 D set_embeddings: value = 0
+0.08.489.054 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.495.652 D srv  update_chat_: Parsing chat message: 1. Red
+
+0.08.495.654 D Parsing input with format Content-only: 1. Red
+
+0.08.495.656 D srv          send: sending result for task id = 9
+0.08.495.656 D srv          send: task id = 9 pushed to result queue
+0.08.495.658 D slot process_toke: id  0 | task 9 | n_decoded = 4, n_remaining = 508, next token:   198 '
+'
+0.08.495.658 D srv  update_slots: run slots completed
+0.08.495.659 D que    start_loop: waiting for new tasks
+0.08.495.659 D que    start_loop: processing new tasks
+0.08.495.659 D que    start_loop: processing task, id = 14
+0.08.495.660 D que    start_loop: update slots
+0.08.495.660 D srv  update_slots: posting NEXT_RESPONSE
+0.08.495.661 D que          post: new task, id = 15, front = 0
+0.08.495.662 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 68, n_cache_tokens = 68, truncated = 0
+0.08.495.662 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.495.663 D clear_adapter_lora: call
+0.08.495.663 D set_embeddings: value = 0
+0.08.495.696 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.502.254 D srv  update_chat_: Parsing chat message: 1. Red
+2
+0.08.502.256 D Parsing input with format Content-only: 1. Red
+2
+0.08.502.258 D srv          send: sending result for task id = 9
+0.08.502.258 D srv          send: task id = 9 pushed to result queue
+0.08.502.260 D slot process_toke: id  0 | task 9 | n_decoded = 5, n_remaining = 507, next token:    17 '2'
+0.08.502.260 D srv  update_slots: run slots completed
+0.08.502.261 D que    start_loop: waiting for new tasks
+0.08.502.261 D que    start_loop: processing new tasks
+0.08.502.263 D que    start_loop: processing task, id = 15
+0.08.502.263 D que    start_loop: update slots
+0.08.502.263 D srv  update_slots: posting NEXT_RESPONSE
+0.08.502.264 D que          post: new task, id = 16, front = 0
+0.08.502.265 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 69, n_cache_tokens = 69, truncated = 0
+0.08.502.265 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.502.266 D clear_adapter_lora: call
+0.08.502.266 D set_embeddings: value = 0
+0.08.502.298 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"2"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.508.861 D srv  update_chat_: Parsing chat message: 1. Red
+2.
+0.08.508.863 D Parsing input with format Content-only: 1. Red
+2.
+0.08.508.864 D srv          send: sending result for task id = 9
+0.08.508.865 D srv          send: task id = 9 pushed to result queue
+0.08.508.866 D slot process_toke: id  0 | task 9 | n_decoded = 6, n_remaining = 506, next token:    13 '.'
+0.08.508.867 D srv  update_slots: run slots completed
+0.08.508.867 D que    start_loop: waiting for new tasks
+0.08.508.867 D que    start_loop: processing new tasks
+0.08.508.868 D que    start_loop: processing task, id = 16
+0.08.508.868 D que    start_loop: update slots
+0.08.508.869 D srv  update_slots: posting NEXT_RESPONSE
+0.08.508.869 D que          post: new task, id = 17, front = 0
+0.08.508.871 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 70, n_cache_tokens = 70, truncated = 0
+0.08.508.871 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.508.871 D clear_adapter_lora: call
+0.08.508.872 D set_embeddings: value = 0
+0.08.508.913 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.515.457 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+0.08.515.459 D Parsing input with format Content-only: 1. Red
+2. Red
+0.08.515.460 D srv          send: sending result for task id = 9
+0.08.515.460 D srv          send: task id = 9 pushed to result queue
+0.08.515.462 D slot process_toke: id  0 | task 9 | n_decoded = 7, n_remaining = 505, next token:  3731 ' Red'
+0.08.515.462 D srv  update_slots: run slots completed
+0.08.515.462 D que    start_loop: waiting for new tasks
+0.08.515.463 D que    start_loop: processing new tasks
+0.08.515.463 D que    start_loop: processing task, id = 17
+0.08.515.464 D que    start_loop: update slots
+0.08.515.464 D srv  update_slots: posting NEXT_RESPONSE
+0.08.515.464 D que          post: new task, id = 18, front = 0
+0.08.515.466 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 71, n_cache_tokens = 71, truncated = 0
+0.08.515.467 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.515.467 D clear_adapter_lora: call
+0.08.515.467 D set_embeddings: value = 0
+0.08.515.502 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.522.055 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+
+0.08.522.057 D Parsing input with format Content-only: 1. Red
+2. Red
+
+0.08.522.058 D srv          send: sending result for task id = 9
+0.08.522.058 D srv          send: task id = 9 pushed to result queue
+0.08.522.060 D slot process_toke: id  0 | task 9 | n_decoded = 8, n_remaining = 504, next token:   198 '
+'
+0.08.522.060 D srv  update_slots: run slots completed
+0.08.522.060 D que    start_loop: waiting for new tasks
+0.08.522.061 D que    start_loop: processing new tasks
+0.08.522.061 D que    start_loop: processing task, id = 18
+0.08.522.062 D que    start_loop: update slots
+0.08.522.062 D srv  update_slots: posting NEXT_RESPONSE
+0.08.522.062 D que          post: new task, id = 19, front = 0
+0.08.522.064 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 72, n_cache_tokens = 72, truncated = 0
+0.08.522.064 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.522.065 D clear_adapter_lora: call
+0.08.522.065 D set_embeddings: value = 0
+0.08.522.099 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.528.641 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3
+0.08.528.643 D Parsing input with format Content-only: 1. Red
+2. Red
+3
+0.08.528.644 D srv          send: sending result for task id = 9
+0.08.528.645 D srv          send: task id = 9 pushed to result queue
+0.08.528.646 D slot process_toke: id  0 | task 9 | n_decoded = 9, n_remaining = 503, next token:    18 '3'
+0.08.528.646 D srv  update_slots: run slots completed
+0.08.528.647 D que    start_loop: waiting for new tasks
+0.08.528.647 D que    start_loop: processing new tasks
+0.08.528.648 D que    start_loop: processing task, id = 19
+0.08.528.648 D que    start_loop: update slots
+0.08.528.648 D srv  update_slots: posting NEXT_RESPONSE
+0.08.528.649 D que          post: new task, id = 20, front = 0
+0.08.528.650 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 73, n_cache_tokens = 73, truncated = 0
+0.08.528.650 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.528.650 D clear_adapter_lora: call
+0.08.528.651 D set_embeddings: value = 0
+0.08.528.686 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"3"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.535.233 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3.
+0.08.535.235 D Parsing input with format Content-only: 1. Red
+2. Red
+3.
+0.08.535.236 D srv          send: sending result for task id = 9
+0.08.535.237 D srv          send: task id = 9 pushed to result queue
+0.08.535.238 D slot process_toke: id  0 | task 9 | n_decoded = 10, n_remaining = 502, next token:    13 '.'
+0.08.535.238 D srv  update_slots: run slots completed
+0.08.535.238 D que    start_loop: waiting for new tasks
+0.08.535.239 D que    start_loop: processing new tasks
+0.08.535.239 D que    start_loop: processing task, id = 20
+0.08.535.240 D que    start_loop: update slots
+0.08.535.240 D srv  update_slots: posting NEXT_RESPONSE
+0.08.535.240 D que          post: new task, id = 21, front = 0
+0.08.535.242 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 74, n_cache_tokens = 74, truncated = 0
+0.08.535.242 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.535.242 D clear_adapter_lora: call
+0.08.535.243 D set_embeddings: value = 0
+0.08.535.276 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.541.820 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+0.08.541.822 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+0.08.541.823 D srv          send: sending result for task id = 9
+0.08.541.823 D srv          send: task id = 9 pushed to result queue
+0.08.541.826 D slot process_toke: id  0 | task 9 | n_decoded = 11, n_remaining = 501, next token:  3731 ' Red'
+0.08.541.827 D srv  update_slots: run slots completed
+0.08.541.827 D que    start_loop: waiting for new tasks
+0.08.541.827 D que    start_loop: processing new tasks
+0.08.541.828 D que    start_loop: processing task, id = 21
+0.08.541.828 D que    start_loop: update slots
+0.08.541.828 D srv  update_slots: posting NEXT_RESPONSE
+0.08.541.829 D que          post: new task, id = 22, front = 0
+0.08.541.830 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 75, n_cache_tokens = 75, truncated = 0
+0.08.541.831 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.541.831 D clear_adapter_lora: call
+0.08.541.831 D set_embeddings: value = 0
+0.08.541.880 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.548.410 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+
+0.08.548.412 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+
+0.08.548.414 D srv          send: sending result for task id = 9
+0.08.548.414 D srv          send: task id = 9 pushed to result queue
+0.08.548.416 D slot process_toke: id  0 | task 9 | n_decoded = 12, n_remaining = 500, next token:   198 '
+'
+0.08.548.416 D srv  update_slots: run slots completed
+0.08.548.416 D que    start_loop: waiting for new tasks
+0.08.548.416 D que    start_loop: processing new tasks
+0.08.548.417 D que    start_loop: processing task, id = 22
+0.08.548.417 D que    start_loop: update slots
+0.08.548.418 D srv  update_slots: posting NEXT_RESPONSE
+0.08.548.418 D que          post: new task, id = 23, front = 0
+0.08.548.420 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 76, n_cache_tokens = 76, truncated = 0
+0.08.548.420 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.548.420 D clear_adapter_lora: call
+0.08.548.421 D set_embeddings: value = 0
+0.08.548.453 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.554.990 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4
+0.08.554.992 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4
+0.08.554.993 D srv          send: sending result for task id = 9
+0.08.554.993 D srv          send: task id = 9 pushed to result queue
+0.08.554.994 D slot process_toke: id  0 | task 9 | n_decoded = 13, n_remaining = 499, next token:    19 '4'
+0.08.554.995 D srv  update_slots: run slots completed
+0.08.554.995 D que    start_loop: waiting for new tasks
+0.08.554.995 D que    start_loop: processing new tasks
+0.08.554.996 D que    start_loop: processing task, id = 23
+0.08.554.996 D que    start_loop: update slots
+0.08.554.996 D srv  update_slots: posting NEXT_RESPONSE
+0.08.554.997 D que          post: new task, id = 24, front = 0
+0.08.554.998 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 77, n_cache_tokens = 77, truncated = 0
+0.08.554.999 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.554.999 D clear_adapter_lora: call
+0.08.554.999 D set_embeddings: value = 0
+0.08.555.033 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"4"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.561.574 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4.
+0.08.561.576 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4.
+0.08.561.578 D srv          send: sending result for task id = 9
+0.08.561.578 D srv          send: task id = 9 pushed to result queue
+0.08.561.580 D slot process_toke: id  0 | task 9 | n_decoded = 14, n_remaining = 498, next token:    13 '.'
+0.08.561.580 D srv  update_slots: run slots completed
+0.08.561.580 D que    start_loop: waiting for new tasks
+0.08.561.581 D que    start_loop: processing new tasks
+0.08.561.581 D que    start_loop: processing task, id = 24
+0.08.561.582 D que    start_loop: update slots
+0.08.561.582 D srv  update_slots: posting NEXT_RESPONSE
+0.08.561.582 D que          post: new task, id = 25, front = 0
+0.08.561.584 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 78, n_cache_tokens = 78, truncated = 0
+0.08.561.584 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.561.585 D clear_adapter_lora: call
+0.08.561.585 D set_embeddings: value = 0
+0.08.561.624 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.568.171 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+0.08.568.174 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+0.08.568.176 D srv          send: sending result for task id = 9
+0.08.568.176 D srv          send: task id = 9 pushed to result queue
+0.08.568.177 D slot process_toke: id  0 | task 9 | n_decoded = 15, n_remaining = 497, next token:  3731 ' Red'
+0.08.568.178 D srv  update_slots: run slots completed
+0.08.568.178 D que    start_loop: waiting for new tasks
+0.08.568.178 D que    start_loop: processing new tasks
+0.08.568.179 D que    start_loop: processing task, id = 25
+0.08.568.179 D que    start_loop: update slots
+0.08.568.180 D srv  update_slots: posting NEXT_RESPONSE
+0.08.568.180 D que          post: new task, id = 26, front = 0
+0.08.568.182 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 79, n_cache_tokens = 79, truncated = 0
+0.08.568.182 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.568.182 D clear_adapter_lora: call
+0.08.568.183 D set_embeddings: value = 0
+0.08.568.214 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.574.767 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+
+0.08.574.770 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+
+0.08.574.772 D srv          send: sending result for task id = 9
+0.08.574.772 D srv          send: task id = 9 pushed to result queue
+0.08.574.773 D slot process_toke: id  0 | task 9 | n_decoded = 16, n_remaining = 496, next token:   198 '
+'
+0.08.574.774 D srv  update_slots: run slots completed
+0.08.574.774 D que    start_loop: waiting for new tasks
+0.08.574.774 D que    start_loop: processing new tasks
+0.08.574.775 D que    start_loop: processing task, id = 26
+0.08.574.775 D que    start_loop: update slots
+0.08.574.775 D srv  update_slots: posting NEXT_RESPONSE
+0.08.574.776 D que          post: new task, id = 27, front = 0
+0.08.574.777 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 80, n_cache_tokens = 80, truncated = 0
+0.08.574.778 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.574.778 D clear_adapter_lora: call
+0.08.574.779 D set_embeddings: value = 0
+0.08.574.817 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.581.369 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5
+0.08.581.371 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5
+0.08.581.373 D srv          send: sending result for task id = 9
+0.08.581.373 D srv          send: task id = 9 pushed to result queue
+0.08.581.375 D slot process_toke: id  0 | task 9 | n_decoded = 17, n_remaining = 495, next token:    20 '5'
+0.08.581.375 D srv  update_slots: run slots completed
+0.08.581.375 D que    start_loop: waiting for new tasks
+0.08.581.375 D que    start_loop: processing new tasks
+0.08.581.376 D que    start_loop: processing task, id = 27
+0.08.581.376 D que    start_loop: update slots
+0.08.581.377 D srv  update_slots: posting NEXT_RESPONSE
+0.08.581.377 D que          post: new task, id = 28, front = 0
+0.08.581.378 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 81, n_cache_tokens = 81, truncated = 0
+0.08.581.379 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.581.379 D clear_adapter_lora: call
+0.08.581.379 D set_embeddings: value = 0
+0.08.581.415 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"5"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.587.969 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5.
+0.08.587.971 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5.
+0.08.587.973 D srv          send: sending result for task id = 9
+0.08.587.974 D srv          send: task id = 9 pushed to result queue
+0.08.587.975 D slot process_toke: id  0 | task 9 | n_decoded = 18, n_remaining = 494, next token:    13 '.'
+0.08.587.976 D srv  update_slots: run slots completed
+0.08.587.976 D que    start_loop: waiting for new tasks
+0.08.587.976 D que    start_loop: processing new tasks
+0.08.587.977 D que    start_loop: processing task, id = 28
+0.08.587.977 D que    start_loop: update slots
+0.08.587.978 D srv  update_slots: posting NEXT_RESPONSE
+0.08.587.978 D que          post: new task, id = 29, front = 0
+0.08.587.980 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 82, n_cache_tokens = 82, truncated = 0
+0.08.587.980 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.587.980 D clear_adapter_lora: call
+0.08.587.981 D set_embeddings: value = 0
+0.08.588.014 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.594.559 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+0.08.594.562 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+0.08.594.563 D srv          send: sending result for task id = 9
+0.08.594.564 D srv          send: task id = 9 pushed to result queue
+0.08.594.565 D slot process_toke: id  0 | task 9 | n_decoded = 19, n_remaining = 493, next token:  3731 ' Red'
+0.08.594.565 D srv  update_slots: run slots completed
+0.08.594.566 D que    start_loop: waiting for new tasks
+0.08.594.566 D que    start_loop: processing new tasks
+0.08.594.567 D que    start_loop: processing task, id = 29
+0.08.594.567 D que    start_loop: update slots
+0.08.594.568 D srv  update_slots: posting NEXT_RESPONSE
+0.08.594.568 D que          post: new task, id = 30, front = 0
+0.08.594.570 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 83, n_cache_tokens = 83, truncated = 0
+0.08.594.570 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.594.571 D clear_adapter_lora: call
+0.08.594.571 D set_embeddings: value = 0
+0.08.594.604 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.601.229 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+
+0.08.601.232 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+
+0.08.601.234 D srv          send: sending result for task id = 9
+0.08.601.235 D srv          send: task id = 9 pushed to result queue
+0.08.601.237 D slot process_toke: id  0 | task 9 | n_decoded = 20, n_remaining = 492, next token:   198 '
+'
+0.08.601.237 D srv  update_slots: run slots completed
+0.08.601.237 D que    start_loop: waiting for new tasks
+0.08.601.238 D que    start_loop: processing new tasks
+0.08.601.239 D que    start_loop: processing task, id = 30
+0.08.601.239 D que    start_loop: update slots
+0.08.601.239 D srv  update_slots: posting NEXT_RESPONSE
+0.08.601.240 D que          post: new task, id = 31, front = 0
+0.08.601.243 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 84, n_cache_tokens = 84, truncated = 0
+0.08.601.243 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.601.244 D clear_adapter_lora: call
+0.08.601.244 D set_embeddings: value = 0
+0.08.601.276 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.607.828 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6
+0.08.607.830 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6
+0.08.607.832 D srv          send: sending result for task id = 9
+0.08.607.833 D srv          send: task id = 9 pushed to result queue
+0.08.607.834 D slot process_toke: id  0 | task 9 | n_decoded = 21, n_remaining = 491, next token:    21 '6'
+0.08.607.835 D srv  update_slots: run slots completed
+0.08.607.835 D que    start_loop: waiting for new tasks
+0.08.607.835 D que    start_loop: processing new tasks
+0.08.607.836 D que    start_loop: processing task, id = 31
+0.08.607.836 D que    start_loop: update slots
+0.08.607.836 D srv  update_slots: posting NEXT_RESPONSE
+0.08.607.837 D que          post: new task, id = 32, front = 0
+0.08.607.838 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 85, n_cache_tokens = 85, truncated = 0
+0.08.607.839 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.607.839 D clear_adapter_lora: call
+0.08.607.839 D set_embeddings: value = 0
+0.08.607.875 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"6"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.614.422 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6.
+0.08.614.424 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6.
+0.08.614.426 D srv          send: sending result for task id = 9
+0.08.614.426 D srv          send: task id = 9 pushed to result queue
+0.08.614.428 D slot process_toke: id  0 | task 9 | n_decoded = 22, n_remaining = 490, next token:    13 '.'
+0.08.614.428 D srv  update_slots: run slots completed
+0.08.614.428 D que    start_loop: waiting for new tasks
+0.08.614.428 D que    start_loop: processing new tasks
+0.08.614.429 D que    start_loop: processing task, id = 32
+0.08.614.429 D que    start_loop: update slots
+0.08.614.430 D srv  update_slots: posting NEXT_RESPONSE
+0.08.614.430 D que          post: new task, id = 33, front = 0
+0.08.614.432 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 86, n_cache_tokens = 86, truncated = 0
+0.08.614.432 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.614.433 D clear_adapter_lora: call
+0.08.614.433 D set_embeddings: value = 0
+0.08.614.468 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.621.103 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+0.08.621.106 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+0.08.621.108 D srv          send: sending result for task id = 9
+0.08.621.108 D srv          send: task id = 9 pushed to result queue
+0.08.621.110 D slot process_toke: id  0 | task 9 | n_decoded = 23, n_remaining = 489, next token:  3731 ' Red'
+0.08.621.110 D srv  update_slots: run slots completed
+0.08.621.111 D que    start_loop: waiting for new tasks
+0.08.621.111 D que    start_loop: processing new tasks
+0.08.621.112 D que    start_loop: processing task, id = 33
+0.08.621.112 D que    start_loop: update slots
+0.08.621.113 D srv  update_slots: posting NEXT_RESPONSE
+0.08.621.114 D que          post: new task, id = 34, front = 0
+0.08.621.116 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 87, n_cache_tokens = 87, truncated = 0
+0.08.621.117 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.621.117 D clear_adapter_lora: call
+0.08.621.118 D set_embeddings: value = 0
+0.08.621.151 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.627.799 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+
+0.08.627.801 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+
+0.08.627.804 D srv          send: sending result for task id = 9
+0.08.627.804 D srv          send: task id = 9 pushed to result queue
+0.08.627.806 D slot process_toke: id  0 | task 9 | n_decoded = 24, n_remaining = 488, next token:   198 '
+'
+0.08.627.806 D srv  update_slots: run slots completed
+0.08.627.807 D que    start_loop: waiting for new tasks
+0.08.627.807 D que    start_loop: processing new tasks
+0.08.627.808 D que    start_loop: processing task, id = 34
+0.08.627.808 D que    start_loop: update slots
+0.08.627.809 D srv  update_slots: posting NEXT_RESPONSE
+0.08.627.810 D que          post: new task, id = 35, front = 0
+0.08.627.812 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 88, n_cache_tokens = 88, truncated = 0
+0.08.627.812 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.627.813 D clear_adapter_lora: call
+0.08.627.813 D set_embeddings: value = 0
+0.08.627.847 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.634.419 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7
+0.08.634.422 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7
+0.08.634.423 D srv          send: sending result for task id = 9
+0.08.634.424 D srv          send: task id = 9 pushed to result queue
+0.08.634.425 D slot process_toke: id  0 | task 9 | n_decoded = 25, n_remaining = 487, next token:    22 '7'
+0.08.634.425 D srv  update_slots: run slots completed
+0.08.634.426 D que    start_loop: waiting for new tasks
+0.08.634.426 D que    start_loop: processing new tasks
+0.08.634.426 D que    start_loop: processing task, id = 35
+0.08.634.427 D que    start_loop: update slots
+0.08.634.427 D srv  update_slots: posting NEXT_RESPONSE
+0.08.634.428 D que          post: new task, id = 36, front = 0
+0.08.634.429 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 89, n_cache_tokens = 89, truncated = 0
+0.08.634.429 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.634.430 D clear_adapter_lora: call
+0.08.634.430 D set_embeddings: value = 0
+0.08.634.465 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"7"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.641.002 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7.
+0.08.641.004 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7.
+0.08.641.006 D srv          send: sending result for task id = 9
+0.08.641.006 D srv          send: task id = 9 pushed to result queue
+0.08.641.008 D slot process_toke: id  0 | task 9 | n_decoded = 26, n_remaining = 486, next token:    13 '.'
+0.08.641.008 D srv  update_slots: run slots completed
+0.08.641.008 D que    start_loop: waiting for new tasks
+0.08.641.009 D que    start_loop: processing new tasks
+0.08.641.009 D que    start_loop: processing task, id = 36
+0.08.641.010 D que    start_loop: update slots
+0.08.641.010 D srv  update_slots: posting NEXT_RESPONSE
+0.08.641.011 D que          post: new task, id = 37, front = 0
+0.08.641.012 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 90, n_cache_tokens = 90, truncated = 0
+0.08.641.013 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.641.013 D clear_adapter_lora: call
+0.08.641.013 D set_embeddings: value = 0
+0.08.641.045 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.647.590 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+0.08.647.592 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+0.08.647.594 D srv          send: sending result for task id = 9
+0.08.647.594 D srv          send: task id = 9 pushed to result queue
+0.08.647.596 D slot process_toke: id  0 | task 9 | n_decoded = 27, n_remaining = 485, next token:  3731 ' Red'
+0.08.647.596 D srv  update_slots: run slots completed
+0.08.647.596 D que    start_loop: waiting for new tasks
+0.08.647.597 D que    start_loop: processing new tasks
+0.08.647.597 D que    start_loop: processing task, id = 37
+0.08.647.598 D que    start_loop: update slots
+0.08.647.598 D srv  update_slots: posting NEXT_RESPONSE
+0.08.647.599 D que          post: new task, id = 38, front = 0
+0.08.647.600 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 91, n_cache_tokens = 91, truncated = 0
+0.08.647.601 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.647.601 D clear_adapter_lora: call
+0.08.647.601 D set_embeddings: value = 0
+0.08.647.634 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.654.180 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+
+0.08.654.182 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+
+0.08.654.184 D srv          send: sending result for task id = 9
+0.08.654.184 D srv          send: task id = 9 pushed to result queue
+0.08.654.186 D slot process_toke: id  0 | task 9 | n_decoded = 28, n_remaining = 484, next token:   198 '
+'
+0.08.654.186 D srv  update_slots: run slots completed
+0.08.654.186 D que    start_loop: waiting for new tasks
+0.08.654.187 D que    start_loop: processing new tasks
+0.08.654.187 D que    start_loop: processing task, id = 38
+0.08.654.188 D que    start_loop: update slots
+0.08.654.188 D srv  update_slots: posting NEXT_RESPONSE
+0.08.654.189 D que          post: new task, id = 39, front = 0
+0.08.654.190 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 92, n_cache_tokens = 92, truncated = 0
+0.08.654.191 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.654.191 D clear_adapter_lora: call
+0.08.654.191 D set_embeddings: value = 0
+0.08.654.224 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.660.768 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8
+0.08.660.771 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8
+0.08.660.772 D srv          send: sending result for task id = 9
+0.08.660.773 D srv          send: task id = 9 pushed to result queue
+0.08.660.774 D slot process_toke: id  0 | task 9 | n_decoded = 29, n_remaining = 483, next token:    23 '8'
+0.08.660.774 D srv  update_slots: run slots completed
+0.08.660.775 D que    start_loop: waiting for new tasks
+0.08.660.775 D que    start_loop: processing new tasks
+0.08.660.775 D que    start_loop: processing task, id = 39
+0.08.660.776 D que    start_loop: update slots
+0.08.660.776 D srv  update_slots: posting NEXT_RESPONSE
+0.08.660.777 D que          post: new task, id = 40, front = 0
+0.08.660.778 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 93, n_cache_tokens = 93, truncated = 0
+0.08.660.778 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.660.779 D clear_adapter_lora: call
+0.08.660.779 D set_embeddings: value = 0
+0.08.660.819 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"8"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.667.373 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8.
+0.08.667.375 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8.
+0.08.667.377 D srv          send: sending result for task id = 9
+0.08.667.377 D srv          send: task id = 9 pushed to result queue
+0.08.667.379 D slot process_toke: id  0 | task 9 | n_decoded = 30, n_remaining = 482, next token:    13 '.'
+0.08.667.379 D srv  update_slots: run slots completed
+0.08.667.379 D que    start_loop: waiting for new tasks
+0.08.667.379 D que    start_loop: processing new tasks
+0.08.667.380 D que    start_loop: processing task, id = 40
+0.08.667.380 D que    start_loop: update slots
+0.08.667.381 D srv  update_slots: posting NEXT_RESPONSE
+0.08.667.381 D que          post: new task, id = 41, front = 0
+0.08.667.383 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 94, n_cache_tokens = 94, truncated = 0
+0.08.667.383 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.667.384 D clear_adapter_lora: call
+0.08.667.384 D set_embeddings: value = 0
+0.08.667.423 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.674.007 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+0.08.674.010 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+0.08.674.012 D srv          send: sending result for task id = 9
+0.08.674.013 D srv          send: task id = 9 pushed to result queue
+0.08.674.014 D slot process_toke: id  0 | task 9 | n_decoded = 31, n_remaining = 481, next token:  3731 ' Red'
+0.08.674.015 D srv  update_slots: run slots completed
+0.08.674.015 D que    start_loop: waiting for new tasks
+0.08.674.015 D que    start_loop: processing new tasks
+0.08.674.016 D que    start_loop: processing task, id = 41
+0.08.674.016 D que    start_loop: update slots
+0.08.674.016 D srv  update_slots: posting NEXT_RESPONSE
+0.08.674.017 D que          post: new task, id = 42, front = 0
+0.08.674.019 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 95, n_cache_tokens = 95, truncated = 0
+0.08.674.020 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.674.020 D clear_adapter_lora: call
+0.08.674.021 D set_embeddings: value = 0
+0.08.674.055 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.680.629 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+
+0.08.680.631 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+
+0.08.680.633 D srv          send: sending result for task id = 9
+0.08.680.633 D srv          send: task id = 9 pushed to result queue
+0.08.680.635 D slot process_toke: id  0 | task 9 | n_decoded = 32, n_remaining = 480, next token:   198 '
+'
+0.08.680.635 D srv  update_slots: run slots completed
+0.08.680.635 D que    start_loop: waiting for new tasks
+0.08.680.636 D que    start_loop: processing new tasks
+0.08.680.636 D que    start_loop: processing task, id = 42
+0.08.680.637 D que    start_loop: update slots
+0.08.680.637 D srv  update_slots: posting NEXT_RESPONSE
+0.08.680.638 D que          post: new task, id = 43, front = 0
+0.08.680.640 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 96, n_cache_tokens = 96, truncated = 0
+0.08.680.640 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.680.641 D clear_adapter_lora: call
+0.08.680.641 D set_embeddings: value = 0
+0.08.680.674 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.687.233 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9
+0.08.687.235 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9
+0.08.687.237 D srv          send: sending result for task id = 9
+0.08.687.237 D srv          send: task id = 9 pushed to result queue
+0.08.687.239 D slot process_toke: id  0 | task 9 | n_decoded = 33, n_remaining = 479, next token:    24 '9'
+0.08.687.239 D srv  update_slots: run slots completed
+0.08.687.239 D que    start_loop: waiting for new tasks
+0.08.687.239 D que    start_loop: processing new tasks
+0.08.687.240 D que    start_loop: processing task, id = 43
+0.08.687.240 D que    start_loop: update slots
+0.08.687.240 D srv  update_slots: posting NEXT_RESPONSE
+0.08.687.241 D que          post: new task, id = 44, front = 0
+0.08.687.242 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 97, n_cache_tokens = 97, truncated = 0
+0.08.687.242 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.687.243 D clear_adapter_lora: call
+0.08.687.243 D set_embeddings: value = 0
+0.08.687.286 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"9"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.693.839 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9.
+0.08.693.841 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9.
+0.08.693.844 D srv          send: sending result for task id = 9
+0.08.693.844 D srv          send: task id = 9 pushed to result queue
+0.08.693.846 D slot process_toke: id  0 | task 9 | n_decoded = 34, n_remaining = 478, next token:    13 '.'
+0.08.693.847 D srv  update_slots: run slots completed
+0.08.693.847 D que    start_loop: waiting for new tasks
+0.08.693.847 D que    start_loop: processing new tasks
+0.08.693.848 D que    start_loop: processing task, id = 44
+0.08.693.849 D que    start_loop: update slots
+0.08.693.849 D srv  update_slots: posting NEXT_RESPONSE
+0.08.693.850 D que          post: new task, id = 45, front = 0
+0.08.693.853 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 98, n_cache_tokens = 98, truncated = 0
+0.08.693.853 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.693.854 D clear_adapter_lora: call
+0.08.693.854 D set_embeddings: value = 0
+0.08.693.889 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.700.447 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+0.08.700.449 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+0.08.700.451 D srv          send: sending result for task id = 9
+0.08.700.451 D srv          send: task id = 9 pushed to result queue
+0.08.700.453 D slot process_toke: id  0 | task 9 | n_decoded = 35, n_remaining = 477, next token:  3731 ' Red'
+0.08.700.453 D srv  update_slots: run slots completed
+0.08.700.453 D que    start_loop: waiting for new tasks
+0.08.700.453 D que    start_loop: processing new tasks
+0.08.700.454 D que    start_loop: processing task, id = 45
+0.08.700.454 D que    start_loop: update slots
+0.08.700.454 D srv  update_slots: posting NEXT_RESPONSE
+0.08.700.455 D que          post: new task, id = 46, front = 0
+0.08.700.457 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 99, n_cache_tokens = 99, truncated = 0
+0.08.700.457 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.700.457 D clear_adapter_lora: call
+0.08.700.458 D set_embeddings: value = 0
+0.08.700.493 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.707.048 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+
+0.08.707.050 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+
+0.08.707.052 D srv          send: sending result for task id = 9
+0.08.707.052 D srv          send: task id = 9 pushed to result queue
+0.08.707.054 D slot process_toke: id  0 | task 9 | n_decoded = 36, n_remaining = 476, next token:   198 '
+'
+0.08.707.054 D srv  update_slots: run slots completed
+0.08.707.054 D que    start_loop: waiting for new tasks
+0.08.707.055 D que    start_loop: processing new tasks
+0.08.707.055 D que    start_loop: processing task, id = 46
+0.08.707.056 D que    start_loop: update slots
+0.08.707.056 D srv  update_slots: posting NEXT_RESPONSE
+0.08.707.056 D que          post: new task, id = 47, front = 0
+0.08.707.058 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 100, n_cache_tokens = 100, truncated = 0
+0.08.707.058 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.707.059 D clear_adapter_lora: call
+0.08.707.059 D set_embeddings: value = 0
+0.08.707.100 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.713.649 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+1
+0.08.713.651 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+1
+0.08.713.653 D srv          send: sending result for task id = 9
+0.08.713.653 D srv          send: task id = 9 pushed to result queue
+0.08.713.654 D slot process_toke: id  0 | task 9 | n_decoded = 37, n_remaining = 475, next token:    16 '1'
+0.08.713.655 D srv  update_slots: run slots completed
+0.08.713.655 D que    start_loop: waiting for new tasks
+0.08.713.655 D que    start_loop: processing new tasks
+0.08.713.656 D que    start_loop: processing task, id = 47
+0.08.713.656 D que    start_loop: update slots
+0.08.713.656 D srv  update_slots: posting NEXT_RESPONSE
+0.08.713.657 D que          post: new task, id = 48, front = 0
+0.08.713.658 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 101, n_cache_tokens = 101, truncated = 0
+0.08.713.659 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.713.659 D clear_adapter_lora: call
+0.08.713.660 D set_embeddings: value = 0
+0.08.713.694 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"1"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.720.256 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10
+0.08.720.259 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10
+0.08.720.261 D srv          send: sending result for task id = 9
+0.08.720.261 D srv          send: task id = 9 pushed to result queue
+0.08.720.262 D slot process_toke: id  0 | task 9 | n_decoded = 38, n_remaining = 474, next token:    15 '0'
+0.08.720.263 D srv  update_slots: run slots completed
+0.08.720.263 D que    start_loop: waiting for new tasks
+0.08.720.263 D que    start_loop: processing new tasks
+0.08.720.264 D que    start_loop: processing task, id = 48
+0.08.720.264 D que    start_loop: update slots
+0.08.720.264 D srv  update_slots: posting NEXT_RESPONSE
+0.08.720.265 D que          post: new task, id = 49, front = 0
+0.08.720.267 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 102, n_cache_tokens = 102, truncated = 0
+0.08.720.267 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.720.268 D clear_adapter_lora: call
+0.08.720.268 D set_embeddings: value = 0
+0.08.720.299 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"0"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.726.876 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10.
+0.08.726.878 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10.
+0.08.726.879 D srv          send: sending result for task id = 9
+0.08.726.880 D srv          send: task id = 9 pushed to result queue
+0.08.726.881 D slot process_toke: id  0 | task 9 | n_decoded = 39, n_remaining = 473, next token:    13 '.'
+0.08.726.881 D srv  update_slots: run slots completed
+0.08.726.882 D que    start_loop: waiting for new tasks
+0.08.726.882 D que    start_loop: processing new tasks
+0.08.726.882 D que    start_loop: processing task, id = 49
+0.08.726.883 D que    start_loop: update slots
+0.08.726.883 D srv  update_slots: posting NEXT_RESPONSE
+0.08.726.883 D que          post: new task, id = 50, front = 0
+0.08.726.885 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 103, n_cache_tokens = 103, truncated = 0
+0.08.726.885 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.726.886 D clear_adapter_lora: call
+0.08.726.886 D set_embeddings: value = 0
+0.08.726.927 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.733.461 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+0.08.733.463 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+0.08.733.464 D srv          send: sending result for task id = 9
+0.08.733.465 D srv          send: task id = 9 pushed to result queue
+0.08.733.466 D slot process_toke: id  0 | task 9 | n_decoded = 40, n_remaining = 472, next token:  3731 ' Red'
+0.08.733.466 D srv  update_slots: run slots completed
+0.08.733.466 D que    start_loop: waiting for new tasks
+0.08.733.467 D que    start_loop: processing new tasks
+0.08.733.467 D que    start_loop: processing task, id = 50
+0.08.733.468 D que    start_loop: update slots
+0.08.733.468 D srv  update_slots: posting NEXT_RESPONSE
+0.08.733.468 D que          post: new task, id = 51, front = 0
+0.08.733.470 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 104, n_cache_tokens = 104, truncated = 0
+0.08.733.470 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.733.470 D clear_adapter_lora: call
+0.08.733.471 D set_embeddings: value = 0
+0.08.733.504 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.740.058 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+
+0.08.740.060 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+
+0.08.740.061 D srv          send: sending result for task id = 9
+0.08.740.062 D srv          send: task id = 9 pushed to result queue
+0.08.740.063 D slot process_toke: id  0 | task 9 | n_decoded = 41, n_remaining = 471, next token:   271 '
+
+'
+0.08.740.063 D srv  update_slots: run slots completed
+0.08.740.064 D que    start_loop: waiting for new tasks
+0.08.740.064 D que    start_loop: processing new tasks
+0.08.740.064 D que    start_loop: processing task, id = 51
+0.08.740.065 D que    start_loop: update slots
+0.08.740.065 D srv  update_slots: posting NEXT_RESPONSE
+0.08.740.066 D que          post: new task, id = 52, front = 0
+0.08.740.067 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 105, n_cache_tokens = 105, truncated = 0
+0.08.740.067 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.740.067 D clear_adapter_lora: call
+0.08.740.068 D set_embeddings: value = 0
+0.08.740.104 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.746.650 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1
+0.08.746.652 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1
+0.08.746.653 D srv          send: sending result for task id = 9
+0.08.746.654 D srv          send: task id = 9 pushed to result queue
+0.08.746.655 D slot process_toke: id  0 | task 9 | n_decoded = 42, n_remaining = 470, next token:    16 '1'
+0.08.746.655 D srv  update_slots: run slots completed
+0.08.746.656 D que    start_loop: waiting for new tasks
+0.08.746.656 D que    start_loop: processing new tasks
+0.08.746.657 D que    start_loop: processing task, id = 52
+0.08.746.657 D que    start_loop: update slots
+0.08.746.657 D srv  update_slots: posting NEXT_RESPONSE
+0.08.746.658 D que          post: new task, id = 53, front = 0
+0.08.746.659 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 106, n_cache_tokens = 106, truncated = 0
+0.08.746.659 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.746.660 D clear_adapter_lora: call
+0.08.746.660 D set_embeddings: value = 0
+0.08.746.692 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"1"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.753.248 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1.
+0.08.753.250 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1.
+0.08.753.251 D srv          send: sending result for task id = 9
+0.08.753.251 D srv          send: task id = 9 pushed to result queue
+0.08.753.253 D slot process_toke: id  0 | task 9 | n_decoded = 43, n_remaining = 469, next token:    13 '.'
+0.08.753.253 D srv  update_slots: run slots completed
+0.08.753.253 D que    start_loop: waiting for new tasks
+0.08.753.253 D que    start_loop: processing new tasks
+0.08.753.254 D que    start_loop: processing task, id = 53
+0.08.753.254 D que    start_loop: update slots
+0.08.753.254 D srv  update_slots: posting NEXT_RESPONSE
+0.08.753.255 D que          post: new task, id = 54, front = 0
+0.08.753.256 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 107, n_cache_tokens = 107, truncated = 0
+0.08.753.256 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.753.256 D clear_adapter_lora: call
+0.08.753.257 D set_embeddings: value = 0
+0.08.753.294 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.759.841 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+0.08.759.844 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+0.08.759.845 D srv          send: sending result for task id = 9
+0.08.759.846 D srv          send: task id = 9 pushed to result queue
+0.08.759.847 D slot process_toke: id  0 | task 9 | n_decoded = 44, n_remaining = 468, next token:  3731 ' Red'
+0.08.759.847 D srv  update_slots: run slots completed
+0.08.759.848 D que    start_loop: waiting for new tasks
+0.08.759.848 D que    start_loop: processing new tasks
+0.08.759.849 D que    start_loop: processing task, id = 54
+0.08.759.849 D que    start_loop: update slots
+0.08.759.849 D srv  update_slots: posting NEXT_RESPONSE
+0.08.759.850 D que          post: new task, id = 55, front = 0
+0.08.759.851 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 108, n_cache_tokens = 108, truncated = 0
+0.08.759.852 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.759.852 D clear_adapter_lora: call
+0.08.759.852 D set_embeddings: value = 0
+0.08.759.894 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.766.432 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+
+0.08.766.434 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+
+0.08.766.436 D srv          send: sending result for task id = 9
+0.08.766.436 D srv          send: task id = 9 pushed to result queue
+0.08.766.438 D slot process_toke: id  0 | task 9 | n_decoded = 45, n_remaining = 467, next token:   198 '
+'
+0.08.766.438 D srv  update_slots: run slots completed
+0.08.766.438 D que    start_loop: waiting for new tasks
+0.08.766.438 D que    start_loop: processing new tasks
+0.08.766.439 D que    start_loop: processing task, id = 55
+0.08.766.439 D que    start_loop: update slots
+0.08.766.440 D srv  update_slots: posting NEXT_RESPONSE
+0.08.766.440 D que          post: new task, id = 56, front = 0
+0.08.766.442 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 109, n_cache_tokens = 109, truncated = 0
+0.08.766.442 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.766.442 D clear_adapter_lora: call
+0.08.766.443 D set_embeddings: value = 0
+0.08.766.475 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.773.033 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2
+0.08.773.036 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2
+0.08.773.037 D srv          send: sending result for task id = 9
+0.08.773.038 D srv          send: task id = 9 pushed to result queue
+0.08.773.039 D slot process_toke: id  0 | task 9 | n_decoded = 46, n_remaining = 466, next token:    17 '2'
+0.08.773.039 D srv  update_slots: run slots completed
+0.08.773.039 D que    start_loop: waiting for new tasks
+0.08.773.040 D que    start_loop: processing new tasks
+0.08.773.040 D que    start_loop: processing task, id = 56
+0.08.773.041 D que    start_loop: update slots
+0.08.773.041 D srv  update_slots: posting NEXT_RESPONSE
+0.08.773.041 D que          post: new task, id = 57, front = 0
+0.08.773.043 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 110, n_cache_tokens = 110, truncated = 0
+0.08.773.043 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.773.043 D clear_adapter_lora: call
+0.08.773.044 D set_embeddings: value = 0
+0.08.773.078 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"2"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.779.674 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2.
+0.08.779.678 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2.
+0.08.779.681 D srv          send: sending result for task id = 9
+0.08.779.681 D srv          send: task id = 9 pushed to result queue
+0.08.779.684 D slot process_toke: id  0 | task 9 | n_decoded = 47, n_remaining = 465, next token:    13 '.'
+0.08.779.685 D srv  update_slots: run slots completed
+0.08.779.685 D que    start_loop: waiting for new tasks
+0.08.779.685 D que    start_loop: processing new tasks
+0.08.779.687 D que    start_loop: processing task, id = 57
+0.08.779.687 D que    start_loop: update slots
+0.08.779.688 D srv  update_slots: posting NEXT_RESPONSE
+0.08.779.689 D que          post: new task, id = 58, front = 0
+0.08.779.692 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 111, n_cache_tokens = 111, truncated = 0
+0.08.779.693 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.779.693 D clear_adapter_lora: call
+0.08.779.694 D set_embeddings: value = 0
+0.08.779.712 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.786.400 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+0.08.786.403 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+0.08.786.409 D srv          send: sending result for task id = 9
+0.08.786.409 D srv          send: task id = 9 pushed to result queue
+0.08.786.411 D slot process_toke: id  0 | task 9 | n_decoded = 48, n_remaining = 464, next token:  3731 ' Red'
+0.08.786.412 D srv  update_slots: run slots completed
+0.08.786.412 D que    start_loop: waiting for new tasks
+0.08.786.413 D que    start_loop: processing new tasks
+0.08.786.415 D que    start_loop: processing task, id = 58
+0.08.786.416 D que    start_loop: update slots
+0.08.786.416 D srv  update_slots: posting NEXT_RESPONSE
+0.08.786.417 D que          post: new task, id = 59, front = 0
+0.08.786.420 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 112, n_cache_tokens = 112, truncated = 0
+0.08.786.421 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.786.423 D clear_adapter_lora: call
+0.08.786.423 D set_embeddings: value = 0
+0.08.786.457 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.793.150 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+
+0.08.793.156 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+
+0.08.793.160 D srv          send: sending result for task id = 9
+0.08.793.160 D srv          send: task id = 9 pushed to result queue
+0.08.793.163 D slot process_toke: id  0 | task 9 | n_decoded = 49, n_remaining = 463, next token:   198 '
+'
+0.08.793.164 D srv  update_slots: run slots completed
+0.08.793.164 D que    start_loop: waiting for new tasks
+0.08.793.164 D que    start_loop: processing new tasks
+0.08.793.165 D que    start_loop: processing task, id = 59
+0.08.793.166 D que    start_loop: update slots
+0.08.793.166 D srv  update_slots: posting NEXT_RESPONSE
+0.08.793.168 D que          post: new task, id = 60, front = 0
+0.08.793.171 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 113, n_cache_tokens = 113, truncated = 0
+0.08.793.171 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.793.172 D clear_adapter_lora: call
+0.08.793.173 D set_embeddings: value = 0
+0.08.793.212 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.799.875 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3
+0.08.799.879 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3
+0.08.799.883 D srv          send: sending result for task id = 9
+0.08.799.883 D srv          send: task id = 9 pushed to result queue
+0.08.799.885 D slot process_toke: id  0 | task 9 | n_decoded = 50, n_remaining = 462, next token:    18 '3'
+0.08.799.886 D srv  update_slots: run slots completed
+0.08.799.887 D que    start_loop: waiting for new tasks
+0.08.799.887 D que    start_loop: processing new tasks
+0.08.799.888 D que    start_loop: processing task, id = 60
+0.08.799.889 D que    start_loop: update slots
+0.08.799.889 D srv  update_slots: posting NEXT_RESPONSE
+0.08.799.891 D que          post: new task, id = 61, front = 0
+0.08.799.894 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 114, n_cache_tokens = 114, truncated = 0
+0.08.799.895 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.799.896 D clear_adapter_lora: call
+0.08.799.896 D set_embeddings: value = 0
+0.08.799.925 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"3"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.806.598 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3.
+0.08.806.602 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3.
+0.08.806.605 D srv          send: sending result for task id = 9
+0.08.806.605 D srv          send: task id = 9 pushed to result queue
+0.08.806.608 D slot process_toke: id  0 | task 9 | n_decoded = 51, n_remaining = 461, next token:    13 '.'
+0.08.806.608 D srv  update_slots: run slots completed
+0.08.806.608 D que    start_loop: waiting for new tasks
+0.08.806.609 D que    start_loop: processing new tasks
+0.08.806.609 D que    start_loop: processing task, id = 61
+0.08.806.610 D que    start_loop: update slots
+0.08.806.610 D srv  update_slots: posting NEXT_RESPONSE
+0.08.806.611 D que          post: new task, id = 62, front = 0
+0.08.806.613 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 115, n_cache_tokens = 115, truncated = 0
+0.08.806.613 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.806.614 D clear_adapter_lora: call
+0.08.806.614 D set_embeddings: value = 0
+0.08.806.636 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.813.273 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+0.08.813.276 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+0.08.813.279 D srv          send: sending result for task id = 9
+0.08.813.279 D srv          send: task id = 9 pushed to result queue
+0.08.813.281 D slot process_toke: id  0 | task 9 | n_decoded = 52, n_remaining = 460, next token:  3731 ' Red'
+0.08.813.281 D srv  update_slots: run slots completed
+0.08.813.281 D que    start_loop: waiting for new tasks
+0.08.813.281 D que    start_loop: processing new tasks
+0.08.813.282 D que    start_loop: processing task, id = 62
+0.08.813.283 D que    start_loop: update slots
+0.08.813.283 D srv  update_slots: posting NEXT_RESPONSE
+0.08.813.284 D que          post: new task, id = 63, front = 0
+0.08.813.286 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 116, n_cache_tokens = 116, truncated = 0
+0.08.813.287 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.813.287 D clear_adapter_lora: call
+0.08.813.288 D set_embeddings: value = 0
+0.08.813.322 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Red"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.819.960 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+
+0.08.819.964 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+
+0.08.819.968 D srv          send: sending result for task id = 9
+0.08.819.969 D srv          send: task id = 9 pushed to result queue
+0.08.819.972 D slot process_toke: id  0 | task 9 | n_decoded = 53, n_remaining = 459, next token:   198 '
+'
+0.08.819.973 D srv  update_slots: run slots completed
+0.08.819.973 D que    start_loop: waiting for new tasks
+0.08.819.973 D que    start_loop: processing new tasks
+0.08.819.974 D que    start_loop: processing task, id = 63
+0.08.819.975 D que    start_loop: update slots
+0.08.819.976 D srv  update_slots: posting NEXT_RESPONSE
+0.08.819.977 D que          post: new task, id = 64, front = 0
+0.08.819.980 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 117, n_cache_tokens = 117, truncated = 0
+0.08.819.981 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.819.981 D clear_adapter_lora: call
+0.08.819.982 D set_embeddings: value = 0
+0.08.820.005 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.826.779 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+4
+0.08.826.785 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+4
+0.08.826.790 D srv          send: sending result for task id = 9
+0.08.826.790 D srv          send: task id = 9 pushed to result queue
+0.08.826.794 D slot process_toke: id  0 | task 9 | n_decoded = 54, n_remaining = 458, next token:    19 '4'
+0.08.826.795 D srv  update_slots: run slots completed
+0.08.826.796 D que    start_loop: waiting for new tasks
+0.08.826.796 D que    start_loop: processing new tasks
+0.08.826.798 D que    start_loop: processing task, id = 64
+0.08.826.799 D que    start_loop: update slots
+0.08.826.800 D srv  update_slots: posting NEXT_RESPONSE
+0.08.826.801 D que          post: new task, id = 65, front = 0
+0.08.826.806 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 118, n_cache_tokens = 118, truncated = 0
+0.08.826.808 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.826.809 D clear_adapter_lora: call
+0.08.826.810 D set_embeddings: value = 0
+0.08.826.831 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"4"}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+0.08.833.711 D srv  update_chat_: Parsing chat message: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+4.
+0.08.833.721 D Parsing input with format Content-only: 1. Red
+2. Red
+3. Red
+4. Red
+5. Red
+6. Red
+7. Red
+8. Red
+9. Red
+10. Red
+
+1. Red
+2. Red
+3. Red
+4.
+0.08.833.728 D srv          send: sending result for task id = 9
+0.08.833.728 D srv          send: task id = 9 pushed to result queue
+0.08.833.734 D slot process_toke: id  0 | task 9 | n_decoded = 55, n_remaining = 457, next token:    13 '.'
+0.08.833.735 D srv  update_slots: run slots completed
+0.08.833.736 D que    start_loop: waiting for new tasks
+0.08.833.736 D que    start_loop: processing new tasks
+0.08.833.738 D que    start_loop: processing task, id = 65
+0.08.833.739 D que    start_loop: update slots
+0.08.833.740 D srv  update_slots: posting NEXT_RESPONSE
+0.08.833.741 D que          post: new task, id = 66, front = 0
+0.08.833.746 D slot update_slots: id  0 | task 9 | slot decode token, n_ctx = 4096, n_past = 119, n_cache_tokens = 119, truncated = 0
+0.08.833.747 D srv  update_slots: decoding batch, n_tokens = 1
+0.08.833.749 D clear_adapter_lora: call
+0.08.833.750 D set_embeddings: value = 0
+0.08.833.773 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793403575,"id":"chatcmpl-OQn2LWwXVhKizvqCc3ocAFpCsk1IWDzp","model":"local","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+

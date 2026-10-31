@@ -1,0 +1,2046 @@
+{
+  "request_id": "I01L2_20261030T233636Z_0adebd-0000",
+  "headers_ns": 185121745246519,
+  "first_content_ns": 185121791216868,
+  "protocol_complete_ns": 185122297102910,
+  "close_ns": 185122297112236,
+  "status": 200,
+  "events": [
+    {
+      "ns": 185121790603711,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": null,
+              "function_call": null,
+              "refusal": null,
+              "role": "assistant",
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": null
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121791216868,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "1",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "1",
+                  "bytes": [
+                    49
+                  ],
+                  "logprob": -0.7106189727783203,
+                  "top_logprobs": [
+                    {
+                      "token": "1",
+                      "bytes": [
+                        49
+                      ],
+                      "logprob": -0.7106189727783203,
+                      "id": 16
+                    }
+                  ],
+                  "id": 16
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121803494155,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -0.010044004768133163,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -0.010044004768133163,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121819416112,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.7355785965919495,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.7355785965919495,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121835765986,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.1314944475889206,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.1314944475889206,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121851660499,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "2",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "2",
+                  "bytes": [
+                    50
+                  ],
+                  "logprob": -0.0048288279213011265,
+                  "top_logprobs": [
+                    {
+                      "token": "2",
+                      "bytes": [
+                        50
+                      ],
+                      "logprob": -0.0048288279213011265,
+                      "id": 17
+                    }
+                  ],
+                  "id": 17
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121867542709,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -6.270605081226677e-05,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -6.270605081226677e-05,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121883401569,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.021939663216471672,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.021939663216471672,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121899148529,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.00702614476904273,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.00702614476904273,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121914916342,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "3",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "3",
+                  "bytes": [
+                    51
+                  ],
+                  "logprob": -5.018836964154616e-05,
+                  "top_logprobs": [
+                    {
+                      "token": "3",
+                      "bytes": [
+                        51
+                      ],
+                      "logprob": -5.018836964154616e-05,
+                      "id": 18
+                    }
+                  ],
+                  "id": 18
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121930968528,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -7.200500112958252e-05,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -7.200500112958252e-05,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121948508864,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.0010164775885641575,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.0010164775885641575,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121964394928,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.0009124864591285586,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.0009124864591285586,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121980302303,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "4",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "4",
+                  "bytes": [
+                    52
+                  ],
+                  "logprob": -3.0041192076168954e-05,
+                  "top_logprobs": [
+                    {
+                      "token": "4",
+                      "bytes": [
+                        52
+                      ],
+                      "logprob": -3.0041192076168954e-05,
+                      "id": 19
+                    }
+                  ],
+                  "id": 19
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185121995593972,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -1.9312092263135128e-05,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -1.9312092263135128e-05,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122010873906,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.0008697118610143661,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.0008697118610143661,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122026109861,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.0008513974607922137,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.0008513974607922137,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122042011609,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "5",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "5",
+                  "bytes": [
+                    53
+                  ],
+                  "logprob": -9.179157132166438e-06,
+                  "top_logprobs": [
+                    {
+                      "token": "5",
+                      "bytes": [
+                        53
+                      ],
+                      "logprob": -9.179157132166438e-06,
+                      "id": 20
+                    }
+                  ],
+                  "id": 20
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122060443755,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -2.849142583727371e-05,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -2.849142583727371e-05,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122077894041,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.0011065761791542172,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.0011065761791542172,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122093379303,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.0014462792314589024,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.0014462792314589024,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403405,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122108855043,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "6",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "6",
+                  "bytes": [
+                    54
+                  ],
+                  "logprob": -4.625427391147241e-05,
+                  "top_logprobs": [
+                    {
+                      "token": "6",
+                      "bytes": [
+                        54
+                      ],
+                      "logprob": -4.625427391147241e-05,
+                      "id": 21
+                    }
+                  ],
+                  "id": 21
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122124501825,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -0.00010395590652478859,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -0.00010395590652478859,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122140183298,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.0010586021235212684,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.0010586021235212684,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122157200267,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.0010944631649181247,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.0010944631649181247,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122173166841,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "7",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "7",
+                  "bytes": [
+                    55
+                  ],
+                  "logprob": -2.8849064619862475e-05,
+                  "top_logprobs": [
+                    {
+                      "token": "7",
+                      "bytes": [
+                        55
+                      ],
+                      "logprob": -2.8849064619862475e-05,
+                      "id": 22
+                    }
+                  ],
+                  "id": 22
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122188863068,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -9.847171895671636e-05,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -9.847171895671636e-05,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122205824128,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.0007081154035404325,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.0007081154035404325,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122221387740,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.0006784117431379855,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.0006784117431379855,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122237678069,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "8",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "8",
+                  "bytes": [
+                    56
+                  ],
+                  "logprob": -3.0041192076168954e-05,
+                  "top_logprobs": [
+                    {
+                      "token": "8",
+                      "bytes": [
+                        56
+                      ],
+                      "logprob": -3.0041192076168954e-05,
+                      "id": 23
+                    }
+                  ],
+                  "id": 23
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122256877392,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": ".",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": ".",
+                  "bytes": [
+                    46
+                  ],
+                  "logprob": -8.80995430634357e-05,
+                  "top_logprobs": [
+                    {
+                      "token": ".",
+                      "bytes": [
+                        46
+                      ],
+                      "logprob": -8.80995430634357e-05,
+                      "id": 13
+                    }
+                  ],
+                  "id": 13
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122274887825,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": " Red",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": " Red",
+                  "bytes": [
+                    32,
+                    82,
+                    101,
+                    100
+                  ],
+                  "logprob": -0.00043526821536943316,
+                  "top_logprobs": [
+                    {
+                      "token": " Red",
+                      "bytes": [
+                        32,
+                        82,
+                        101,
+                        100
+                      ],
+                      "logprob": -0.00043526821536943316,
+                      "id": 3731
+                    }
+                  ],
+                  "id": 3731
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122294166270,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": "\n",
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": null,
+            "logprobs": {
+              "content": [
+                {
+                  "token": "\n",
+                  "bytes": [
+                    10
+                  ],
+                  "logprob": -0.0006589079857803881,
+                  "top_logprobs": [
+                    {
+                      "token": "\n",
+                      "bytes": [
+                        10
+                      ],
+                      "logprob": -0.0006589079857803881,
+                      "id": 198
+                    }
+                  ],
+                  "id": 198
+                }
+              ],
+              "refusal": null
+            }
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122294729290,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [
+          {
+            "delta": {
+              "audio": null,
+              "content": null,
+              "function_call": null,
+              "refusal": null,
+              "role": null,
+              "tool_calls": null
+            },
+            "index": 0,
+            "finish_reason": "length",
+            "logprobs": null
+          }
+        ],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": null
+      }
+    },
+    {
+      "ns": 185122295845234,
+      "event": {
+        "id": "chatcmpl-Y4DcwFqJeNIDKec6CDjTIBjuau7IMEJ4",
+        "choices": [],
+        "created": 1793403406,
+        "model": "local",
+        "object": "chat.completion.chunk",
+        "moderation": null,
+        "obfuscation": null,
+        "service_tier": null,
+        "system_fingerprint": "b6500-a7a98e0ff",
+        "usage": {
+          "completion_tokens": 32,
+          "prompt_tokens": 64,
+          "total_tokens": 96,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 64,
+          "prompt_ms": 32.601,
+          "prompt_per_token_ms": 0.509390625,
+          "prompt_per_second": 1963.1299653384865,
+          "predicted_n": 32,
+          "predicted_ms": 515.935,
+          "predicted_per_token_ms": 16.12296875,
+          "predicted_per_second": 62.0233168906936
+        }
+      }
+    }
+  ],
+  "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 64,
+    "total_tokens": 96,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": null
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 64,
+    "prompt_ms": 32.601,
+    "prompt_per_token_ms": 0.509390625,
+    "prompt_per_second": 1963.1299653384865,
+    "predicted_n": 32,
+    "predicted_ms": 515.935,
+    "predicted_per_token_ms": 16.12296875,
+    "predicted_per_second": 62.0233168906936
+  },
+  "finish_reason": "length",
+  "error": null,
+  "body_reads": [
+    {
+      "ns": 185121786988643,
+      "bytes": 256,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOm51bGx9fV0sImNyZWF0ZWQiOjE3OTM0MDM0MDUsImlkIjoiY2hhdGNtcGwtWTREY3dGcUplTklES2VjNkNEalRJQmp1YXU3SU1FSjQiLCJtb2RlbCI6ImxvY2FsIiwic3lzdGVtX2ZpbmdlcnByaW50IjoiYjY1MDAtYTdhOThlMGZmIiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uLmNodW5rIn0KCg=="
+    },
+    {
+      "ns": 185121790655962,
+      "bytes": 408,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjEifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjE2LCJ0b2tlbiI6IjEiLCJieXRlcyI6WzQ5XSwibG9ncHJvYiI6LTAuNzEwNjE4OTcyNzc4MzIwMywidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTYsInRva2VuIjoiMSIsImJ5dGVzIjpbNDldLCJsb2dwcm9iIjotMC43MTA2MTg5NzI3NzgzMjAzfV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185121803309758,
+      "bytes": 412,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTAuMDEwMDQ0MDA0NzY4MTMzMTYzLCJ0b3BfbG9ncHJvYnMiOlt7ImlkIjoxMywidG9rZW4iOiIuIiwiYnl0ZXMiOls0Nl0sImxvZ3Byb2IiOi0wLjAxMDA0NDAwNDc2ODEzMzE2M31dfV19fV0sImNyZWF0ZWQiOjE3OTM0MDM0MDUsImlkIjoiY2hhdGNtcGwtWTREY3dGcUplTklES2VjNkNEalRJQmp1YXU3SU1FSjQiLCJtb2RlbCI6ImxvY2FsIiwic3lzdGVtX2ZpbmdlcnByaW50IjoiYjY1MDAtYTdhOThlMGZmIiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uLmNodW5rIn0KCg=="
+    },
+    {
+      "ns": 185121819195888,
+      "bytes": 443,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjczNTU3ODU5NjU5MTk0OTUsInRvcF9sb2dwcm9icyI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjczNTU3ODU5NjU5MTk0OTV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185121835559010,
+      "bytes": 413,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMTMxNDk0NDQ3NTg4OTIwNiwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTk4LCJ0b2tlbiI6IlxuIiwiYnl0ZXMiOlsxMF0sImxvZ3Byb2IiOi0wLjEzMTQ5NDQ0NzU4ODkyMDZ9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185121851463518,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjIifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjE3LCJ0b2tlbiI6IjIiLCJieXRlcyI6WzUwXSwibG9ncHJvYiI6LTAuMDA0ODI4ODI3OTIxMzAxMTI2NSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTcsInRva2VuIjoiMiIsImJ5dGVzIjpbNTBdLCJsb2dwcm9iIjotMC4wMDQ4Mjg4Mjc5MjEzMDExMjY1fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185121867361634,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTYuMjcwNjA1MDgxMjI2Njc3ZS0wNSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTMsInRva2VuIjoiLiIsImJ5dGVzIjpbNDZdLCJsb2dwcm9iIjotNi4yNzA2MDUwODEyMjY2NzdlLTA1fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185121883211887,
+      "bytes": 447,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAyMTkzOTY2MzIxNjQ3MTY3MiwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MzczMSwidG9rZW4iOiIgUmVkIiwiYnl0ZXMiOlszMiw4MiwxMDEsMTAwXSwibG9ncHJvYiI6LTAuMDIxOTM5NjYzMjE2NDcxNjcyfV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185121898968587,
+      "bytes": 415,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMDA3MDI2MTQ0NzY5MDQyNzMsInRvcF9sb2dwcm9icyI6W3siaWQiOjE5OCwidG9rZW4iOiJcbiIsImJ5dGVzIjpbMTBdLCJsb2dwcm9iIjotMC4wMDcwMjYxNDQ3NjkwNDI3M31dfV19fV0sImNyZWF0ZWQiOjE3OTM0MDM0MDUsImlkIjoiY2hhdGNtcGwtWTREY3dGcUplTklES2VjNkNEalRJQmp1YXU3SU1FSjQiLCJtb2RlbCI6ImxvY2FsIiwic3lzdGVtX2ZpbmdlcnByaW50IjoiYjY1MDAtYTdhOThlMGZmIiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uLmNodW5rIn0KCg=="
+    },
+    {
+      "ns": 185121914735355,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjMifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjE4LCJ0b2tlbiI6IjMiLCJieXRlcyI6WzUxXSwibG9ncHJvYiI6LTUuMDE4ODM2OTY0MTU0NjE2ZS0wNSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTgsInRva2VuIjoiMyIsImJ5dGVzIjpbNTFdLCJsb2dwcm9iIjotNS4wMTg4MzY5NjQxNTQ2MTZlLTA1fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185121930729586,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTcuMjAwNTAwMTEyOTU4MjUyZS0wNSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTMsInRva2VuIjoiLiIsImJ5dGVzIjpbNDZdLCJsb2dwcm9iIjotNy4yMDA1MDAxMTI5NTgyNTJlLTA1fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185121948296840,
+      "bytes": 449,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMTAxNjQ3NzU4ODU2NDE1NzUsInRvcF9sb2dwcm9icyI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMTAxNjQ3NzU4ODU2NDE1NzV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185121964190317,
+      "bytes": 419,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMDAwOTEyNDg2NDU5MTI4NTU4NiwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTk4LCJ0b2tlbiI6IlxuIiwiYnl0ZXMiOlsxMF0sImxvZ3Byb2IiOi0wLjAwMDkxMjQ4NjQ1OTEyODU1ODZ9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185121980120994,
+      "bytes": 416,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjE5LCJ0b2tlbiI6IjQiLCJieXRlcyI6WzUyXSwibG9ncHJvYiI6LTMuMDA0MTE5MjA3NjE2ODk1NGUtMDUsInRvcF9sb2dwcm9icyI6W3siaWQiOjE5LCJ0b2tlbiI6IjQiLCJieXRlcyI6WzUyXSwibG9ncHJvYiI6LTMuMDA0MTE5MjA3NjE2ODk1NGUtMDV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185121995408047,
+      "bytes": 416,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTEuOTMxMjA5MjI2MzEzNTEyOGUtMDUsInRvcF9sb2dwcm9icyI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTEuOTMxMjA5MjI2MzEzNTEyOGUtMDV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122010694187,
+      "bytes": 449,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMDg2OTcxMTg2MTAxNDM2NjEsInRvcF9sb2dwcm9icyI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMDg2OTcxMTg2MTAxNDM2NjF9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122025921596,
+      "bytes": 419,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMDAwODUxMzk3NDYwNzkyMjEzNywidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTk4LCJ0b2tlbiI6IlxuIiwiYnl0ZXMiOlsxMF0sImxvZ3Byb2IiOi0wLjAwMDg1MTM5NzQ2MDc5MjIxMzd9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122041791869,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjUifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjIwLCJ0b2tlbiI6IjUiLCJieXRlcyI6WzUzXSwibG9ncHJvYiI6LTkuMTc5MTU3MTMyMTY2NDM4ZS0wNiwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MjAsInRva2VuIjoiNSIsImJ5dGVzIjpbNTNdLCJsb2dwcm9iIjotOS4xNzkxNTcxMzIxNjY0MzhlLTA2fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185122060221273,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTIuODQ5MTQyNTgzNzI3MzcxZS0wNSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTMsInRva2VuIjoiLiIsImJ5dGVzIjpbNDZdLCJsb2dwcm9iIjotMi44NDkxNDI1ODM3MjczNzFlLTA1fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNSwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185122077666638,
+      "bytes": 449,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMTEwNjU3NjE3OTE1NDIxNzIsInRvcF9sb2dwcm9icyI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMTEwNjU3NjE3OTE1NDIxNzJ9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122093168592,
+      "bytes": 419,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMDAxNDQ2Mjc5MjMxNDU4OTAyNCwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTk4LCJ0b2tlbiI6IlxuIiwiYnl0ZXMiOlsxMF0sImxvZ3Byb2IiOi0wLjAwMTQ0NjI3OTIzMTQ1ODkwMjR9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA1LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122108659783,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjYifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjIxLCJ0b2tlbiI6IjYiLCJieXRlcyI6WzU0XSwibG9ncHJvYiI6LTQuNjI1NDI3MzkxMTQ3MjQxZS0wNSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MjEsInRva2VuIjoiNiIsImJ5dGVzIjpbNTRdLCJsb2dwcm9iIjotNC42MjU0MjczOTExNDcyNDFlLTA1fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNiwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185122124317748,
+      "bytes": 416,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTAuMDAwMTAzOTU1OTA2NTI0Nzg4NTksInRvcF9sb2dwcm9icyI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTAuMDAwMTAzOTU1OTA2NTI0Nzg4NTl9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122139964391,
+      "bytes": 449,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMTA1ODYwMjEyMzUyMTI2ODQsInRvcF9sb2dwcm9icyI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMTA1ODYwMjEyMzUyMTI2ODR9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122156962429,
+      "bytes": 419,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMDAxMDk0NDYzMTY0OTE4MTI0NywidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTk4LCJ0b2tlbiI6IlxuIiwiYnl0ZXMiOlsxMF0sImxvZ3Byb2IiOi0wLjAwMTA5NDQ2MzE2NDkxODEyNDd9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122172970193,
+      "bytes": 416,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjcifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjIyLCJ0b2tlbiI6IjciLCJieXRlcyI6WzU1XSwibG9ncHJvYiI6LTIuODg0OTA2NDYxOTg2MjQ3NWUtMDUsInRvcF9sb2dwcm9icyI6W3siaWQiOjIyLCJ0b2tlbiI6IjciLCJieXRlcyI6WzU1XSwibG9ncHJvYiI6LTIuODg0OTA2NDYxOTg2MjQ3NWUtMDV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122188659365,
+      "bytes": 414,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTkuODQ3MTcxODk1NjcxNjM2ZS0wNSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTMsInRva2VuIjoiLiIsImJ5dGVzIjpbNDZdLCJsb2dwcm9iIjotOS44NDcxNzE4OTU2NzE2MzZlLTA1fV19XX19XSwiY3JlYXRlZCI6MTc5MzQwMzQwNiwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsifQoK"
+    },
+    {
+      "ns": 185122205620693,
+      "bytes": 449,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMDcwODExNTQwMzU0MDQzMjUsInRvcF9sb2dwcm9icyI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMDcwODExNTQwMzU0MDQzMjV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122221195295,
+      "bytes": 419,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMDAwNjc4NDExNzQzMTM3OTg1NSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTk4LCJ0b2tlbiI6IlxuIiwiYnl0ZXMiOlsxMF0sImxvZ3Byb2IiOi0wLjAwMDY3ODQxMTc0MzEzNzk4NTV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122237366786,
+      "bytes": 416,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IjgifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjIzLCJ0b2tlbiI6IjgiLCJieXRlcyI6WzU2XSwibG9ncHJvYiI6LTMuMDA0MTE5MjA3NjE2ODk1NGUtMDUsInRvcF9sb2dwcm9icyI6W3siaWQiOjIzLCJ0b2tlbiI6IjgiLCJieXRlcyI6WzU2XSwibG9ncHJvYiI6LTMuMDA0MTE5MjA3NjE2ODk1NGUtMDV9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122256534440,
+      "bytes": 412,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6Ii4ifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjEzLCJ0b2tlbiI6Ii4iLCJieXRlcyI6WzQ2XSwibG9ncHJvYiI6LTguODA5OTU0MzA2MzQzNTdlLTA1LCJ0b3BfbG9ncHJvYnMiOlt7ImlkIjoxMywidG9rZW4iOiIuIiwiYnl0ZXMiOls0Nl0sImxvZ3Byb2IiOi04LjgwOTk1NDMwNjM0MzU3ZS0wNX1dfV19fV0sImNyZWF0ZWQiOjE3OTM0MDM0MDYsImlkIjoiY2hhdGNtcGwtWTREY3dGcUplTklES2VjNkNEalRJQmp1YXU3SU1FSjQiLCJtb2RlbCI6ImxvY2FsIiwic3lzdGVtX2ZpbmdlcnByaW50IjoiYjY1MDAtYTdhOThlMGZmIiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uLmNodW5rIn0KCg=="
+    },
+    {
+      "ns": 185122274537399,
+      "bytes": 451,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IiBSZWQifSwibG9ncHJvYnMiOnsiY29udGVudCI6W3siaWQiOjM3MzEsInRva2VuIjoiIFJlZCIsImJ5dGVzIjpbMzIsODIsMTAxLDEwMF0sImxvZ3Byb2IiOi0wLjAwMDQzNTI2ODIxNTM2OTQzMzE2LCJ0b3BfbG9ncHJvYnMiOlt7ImlkIjozNzMxLCJ0b2tlbiI6IiBSZWQiLCJieXRlcyI6WzMyLDgyLDEwMSwxMDBdLCJsb2dwcm9iIjotMC4wMDA0MzUyNjgyMTUzNjk0MzMxNn1dfV19fV0sImNyZWF0ZWQiOjE3OTM0MDM0MDYsImlkIjoiY2hhdGNtcGwtWTREY3dGcUplTklES2VjNkNEalRJQmp1YXU3SU1FSjQiLCJtb2RlbCI6ImxvY2FsIiwic3lzdGVtX2ZpbmdlcnByaW50IjoiYjY1MDAtYTdhOThlMGZmIiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uLmNodW5rIn0KCg=="
+    },
+    {
+      "ns": 185122293831298,
+      "bytes": 419,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjpudWxsLCJpbmRleCI6MCwiZGVsdGEiOnsiY29udGVudCI6IlxuIn0sImxvZ3Byb2JzIjp7ImNvbnRlbnQiOlt7ImlkIjoxOTgsInRva2VuIjoiXG4iLCJieXRlcyI6WzEwXSwibG9ncHJvYiI6LTAuMDAwNjU4OTA3OTg1NzgwMzg4MSwidG9wX2xvZ3Byb2JzIjpbeyJpZCI6MTk4LCJ0b2tlbiI6IlxuIiwiYnl0ZXMiOlsxMF0sImxvZ3Byb2IiOi0wLjAwMDY1ODkwNzk4NTc4MDM4ODF9XX1dfX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122294245791,
+      "bytes": 227,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjoibGVuZ3RoIiwiaW5kZXgiOjAsImRlbHRhIjp7fX1dLCJjcmVhdGVkIjoxNzkzNDAzNDA2LCJpZCI6ImNoYXRjbXBsLVk0RGN3RnFKZU5JREtlYzZDRGpUSUJqdWF1N0lNRUo0IiwibW9kZWwiOiJsb2NhbCIsInN5c3RlbV9maW5nZXJwcmludCI6ImI2NTAwLWE3YTk4ZTBmZiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbi5jaHVuayJ9Cgo="
+    },
+    {
+      "ns": 185122294844138,
+      "bytes": 497,
+      "base64": "ZGF0YTogeyJjaG9pY2VzIjpbXSwiY3JlYXRlZCI6MTc5MzQwMzQwNiwiaWQiOiJjaGF0Y21wbC1ZNERjd0ZxSmVOSURLZWM2Q0RqVElCanVhdTdJTUVKNCIsIm1vZGVsIjoibG9jYWwiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiNjUwMC1hN2E5OGUwZmYiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24uY2h1bmsiLCJ1c2FnZSI6eyJjb21wbGV0aW9uX3Rva2VucyI6MzIsInByb21wdF90b2tlbnMiOjY0LCJ0b3RhbF90b2tlbnMiOjk2fSwidGltaW5ncyI6eyJjYWNoZV9uIjowLCJwcm9tcHRfbiI6NjQsInByb21wdF9tcyI6MzIuNjAxLCJwcm9tcHRfcGVyX3Rva2VuX21zIjowLjUwOTM5MDYyNSwicHJvbXB0X3Blcl9zZWNvbmQiOjE5NjMuMTI5OTY1MzM4NDg2NSwicHJlZGljdGVkX24iOjMyLCJwcmVkaWN0ZWRfbXMiOjUxNS45MzUsInByZWRpY3RlZF9wZXJfdG9rZW5fbXMiOjE2LjEyMjk2ODc1LCJwcmVkaWN0ZWRfcGVyX3NlY29uZCI6NjIuMDIzMzE2ODkwNjkzNn19Cgo="
+    },
+    {
+      "ns": 185122296786141,
+      "bytes": 14,
+      "base64": "ZGF0YTogW0RPTkVdCgo="
+    }
+  ],
+  "transport_trace": [
+    {
+      "ns": 185121742278472,
+      "name": "connection.connect_tcp.started"
+    },
+    {
+      "ns": 185121742785600,
+      "name": "connection.connect_tcp.complete"
+    },
+    {
+      "ns": 185121742846538,
+      "name": "http11.send_request_headers.started"
+    },
+    {
+      "ns": 185121742990798,
+      "name": "http11.send_request_headers.complete"
+    },
+    {
+      "ns": 185121742994568,
+      "name": "http11.send_request_body.started"
+    },
+    {
+      "ns": 185121743068506,
+      "name": "http11.send_request_body.complete"
+    },
+    {
+      "ns": 185121743071708,
+      "name": "http11.receive_response_headers.started"
+    },
+    {
+      "ns": 185121745110232,
+      "name": "http11.receive_response_headers.complete"
+    },
+    {
+      "ns": 185121745334884,
+      "name": "http11.receive_response_body.started"
+    },
+    {
+      "ns": 185122296861415,
+      "name": "http11.response_closed.started"
+    },
+    {
+      "ns": 185122296997384,
+      "name": "http11.response_closed.complete"
+    },
+    {
+      "ns": 185122297063049,
+      "name": "http11.receive_response_body.failed"
+    }
+  ],
+  "diagnostic": true,
+  "detail": true,
+  "anchor_pair": {
+    "utc_ns": 1793403405612685238,
+    "monotonic_ns": 185121716657259
+  },
+  "send_ns": 185121716658355,
+  "complete": true,
+  "phase": "diagnostic",
+  "isl": 64,
+  "block": null,
+  "control": "audit",
+  "pair": null,
+  "condition": null
+}

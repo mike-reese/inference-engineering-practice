@@ -1,0 +1,104 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "matrix",
+    "result": [
+      {
+        "metric": {
+          "__name__": "ALERTS",
+          "alertname": "InferenceServerDown",
+          "alertstate": "firing",
+          "instance": "server:8080",
+          "job": "server",
+          "severity": "warning"
+        },
+        "values": [
+          [
+            1793403579,
+            "1"
+          ],
+          [
+            1793403580,
+            "1"
+          ],
+          [
+            1793403581,
+            "1"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "ALERTS",
+          "alertname": "InferenceServerDown",
+          "alertstate": "pending",
+          "instance": "server:8080",
+          "job": "server",
+          "severity": "warning"
+        },
+        "values": [
+          [
+            1793403486,
+            "1"
+          ],
+          [
+            1793403487,
+            "1"
+          ],
+          [
+            1793403500,
+            "1"
+          ],
+          [
+            1793403501,
+            "1"
+          ],
+          [
+            1793403513,
+            "1"
+          ],
+          [
+            1793403514,
+            "1"
+          ],
+          [
+            1793403526,
+            "1"
+          ],
+          [
+            1793403527,
+            "1"
+          ],
+          [
+            1793403540,
+            "1"
+          ],
+          [
+            1793403541,
+            "1"
+          ],
+          [
+            1793403554,
+            "1"
+          ],
+          [
+            1793403567,
+            "1"
+          ],
+          [
+            1793403568,
+            "1"
+          ],
+          [
+            1793403577,
+            "1"
+          ],
+          [
+            1793403578,
+            "1"
+          ]
+        ]
+      }
+    ]
+  }
+}

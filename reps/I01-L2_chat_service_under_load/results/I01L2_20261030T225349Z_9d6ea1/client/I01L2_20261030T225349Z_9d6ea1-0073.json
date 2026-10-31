@@ -1,0 +1,45 @@
+{
+  "request_id": "I01L2_20261030T225349Z_9d6ea1-0073",
+  "headers_ns": 182592272470403,
+  "first_content_ns": 182592307118538,
+  "protocol_complete_ns": 182592528593401,
+  "close_ns": 182592528597924,
+  "status": 200,
+  "events": [],
+  "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 256,
+    "total_tokens": 288,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": null
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 256,
+    "prompt_ms": 33.888,
+    "prompt_per_token_ms": 0.132375,
+    "prompt_per_second": 7554.296506137866,
+    "predicted_n": 32,
+    "predicted_ms": 221.187,
+    "predicted_per_token_ms": 6.91209375,
+    "predicted_per_second": 144.67396365970873
+  },
+  "finish_reason": "length",
+  "error": null,
+  "body_reads": [],
+  "transport_trace": [],
+  "diagnostic": false,
+  "detail": false,
+  "anchor_pair": {
+    "utc_ns": 1793400876161824528,
+    "monotonic_ns": 182592265796317
+  },
+  "send_ns": 182592265797045,
+  "complete": true,
+  "phase": "warmup",
+  "isl": 256,
+  "block": null,
+  "control": "observer",
+  "pair": 3,
+  "condition": "off"
+}

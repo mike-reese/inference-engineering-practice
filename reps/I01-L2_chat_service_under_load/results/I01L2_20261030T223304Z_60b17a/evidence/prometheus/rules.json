@@ -1,0 +1,35 @@
+{
+  "status": "success",
+  "data": {
+    "groups": [
+      {
+        "name": "i01_l2",
+        "file": "/etc/prometheus/rules.yml",
+        "rules": [
+          {
+            "state": "inactive",
+            "name": "InferenceServerDown",
+            "query": "up{job=\"server\"} == 0",
+            "duration": 2,
+            "keepFiringFor": 0,
+            "labels": {
+              "severity": "warning"
+            },
+            "annotations": {
+              "summary": "The inference server's metricws target is uncreachable"
+            },
+            "alerts": [],
+            "health": "ok",
+            "evaluationTime": 0.000125524,
+            "lastEvaluation": "2026-10-30T22:33:43.382915469Z",
+            "type": "alerting"
+          }
+        ],
+        "interval": 1,
+        "limit": 0,
+        "evaluationTime": 0.000144256,
+        "lastEvaluation": "2026-10-30T22:33:43.382899004Z"
+      }
+    ]
+  }
+}

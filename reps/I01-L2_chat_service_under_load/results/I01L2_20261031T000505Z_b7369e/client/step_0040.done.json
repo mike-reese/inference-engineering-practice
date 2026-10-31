@@ -1,0 +1,18 @@
+{
+  "step": 40,
+  "ok": true,
+  "locust": [
+    {
+      "name": "control isl=256",
+      "num_requests": 4,
+      "num_failures": 0,
+      "median_ms": 250,
+      "p95_ms": 260,
+      "response_times": {
+        "240": 2,
+        "250": 1,
+        "260": 1
+      }
+    }
+  ]
+}

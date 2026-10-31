@@ -1,0 +1,492 @@
+[
+  {
+    "Id": "sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0",
+    "RepoTags": [
+      "prom/node-exporter:v1.12.1"
+    ],
+    "RepoDigests": [
+      "prom/node-exporter@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0"
+    ],
+    "Comment": "buildkit.dockerfile.v0",
+    "Created": "2026-07-14T12:11:16.849376637Z",
+    "Author": "The Prometheus Authors <prometheus-developers@googlegroups.com>",
+    "Config": {
+      "User": "nobody",
+      "ExposedPorts": {
+        "9100/tcp": {}
+      },
+      "Env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      ],
+      "Entrypoint": [
+        "/bin/node_exporter"
+      ],
+      "Labels": {
+        "io.prometheus.image.variant": "busybox",
+        "maintainer": "The Prometheus Authors <prometheus-developers@googlegroups.com>",
+        "org.opencontainers.image.authors": "The Prometheus Authors",
+        "org.opencontainers.image.description": "Prometheus exporter for hardware and OS metrics exposed by *NIX kernels",
+        "org.opencontainers.image.documentation": "https://github.com/prometheus/node_exporter",
+        "org.opencontainers.image.licenses": "Apache License 2.0",
+        "org.opencontainers.image.source": "https://github.com/prometheus/node_exporter",
+        "org.opencontainers.image.title": "node_exporter",
+        "org.opencontainers.image.url": "https://github.com/prometheus/node_exporter",
+        "org.opencontainers.image.vendor": "Prometheus"
+      }
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 41017397,
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:aa7b79d243076cc760c0b06dd535bb163cb216cb4fcf4d38019ffee58d862cc6",
+        "sha256:b72b848ff706c7d193e04254f0007214a04d63c3854b190545535cbef8fffab2",
+        "sha256:8c4ca5f8e36f62b6ed1033d21822349ed71549d5dd4e54cf1136bd5a42ad07d0"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-28T21:21:22.266654075Z"
+    },
+    "Descriptor": {
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "digest": "sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0",
+      "size": 2004
+    },
+    "Identity": {
+      "Pull": [
+        {
+          "Repository": "docker.io/prom/node-exporter"
+        }
+      ]
+    }
+  },
+  {
+    "Id": "sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205",
+    "RepoTags": [
+      "grafana/grafana:13.3.0"
+    ],
+    "RepoDigests": [
+      "grafana/grafana@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205"
+    ],
+    "Comment": "buildkit.dockerfile.v0",
+    "Created": "2026-10-26T22:26:40Z",
+    "Config": {
+      "User": "472",
+      "ExposedPorts": {
+        "3000/tcp": {}
+      },
+      "Env": [
+        "PATH=/usr/share/grafana/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "GF_PATHS_CONFIG=/etc/grafana/grafana.ini",
+        "GF_PATHS_DATA=/var/lib/grafana",
+        "GF_PATHS_HOME=/usr/share/grafana",
+        "GF_PATHS_LOGS=/var/log/grafana",
+        "GF_PATHS_PLUGINS=/var/lib/grafana/plugins",
+        "GF_PATHS_PROVISIONING=/etc/grafana/provisioning"
+      ],
+      "Entrypoint": [
+        "/run.sh"
+      ],
+      "WorkingDir": "/usr/share/grafana",
+      "Labels": {
+        "maintainer": "Grafana Labs <hello@grafana.com>",
+        "org.opencontainers.image.source": "https://github.com/grafana/grafana"
+      }
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 2002753267,
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba",
+        "sha256:9980e6345a54e43021f925043e0b78fb78e4e64e608970fdb53f4daf72165ecc",
+        "sha256:472ab24471269d2ce17e133ca8f4c1011af64ec1ebe6783ca961c8b8b2ed3409",
+        "sha256:4777534357c1962995bc87376e8c98f0423c1fe6e3935011524f694d025e743f",
+        "sha256:4710e6db4514f75171c55d16d62d68b70a9b5ab3853fc6c084a415835e2a7bec",
+        "sha256:b3e7b703b281e326b71e9e651af6f2a9d15b3dd64a898e91ad32b40fd2689070",
+        "sha256:ecf9758707296e38a66bc948095862ad1a960df7721d737b6e0c87d8915f2b54",
+        "sha256:6f8c8cc3c80dcd35780a5698bb130bc6f22c932e39638dff2899884fa3aa3e89",
+        "sha256:672314b30784911793f9c37e5d30074877007312e2382d01f1a01e5dbe4eac5e",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+        "sha256:b3fde9f6f96009271b2b3243096e2f9281565ade1cced940aab4f50e3219bbd1"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-28T21:21:48.885520192Z"
+    },
+    "Descriptor": {
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "digest": "sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205",
+      "size": 1079
+    },
+    "Identity": {
+      "Pull": [
+        {
+          "Repository": "docker.io/grafana/grafana"
+        }
+      ]
+    }
+  },
+  {
+    "Id": "sha256:64f322a826599664a1fe5ea4e3f76b7b0984142050e7047d63ae1d6687b4b1aa",
+    "RepoTags": [
+      "nvidia/dcgm-exporter:4.3.1-4.4.1-ubuntu22.04"
+    ],
+    "RepoDigests": [
+      "nvidia/dcgm-exporter@sha256:64f322a826599664a1fe5ea4e3f76b7b0984142050e7047d63ae1d6687b4b1aa"
+    ],
+    "Comment": "buildkit.dockerfile.v0",
+    "Created": "2025-08-14T17:57:37.282000648Z",
+    "Config": {
+      "Env": [
+        "PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "NVARCH=x86_64",
+        "NVIDIA_REQUIRE_CUDA=cuda>=12.9 brand=unknown,driver>=535,driver<536 brand=grid,driver>=535,driver<536 brand=tesla,driver>=535,driver<536 brand=nvidia,driver>=535,driver<536 brand=quadro,driver>=535,driver<536 brand=quadrortx,driver>=535,driver<536 brand=nvidiartx,driver>=535,driver<536 brand=vapps,driver>=535,driver<536 brand=vpc,driver>=535,driver<536 brand=vcs,driver>=535,driver<536 brand=vws,driver>=535,driver<536 brand=cloudgaming,driver>=535,driver<536 brand=unknown,driver>=550,driver<551 brand=grid,driver>=550,driver<551 brand=tesla,driver>=550,driver<551 brand=nvidia,driver>=550,driver<551 brand=quadro,driver>=550,driver<551 brand=quadrortx,driver>=550,driver<551 brand=nvidiartx,driver>=550,driver<551 brand=vapps,driver>=550,driver<551 brand=vpc,driver>=550,driver<551 brand=vcs,driver>=550,driver<551 brand=vws,driver>=550,driver<551 brand=cloudgaming,driver>=550,driver<551 brand=unknown,driver>=560,driver<561 brand=grid,driver>=560,driver<561 brand=tesla,driver>=560,driver<561 brand=nvidia,driver>=560,driver<561 brand=quadro,driver>=560,driver<561 brand=quadrortx,driver>=560,driver<561 brand=nvidiartx,driver>=560,driver<561 brand=vapps,driver>=560,driver<561 brand=vpc,driver>=560,driver<561 brand=vcs,driver>=560,driver<561 brand=vws,driver>=560,driver<561 brand=cloudgaming,driver>=560,driver<561 brand=unknown,driver>=565,driver<566 brand=grid,driver>=565,driver<566 brand=tesla,driver>=565,driver<566 brand=nvidia,driver>=565,driver<566 brand=quadro,driver>=565,driver<566 brand=quadrortx,driver>=565,driver<566 brand=nvidiartx,driver>=565,driver<566 brand=vapps,driver>=565,driver<566 brand=vpc,driver>=565,driver<566 brand=vcs,driver>=565,driver<566 brand=vws,driver>=565,driver<566 brand=cloudgaming,driver>=565,driver<566 brand=unknown,driver>=570,driver<571 brand=grid,driver>=570,driver<571 brand=tesla,driver>=570,driver<571 brand=nvidia,driver>=570,driver<571 brand=quadro,driver>=570,driver<571 brand=quadrortx,driver>=570,driver<571 brand=nvidiartx,driver>=570,driver<571 brand=vapps,driver>=570,driver<571 brand=vpc,driver>=570,driver<571 brand=vcs,driver>=570,driver<571 brand=vws,driver>=570,driver<571 brand=cloudgaming,driver>=570,driver<571",
+        "NV_CUDA_CUDART_VERSION=12.9.79-1",
+        "CUDA_VERSION=12.9.1",
+        "LD_LIBRARY_PATH=/usr/local/cuda/lib64",
+        "NVIDIA_VISIBLE_DEVICES=all",
+        "NVIDIA_DRIVER_CAPABILITIES=compute,utility,compat32",
+        "DEBIAN_FRONTEND=noninteractive",
+        "NVIDIA_DISABLE_REQUIRE=true",
+        "NO_SETCAP="
+      ],
+      "Entrypoint": [
+        "/usr/local/dcgm/dcgm-exporter-entrypoint.sh"
+      ],
+      "Labels": {
+        "description": "See summary",
+        "io.k8s.display-name": "NVIDIA DCGM Exporter",
+        "maintainer": "NVIDIA CORPORATION <cudatools@nvidia.com>",
+        "name": "NVIDIA DCGM Exporter",
+        "org.opencontainers.image.ref.name": "ubuntu",
+        "org.opencontainers.image.version": "22.04",
+        "release": "N/A",
+        "summary": "Exports GPU Metrics to Prometheus",
+        "vendor": "NVIDIA",
+        "version": "4.4.1"
+      }
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 740359773,
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:3cc982388b71ef357e0157e0b7d3059dcefa4dc9fd2e3815bde6c6ce040302f3",
+        "sha256:b5e294e75ffe843434721e036fd14b2ac9323ec7e3fd6d5daa4ab18009e8f2ef",
+        "sha256:2f58442919fa6fc058366388cf4cf5cac69571b9e4100715a0659dcb3f2b464f",
+        "sha256:68b381704cbd81ffb973ff5841fde44df7a1e544836551e969bdde6a7d4937a0",
+        "sha256:455bca42f6ec40ca42fea4bea15c6c17b97101af90413cdd25647de2b9d98960",
+        "sha256:eb1f0931ccbc72b6102ce8008b9b58f6c356d23bcc3519b4d186f9355857dcd8",
+        "sha256:f7e6b6d8c41825f52991d60627c5251bab93d99c2c9e6421b499b93cbc774b78",
+        "sha256:a467616751f02d61bb5062527606f0c485cac0542bf52825c35eceece33a84dc",
+        "sha256:c8a796b32cf6adfb35f7a7a5f10e7b6ca714bd0215c2cc4f705cdf35b7d50f54",
+        "sha256:0a396baf01d5cc3a8788f35e3d8fa3d4aa0c03a21120c7a9ac3169ec3dc48244",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+        "sha256:9bff8ff4ebc088c25521ee2924936459db055f4178430fa181fe466b765d3135"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-28T21:21:34.134215574Z"
+    },
+    "Descriptor": {
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "digest": "sha256:64f322a826599664a1fe5ea4e3f76b7b0984142050e7047d63ae1d6687b4b1aa",
+      "size": 1609
+    },
+    "Identity": {
+      "Pull": [
+        {
+          "Repository": "docker.io/nvidia/dcgm-exporter"
+        }
+      ]
+    }
+  },
+  {
+    "Id": "sha256:8fcdcdad2ae4d9fab4391b451f1aa7895ec85ce0f96dbd075179d1ffba4217b1",
+    "RepoTags": [
+      "ie-client:i01-l2"
+    ],
+    "RepoDigests": [
+      "ie-client@sha256:8fcdcdad2ae4d9fab4391b451f1aa7895ec85ce0f96dbd075179d1ffba4217b1"
+    ],
+    "Comment": "buildkit.dockerfile.v0",
+    "Created": "2026-10-30T15:53:49.581037442-07:00",
+    "Config": {
+      "Env": [
+        "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=C.UTF-8",
+        "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+        "PYTHON_VERSION=3.12.14",
+        "PYTHON_SHA256=5c8462af5790baf43a321a1559dbe0db06d1be4300fb85fb53c40060668e548a"
+      ],
+      "Cmd": [
+        "python",
+        "-u",
+        "/app/locust_load.py"
+      ],
+      "WorkingDir": "/app",
+      "Labels": {
+        "com.docker.compose.project": "ie-i01-l2",
+        "com.docker.compose.service": "client",
+        "com.docker.compose.version": "5.6.0"
+      },
+      "ArgsEscaped": true
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 328774861,
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:411a86676185cb54d695a805b238194a64e9b77e0c723f3802fbb87d333ea0b3",
+        "sha256:3070bb8623db07ca38569112f9b296043371a00bfb3ee4d9f8f63ddfd2f2efca",
+        "sha256:3d664d274420a79749a26f9e5115b2120d46037264011773ca4c52e22780b2ca",
+        "sha256:24257af4ce5bde01d3c7ebd6d366ec4a298ed27c794bbd6832ef5ce934a66170",
+        "sha256:3165f0c19515747bf77cf76efb895f469c0331e9101359487a3883ec35d3fb67",
+        "sha256:9decdb70684151ff77c7b698a7662a2692d0b12befa1181a6fd9ccf32caeb75d",
+        "sha256:126f618cfb50bb5138ac40fd1b3a6a9b01ad061a82455e342397eb07df08be70",
+        "sha256:fa5277353ac86391252ac9aa6217c518afd87c78d912ed262cdd563a1f80944d"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-31T00:05:06.104749723Z"
+    },
+    "Descriptor": {
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "digest": "sha256:8fcdcdad2ae4d9fab4391b451f1aa7895ec85ce0f96dbd075179d1ffba4217b1",
+      "size": 856
+    },
+    "Identity": {
+      "Build": [
+        {
+          "Ref": "korp3uqzg2gfoevh7hjdj1leq",
+          "CreatedAt": "2026-10-30T17:05:06.11867254-07:00"
+        }
+      ]
+    }
+  },
+  {
+    "Id": "sha256:aafa9d694e6a883c02db516d9f6e5b84e14195f49a2a6456a4cca815edda72b9",
+    "RepoTags": [
+      "prom/prometheus:v3.13.5"
+    ],
+    "RepoDigests": [
+      "prom/prometheus@sha256:aafa9d694e6a883c02db516d9f6e5b84e14195f49a2a6456a4cca815edda72b9"
+    ],
+    "Comment": "buildkit.dockerfile.v0",
+    "Created": "2026-10-21T11:03:45.130488234Z",
+    "Author": "The Prometheus Authors <prometheus-developers@googlegroups.com>",
+    "Config": {
+      "User": "nobody",
+      "ExposedPorts": {
+        "9090/tcp": {}
+      },
+      "Env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      ],
+      "Entrypoint": [
+        "/bin/prometheus"
+      ],
+      "Cmd": [
+        "--config.file=/etc/prometheus/prometheus.yml",
+        "--storage.tsdb.path=/prometheus"
+      ],
+      "Volumes": {
+        "/prometheus": {}
+      },
+      "WorkingDir": "/prometheus",
+      "Labels": {
+        "io.prometheus.image.variant": "busybox",
+        "maintainer": "The Prometheus Authors <prometheus-developers@googlegroups.com>",
+        "org.opencontainers.image.authors": "The Prometheus Authors",
+        "org.opencontainers.image.description": "The Prometheus monitoring system and time series database",
+        "org.opencontainers.image.documentation": "https://prometheus.io/docs",
+        "org.opencontainers.image.licenses": "Apache License 2.0",
+        "org.opencontainers.image.source": "https://github.com/prometheus/prometheus",
+        "org.opencontainers.image.title": "Prometheus",
+        "org.opencontainers.image.url": "https://github.com/prometheus/prometheus",
+        "org.opencontainers.image.vendor": "Prometheus"
+      },
+      "ArgsEscaped": true
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 362016122,
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:aa34e3131bf0650960e1ec314a32f7295b019a881db18dda84d319e96c3d68df",
+        "sha256:58edf90fd8b3580d1bdfb1819eb4baef9e6479a78a9fdf23bf53d634f8d0d866",
+        "sha256:19b5626670860cd12580c812977293ef65a972eed988e8e0d81da32429755670",
+        "sha256:5cd8ab9006247264d2f3966026e9de373303c9989332941307238c30f6c18a41",
+        "sha256:547281cc34169892478a4843ae05b217c09a834a7c60c541669f8cb37e0a8bbc",
+        "sha256:22a129df54a8d424d5b91a343ac6ae0343779477e151a3b169f70cb48d58333a",
+        "sha256:88f3e3c84f8141bf2c15c944f8076f4659b11705400f4b5389c10eb8a3b0c8e7",
+        "sha256:fa0a376d8b4ec128c44a829fe6690c608f5ef45e60ecac7a9f97ee92329ba8dc",
+        "sha256:430ac40f040ff6e1bec4d5a37d6f07aae19711eb0b7e99b7f7178a1b9c53c8a2"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-28T20:55:17.137308839Z"
+    },
+    "Descriptor": {
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "digest": "sha256:aafa9d694e6a883c02db516d9f6e5b84e14195f49a2a6456a4cca815edda72b9",
+      "size": 2010
+    },
+    "Identity": {
+      "Pull": [
+        {
+          "Repository": "docker.io/prom/prometheus"
+        }
+      ]
+    }
+  },
+  {
+    "Id": "sha256:b0aa24d3a8f2716955f1b19e1a8a6a8c017bfb138833c77a583ec145a62c1c51",
+    "RepoTags": [
+      "ie-llama-cpp-server:b6500-cuda12.4-sm61"
+    ],
+    "RepoDigests": [
+      "ie-llama-cpp-server@sha256:b0aa24d3a8f2716955f1b19e1a8a6a8c017bfb138833c77a583ec145a62c1c51"
+    ],
+    "Comment": "buildkit.dockerfile.v0",
+    "Created": "2026-10-29T13:54:56.947043758-07:00",
+    "Config": {
+      "Env": [
+        "PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "NVARCH=x86_64",
+        "NVIDIA_REQUIRE_CUDA=cuda>=12.4 brand=tesla,driver>=470,driver<471 brand=unknown,driver>=470,driver<471 brand=nvidia,driver>=470,driver<471 brand=nvidiartx,driver>=470,driver<471 brand=geforce,driver>=470,driver<471 brand=geforcertx,driver>=470,driver<471 brand=quadro,driver>=470,driver<471 brand=quadrortx,driver>=470,driver<471 brand=titan,driver>=470,driver<471 brand=titanrtx,driver>=470,driver<471 brand=tesla,driver>=525,driver<526 brand=unknown,driver>=525,driver<526 brand=nvidia,driver>=525,driver<526 brand=nvidiartx,driver>=525,driver<526 brand=geforce,driver>=525,driver<526 brand=geforcertx,driver>=525,driver<526 brand=quadro,driver>=525,driver<526 brand=quadrortx,driver>=525,driver<526 brand=titan,driver>=525,driver<526 brand=titanrtx,driver>=525,driver<526 brand=tesla,driver>=535,driver<536 brand=unknown,driver>=535,driver<536 brand=nvidia,driver>=535,driver<536 brand=nvidiartx,driver>=535,driver<536 brand=geforce,driver>=535,driver<536 brand=geforcertx,driver>=535,driver<536 brand=quadro,driver>=535,driver<536 brand=quadrortx,driver>=535,driver<536 brand=titan,driver>=535,driver<536 brand=titanrtx,driver>=535,driver<536",
+        "NV_CUDA_CUDART_VERSION=12.4.99-1",
+        "NV_CUDA_COMPAT_PACKAGE=cuda-compat-12-4",
+        "CUDA_VERSION=12.4.0",
+        "LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64",
+        "NVIDIA_VISIBLE_DEVICES=all",
+        "NVIDIA_DRIVER_CAPABILITIES=compute,utility",
+        "NV_CUDA_LIB_VERSION=12.4.0-1",
+        "NV_NVTX_VERSION=12.4.99-1",
+        "NV_LIBNPP_VERSION=12.2.5.2-1",
+        "NV_LIBNPP_PACKAGE=libnpp-12-4=12.2.5.2-1",
+        "NV_LIBCUSPARSE_VERSION=12.3.0.142-1",
+        "NV_LIBCUBLAS_PACKAGE_NAME=libcublas-12-4",
+        "NV_LIBCUBLAS_VERSION=12.4.2.65-1",
+        "NV_LIBCUBLAS_PACKAGE=libcublas-12-4=12.4.2.65-1",
+        "NV_LIBNCCL_PACKAGE_NAME=libnccl2",
+        "NV_LIBNCCL_PACKAGE_VERSION=2.20.5-1",
+        "NCCL_VERSION=2.20.5-1",
+        "NV_LIBNCCL_PACKAGE=libnccl2=2.20.5-1+cuda12.4",
+        "NVIDIA_PRODUCT_NAME=CUDA",
+        "LLAMA_ARG_HOST=0.0.0.0"
+      ],
+      "Entrypoint": [
+        "/app/llama-server"
+      ],
+      "WorkingDir": "/app",
+      "Labels": {
+        "maintainer": "NVIDIA CORPORATION <cudatools@nvidia.com>",
+        "org.opencontainers.image.ref.name": "ubuntu",
+        "org.opencontainers.image.version": "22.04"
+      },
+      "Healthcheck": {
+        "Test": [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:8080/health"
+        ]
+      }
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 3861371515,
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:5498e8c22f6996f25ef193ee58617d5b37e2a96decf22e72de13c3b34e147591",
+        "sha256:4cd4079525948900a02a5734090afd1f3e046fc940dc882c55efcaee0a252dd0",
+        "sha256:022bf74291b27404b223ba9ee16a7f3fb067253df9c65e23dfb3339800b28dfa",
+        "sha256:eeb5315df33c9e700b3b8b8a3cdd1cf11e13c9dd44bfd946e340573478303349",
+        "sha256:e942261d196e5e686398e2326c033119112f910191143b0497f13f78c377fa03",
+        "sha256:421c5b38d6e056b3eee631bc65e1d2b24cee88b8f858457ec2ed1604b68cdbbb",
+        "sha256:520e0f301880ab5ca0650a44703c86d75428b6ece6c3190b8ecd850e55372f60",
+        "sha256:700fe921ad1f9a93e69a6a4faec3406f3f51e0f4ab4e9b732a9141261d941a4f",
+        "sha256:b0dfaf1ca5c560107272f1e55220f7cef07d30d44ebac56c4cf8c45308538b91",
+        "sha256:3cf8309fc3b64323deb20d10a47517a939e2a9cfd0764f6855340e544c10d7b8",
+        "sha256:aed6e53b42ee2c94ba7a2cfffb0a26562b83e29263a1d6ffd5a78a0699e9cddb",
+        "sha256:b6cbd5e4815abf37996b61049435334cb588bc5365e9219c68eecc4ac302cb3b",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-29T20:54:58.438330038Z"
+    },
+    "Descriptor": {
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "digest": "sha256:b0aa24d3a8f2716955f1b19e1a8a6a8c017bfb138833c77a583ec145a62c1c51",
+      "size": 856
+    },
+    "Identity": {
+      "Build": [
+        {
+          "Ref": "lxj4y2bt2i0vhpj00tmx6ag20",
+          "CreatedAt": "2026-10-29T13:54:59.057947613-07:00"
+        }
+      ]
+    }
+  },
+  {
+    "Id": "sha256:f7c43309fe141e14fc34260114a946a433d0d76548969fe4c040b25b83f5481c",
+    "RepoTags": [
+      "ie-capture:alpine3.20"
+    ],
+    "RepoDigests": [
+      "ie-capture@sha256:f7c43309fe141e14fc34260114a946a433d0d76548969fe4c040b25b83f5481c"
+    ],
+    "Comment": "buildkit.dockerfile.v0",
+    "Created": "2026-10-28T14:56:14.824053315-07:00",
+    "Config": {
+      "Env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      ],
+      "Cmd": [
+        "/bin/sh"
+      ],
+      "WorkingDir": "/",
+      "Labels": {
+        "com.docker.compose.project": "ie-i01-l2",
+        "com.docker.compose.service": "capture",
+        "com.docker.compose.version": "5.6.0"
+      }
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 186857846,
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:08bc4e534116aa76b16015484b82eac51f9a593416feae9296c8a2d4bb7aa4a2",
+        "sha256:1faed54f066da0619908b5e9d301c5573babf06e2bcc2739bd84e1819c8cb695"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-31T00:05:06.745200035Z"
+    },
+    "Descriptor": {
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "digest": "sha256:f7c43309fe141e14fc34260114a946a433d0d76548969fe4c040b25b83f5481c",
+      "size": 855
+    },
+    "Identity": {
+      "Build": [
+        {
+          "Ref": "zmes9m7u4nc79w5zdsly8e2kv",
+          "CreatedAt": "2026-10-30T17:05:06.760649906-07:00"
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,2307 @@
+0.00.000.554 I build: 6500 (a7a98e0ff) with cc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 for x86_64-linux-gnu
+0.00.000.590 I system info: n_threads = 8, n_threads_batch = 8, total_threads = 16
+0.00.000.592 I 
+0.00.000.631 I system_info: n_threads = 8 (n_threads_batch = 8) / 16 | CUDA : ARCHS = 610 | USE_GRAPHS = 1 | PEER_MAX_BATCH_SIZE = 128 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | BMI2 = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | 
+0.00.000.633 I 
+0.00.000.718 I main: binding port with default address family
+0.00.001.839 I main: HTTP server is listening, hostname: 0.0.0.0, port: 8080, http threads: 15
+0.00.001.842 I main: loading model
+0.00.001.849 I srv    load_model: loading model '/model/model.gguf'
+0.00.047.590 I llama_model_load_from_file_impl: using device CUDA0 (NVIDIA GeForce GTX 1080 Ti) (0000:01:00.0) - 10017 MiB free
+0.00.079.479 I llama_model_loader: loaded meta data with 25 key-value pairs and 290 tensors from /model/model.gguf (version GGUF V3 (latest))
+0.00.079.511 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.00.079.527 I llama_model_loader: - kv   0:                       general.architecture str              = qwen2
+0.00.079.530 I llama_model_loader: - kv   1:                               general.type str              = model
+0.00.079.534 I llama_model_loader: - kv   2:                               general.name str              = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.079.536 I llama_model_loader: - kv   3:                           general.finetune str              = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.079.537 I llama_model_loader: - kv   4:                         general.size_label str              = 494M
+0.00.079.542 I llama_model_loader: - kv   5:                          qwen2.block_count u32              = 24
+0.00.079.542 I llama_model_loader: - kv   6:                       qwen2.context_length u32              = 32768
+0.00.079.543 I llama_model_loader: - kv   7:                     qwen2.embedding_length u32              = 896
+0.00.079.544 I llama_model_loader: - kv   8:                  qwen2.feed_forward_length u32              = 4864
+0.00.079.544 I llama_model_loader: - kv   9:                 qwen2.attention.head_count u32              = 14
+0.00.079.545 I llama_model_loader: - kv  10:              qwen2.attention.head_count_kv u32              = 2
+0.00.079.558 I llama_model_loader: - kv  11:                       qwen2.rope.freq_base f32              = 1000000.000000
+0.00.079.560 I llama_model_loader: - kv  12:     qwen2.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.00.079.560 I llama_model_loader: - kv  13:                          general.file_type u32              = 0
+0.00.079.561 I llama_model_loader: - kv  14:               general.quantization_version u32              = 2
+0.00.079.562 I llama_model_loader: - kv  15:                       tokenizer.ggml.model str              = gpt2
+0.00.079.563 I llama_model_loader: - kv  16:                         tokenizer.ggml.pre str              = qwen2
+0.00.103.348 I llama_model_loader: - kv  17:                      tokenizer.ggml.tokens arr[str,151936]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+0.00.108.375 I llama_model_loader: - kv  18:                  tokenizer.ggml.token_type arr[i32,151936]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.00.128.710 I llama_model_loader: - kv  19:                      tokenizer.ggml.merges arr[str,151387]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+0.00.128.720 I llama_model_loader: - kv  20:                tokenizer.ggml.eos_token_id u32              = 151645
+0.00.128.727 I llama_model_loader: - kv  21:            tokenizer.ggml.padding_token_id u32              = 151643
+0.00.128.727 I llama_model_loader: - kv  22:                tokenizer.ggml.bos_token_id u32              = 151643
+0.00.128.728 I llama_model_loader: - kv  23:               tokenizer.ggml.add_bos_token bool             = false
+0.00.128.731 I llama_model_loader: - kv  24:                    tokenizer.chat_template str              = {%- if tools %}\n    {{- '<|im_start|>...
+0.00.128.735 I llama_model_loader: - type  f32:  290 tensors
+0.00.128.737 I print_info: file format = GGUF V3 (latest)
+0.00.128.738 I print_info: file type   = all F32
+0.00.128.741 I print_info: file size   = 1.84 GiB (32.00 BPW) 
+0.00.236.709 D init_tokenizer: initializing tokenizer for type 2
+0.00.259.994 D load: control token: 151660 '<|fim_middle|>' is not marked as EOG
+0.00.259.998 D load: control token: 151659 '<|fim_prefix|>' is not marked as EOG
+0.00.259.999 D load: control token: 151653 '<|vision_end|>' is not marked as EOG
+0.00.259.999 D load: control token: 151648 '<|box_start|>' is not marked as EOG
+0.00.260.000 D load: control token: 151646 '<|object_ref_start|>' is not marked as EOG
+0.00.260.188 D load: control token: 151649 '<|box_end|>' is not marked as EOG
+0.00.262.044 D load: control token: 151655 '<|image_pad|>' is not marked as EOG
+0.00.262.232 D load: control token: 151651 '<|quad_end|>' is not marked as EOG
+0.00.265.121 D load: control token: 151647 '<|object_ref_end|>' is not marked as EOG
+0.00.269.635 D load: control token: 151652 '<|vision_start|>' is not marked as EOG
+0.00.274.629 D load: control token: 151654 '<|vision_pad|>' is not marked as EOG
+0.00.278.779 D load: control token: 151656 '<|video_pad|>' is not marked as EOG
+0.00.279.493 D load: control token: 151644 '<|im_start|>' is not marked as EOG
+0.00.280.988 D load: control token: 151661 '<|fim_suffix|>' is not marked as EOG
+0.00.282.152 D load: control token: 151650 '<|quad_start|>' is not marked as EOG
+0.00.296.366 I load: printing all EOG tokens:
+0.00.296.372 I load:   - 151643 ('<|endoftext|>')
+0.00.296.373 I load:   - 151645 ('<|im_end|>')
+0.00.296.374 I load:   - 151662 ('<|fim_pad|>')
+0.00.296.374 I load:   - 151663 ('<|repo_name|>')
+0.00.296.375 I load:   - 151664 ('<|file_sep|>')
+0.00.297.012 I load: special tokens cache size = 22
+0.00.354.235 I load: token to piece cache size = 0.9310 MB
+0.00.354.262 I print_info: arch             = qwen2
+0.00.354.263 I print_info: vocab_only       = 0
+0.00.354.263 I print_info: n_ctx_train      = 32768
+0.00.354.264 I print_info: n_embd           = 896
+0.00.354.264 I print_info: n_layer          = 24
+0.00.354.275 I print_info: n_head           = 14
+0.00.354.277 I print_info: n_head_kv        = 2
+0.00.354.278 I print_info: n_rot            = 64
+0.00.354.278 I print_info: n_swa            = 0
+0.00.354.279 I print_info: is_swa_any       = 0
+0.00.354.279 I print_info: n_embd_head_k    = 64
+0.00.354.280 I print_info: n_embd_head_v    = 64
+0.00.354.282 I print_info: n_gqa            = 7
+0.00.354.284 I print_info: n_embd_k_gqa     = 128
+0.00.354.287 I print_info: n_embd_v_gqa     = 128
+0.00.354.288 I print_info: f_norm_eps       = 0.0e+00
+0.00.354.289 I print_info: f_norm_rms_eps   = 1.0e-06
+0.00.354.289 I print_info: f_clamp_kqv      = 0.0e+00
+0.00.354.290 I print_info: f_max_alibi_bias = 0.0e+00
+0.00.354.290 I print_info: f_logit_scale    = 0.0e+00
+0.00.354.291 I print_info: f_attn_scale     = 0.0e+00
+0.00.354.293 I print_info: n_ff             = 4864
+0.00.354.293 I print_info: n_expert         = 0
+0.00.354.294 I print_info: n_expert_used    = 0
+0.00.354.294 I print_info: causal attn      = 1
+0.00.354.295 I print_info: pooling type     = -1
+0.00.354.295 I print_info: rope type        = 2
+0.00.354.295 I print_info: rope scaling     = linear
+0.00.354.297 I print_info: freq_base_train  = 1000000.0
+0.00.354.297 I print_info: freq_scale_train = 1
+0.00.354.298 I print_info: n_ctx_orig_yarn  = 32768
+0.00.354.298 I print_info: rope_finetuned   = unknown
+0.00.354.299 I print_info: model type       = 1B
+0.00.354.301 I print_info: model params     = 494.03 M
+0.00.354.301 I print_info: general.name     = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.354.304 I print_info: vocab type       = BPE
+0.00.354.305 I print_info: n_vocab          = 151936
+0.00.354.305 I print_info: n_merges         = 151387
+0.00.354.306 I print_info: BOS token        = 151643 '<|endoftext|>'
+0.00.354.306 I print_info: EOS token        = 151645 '<|im_end|>'
+0.00.354.307 I print_info: EOT token        = 151645 '<|im_end|>'
+0.00.354.307 I print_info: PAD token        = 151643 '<|endoftext|>'
+0.00.354.308 I print_info: LF token         = 198 'Ċ'
+0.00.354.309 I print_info: FIM PRE token    = 151659 '<|fim_prefix|>'
+0.00.354.309 I print_info: FIM SUF token    = 151661 '<|fim_suffix|>'
+0.00.354.309 I print_info: FIM MID token    = 151660 '<|fim_middle|>'
+0.00.354.310 I print_info: FIM PAD token    = 151662 '<|fim_pad|>'
+0.00.354.310 I print_info: FIM REP token    = 151663 '<|repo_name|>'
+0.00.354.310 I print_info: FIM SEP token    = 151664 '<|file_sep|>'
+0.00.354.311 I print_info: EOG token        = 151643 '<|endoftext|>'
+0.00.354.312 I print_info: EOG token        = 151645 '<|im_end|>'
+0.00.354.312 I print_info: EOG token        = 151662 '<|fim_pad|>'
+0.00.354.312 I print_info: EOG token        = 151663 '<|repo_name|>'
+0.00.354.313 I print_info: EOG token        = 151664 '<|file_sep|>'
+0.00.354.313 I print_info: max token length = 256
+0.00.354.321 I load_tensors: loading model tensors, this can take a while... (mmap = true)
+0.00.354.421 D load_tensors: layer   0 assigned to device CUDA0, is_swa = 0
+0.00.354.421 D load_tensors: layer   1 assigned to device CUDA0, is_swa = 0
+0.00.354.422 D load_tensors: layer   2 assigned to device CUDA0, is_swa = 0
+0.00.354.422 D load_tensors: layer   3 assigned to device CUDA0, is_swa = 0
+0.00.354.422 D load_tensors: layer   4 assigned to device CUDA0, is_swa = 0
+0.00.354.423 D load_tensors: layer   5 assigned to device CUDA0, is_swa = 0
+0.00.354.423 D load_tensors: layer   6 assigned to device CUDA0, is_swa = 0
+0.00.354.423 D load_tensors: layer   7 assigned to device CUDA0, is_swa = 0
+0.00.354.424 D load_tensors: layer   8 assigned to device CUDA0, is_swa = 0
+0.00.354.424 D load_tensors: layer   9 assigned to device CUDA0, is_swa = 0
+0.00.354.424 D load_tensors: layer  10 assigned to device CUDA0, is_swa = 0
+0.00.354.425 D load_tensors: layer  11 assigned to device CUDA0, is_swa = 0
+0.00.354.425 D load_tensors: layer  12 assigned to device CUDA0, is_swa = 0
+0.00.354.425 D load_tensors: layer  13 assigned to device CUDA0, is_swa = 0
+0.00.354.426 D load_tensors: layer  14 assigned to device CUDA0, is_swa = 0
+0.00.354.426 D load_tensors: layer  15 assigned to device CUDA0, is_swa = 0
+0.00.354.426 D load_tensors: layer  16 assigned to device CUDA0, is_swa = 0
+0.00.354.427 D load_tensors: layer  17 assigned to device CUDA0, is_swa = 0
+0.00.354.427 D load_tensors: layer  18 assigned to device CUDA0, is_swa = 0
+0.00.354.427 D load_tensors: layer  19 assigned to device CUDA0, is_swa = 0
+0.00.354.428 D load_tensors: layer  20 assigned to device CUDA0, is_swa = 0
+0.00.354.428 D load_tensors: layer  21 assigned to device CUDA0, is_swa = 0
+0.00.354.428 D load_tensors: layer  22 assigned to device CUDA0, is_swa = 0
+0.00.354.429 D load_tensors: layer  23 assigned to device CUDA0, is_swa = 0
+0.00.354.429 D load_tensors: layer  24 assigned to device CUDA0, is_swa = 0
+0.00.354.485 D create_tensor: loading tensor token_embd.weight
+0.00.354.502 D create_tensor: loading tensor output_norm.weight
+0.00.354.518 D create_tensor: loading tensor token_embd.weight
+0.00.354.528 D create_tensor: loading tensor blk.0.attn_norm.weight
+0.00.354.536 D create_tensor: loading tensor blk.0.attn_q.weight
+0.00.354.548 D create_tensor: loading tensor blk.0.attn_k.weight
+0.00.354.557 D create_tensor: loading tensor blk.0.attn_v.weight
+0.00.354.567 D create_tensor: loading tensor blk.0.attn_output.weight
+0.00.354.574 D create_tensor: loading tensor blk.0.attn_q.bias
+0.00.354.587 D create_tensor: loading tensor blk.0.attn_k.bias
+0.00.354.596 D create_tensor: loading tensor blk.0.attn_v.bias
+0.00.354.602 D create_tensor: loading tensor blk.0.ffn_norm.weight
+0.00.354.606 D create_tensor: loading tensor blk.0.ffn_gate.weight
+0.00.354.610 D create_tensor: loading tensor blk.0.ffn_down.weight
+0.00.354.615 D create_tensor: loading tensor blk.0.ffn_up.weight
+0.00.354.620 D create_tensor: loading tensor blk.1.attn_norm.weight
+0.00.354.624 D create_tensor: loading tensor blk.1.attn_q.weight
+0.00.354.628 D create_tensor: loading tensor blk.1.attn_k.weight
+0.00.354.632 D create_tensor: loading tensor blk.1.attn_v.weight
+0.00.354.636 D create_tensor: loading tensor blk.1.attn_output.weight
+0.00.354.640 D create_tensor: loading tensor blk.1.attn_q.bias
+0.00.354.645 D create_tensor: loading tensor blk.1.attn_k.bias
+0.00.354.649 D create_tensor: loading tensor blk.1.attn_v.bias
+0.00.354.652 D create_tensor: loading tensor blk.1.ffn_norm.weight
+0.00.354.656 D create_tensor: loading tensor blk.1.ffn_gate.weight
+0.00.354.669 D create_tensor: loading tensor blk.1.ffn_down.weight
+0.00.354.677 D create_tensor: loading tensor blk.1.ffn_up.weight
+0.00.354.684 D create_tensor: loading tensor blk.2.attn_norm.weight
+0.00.354.691 D create_tensor: loading tensor blk.2.attn_q.weight
+0.00.354.698 D create_tensor: loading tensor blk.2.attn_k.weight
+0.00.354.705 D create_tensor: loading tensor blk.2.attn_v.weight
+0.00.354.712 D create_tensor: loading tensor blk.2.attn_output.weight
+0.00.354.721 D create_tensor: loading tensor blk.2.attn_q.bias
+0.00.354.728 D create_tensor: loading tensor blk.2.attn_k.bias
+0.00.354.735 D create_tensor: loading tensor blk.2.attn_v.bias
+0.00.354.741 D create_tensor: loading tensor blk.2.ffn_norm.weight
+0.00.354.748 D create_tensor: loading tensor blk.2.ffn_gate.weight
+0.00.354.755 D create_tensor: loading tensor blk.2.ffn_down.weight
+0.00.354.762 D create_tensor: loading tensor blk.2.ffn_up.weight
+0.00.354.769 D create_tensor: loading tensor blk.3.attn_norm.weight
+0.00.354.776 D create_tensor: loading tensor blk.3.attn_q.weight
+0.00.354.783 D create_tensor: loading tensor blk.3.attn_k.weight
+0.00.354.790 D create_tensor: loading tensor blk.3.attn_v.weight
+0.00.354.799 D create_tensor: loading tensor blk.3.attn_output.weight
+0.00.354.807 D create_tensor: loading tensor blk.3.attn_q.bias
+0.00.354.814 D create_tensor: loading tensor blk.3.attn_k.bias
+0.00.354.821 D create_tensor: loading tensor blk.3.attn_v.bias
+0.00.354.829 D create_tensor: loading tensor blk.3.ffn_norm.weight
+0.00.354.836 D create_tensor: loading tensor blk.3.ffn_gate.weight
+0.00.354.843 D create_tensor: loading tensor blk.3.ffn_down.weight
+0.00.354.850 D create_tensor: loading tensor blk.3.ffn_up.weight
+0.00.354.858 D create_tensor: loading tensor blk.4.attn_norm.weight
+0.00.354.865 D create_tensor: loading tensor blk.4.attn_q.weight
+0.00.354.872 D create_tensor: loading tensor blk.4.attn_k.weight
+0.00.354.880 D create_tensor: loading tensor blk.4.attn_v.weight
+0.00.354.890 D create_tensor: loading tensor blk.4.attn_output.weight
+0.00.354.898 D create_tensor: loading tensor blk.4.attn_q.bias
+0.00.354.905 D create_tensor: loading tensor blk.4.attn_k.bias
+0.00.354.913 D create_tensor: loading tensor blk.4.attn_v.bias
+0.00.354.921 D create_tensor: loading tensor blk.4.ffn_norm.weight
+0.00.354.928 D create_tensor: loading tensor blk.4.ffn_gate.weight
+0.00.354.935 D create_tensor: loading tensor blk.4.ffn_down.weight
+0.00.354.943 D create_tensor: loading tensor blk.4.ffn_up.weight
+0.00.354.950 D create_tensor: loading tensor blk.5.attn_norm.weight
+0.00.354.957 D create_tensor: loading tensor blk.5.attn_q.weight
+0.00.354.964 D create_tensor: loading tensor blk.5.attn_k.weight
+0.00.354.975 D create_tensor: loading tensor blk.5.attn_v.weight
+0.00.354.983 D create_tensor: loading tensor blk.5.attn_output.weight
+0.00.354.990 D create_tensor: loading tensor blk.5.attn_q.bias
+0.00.354.997 D create_tensor: loading tensor blk.5.attn_k.bias
+0.00.355.004 D create_tensor: loading tensor blk.5.attn_v.bias
+0.00.355.012 D create_tensor: loading tensor blk.5.ffn_norm.weight
+0.00.355.019 D create_tensor: loading tensor blk.5.ffn_gate.weight
+0.00.355.026 D create_tensor: loading tensor blk.5.ffn_down.weight
+0.00.355.034 D create_tensor: loading tensor blk.5.ffn_up.weight
+0.00.355.042 D create_tensor: loading tensor blk.6.attn_norm.weight
+0.00.355.050 D create_tensor: loading tensor blk.6.attn_q.weight
+0.00.355.061 D create_tensor: loading tensor blk.6.attn_k.weight
+0.00.355.069 D create_tensor: loading tensor blk.6.attn_v.weight
+0.00.355.077 D create_tensor: loading tensor blk.6.attn_output.weight
+0.00.355.084 D create_tensor: loading tensor blk.6.attn_q.bias
+0.00.355.093 D create_tensor: loading tensor blk.6.attn_k.bias
+0.00.355.099 D create_tensor: loading tensor blk.6.attn_v.bias
+0.00.355.107 D create_tensor: loading tensor blk.6.ffn_norm.weight
+0.00.355.114 D create_tensor: loading tensor blk.6.ffn_gate.weight
+0.00.355.121 D create_tensor: loading tensor blk.6.ffn_down.weight
+0.00.355.129 D create_tensor: loading tensor blk.6.ffn_up.weight
+0.00.355.136 D create_tensor: loading tensor blk.7.attn_norm.weight
+0.00.355.146 D create_tensor: loading tensor blk.7.attn_q.weight
+0.00.355.153 D create_tensor: loading tensor blk.7.attn_k.weight
+0.00.355.161 D create_tensor: loading tensor blk.7.attn_v.weight
+0.00.355.168 D create_tensor: loading tensor blk.7.attn_output.weight
+0.00.355.176 D create_tensor: loading tensor blk.7.attn_q.bias
+0.00.355.182 D create_tensor: loading tensor blk.7.attn_k.bias
+0.00.355.189 D create_tensor: loading tensor blk.7.attn_v.bias
+0.00.355.196 D create_tensor: loading tensor blk.7.ffn_norm.weight
+0.00.355.203 D create_tensor: loading tensor blk.7.ffn_gate.weight
+0.00.355.217 D create_tensor: loading tensor blk.7.ffn_down.weight
+0.00.355.225 D create_tensor: loading tensor blk.7.ffn_up.weight
+0.00.355.236 D create_tensor: loading tensor blk.8.attn_norm.weight
+0.00.355.244 D create_tensor: loading tensor blk.8.attn_q.weight
+0.00.355.251 D create_tensor: loading tensor blk.8.attn_k.weight
+0.00.355.259 D create_tensor: loading tensor blk.8.attn_v.weight
+0.00.355.266 D create_tensor: loading tensor blk.8.attn_output.weight
+0.00.355.274 D create_tensor: loading tensor blk.8.attn_q.bias
+0.00.355.281 D create_tensor: loading tensor blk.8.attn_k.bias
+0.00.355.286 D create_tensor: loading tensor blk.8.attn_v.bias
+0.00.355.290 D create_tensor: loading tensor blk.8.ffn_norm.weight
+0.00.355.295 D create_tensor: loading tensor blk.8.ffn_gate.weight
+0.00.355.299 D create_tensor: loading tensor blk.8.ffn_down.weight
+0.00.355.306 D create_tensor: loading tensor blk.8.ffn_up.weight
+0.00.355.312 D create_tensor: loading tensor blk.9.attn_norm.weight
+0.00.355.320 D create_tensor: loading tensor blk.9.attn_q.weight
+0.00.355.328 D create_tensor: loading tensor blk.9.attn_k.weight
+0.00.355.336 D create_tensor: loading tensor blk.9.attn_v.weight
+0.00.355.344 D create_tensor: loading tensor blk.9.attn_output.weight
+0.00.355.352 D create_tensor: loading tensor blk.9.attn_q.bias
+0.00.355.361 D create_tensor: loading tensor blk.9.attn_k.bias
+0.00.355.369 D create_tensor: loading tensor blk.9.attn_v.bias
+0.00.355.378 D create_tensor: loading tensor blk.9.ffn_norm.weight
+0.00.355.387 D create_tensor: loading tensor blk.9.ffn_gate.weight
+0.00.355.399 D create_tensor: loading tensor blk.9.ffn_down.weight
+0.00.355.408 D create_tensor: loading tensor blk.9.ffn_up.weight
+0.00.355.416 D create_tensor: loading tensor blk.10.attn_norm.weight
+0.00.355.424 D create_tensor: loading tensor blk.10.attn_q.weight
+0.00.355.431 D create_tensor: loading tensor blk.10.attn_k.weight
+0.00.355.439 D create_tensor: loading tensor blk.10.attn_v.weight
+0.00.355.446 D create_tensor: loading tensor blk.10.attn_output.weight
+0.00.355.453 D create_tensor: loading tensor blk.10.attn_q.bias
+0.00.355.462 D create_tensor: loading tensor blk.10.attn_k.bias
+0.00.355.471 D create_tensor: loading tensor blk.10.attn_v.bias
+0.00.355.479 D create_tensor: loading tensor blk.10.ffn_norm.weight
+0.00.355.489 D create_tensor: loading tensor blk.10.ffn_gate.weight
+0.00.355.496 D create_tensor: loading tensor blk.10.ffn_down.weight
+0.00.355.504 D create_tensor: loading tensor blk.10.ffn_up.weight
+0.00.355.511 D create_tensor: loading tensor blk.11.attn_norm.weight
+0.00.355.517 D create_tensor: loading tensor blk.11.attn_q.weight
+0.00.355.523 D create_tensor: loading tensor blk.11.attn_k.weight
+0.00.355.531 D create_tensor: loading tensor blk.11.attn_v.weight
+0.00.355.538 D create_tensor: loading tensor blk.11.attn_output.weight
+0.00.355.544 D create_tensor: loading tensor blk.11.attn_q.bias
+0.00.355.550 D create_tensor: loading tensor blk.11.attn_k.bias
+0.00.355.557 D create_tensor: loading tensor blk.11.attn_v.bias
+0.00.355.562 D create_tensor: loading tensor blk.11.ffn_norm.weight
+0.00.355.571 D create_tensor: loading tensor blk.11.ffn_gate.weight
+0.00.355.578 D create_tensor: loading tensor blk.11.ffn_down.weight
+0.00.355.585 D create_tensor: loading tensor blk.11.ffn_up.weight
+0.00.355.591 D create_tensor: loading tensor blk.12.attn_norm.weight
+0.00.355.597 D create_tensor: loading tensor blk.12.attn_q.weight
+0.00.355.604 D create_tensor: loading tensor blk.12.attn_k.weight
+0.00.355.611 D create_tensor: loading tensor blk.12.attn_v.weight
+0.00.355.618 D create_tensor: loading tensor blk.12.attn_output.weight
+0.00.355.624 D create_tensor: loading tensor blk.12.attn_q.bias
+0.00.355.630 D create_tensor: loading tensor blk.12.attn_k.bias
+0.00.355.637 D create_tensor: loading tensor blk.12.attn_v.bias
+0.00.355.646 D create_tensor: loading tensor blk.12.ffn_norm.weight
+0.00.355.652 D create_tensor: loading tensor blk.12.ffn_gate.weight
+0.00.355.659 D create_tensor: loading tensor blk.12.ffn_down.weight
+0.00.355.670 D create_tensor: loading tensor blk.12.ffn_up.weight
+0.00.355.677 D create_tensor: loading tensor blk.13.attn_norm.weight
+0.00.355.683 D create_tensor: loading tensor blk.13.attn_q.weight
+0.00.355.688 D create_tensor: loading tensor blk.13.attn_k.weight
+0.00.355.695 D create_tensor: loading tensor blk.13.attn_v.weight
+0.00.355.702 D create_tensor: loading tensor blk.13.attn_output.weight
+0.00.355.708 D create_tensor: loading tensor blk.13.attn_q.bias
+0.00.355.714 D create_tensor: loading tensor blk.13.attn_k.bias
+0.00.355.723 D create_tensor: loading tensor blk.13.attn_v.bias
+0.00.355.730 D create_tensor: loading tensor blk.13.ffn_norm.weight
+0.00.355.737 D create_tensor: loading tensor blk.13.ffn_gate.weight
+0.00.355.743 D create_tensor: loading tensor blk.13.ffn_down.weight
+0.00.355.750 D create_tensor: loading tensor blk.13.ffn_up.weight
+0.00.355.756 D create_tensor: loading tensor blk.14.attn_norm.weight
+0.00.355.763 D create_tensor: loading tensor blk.14.attn_q.weight
+0.00.355.770 D create_tensor: loading tensor blk.14.attn_k.weight
+0.00.355.776 D create_tensor: loading tensor blk.14.attn_v.weight
+0.00.355.782 D create_tensor: loading tensor blk.14.attn_output.weight
+0.00.355.788 D create_tensor: loading tensor blk.14.attn_q.bias
+0.00.355.797 D create_tensor: loading tensor blk.14.attn_k.bias
+0.00.355.804 D create_tensor: loading tensor blk.14.attn_v.bias
+0.00.355.810 D create_tensor: loading tensor blk.14.ffn_norm.weight
+0.00.355.816 D create_tensor: loading tensor blk.14.ffn_gate.weight
+0.00.355.822 D create_tensor: loading tensor blk.14.ffn_down.weight
+0.00.355.826 D create_tensor: loading tensor blk.14.ffn_up.weight
+0.00.355.830 D create_tensor: loading tensor blk.15.attn_norm.weight
+0.00.355.833 D create_tensor: loading tensor blk.15.attn_q.weight
+0.00.355.839 D create_tensor: loading tensor blk.15.attn_k.weight
+0.00.355.845 D create_tensor: loading tensor blk.15.attn_v.weight
+0.00.355.852 D create_tensor: loading tensor blk.15.attn_output.weight
+0.00.355.860 D create_tensor: loading tensor blk.15.attn_q.bias
+0.00.355.866 D create_tensor: loading tensor blk.15.attn_k.bias
+0.00.355.870 D create_tensor: loading tensor blk.15.attn_v.bias
+0.00.355.874 D create_tensor: loading tensor blk.15.ffn_norm.weight
+0.00.355.877 D create_tensor: loading tensor blk.15.ffn_gate.weight
+0.00.355.881 D create_tensor: loading tensor blk.15.ffn_down.weight
+0.00.355.884 D create_tensor: loading tensor blk.15.ffn_up.weight
+0.00.355.888 D create_tensor: loading tensor blk.16.attn_norm.weight
+0.00.355.895 D create_tensor: loading tensor blk.16.attn_q.weight
+0.00.355.900 D create_tensor: loading tensor blk.16.attn_k.weight
+0.00.355.906 D create_tensor: loading tensor blk.16.attn_v.weight
+0.00.355.916 D create_tensor: loading tensor blk.16.attn_output.weight
+0.00.355.922 D create_tensor: loading tensor blk.16.attn_q.bias
+0.00.355.928 D create_tensor: loading tensor blk.16.attn_k.bias
+0.00.355.935 D create_tensor: loading tensor blk.16.attn_v.bias
+0.00.355.941 D create_tensor: loading tensor blk.16.ffn_norm.weight
+0.00.355.948 D create_tensor: loading tensor blk.16.ffn_gate.weight
+0.00.355.954 D create_tensor: loading tensor blk.16.ffn_down.weight
+0.00.355.960 D create_tensor: loading tensor blk.16.ffn_up.weight
+0.00.355.966 D create_tensor: loading tensor blk.17.attn_norm.weight
+0.00.355.972 D create_tensor: loading tensor blk.17.attn_q.weight
+0.00.355.979 D create_tensor: loading tensor blk.17.attn_k.weight
+0.00.355.988 D create_tensor: loading tensor blk.17.attn_v.weight
+0.00.355.994 D create_tensor: loading tensor blk.17.attn_output.weight
+0.00.356.000 D create_tensor: loading tensor blk.17.attn_q.bias
+0.00.356.007 D create_tensor: loading tensor blk.17.attn_k.bias
+0.00.356.013 D create_tensor: loading tensor blk.17.attn_v.bias
+0.00.356.020 D create_tensor: loading tensor blk.17.ffn_norm.weight
+0.00.356.026 D create_tensor: loading tensor blk.17.ffn_gate.weight
+0.00.356.033 D create_tensor: loading tensor blk.17.ffn_down.weight
+0.00.356.039 D create_tensor: loading tensor blk.17.ffn_up.weight
+0.00.356.045 D create_tensor: loading tensor blk.18.attn_norm.weight
+0.00.356.052 D create_tensor: loading tensor blk.18.attn_q.weight
+0.00.356.058 D create_tensor: loading tensor blk.18.attn_k.weight
+0.00.356.068 D create_tensor: loading tensor blk.18.attn_v.weight
+0.00.356.074 D create_tensor: loading tensor blk.18.attn_output.weight
+0.00.356.080 D create_tensor: loading tensor blk.18.attn_q.bias
+0.00.356.086 D create_tensor: loading tensor blk.18.attn_k.bias
+0.00.356.093 D create_tensor: loading tensor blk.18.attn_v.bias
+0.00.356.098 D create_tensor: loading tensor blk.18.ffn_norm.weight
+0.00.356.104 D create_tensor: loading tensor blk.18.ffn_gate.weight
+0.00.356.111 D create_tensor: loading tensor blk.18.ffn_down.weight
+0.00.356.117 D create_tensor: loading tensor blk.18.ffn_up.weight
+0.00.356.124 D create_tensor: loading tensor blk.19.attn_norm.weight
+0.00.356.131 D create_tensor: loading tensor blk.19.attn_q.weight
+0.00.356.140 D create_tensor: loading tensor blk.19.attn_k.weight
+0.00.356.146 D create_tensor: loading tensor blk.19.attn_v.weight
+0.00.356.153 D create_tensor: loading tensor blk.19.attn_output.weight
+0.00.356.160 D create_tensor: loading tensor blk.19.attn_q.bias
+0.00.356.166 D create_tensor: loading tensor blk.19.attn_k.bias
+0.00.356.173 D create_tensor: loading tensor blk.19.attn_v.bias
+0.00.356.181 D create_tensor: loading tensor blk.19.ffn_norm.weight
+0.00.356.189 D create_tensor: loading tensor blk.19.ffn_gate.weight
+0.00.356.195 D create_tensor: loading tensor blk.19.ffn_down.weight
+0.00.356.203 D create_tensor: loading tensor blk.19.ffn_up.weight
+0.00.356.211 D create_tensor: loading tensor blk.20.attn_norm.weight
+0.00.356.221 D create_tensor: loading tensor blk.20.attn_q.weight
+0.00.356.235 D create_tensor: loading tensor blk.20.attn_k.weight
+0.00.356.242 D create_tensor: loading tensor blk.20.attn_v.weight
+0.00.356.250 D create_tensor: loading tensor blk.20.attn_output.weight
+0.00.356.257 D create_tensor: loading tensor blk.20.attn_q.bias
+0.00.356.264 D create_tensor: loading tensor blk.20.attn_k.bias
+0.00.356.271 D create_tensor: loading tensor blk.20.attn_v.bias
+0.00.356.278 D create_tensor: loading tensor blk.20.ffn_norm.weight
+0.00.356.285 D create_tensor: loading tensor blk.20.ffn_gate.weight
+0.00.356.292 D create_tensor: loading tensor blk.20.ffn_down.weight
+0.00.356.300 D create_tensor: loading tensor blk.20.ffn_up.weight
+0.00.356.310 D create_tensor: loading tensor blk.21.attn_norm.weight
+0.00.356.317 D create_tensor: loading tensor blk.21.attn_q.weight
+0.00.356.323 D create_tensor: loading tensor blk.21.attn_k.weight
+0.00.356.330 D create_tensor: loading tensor blk.21.attn_v.weight
+0.00.356.338 D create_tensor: loading tensor blk.21.attn_output.weight
+0.00.356.345 D create_tensor: loading tensor blk.21.attn_q.bias
+0.00.356.352 D create_tensor: loading tensor blk.21.attn_k.bias
+0.00.356.359 D create_tensor: loading tensor blk.21.attn_v.bias
+0.00.356.367 D create_tensor: loading tensor blk.21.ffn_norm.weight
+0.00.356.374 D create_tensor: loading tensor blk.21.ffn_gate.weight
+0.00.356.382 D create_tensor: loading tensor blk.21.ffn_down.weight
+0.00.356.393 D create_tensor: loading tensor blk.21.ffn_up.weight
+0.00.356.401 D create_tensor: loading tensor blk.22.attn_norm.weight
+0.00.356.410 D create_tensor: loading tensor blk.22.attn_q.weight
+0.00.356.417 D create_tensor: loading tensor blk.22.attn_k.weight
+0.00.356.425 D create_tensor: loading tensor blk.22.attn_v.weight
+0.00.356.433 D create_tensor: loading tensor blk.22.attn_output.weight
+0.00.356.440 D create_tensor: loading tensor blk.22.attn_q.bias
+0.00.356.448 D create_tensor: loading tensor blk.22.attn_k.bias
+0.00.356.455 D create_tensor: loading tensor blk.22.attn_v.bias
+0.00.356.463 D create_tensor: loading tensor blk.22.ffn_norm.weight
+0.00.356.472 D create_tensor: loading tensor blk.22.ffn_gate.weight
+0.00.356.482 D create_tensor: loading tensor blk.22.ffn_down.weight
+0.00.356.490 D create_tensor: loading tensor blk.22.ffn_up.weight
+0.00.356.498 D create_tensor: loading tensor blk.23.attn_norm.weight
+0.00.356.507 D create_tensor: loading tensor blk.23.attn_q.weight
+0.00.356.515 D create_tensor: loading tensor blk.23.attn_k.weight
+0.00.356.523 D create_tensor: loading tensor blk.23.attn_v.weight
+0.00.356.531 D create_tensor: loading tensor blk.23.attn_output.weight
+0.00.356.540 D create_tensor: loading tensor blk.23.attn_q.bias
+0.00.356.548 D create_tensor: loading tensor blk.23.attn_k.bias
+0.00.356.555 D create_tensor: loading tensor blk.23.attn_v.bias
+0.00.356.563 D create_tensor: loading tensor blk.23.ffn_norm.weight
+0.00.356.574 D create_tensor: loading tensor blk.23.ffn_gate.weight
+0.00.356.584 D create_tensor: loading tensor blk.23.ffn_down.weight
+0.00.356.592 D create_tensor: loading tensor blk.23.ffn_up.weight
+0.00.356.602 D load_tensors: tensor 'token_embd.weight' (f32) (and 0 others) cannot be used with preferred buffer type CUDA_Host, using CPU instead
+0.00.395.772 I load_tensors: offloading 24 repeating layers to GPU
+0.00.395.775 I load_tensors: offloading output layer to GPU
+0.00.395.775 I load_tensors: offloaded 25/25 layers to GPU
+0.00.395.782 I load_tensors:        CUDA0 model buffer size =  1884.59 MiB
+0.00.395.783 I load_tensors:   CPU_Mapped model buffer size =   519.31 MiB
+...........................................................
+0.00.686.243 I llama_context: constructing llama_context
+0.00.686.247 I llama_context: n_seq_max     = 1
+0.00.686.247 I llama_context: n_ctx         = 4096
+0.00.686.247 I llama_context: n_ctx_per_seq = 4096
+0.00.686.247 I llama_context: n_batch       = 2048
+0.00.686.248 I llama_context: n_ubatch      = 512
+0.00.686.248 I llama_context: causal_attn   = 1
+0.00.686.249 I llama_context: flash_attn    = auto
+0.00.686.250 I llama_context: kv_unified    = false
+0.00.686.252 I llama_context: freq_base     = 1000000.0
+0.00.686.253 I llama_context: freq_scale    = 1
+0.00.686.253 W llama_context: n_ctx_per_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+0.00.686.269 D set_abort_callback: call
+0.00.686.976 I llama_context:  CUDA_Host  output buffer size =     0.58 MiB
+0.00.686.981 D create_memory: n_ctx = 4096 (padded)
+0.00.686.998 D llama_kv_cache: layer   0: dev = CUDA0
+0.00.687.011 D llama_kv_cache: layer   1: dev = CUDA0
+0.00.687.013 D llama_kv_cache: layer   2: dev = CUDA0
+0.00.687.014 D llama_kv_cache: layer   3: dev = CUDA0
+0.00.687.016 D llama_kv_cache: layer   4: dev = CUDA0
+0.00.687.017 D llama_kv_cache: layer   5: dev = CUDA0
+0.00.687.019 D llama_kv_cache: layer   6: dev = CUDA0
+0.00.687.020 D llama_kv_cache: layer   7: dev = CUDA0
+0.00.687.021 D llama_kv_cache: layer   8: dev = CUDA0
+0.00.687.024 D llama_kv_cache: layer   9: dev = CUDA0
+0.00.687.025 D llama_kv_cache: layer  10: dev = CUDA0
+0.00.687.025 D llama_kv_cache: layer  11: dev = CUDA0
+0.00.687.026 D llama_kv_cache: layer  12: dev = CUDA0
+0.00.687.027 D llama_kv_cache: layer  13: dev = CUDA0
+0.00.687.029 D llama_kv_cache: layer  14: dev = CUDA0
+0.00.687.029 D llama_kv_cache: layer  15: dev = CUDA0
+0.00.687.031 D llama_kv_cache: layer  16: dev = CUDA0
+0.00.687.032 D llama_kv_cache: layer  17: dev = CUDA0
+0.00.687.033 D llama_kv_cache: layer  18: dev = CUDA0
+0.00.687.033 D llama_kv_cache: layer  19: dev = CUDA0
+0.00.687.034 D llama_kv_cache: layer  20: dev = CUDA0
+0.00.687.035 D llama_kv_cache: layer  21: dev = CUDA0
+0.00.687.036 D llama_kv_cache: layer  22: dev = CUDA0
+0.00.687.037 D llama_kv_cache: layer  23: dev = CUDA0
+0.00.687.166 I llama_kv_cache:      CUDA0 KV buffer size =    48.00 MiB
+0.00.687.315 I llama_kv_cache: size =   48.00 MiB (  4096 cells,  24 layers,  1/1 seqs), K (f16):   24.00 MiB, V (f16):   24.00 MiB
+0.00.687.319 D llama_context: enumerating backends
+0.00.687.323 D llama_context: backend_ptrs.size() = 2
+0.00.687.325 D llama_context: max_nodes = 2328
+0.00.687.500 D llama_context: reserving full memory module
+0.00.687.506 D llama_context: worst-case: n_tokens = 512, n_seqs = 1, n_outputs = 1
+0.00.687.507 D graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
+0.00.687.879 I llama_context: Flash Attention was auto, set to enabled
+0.00.687.881 D graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
+0.00.691.618 D graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
+0.00.692.299 D graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
+0.00.692.996 I llama_context:      CUDA0 compute buffer size =   310.01 MiB
+0.00.693.001 I llama_context:  CUDA_Host compute buffer size =     9.76 MiB
+0.00.693.001 I llama_context: graph nodes  = 823
+0.00.693.002 I llama_context: graph splits = 2
+0.00.693.007 D clear_adapter_lora: call
+0.00.694.249 I common_init_from_params: added <|endoftext|> logit bias = -inf
+0.00.694.253 I common_init_from_params: added <|im_end|> logit bias = -inf
+0.00.694.254 I common_init_from_params: added <|fim_pad|> logit bias = -inf
+0.00.694.255 I common_init_from_params: added <|repo_name|> logit bias = -inf
+0.00.694.255 I common_init_from_params: added <|file_sep|> logit bias = -inf
+0.00.694.259 I common_init_from_params: setting dry_penalty_last_n to ctx_size = 4096
+0.00.694.260 W common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+0.00.694.262 D set_warmup: value = 1
+0.00.715.720 D set_warmup: value = 0
+0.00.730.273 I srv          init: initializing slots, n_slots = 1
+0.00.730.280 I slot         init: id  0 | task -1 | new slot n_ctx_slot = 4096
+0.00.730.282 D slot        reset: id  0 | task -1 | 
+0.00.730.425 I srv          init: Enable thinking? 0
+0.00.730.430 I main: model loaded
+0.00.730.461 I main: chat template, chat_template: {%- if tools %}
+    {{- '<|im_start|>system\n' }}
+    {%- if messages[0]['role'] == 'system' %}
+        {{- messages[0]['content'] }}
+    {%- else %}
+        {{- 'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.' }}
+    {%- endif %}
+    {{- "\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>" }}
+    {%- for tool in tools %}
+        {{- "\n" }}
+        {{- tool | tojson }}
+    {%- endfor %}
+    {{- "\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n" }}
+{%- else %}
+    {%- if messages[0]['role'] == 'system' %}
+        {{- '<|im_start|>system\n' + messages[0]['content'] + '<|im_end|>\n' }}
+    {%- else %}
+        {{- '<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n' }}
+    {%- endif %}
+{%- endif %}
+{%- for message in messages %}
+    {%- if (message.role == "user") or (message.role == "system" and not loop.first) or (message.role == "assistant" and not message.tool_calls) %}
+        {{- '<|im_start|>' + message.role + '\n' + message.content + '<|im_end|>' + '\n' }}
+    {%- elif message.role == "assistant" %}
+        {{- '<|im_start|>' + message.role }}
+        {%- if message.content %}
+            {{- '\n' + message.content }}
+        {%- endif %}
+        {%- for tool_call in message.tool_calls %}
+            {%- if tool_call.function is defined %}
+                {%- set tool_call = tool_call.function %}
+            {%- endif %}
+            {{- '\n<tool_call>\n{"name": "' }}
+            {{- tool_call.name }}
+            {{- '", "arguments": ' }}
+            {{- tool_call.arguments | tojson }}
+            {{- '}\n</tool_call>' }}
+        {%- endfor %}
+        {{- '<|im_end|>\n' }}
+    {%- elif message.role == "tool" %}
+        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != "tool") %}
+            {{- '<|im_start|>user' }}
+        {%- endif %}
+        {{- '\n<tool_response>\n' }}
+        {{- message.content }}
+        {{- '\n</tool_response>' }}
+        {%- if loop.last or (messages[loop.index0 + 1].role != "tool") %}
+            {{- '<|im_end|>\n' }}
+        {%- endif %}
+    {%- endif %}
+{%- endfor %}
+{%- if add_generation_prompt %}
+    {{- '<|im_start|>assistant\n' }}
+{%- endif %}
+, example_format: '<|im_start|>system
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+Hello<|im_end|>
+<|im_start|>assistant
+Hi there<|im_end|>
+<|im_start|>user
+How are you?<|im_end|>
+<|im_start|>assistant
+'
+0.00.730.467 I main: server is listening on http://0.0.0.0:8080 - starting the main loop
+0.00.730.468 D que    start_loop: processing new tasks
+0.00.730.469 D que    start_loop: update slots
+0.00.730.474 I srv  update_slots: all slots are idle
+0.00.730.474 D srv  kv_cache_cle: clearing KV cache
+0.00.730.637 D que    start_loop: waiting for new tasks
+0.30.010.130 I srv  log_server_r: request: GET /health 127.0.0.1 200
+0.30.010.134 D srv  log_server_r: request:  
+0.30.010.135 D srv  log_server_r: response: {"status":"ok"}
+1.00.050.944 I srv  log_server_r: request: GET /health 127.0.0.1 200
+1.00.050.947 D srv  log_server_r: request:  
+1.00.050.947 D srv  log_server_r: response: {"status":"ok"}
+1.18.827.941 D request: { "messages": [{"role": "system", "content": "You are a concise assistant for an inference team."},{"role": "user", "content": "In one short sentence, what does the KV cache store?"}],"max_tokens": 32, "stream": true}
+1.18.829.748 D srv  params_from_: Grammar: 
+1.18.829.749 D srv  params_from_: Grammar lazy: false
+1.18.829.750 I srv  params_from_: Chat format: Content-only
+1.18.829.754 D srv  add_waiting_: add task 0 to waiting list. current waiting = 0 (before add)
+1.18.829.755 D que          post: new task, id = 0/1, front = 0
+1.18.829.762 D que    start_loop: processing new tasks
+1.18.829.764 D que    start_loop: processing task, id = 0
+1.18.829.766 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+1.18.829.767 D slot        reset: id  0 | task -1 | 
+1.18.829.823 D slot launch_slot_: id  0 | task 0 | launching slot : {"id":0,"id_task":0,"n_ctx":4096,"speculative":false,"is_processing":false,"params":{"n_predict":32,"seed":0,"temperature":0.0,"dynatemp_range":0.0,"dynatemp_exponent":1.0,"top_k":40,"top_p":0.949999988079071,"min_p":0.05000000074505806,"top_n_sigma":-1.0,"xtc_probability":0.0,"xtc_threshold":0.10000000149011612,"typical_p":1.0,"repeat_last_n":64,"repeat_penalty":1.0,"presence_penalty":0.0,"frequency_penalty":0.0,"dry_multiplier":0.0,"dry_base":1.75,"dry_allowed_length":2,"dry_penalty_last_n":4096,"dry_sequence_breakers":["\n",":","\"","*"],"mirostat":0,"mirostat_tau":5.0,"mirostat_eta":0.10000000149011612,"stop":[],"max_tokens":32,"n_keep":0,"n_discard":0,"ignore_eos":false,"stream":true,"logit_bias":[],"n_probs":0,"min_keep":0,"grammar":"","grammar_lazy":false,"grammar_triggers":[],"preserved_tokens":[],"chat_format":"Content-only","reasoning_format":"auto","reasoning_in_content":false,"thinking_forced_open":false,"samplers":["penalties","dry","top_n_sigma","top_k","typ_p","top_p","min_p","xtc","temperature"],"speculative.n_max":16,"speculative.n_min":0,"speculative.p_min":0.75,"timings_per_token":false,"post_sampling_probs":false,"lora":[]},"prompt":"<|im_start|>system\nYou are a concise assistant for an inference team.<|im_end|>\n<|im_start|>user\nIn one short sentence, what does the KV cache store?<|im_end|>\n<|im_start|>assistant\n","next_token":{"has_next_token":true,"has_new_line":false,"n_remain":-1,"n_decoded":0,"stopping_word":""}}
+1.18.829.839 I slot launch_slot_: id  0 | task 0 | processing task
+1.18.829.840 D que    start_loop: update slots
+1.18.829.841 D srv  update_slots: posting NEXT_RESPONSE
+1.18.829.841 D que          post: new task, id = 1, front = 0
+1.18.829.845 I slot update_slots: id  0 | task 0 | new prompt, n_ctx_slot = 4096, n_keep = 0, n_prompt_tokens = 35
+1.18.829.850 I slot update_slots: id  0 | task 0 | kv cache rm [0, end)
+1.18.829.855 I slot update_slots: id  0 | task 0 | prompt processing progress, n_past = 35, n_tokens = 35, progress = 1.000000
+1.18.829.866 I slot update_slots: id  0 | task 0 | prompt done, n_past = 35, n_tokens = 35
+1.18.829.867 D srv  update_slots: decoding batch, n_tokens = 35
+1.18.829.868 D clear_adapter_lora: call
+1.18.829.869 D set_embeddings: value = 0
+1.18.856.363 D srv  update_chat_: Parsing chat message: The
+1.18.856.367 D Parsing input with format Content-only: The
+1.18.856.371 D srv          send: sending result for task id = 0
+1.18.856.371 D srv          send: task id = 0 pushed to result queue
+1.18.856.375 D slot process_toke: id  0 | task 0 | n_decoded = 1, n_remaining = 31, next token:   785 'The'
+1.18.856.376 D srv  update_slots: run slots completed
+1.18.856.377 D que    start_loop: waiting for new tasks
+1.18.856.377 D que    start_loop: processing new tasks
+1.18.856.380 D que    start_loop: processing task, id = 1
+1.18.856.381 D que    start_loop: update slots
+1.18.856.381 D srv  update_slots: posting NEXT_RESPONSE
+1.18.856.382 D que          post: new task, id = 2, front = 0
+1.18.856.383 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 36, n_cache_tokens = 36, truncated = 0
+1.18.856.384 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.856.385 D clear_adapter_lora: call
+1.18.856.386 D set_embeddings: value = 0
+1.18.856.432 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.856.470 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"The"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.865.177 D srv  update_chat_: Parsing chat message: The KV
+1.18.865.181 D Parsing input with format Content-only: The KV
+1.18.865.185 D srv          send: sending result for task id = 0
+1.18.865.185 D srv          send: task id = 0 pushed to result queue
+1.18.865.188 D slot process_toke: id  0 | task 0 | n_decoded = 2, n_remaining = 30, next token: 84648 ' KV'
+1.18.865.189 D srv  update_slots: run slots completed
+1.18.865.189 D que    start_loop: waiting for new tasks
+1.18.865.189 D que    start_loop: processing new tasks
+1.18.865.190 D que    start_loop: processing task, id = 2
+1.18.865.191 D que    start_loop: update slots
+1.18.865.191 D srv  update_slots: posting NEXT_RESPONSE
+1.18.865.192 D que          post: new task, id = 3, front = 0
+1.18.865.194 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 37, n_cache_tokens = 37, truncated = 0
+1.18.865.195 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.865.195 D clear_adapter_lora: call
+1.18.865.196 D set_embeddings: value = 0
+1.18.865.236 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" KV"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.873.910 D srv  update_chat_: Parsing chat message: The KV cache
+1.18.873.913 D Parsing input with format Content-only: The KV cache
+1.18.873.916 D srv          send: sending result for task id = 0
+1.18.873.916 D srv          send: task id = 0 pushed to result queue
+1.18.873.918 D slot process_toke: id  0 | task 0 | n_decoded = 3, n_remaining = 29, next token:  6500 ' cache'
+1.18.873.918 D srv  update_slots: run slots completed
+1.18.873.919 D que    start_loop: waiting for new tasks
+1.18.873.919 D que    start_loop: processing new tasks
+1.18.873.920 D que    start_loop: processing task, id = 3
+1.18.873.920 D que    start_loop: update slots
+1.18.873.920 D srv  update_slots: posting NEXT_RESPONSE
+1.18.873.921 D que          post: new task, id = 4, front = 0
+1.18.873.924 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 38, n_cache_tokens = 38, truncated = 0
+1.18.873.924 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.873.925 D clear_adapter_lora: call
+1.18.873.925 D set_embeddings: value = 0
+1.18.873.960 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" cache"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.881.970 D srv  update_chat_: Parsing chat message: The KV cache stores
+1.18.881.973 D Parsing input with format Content-only: The KV cache stores
+1.18.881.975 D srv          send: sending result for task id = 0
+1.18.881.975 D srv          send: task id = 0 pushed to result queue
+1.18.881.977 D slot process_toke: id  0 | task 0 | n_decoded = 4, n_remaining = 28, next token: 10533 ' stores'
+1.18.881.977 D srv  update_slots: run slots completed
+1.18.881.977 D que    start_loop: waiting for new tasks
+1.18.881.977 D que    start_loop: processing new tasks
+1.18.881.978 D que    start_loop: processing task, id = 4
+1.18.881.979 D que    start_loop: update slots
+1.18.881.979 D srv  update_slots: posting NEXT_RESPONSE
+1.18.881.979 D que          post: new task, id = 5, front = 0
+1.18.881.982 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 39, n_cache_tokens = 39, truncated = 0
+1.18.881.982 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.881.983 D clear_adapter_lora: call
+1.18.881.983 D set_embeddings: value = 0
+1.18.882.021 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" stores"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.889.893 D srv  update_chat_: Parsing chat message: The KV cache stores key
+1.18.889.894 D Parsing input with format Content-only: The KV cache stores key
+1.18.889.896 D srv          send: sending result for task id = 0
+1.18.889.896 D srv          send: task id = 0 pushed to result queue
+1.18.889.898 D slot process_toke: id  0 | task 0 | n_decoded = 5, n_remaining = 27, next token:  1376 ' key'
+1.18.889.898 D srv  update_slots: run slots completed
+1.18.889.899 D que    start_loop: waiting for new tasks
+1.18.889.899 D que    start_loop: processing new tasks
+1.18.889.899 D que    start_loop: processing task, id = 5
+1.18.889.900 D que    start_loop: update slots
+1.18.889.900 D srv  update_slots: posting NEXT_RESPONSE
+1.18.889.900 D que          post: new task, id = 6, front = 0
+1.18.889.902 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 40, n_cache_tokens = 40, truncated = 0
+1.18.889.902 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.889.902 D clear_adapter_lora: call
+1.18.889.903 D set_embeddings: value = 0
+1.18.889.947 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" key"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.898.322 D srv  update_chat_: Parsing chat message: The KV cache stores key-value
+1.18.898.326 D Parsing input with format Content-only: The KV cache stores key-value
+1.18.898.330 D srv          send: sending result for task id = 0
+1.18.898.331 D srv          send: task id = 0 pushed to result queue
+1.18.898.333 D slot process_toke: id  0 | task 0 | n_decoded = 6, n_remaining = 26, next token: 19083 '-value'
+1.18.898.333 D srv  update_slots: run slots completed
+1.18.898.334 D que    start_loop: waiting for new tasks
+1.18.898.334 D que    start_loop: processing new tasks
+1.18.898.335 D que    start_loop: processing task, id = 6
+1.18.898.336 D que    start_loop: update slots
+1.18.898.336 D srv  update_slots: posting NEXT_RESPONSE
+1.18.898.337 D que          post: new task, id = 7, front = 0
+1.18.898.341 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 41, n_cache_tokens = 41, truncated = 0
+1.18.898.341 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.898.343 D clear_adapter_lora: call
+1.18.898.343 D set_embeddings: value = 0
+1.18.898.386 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"-value"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.907.094 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs
+1.18.907.096 D Parsing input with format Content-only: The KV cache stores key-value pairs
+1.18.907.098 D srv          send: sending result for task id = 0
+1.18.907.098 D srv          send: task id = 0 pushed to result queue
+1.18.907.100 D slot process_toke: id  0 | task 0 | n_decoded = 7, n_remaining = 25, next token: 13530 ' pairs'
+1.18.907.100 D srv  update_slots: run slots completed
+1.18.907.101 D que    start_loop: waiting for new tasks
+1.18.907.101 D que    start_loop: processing new tasks
+1.18.907.102 D que    start_loop: processing task, id = 7
+1.18.907.102 D que    start_loop: update slots
+1.18.907.103 D srv  update_slots: posting NEXT_RESPONSE
+1.18.907.103 D que          post: new task, id = 8, front = 0
+1.18.907.105 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 42, n_cache_tokens = 42, truncated = 0
+1.18.907.105 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.907.106 D clear_adapter_lora: call
+1.18.907.106 D set_embeddings: value = 0
+1.18.907.142 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" pairs"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.915.327 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in
+1.18.915.329 D Parsing input with format Content-only: The KV cache stores key-value pairs in
+1.18.915.331 D srv          send: sending result for task id = 0
+1.18.915.331 D srv          send: task id = 0 pushed to result queue
+1.18.915.332 D slot process_toke: id  0 | task 0 | n_decoded = 8, n_remaining = 24, next token:   304 ' in'
+1.18.915.333 D srv  update_slots: run slots completed
+1.18.915.333 D que    start_loop: waiting for new tasks
+1.18.915.334 D que    start_loop: processing new tasks
+1.18.915.334 D que    start_loop: processing task, id = 8
+1.18.915.335 D que    start_loop: update slots
+1.18.915.335 D srv  update_slots: posting NEXT_RESPONSE
+1.18.915.336 D que          post: new task, id = 9, front = 0
+1.18.915.337 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 43, n_cache_tokens = 43, truncated = 0
+1.18.915.338 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.915.338 D clear_adapter_lora: call
+1.18.915.338 D set_embeddings: value = 0
+1.18.915.379 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" in"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.922.991 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory
+1.18.922.994 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory
+1.18.922.996 D srv          send: sending result for task id = 0
+1.18.922.996 D srv          send: task id = 0 pushed to result queue
+1.18.922.998 D slot process_toke: id  0 | task 0 | n_decoded = 9, n_remaining = 23, next token:  4938 ' memory'
+1.18.922.999 D srv  update_slots: run slots completed
+1.18.922.999 D que    start_loop: waiting for new tasks
+1.18.922.999 D que    start_loop: processing new tasks
+1.18.923.000 D que    start_loop: processing task, id = 9
+1.18.923.001 D que    start_loop: update slots
+1.18.923.001 D srv  update_slots: posting NEXT_RESPONSE
+1.18.923.002 D que          post: new task, id = 10, front = 0
+1.18.923.004 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 44, n_cache_tokens = 44, truncated = 0
+1.18.923.004 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.923.005 D clear_adapter_lora: call
+1.18.923.005 D set_embeddings: value = 0
+1.18.923.044 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" memory"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.931.728 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for
+1.18.931.732 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for
+1.18.931.736 D srv          send: sending result for task id = 0
+1.18.931.736 D srv          send: task id = 0 pushed to result queue
+1.18.931.739 D slot process_toke: id  0 | task 0 | n_decoded = 10, n_remaining = 22, next token:   369 ' for'
+1.18.931.740 D srv  update_slots: run slots completed
+1.18.931.740 D que    start_loop: waiting for new tasks
+1.18.931.741 D que    start_loop: processing new tasks
+1.18.931.742 D que    start_loop: processing task, id = 10
+1.18.931.742 D que    start_loop: update slots
+1.18.931.743 D srv  update_slots: posting NEXT_RESPONSE
+1.18.931.744 D que          post: new task, id = 11, front = 0
+1.18.931.748 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 45, n_cache_tokens = 45, truncated = 0
+1.18.931.748 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.931.749 D clear_adapter_lora: call
+1.18.931.749 D set_embeddings: value = 0
+1.18.931.780 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" for"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.939.953 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for quick
+1.18.939.956 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for quick
+1.18.939.960 D srv          send: sending result for task id = 0
+1.18.939.961 D srv          send: task id = 0 pushed to result queue
+1.18.939.963 D slot process_toke: id  0 | task 0 | n_decoded = 11, n_remaining = 21, next token:  3974 ' quick'
+1.18.939.964 D srv  update_slots: run slots completed
+1.18.939.964 D que    start_loop: waiting for new tasks
+1.18.939.965 D que    start_loop: processing new tasks
+1.18.939.966 D que    start_loop: processing task, id = 11
+1.18.939.966 D que    start_loop: update slots
+1.18.939.967 D srv  update_slots: posting NEXT_RESPONSE
+1.18.939.968 D que          post: new task, id = 12, front = 0
+1.18.939.971 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 46, n_cache_tokens = 46, truncated = 0
+1.18.939.971 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.939.972 D clear_adapter_lora: call
+1.18.939.973 D set_embeddings: value = 0
+1.18.940.002 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" quick"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.948.424 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for quick access
+1.18.948.428 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for quick access
+1.18.948.431 D srv          send: sending result for task id = 0
+1.18.948.431 D srv          send: task id = 0 pushed to result queue
+1.18.948.433 D slot process_toke: id  0 | task 0 | n_decoded = 12, n_remaining = 20, next token:  2615 ' access'
+1.18.948.434 D srv  update_slots: run slots completed
+1.18.948.434 D que    start_loop: waiting for new tasks
+1.18.948.434 D que    start_loop: processing new tasks
+1.18.948.435 D que    start_loop: processing task, id = 12
+1.18.948.436 D que    start_loop: update slots
+1.18.948.436 D srv  update_slots: posting NEXT_RESPONSE
+1.18.948.437 D que          post: new task, id = 13, front = 0
+1.18.948.440 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 47, n_cache_tokens = 47, truncated = 0
+1.18.948.440 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.948.441 D clear_adapter_lora: call
+1.18.948.442 D set_embeddings: value = 0
+1.18.948.474 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" access"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.956.110 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for quick access to
+1.18.956.113 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for quick access to
+1.18.956.116 D srv          send: sending result for task id = 0
+1.18.956.116 D srv          send: task id = 0 pushed to result queue
+1.18.956.118 D slot process_toke: id  0 | task 0 | n_decoded = 13, n_remaining = 19, next token:   311 ' to'
+1.18.956.119 D srv  update_slots: run slots completed
+1.18.956.119 D que    start_loop: waiting for new tasks
+1.18.956.120 D que    start_loop: processing new tasks
+1.18.956.120 D que    start_loop: processing task, id = 13
+1.18.956.121 D que    start_loop: update slots
+1.18.956.121 D srv  update_slots: posting NEXT_RESPONSE
+1.18.956.122 D que          post: new task, id = 14, front = 0
+1.18.956.124 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 48, n_cache_tokens = 48, truncated = 0
+1.18.956.125 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.956.125 D clear_adapter_lora: call
+1.18.956.126 D set_embeddings: value = 0
+1.18.956.165 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" to"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.965.218 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for quick access to data
+1.18.965.221 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for quick access to data
+1.18.965.224 D srv          send: sending result for task id = 0
+1.18.965.224 D srv          send: task id = 0 pushed to result queue
+1.18.965.226 D slot process_toke: id  0 | task 0 | n_decoded = 14, n_remaining = 18, next token:   821 ' data'
+1.18.965.226 D srv  update_slots: run slots completed
+1.18.965.227 D que    start_loop: waiting for new tasks
+1.18.965.227 D que    start_loop: processing new tasks
+1.18.965.228 D que    start_loop: processing task, id = 14
+1.18.965.229 D que    start_loop: update slots
+1.18.965.230 D srv  update_slots: posting NEXT_RESPONSE
+1.18.965.230 D que          post: new task, id = 15, front = 0
+1.18.965.233 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 49, n_cache_tokens = 49, truncated = 0
+1.18.965.233 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.965.234 D clear_adapter_lora: call
+1.18.965.234 D set_embeddings: value = 0
+1.18.965.265 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" data"}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.973.146 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for quick access to data.
+1.18.973.149 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for quick access to data.
+1.18.973.153 D srv          send: sending result for task id = 0
+1.18.973.153 D srv          send: task id = 0 pushed to result queue
+1.18.973.156 D slot process_toke: id  0 | task 0 | n_decoded = 15, n_remaining = 17, next token:    13 '.'
+1.18.973.156 D srv  update_slots: run slots completed
+1.18.973.157 D que    start_loop: waiting for new tasks
+1.18.973.157 D que    start_loop: processing new tasks
+1.18.973.158 D que    start_loop: processing task, id = 15
+1.18.973.158 D que    start_loop: update slots
+1.18.973.159 D srv  update_slots: posting NEXT_RESPONSE
+1.18.973.160 D que          post: new task, id = 16, front = 0
+1.18.973.163 D slot update_slots: id  0 | task 0 | slot decode token, n_ctx = 4096, n_past = 50, n_cache_tokens = 50, truncated = 0
+1.18.973.164 D srv  update_slots: decoding batch, n_tokens = 1
+1.18.973.164 D clear_adapter_lora: call
+1.18.973.165 D set_embeddings: value = 0
+1.18.973.193 D data stream, to_send: data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.981.623 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for quick access to data.
+1.18.981.627 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for quick access to data.
+1.18.981.630 D srv          send: sending result for task id = 0
+1.18.981.630 D srv          send: task id = 0 pushed to result queue
+1.18.981.639 D slot process_toke: id  0 | task 0 | stopped by EOS
+1.18.981.640 D slot process_toke: id  0 | task 0 | n_decoded = 16, n_remaining = 16, next token: 151645 ''
+1.18.981.641 I slot      release: id  0 | task 0 | stop processing: n_past = 50, truncated = 0
+1.18.981.649 I slot print_timing: id  0 | task 0 | 
+prompt eval time =      26.51 ms /    35 tokens (    0.76 ms per token,  1320.11 tokens per second)
+       eval time =     125.28 ms /    16 tokens (    7.83 ms per token,   127.71 tokens per second)
+      total time =     151.80 ms /    51 tokens
+1.18.981.655 D srv  update_chat_: Parsing chat message: The KV cache stores key-value pairs in memory for quick access to data.
+1.18.981.655 D Parsing input with format Content-only: The KV cache stores key-value pairs in memory for quick access to data.
+1.18.981.667 D Parsed message: {"role":"assistant","content":"The KV cache stores key-value pairs in memory for quick access to data."}
+1.18.981.670 D srv          send: sending result for task id = 0
+1.18.981.670 D srv          send: task id = 0 pushed to result queue
+1.18.981.671 D srv  update_slots: run slots completed
+1.18.981.671 D que    start_loop: waiting for new tasks
+1.18.981.672 D que    start_loop: processing new tasks
+1.18.981.673 D que    start_loop: processing task, id = 16
+1.18.981.674 D que    start_loop: update slots
+1.18.981.675 I srv  update_slots: all slots are idle
+1.18.981.675 D que    start_loop: waiting for new tasks
+1.18.981.708 D data stream, to_send: data: {"choices":[{"finish_reason":"stop","index":0,"delta":{}}],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk"}
+
+1.18.981.749 D data stream, to_send: data: {"choices":[],"created":1793383042,"id":"chatcmpl-H79qSi7lDiKG6i8txlbB6sTHCf1eCN8t","model":"gpt-3.5-turbo","system_fingerprint":"b6500-a7a98e0ff","object":"chat.completion.chunk","usage":{"completion_tokens":16,"prompt_tokens":35,"total_tokens":51},"timings":{"cache_n":0,"prompt_n":35,"prompt_ms":26.513,"prompt_per_token_ms":0.7575142857142858,"prompt_per_second":1320.1071172632292,"predicted_n":16,"predicted_ms":125.283,"predicted_per_token_ms":7.8301875,"predicted_per_second":127.71086260705762}}
+
+1.18.981.796 I srv  log_server_r: request: POST /v1/chat/completions 172.18.0.1 200
+1.18.981.797 D srv  log_server_r: request:  { "messages": [{"role": "system", "content": "You are a concise assistant for an inference team."},{"role": "user", "content": "In one short sentence, what does the KV cache store?"}],"max_tokens": 32, "stream": true}
+1.18.981.798 D srv  log_server_r: response: 
+1.18.981.798 D srv  remove_waiti: remove task 0 from waiting list. current waiting = 1 (before remove)
+1.30.092.564 I srv  log_server_r: request: GET /health 127.0.0.1 200
+1.30.092.566 D srv  log_server_r: request:  
+1.30.092.567 D srv  log_server_r: response: {"status":"ok"}
+2.00.134.119 I srv  log_server_r: request: GET /health 127.0.0.1 200
+2.00.134.123 D srv  log_server_r: request:  
+2.00.134.123 D srv  log_server_r: response: {"status":"ok"}
+2.30.175.318 I srv  log_server_r: request: GET /health 127.0.0.1 200
+2.30.175.322 D srv  log_server_r: request:  
+2.30.175.323 D srv  log_server_r: response: {"status":"ok"}
+3.00.215.691 I srv  log_server_r: request: GET /health 127.0.0.1 200
+3.00.215.696 D srv  log_server_r: request:  
+3.00.215.696 D srv  log_server_r: response: {"status":"ok"}
+3.30.255.627 I srv  log_server_r: request: GET /health 127.0.0.1 200
+3.30.255.631 D srv  log_server_r: request:  
+3.30.255.631 D srv  log_server_r: response: {"status":"ok"}
+4.00.294.851 I srv  log_server_r: request: GET /health 127.0.0.1 200
+4.00.294.854 D srv  log_server_r: request:  
+4.00.294.854 D srv  log_server_r: response: {"status":"ok"}
+4.30.335.412 I srv  log_server_r: request: GET /health 127.0.0.1 200
+4.30.335.414 D srv  log_server_r: request:  
+4.30.335.414 D srv  log_server_r: response: {"status":"ok"}
+5.00.376.252 I srv  log_server_r: request: GET /health 127.0.0.1 200
+5.00.376.256 D srv  log_server_r: request:  
+5.00.376.256 D srv  log_server_r: response: {"status":"ok"}
+5.30.415.373 I srv  log_server_r: request: GET /health 127.0.0.1 200
+5.30.415.375 D srv  log_server_r: request:  
+5.30.415.375 D srv  log_server_r: response: {"status":"ok"}
+6.00.457.056 I srv  log_server_r: request: GET /health 127.0.0.1 200
+6.00.457.059 D srv  log_server_r: request:  
+6.00.457.059 D srv  log_server_r: response: {"status":"ok"}
+6.30.498.004 I srv  log_server_r: request: GET /health 127.0.0.1 200
+6.30.498.006 D srv  log_server_r: request:  
+6.30.498.007 D srv  log_server_r: response: {"status":"ok"}
+7.00.538.488 I srv  log_server_r: request: GET /health 127.0.0.1 200
+7.00.538.489 D srv  log_server_r: request:  
+7.00.538.490 D srv  log_server_r: response: {"status":"ok"}
+7.30.580.605 I srv  log_server_r: request: GET /health 127.0.0.1 200
+7.30.580.608 D srv  log_server_r: request:  
+7.30.580.608 D srv  log_server_r: response: {"status":"ok"}
+8.00.621.444 I srv  log_server_r: request: GET /health 127.0.0.1 200
+8.00.621.448 D srv  log_server_r: request:  
+8.00.621.449 D srv  log_server_r: response: {"status":"ok"}
+8.30.662.492 I srv  log_server_r: request: GET /health 127.0.0.1 200
+8.30.662.496 D srv  log_server_r: request:  
+8.30.662.496 D srv  log_server_r: response: {"status":"ok"}
+9.00.703.557 I srv  log_server_r: request: GET /health 127.0.0.1 200
+9.00.703.560 D srv  log_server_r: request:  
+9.00.703.561 D srv  log_server_r: response: {"status":"ok"}
+9.30.744.315 I srv  log_server_r: request: GET /health 127.0.0.1 200
+9.30.744.316 D srv  log_server_r: request:  
+9.30.744.317 D srv  log_server_r: response: {"status":"ok"}
+10.00.784.611 I srv  log_server_r: request: GET /health 127.0.0.1 200
+10.00.784.616 D srv  log_server_r: request:  
+10.00.784.616 D srv  log_server_r: response: {"status":"ok"}
+10.30.826.118 I srv  log_server_r: request: GET /health 127.0.0.1 200
+10.30.826.121 D srv  log_server_r: request:  
+10.30.826.121 D srv  log_server_r: response: {"status":"ok"}
+11.00.866.026 I srv  log_server_r: request: GET /health 127.0.0.1 200
+11.00.866.028 D srv  log_server_r: request:  
+11.00.866.029 D srv  log_server_r: response: {"status":"ok"}
+11.30.906.285 I srv  log_server_r: request: GET /health 127.0.0.1 200
+11.30.906.287 D srv  log_server_r: request:  
+11.30.906.287 D srv  log_server_r: response: {"status":"ok"}
+12.00.946.905 I srv  log_server_r: request: GET /health 127.0.0.1 200
+12.00.946.910 D srv  log_server_r: request:  
+12.00.946.911 D srv  log_server_r: response: {"status":"ok"}
+12.30.987.170 I srv  log_server_r: request: GET /health 127.0.0.1 200
+12.30.987.172 D srv  log_server_r: request:  
+12.30.987.172 D srv  log_server_r: response: {"status":"ok"}
+13.01.029.627 I srv  log_server_r: request: GET /health 127.0.0.1 200
+13.01.029.630 D srv  log_server_r: request:  
+13.01.029.630 D srv  log_server_r: response: {"status":"ok"}
+13.31.069.376 I srv  log_server_r: request: GET /health 127.0.0.1 200
+13.31.069.381 D srv  log_server_r: request:  
+13.31.069.381 D srv  log_server_r: response: {"status":"ok"}
+14.01.111.520 I srv  log_server_r: request: GET /health 127.0.0.1 200
+14.01.111.523 D srv  log_server_r: request:  
+14.01.111.523 D srv  log_server_r: response: {"status":"ok"}
+14.31.152.033 I srv  log_server_r: request: GET /health 127.0.0.1 200
+14.31.152.037 D srv  log_server_r: request:  
+14.31.152.037 D srv  log_server_r: response: {"status":"ok"}
+15.01.193.716 I srv  log_server_r: request: GET /health 127.0.0.1 200
+15.01.193.721 D srv  log_server_r: request:  
+15.01.193.722 D srv  log_server_r: response: {"status":"ok"}
+15.31.234.986 I srv  log_server_r: request: GET /health 127.0.0.1 200
+15.31.234.989 D srv  log_server_r: request:  
+15.31.234.989 D srv  log_server_r: response: {"status":"ok"}
+16.01.274.099 I srv  log_server_r: request: GET /health 127.0.0.1 200
+16.01.274.102 D srv  log_server_r: request:  
+16.01.274.102 D srv  log_server_r: response: {"status":"ok"}
+16.31.317.342 I srv  log_server_r: request: GET /health 127.0.0.1 200
+16.31.317.345 D srv  log_server_r: request:  
+16.31.317.345 D srv  log_server_r: response: {"status":"ok"}
+17.01.357.180 I srv  log_server_r: request: GET /health 127.0.0.1 200
+17.01.357.184 D srv  log_server_r: request:  
+17.01.357.185 D srv  log_server_r: response: {"status":"ok"}
+17.31.398.246 I srv  log_server_r: request: GET /health 127.0.0.1 200
+17.31.398.251 D srv  log_server_r: request:  
+17.31.398.251 D srv  log_server_r: response: {"status":"ok"}
+18.01.437.086 I srv  log_server_r: request: GET /health 127.0.0.1 200
+18.01.437.097 D srv  log_server_r: request:  
+18.01.437.097 D srv  log_server_r: response: {"status":"ok"}
+18.31.476.683 I srv  log_server_r: request: GET /health 127.0.0.1 200
+18.31.476.688 D srv  log_server_r: request:  
+18.31.476.689 D srv  log_server_r: response: {"status":"ok"}
+19.01.518.376 I srv  log_server_r: request: GET /health 127.0.0.1 200
+19.01.518.379 D srv  log_server_r: request:  
+19.01.518.379 D srv  log_server_r: response: {"status":"ok"}
+19.31.559.162 I srv  log_server_r: request: GET /health 127.0.0.1 200
+19.31.559.165 D srv  log_server_r: request:  
+19.31.559.165 D srv  log_server_r: response: {"status":"ok"}
+20.01.600.206 I srv  log_server_r: request: GET /health 127.0.0.1 200
+20.01.600.211 D srv  log_server_r: request:  
+20.01.600.212 D srv  log_server_r: response: {"status":"ok"}
+20.31.643.020 I srv  log_server_r: request: GET /health 127.0.0.1 200
+20.31.643.022 D srv  log_server_r: request:  
+20.31.643.023 D srv  log_server_r: response: {"status":"ok"}
+21.01.686.972 I srv  log_server_r: request: GET /health 127.0.0.1 200
+21.01.687.044 D srv  log_server_r: request:  
+21.01.687.044 D srv  log_server_r: response: {"status":"ok"}
+21.31.728.971 I srv  log_server_r: request: GET /health 127.0.0.1 200
+21.31.728.974 D srv  log_server_r: request:  
+21.31.728.974 D srv  log_server_r: response: {"status":"ok"}
+22.01.770.754 I srv  log_server_r: request: GET /health 127.0.0.1 200
+22.01.770.757 D srv  log_server_r: request:  
+22.01.770.757 D srv  log_server_r: response: {"status":"ok"}
+22.31.809.874 I srv  log_server_r: request: GET /health 127.0.0.1 200
+22.31.809.884 D srv  log_server_r: request:  
+22.31.809.884 D srv  log_server_r: response: {"status":"ok"}
+23.01.850.822 I srv  log_server_r: request: GET /health 127.0.0.1 200
+23.01.850.827 D srv  log_server_r: request:  
+23.01.850.827 D srv  log_server_r: response: {"status":"ok"}
+23.31.889.797 I srv  log_server_r: request: GET /health 127.0.0.1 200
+23.31.889.800 D srv  log_server_r: request:  
+23.31.889.800 D srv  log_server_r: response: {"status":"ok"}
+24.01.928.694 I srv  log_server_r: request: GET /health 127.0.0.1 200
+24.01.928.699 D srv  log_server_r: request:  
+24.01.928.699 D srv  log_server_r: response: {"status":"ok"}
+24.31.968.301 I srv  log_server_r: request: GET /health 127.0.0.1 200
+24.31.968.304 D srv  log_server_r: request:  
+24.31.968.304 D srv  log_server_r: response: {"status":"ok"}
+25.02.009.407 I srv  log_server_r: request: GET /health 127.0.0.1 200
+25.02.009.410 D srv  log_server_r: request:  
+25.02.009.410 D srv  log_server_r: response: {"status":"ok"}
+25.32.049.587 I srv  log_server_r: request: GET /health 127.0.0.1 200
+25.32.049.590 D srv  log_server_r: request:  
+25.32.049.591 D srv  log_server_r: response: {"status":"ok"}
+26.02.089.553 I srv  log_server_r: request: GET /health 127.0.0.1 200
+26.02.089.555 D srv  log_server_r: request:  
+26.02.089.556 D srv  log_server_r: response: {"status":"ok"}
+26.32.130.322 I srv  log_server_r: request: GET /health 127.0.0.1 200
+26.32.130.327 D srv  log_server_r: request:  
+26.32.130.327 D srv  log_server_r: response: {"status":"ok"}
+27.02.173.956 I srv  log_server_r: request: GET /health 127.0.0.1 200
+27.02.173.958 D srv  log_server_r: request:  
+27.02.173.959 D srv  log_server_r: response: {"status":"ok"}
+27.32.215.235 I srv  log_server_r: request: GET /health 127.0.0.1 200
+27.32.215.239 D srv  log_server_r: request:  
+27.32.215.239 D srv  log_server_r: response: {"status":"ok"}
+28.02.255.801 I srv  log_server_r: request: GET /health 127.0.0.1 200
+28.02.255.804 D srv  log_server_r: request:  
+28.02.255.804 D srv  log_server_r: response: {"status":"ok"}
+28.32.296.451 I srv  log_server_r: request: GET /health 127.0.0.1 200
+28.32.296.453 D srv  log_server_r: request:  
+28.32.296.453 D srv  log_server_r: response: {"status":"ok"}
+29.02.335.765 I srv  log_server_r: request: GET /health 127.0.0.1 200
+29.02.335.769 D srv  log_server_r: request:  
+29.02.335.769 D srv  log_server_r: response: {"status":"ok"}
+29.32.378.068 I srv  log_server_r: request: GET /health 127.0.0.1 200
+29.32.378.071 D srv  log_server_r: request:  
+29.32.378.071 D srv  log_server_r: response: {"status":"ok"}
+30.02.417.963 I srv  log_server_r: request: GET /health 127.0.0.1 200
+30.02.417.965 D srv  log_server_r: request:  
+30.02.417.966 D srv  log_server_r: response: {"status":"ok"}
+30.32.457.798 I srv  log_server_r: request: GET /health 127.0.0.1 200
+30.32.457.803 D srv  log_server_r: request:  
+30.32.457.803 D srv  log_server_r: response: {"status":"ok"}
+31.02.499.461 I srv  log_server_r: request: GET /health 127.0.0.1 200
+31.02.499.463 D srv  log_server_r: request:  
+31.02.499.463 D srv  log_server_r: response: {"status":"ok"}
+31.32.540.614 I srv  log_server_r: request: GET /health 127.0.0.1 200
+31.32.540.625 D srv  log_server_r: request:  
+31.32.540.626 D srv  log_server_r: response: {"status":"ok"}
+32.02.582.766 I srv  log_server_r: request: GET /health 127.0.0.1 200
+32.02.582.771 D srv  log_server_r: request:  
+32.02.582.771 D srv  log_server_r: response: {"status":"ok"}
+32.32.625.180 I srv  log_server_r: request: GET /health 127.0.0.1 200
+32.32.625.187 D srv  log_server_r: request:  
+32.32.625.187 D srv  log_server_r: response: {"status":"ok"}
+33.02.664.908 I srv  log_server_r: request: GET /health 127.0.0.1 200
+33.02.664.912 D srv  log_server_r: request:  
+33.02.664.912 D srv  log_server_r: response: {"status":"ok"}
+33.32.705.674 I srv  log_server_r: request: GET /health 127.0.0.1 200
+33.32.705.679 D srv  log_server_r: request:  
+33.32.705.679 D srv  log_server_r: response: {"status":"ok"}
+34.02.748.630 I srv  log_server_r: request: GET /health 127.0.0.1 200
+34.02.748.633 D srv  log_server_r: request:  
+34.02.748.633 D srv  log_server_r: response: {"status":"ok"}
+34.32.789.944 I srv  log_server_r: request: GET /health 127.0.0.1 200
+34.32.789.948 D srv  log_server_r: request:  
+34.32.789.948 D srv  log_server_r: response: {"status":"ok"}
+35.02.832.256 I srv  log_server_r: request: GET /health 127.0.0.1 200
+35.02.832.266 D srv  log_server_r: request:  
+35.02.832.266 D srv  log_server_r: response: {"status":"ok"}
+35.32.873.807 I srv  log_server_r: request: GET /health 127.0.0.1 200
+35.32.873.810 D srv  log_server_r: request:  
+35.32.873.810 D srv  log_server_r: response: {"status":"ok"}
+36.02.916.866 I srv  log_server_r: request: GET /health 127.0.0.1 200
+36.02.916.870 D srv  log_server_r: request:  
+36.02.916.870 D srv  log_server_r: response: {"status":"ok"}
+36.32.957.281 I srv  log_server_r: request: GET /health 127.0.0.1 200
+36.32.957.284 D srv  log_server_r: request:  
+36.32.957.284 D srv  log_server_r: response: {"status":"ok"}
+37.02.997.007 I srv  log_server_r: request: GET /health 127.0.0.1 200
+37.02.997.009 D srv  log_server_r: request:  
+37.02.997.010 D srv  log_server_r: response: {"status":"ok"}
+37.33.037.934 I srv  log_server_r: request: GET /health 127.0.0.1 200
+37.33.037.937 D srv  log_server_r: request:  
+37.33.037.938 D srv  log_server_r: response: {"status":"ok"}
+38.03.077.700 I srv  log_server_r: request: GET /health 127.0.0.1 200
+38.03.077.703 D srv  log_server_r: request:  
+38.03.077.703 D srv  log_server_r: response: {"status":"ok"}
+38.33.117.273 I srv  log_server_r: request: GET /health 127.0.0.1 200
+38.33.117.275 D srv  log_server_r: request:  
+38.33.117.275 D srv  log_server_r: response: {"status":"ok"}
+39.03.157.499 I srv  log_server_r: request: GET /health 127.0.0.1 200
+39.03.157.501 D srv  log_server_r: request:  
+39.03.157.501 D srv  log_server_r: response: {"status":"ok"}
+39.33.197.552 I srv  log_server_r: request: GET /health 127.0.0.1 200
+39.33.197.554 D srv  log_server_r: request:  
+39.33.197.554 D srv  log_server_r: response: {"status":"ok"}
+40.03.240.685 I srv  log_server_r: request: GET /health 127.0.0.1 200
+40.03.240.689 D srv  log_server_r: request:  
+40.03.240.689 D srv  log_server_r: response: {"status":"ok"}
+40.33.281.225 I srv  log_server_r: request: GET /health 127.0.0.1 200
+40.33.281.228 D srv  log_server_r: request:  
+40.33.281.228 D srv  log_server_r: response: {"status":"ok"}
+41.03.323.642 I srv  log_server_r: request: GET /health 127.0.0.1 200
+41.03.323.645 D srv  log_server_r: request:  
+41.03.323.645 D srv  log_server_r: response: {"status":"ok"}
+41.33.365.014 I srv  log_server_r: request: GET /health 127.0.0.1 200
+41.33.365.016 D srv  log_server_r: request:  
+41.33.365.016 D srv  log_server_r: response: {"status":"ok"}
+42.03.405.581 I srv  log_server_r: request: GET /health 127.0.0.1 200
+42.03.405.584 D srv  log_server_r: request:  
+42.03.405.585 D srv  log_server_r: response: {"status":"ok"}
+42.33.445.109 I srv  log_server_r: request: GET /health 127.0.0.1 200
+42.33.445.114 D srv  log_server_r: request:  
+42.33.445.115 D srv  log_server_r: response: {"status":"ok"}
+43.03.486.087 I srv  log_server_r: request: GET /health 127.0.0.1 200
+43.03.486.090 D srv  log_server_r: request:  
+43.03.486.091 D srv  log_server_r: response: {"status":"ok"}
+43.33.527.690 I srv  log_server_r: request: GET /health 127.0.0.1 200
+43.33.527.693 D srv  log_server_r: request:  
+43.33.527.694 D srv  log_server_r: response: {"status":"ok"}
+44.03.567.370 I srv  log_server_r: request: GET /health 127.0.0.1 200
+44.03.567.373 D srv  log_server_r: request:  
+44.03.567.373 D srv  log_server_r: response: {"status":"ok"}
+44.33.608.831 I srv  log_server_r: request: GET /health 127.0.0.1 200
+44.33.608.834 D srv  log_server_r: request:  
+44.33.608.834 D srv  log_server_r: response: {"status":"ok"}
+45.03.650.427 I srv  log_server_r: request: GET /health 127.0.0.1 200
+45.03.650.430 D srv  log_server_r: request:  
+45.03.650.430 D srv  log_server_r: response: {"status":"ok"}
+45.33.690.003 I srv  log_server_r: request: GET /health 127.0.0.1 200
+45.33.690.010 D srv  log_server_r: request:  
+45.33.690.010 D srv  log_server_r: response: {"status":"ok"}
+46.03.732.732 I srv  log_server_r: request: GET /health 127.0.0.1 200
+46.03.732.737 D srv  log_server_r: request:  
+46.03.732.737 D srv  log_server_r: response: {"status":"ok"}
+46.33.773.860 I srv  log_server_r: request: GET /health 127.0.0.1 200
+46.33.773.865 D srv  log_server_r: request:  
+46.33.773.866 D srv  log_server_r: response: {"status":"ok"}
+47.03.815.541 I srv  log_server_r: request: GET /health 127.0.0.1 200
+47.03.815.543 D srv  log_server_r: request:  
+47.03.815.543 D srv  log_server_r: response: {"status":"ok"}
+47.33.856.579 I srv  log_server_r: request: GET /health 127.0.0.1 200
+47.33.856.582 D srv  log_server_r: request:  
+47.33.856.582 D srv  log_server_r: response: {"status":"ok"}
+48.03.897.961 I srv  log_server_r: request: GET /health 127.0.0.1 200
+48.03.897.962 D srv  log_server_r: request:  
+48.03.897.963 D srv  log_server_r: response: {"status":"ok"}
+48.33.940.890 I srv  log_server_r: request: GET /health 127.0.0.1 200
+48.33.940.894 D srv  log_server_r: request:  
+48.33.940.894 D srv  log_server_r: response: {"status":"ok"}
+49.03.981.959 I srv  log_server_r: request: GET /health 127.0.0.1 200
+49.03.981.961 D srv  log_server_r: request:  
+49.03.981.962 D srv  log_server_r: response: {"status":"ok"}
+49.34.024.071 I srv  log_server_r: request: GET /health 127.0.0.1 200
+49.34.024.076 D srv  log_server_r: request:  
+49.34.024.076 D srv  log_server_r: response: {"status":"ok"}
+50.04.063.924 I srv  log_server_r: request: GET /health 127.0.0.1 200
+50.04.063.929 D srv  log_server_r: request:  
+50.04.063.929 D srv  log_server_r: response: {"status":"ok"}
+50.34.104.944 I srv  log_server_r: request: GET /health 127.0.0.1 200
+50.34.104.947 D srv  log_server_r: request:  
+50.34.104.947 D srv  log_server_r: response: {"status":"ok"}
+51.04.146.944 I srv  log_server_r: request: GET /health 127.0.0.1 200
+51.04.146.949 D srv  log_server_r: request:  
+51.04.146.950 D srv  log_server_r: response: {"status":"ok"}
+51.34.188.024 I srv  log_server_r: request: GET /health 127.0.0.1 200
+51.34.188.027 D srv  log_server_r: request:  
+51.34.188.027 D srv  log_server_r: response: {"status":"ok"}
+52.04.229.115 I srv  log_server_r: request: GET /health 127.0.0.1 200
+52.04.229.118 D srv  log_server_r: request:  
+52.04.229.118 D srv  log_server_r: response: {"status":"ok"}
+52.34.273.152 I srv  log_server_r: request: GET /health 127.0.0.1 200
+52.34.273.156 D srv  log_server_r: request:  
+52.34.273.156 D srv  log_server_r: response: {"status":"ok"}
+53.04.313.467 I srv  log_server_r: request: GET /health 127.0.0.1 200
+53.04.313.469 D srv  log_server_r: request:  
+53.04.313.469 D srv  log_server_r: response: {"status":"ok"}
+53.34.353.806 I srv  log_server_r: request: GET /health 127.0.0.1 200
+53.34.353.811 D srv  log_server_r: request:  
+53.34.353.811 D srv  log_server_r: response: {"status":"ok"}
+54.04.395.305 I srv  log_server_r: request: GET /health 127.0.0.1 200
+54.04.395.308 D srv  log_server_r: request:  
+54.04.395.309 D srv  log_server_r: response: {"status":"ok"}
+54.34.437.344 I srv  log_server_r: request: GET /health 127.0.0.1 200
+54.34.437.347 D srv  log_server_r: request:  
+54.34.437.347 D srv  log_server_r: response: {"status":"ok"}
+55.04.480.884 I srv  log_server_r: request: GET /health 127.0.0.1 200
+55.04.480.890 D srv  log_server_r: request:  
+55.04.480.890 D srv  log_server_r: response: {"status":"ok"}
+55.34.521.645 I srv  log_server_r: request: GET /health 127.0.0.1 200
+55.34.521.648 D srv  log_server_r: request:  
+55.34.521.648 D srv  log_server_r: response: {"status":"ok"}
+56.04.562.393 I srv  log_server_r: request: GET /health 127.0.0.1 200
+56.04.562.395 D srv  log_server_r: request:  
+56.04.562.396 D srv  log_server_r: response: {"status":"ok"}
+56.34.604.105 I srv  log_server_r: request: GET /health 127.0.0.1 200
+56.34.604.107 D srv  log_server_r: request:  
+56.34.604.107 D srv  log_server_r: response: {"status":"ok"}
+57.04.645.556 I srv  log_server_r: request: GET /health 127.0.0.1 200
+57.04.645.558 D srv  log_server_r: request:  
+57.04.645.558 D srv  log_server_r: response: {"status":"ok"}
+57.34.686.309 I srv  log_server_r: request: GET /health 127.0.0.1 200
+57.34.686.312 D srv  log_server_r: request:  
+57.34.686.313 D srv  log_server_r: response: {"status":"ok"}
+58.04.728.051 I srv  log_server_r: request: GET /health 127.0.0.1 200
+58.04.728.057 D srv  log_server_r: request:  
+58.04.728.057 D srv  log_server_r: response: {"status":"ok"}
+58.34.770.532 I srv  log_server_r: request: GET /health 127.0.0.1 200
+58.34.770.533 D srv  log_server_r: request:  
+58.34.770.534 D srv  log_server_r: response: {"status":"ok"}
+59.04.810.235 I srv  log_server_r: request: GET /health 127.0.0.1 200
+59.04.810.237 D srv  log_server_r: request:  
+59.04.810.237 D srv  log_server_r: response: {"status":"ok"}
+59.34.850.622 I srv  log_server_r: request: GET /health 127.0.0.1 200
+59.34.850.624 D srv  log_server_r: request:  
+59.34.850.624 D srv  log_server_r: response: {"status":"ok"}
+60.04.891.417 I srv  log_server_r: request: GET /health 127.0.0.1 200
+60.04.891.421 D srv  log_server_r: request:  
+60.04.891.421 D srv  log_server_r: response: {"status":"ok"}
+60.34.933.456 I srv  log_server_r: request: GET /health 127.0.0.1 200
+60.34.933.459 D srv  log_server_r: request:  
+60.34.933.459 D srv  log_server_r: response: {"status":"ok"}
+61.04.972.577 I srv  log_server_r: request: GET /health 127.0.0.1 200
+61.04.972.579 D srv  log_server_r: request:  
+61.04.972.579 D srv  log_server_r: response: {"status":"ok"}
+61.35.014.518 I srv  log_server_r: request: GET /health 127.0.0.1 200
+61.35.014.521 D srv  log_server_r: request:  
+61.35.014.521 D srv  log_server_r: response: {"status":"ok"}
+62.05.055.887 I srv  log_server_r: request: GET /health 127.0.0.1 200
+62.05.055.898 D srv  log_server_r: request:  
+62.05.055.898 D srv  log_server_r: response: {"status":"ok"}
+62.35.098.501 I srv  log_server_r: request: GET /health 127.0.0.1 200
+62.35.098.506 D srv  log_server_r: request:  
+62.35.098.506 D srv  log_server_r: response: {"status":"ok"}
+63.05.139.964 I srv  log_server_r: request: GET /health 127.0.0.1 200
+63.05.139.966 D srv  log_server_r: request:  
+63.05.139.967 D srv  log_server_r: response: {"status":"ok"}
+63.35.180.427 I srv  log_server_r: request: GET /health 127.0.0.1 200
+63.35.180.438 D srv  log_server_r: request:  
+63.35.180.438 D srv  log_server_r: response: {"status":"ok"}
+64.05.221.994 I srv  log_server_r: request: GET /health 127.0.0.1 200
+64.05.221.997 D srv  log_server_r: request:  
+64.05.221.997 D srv  log_server_r: response: {"status":"ok"}
+64.35.263.082 I srv  log_server_r: request: GET /health 127.0.0.1 200
+64.35.263.085 D srv  log_server_r: request:  
+64.35.263.085 D srv  log_server_r: response: {"status":"ok"}
+65.05.304.464 I srv  log_server_r: request: GET /health 127.0.0.1 200
+65.05.304.466 D srv  log_server_r: request:  
+65.05.304.466 D srv  log_server_r: response: {"status":"ok"}
+65.35.346.495 I srv  log_server_r: request: GET /health 127.0.0.1 200
+65.35.346.497 D srv  log_server_r: request:  
+65.35.346.497 D srv  log_server_r: response: {"status":"ok"}
+66.05.386.915 I srv  log_server_r: request: GET /health 127.0.0.1 200
+66.05.386.918 D srv  log_server_r: request:  
+66.05.386.918 D srv  log_server_r: response: {"status":"ok"}
+66.35.428.130 I srv  log_server_r: request: GET /health 127.0.0.1 200
+66.35.428.132 D srv  log_server_r: request:  
+66.35.428.133 D srv  log_server_r: response: {"status":"ok"}
+67.05.470.253 I srv  log_server_r: request: GET /health 127.0.0.1 200
+67.05.470.255 D srv  log_server_r: request:  
+67.05.470.255 D srv  log_server_r: response: {"status":"ok"}
+67.35.509.537 I srv  log_server_r: request: GET /health 127.0.0.1 200
+67.35.509.553 D srv  log_server_r: request:  
+67.35.509.553 D srv  log_server_r: response: {"status":"ok"}
+68.05.550.945 I srv  log_server_r: request: GET /health 127.0.0.1 200
+68.05.551.062 D srv  log_server_r: request:  
+68.05.551.063 D srv  log_server_r: response: {"status":"ok"}
+68.35.591.486 I srv  log_server_r: request: GET /health 127.0.0.1 200
+68.35.591.491 D srv  log_server_r: request:  
+68.35.591.492 D srv  log_server_r: response: {"status":"ok"}
+69.05.634.591 I srv  log_server_r: request: GET /health 127.0.0.1 200
+69.05.634.594 D srv  log_server_r: request:  
+69.05.634.595 D srv  log_server_r: response: {"status":"ok"}
+69.35.675.923 I srv  log_server_r: request: GET /health 127.0.0.1 200
+69.35.675.926 D srv  log_server_r: request:  
+69.35.675.926 D srv  log_server_r: response: {"status":"ok"}
+70.05.716.531 I srv  log_server_r: request: GET /health 127.0.0.1 200
+70.05.716.534 D srv  log_server_r: request:  
+70.05.716.535 D srv  log_server_r: response: {"status":"ok"}
+70.35.757.720 I srv  log_server_r: request: GET /health 127.0.0.1 200
+70.35.757.722 D srv  log_server_r: request:  
+70.35.757.722 D srv  log_server_r: response: {"status":"ok"}
+71.05.798.159 I srv  log_server_r: request: GET /health 127.0.0.1 200
+71.05.798.166 D srv  log_server_r: request:  
+71.05.798.166 D srv  log_server_r: response: {"status":"ok"}
+71.35.838.278 I srv  log_server_r: request: GET /health 127.0.0.1 200
+71.35.838.280 D srv  log_server_r: request:  
+71.35.838.280 D srv  log_server_r: response: {"status":"ok"}
+72.05.879.474 I srv  log_server_r: request: GET /health 127.0.0.1 200
+72.05.879.478 D srv  log_server_r: request:  
+72.05.879.479 D srv  log_server_r: response: {"status":"ok"}
+72.35.919.864 I srv  log_server_r: request: GET /health 127.0.0.1 200
+72.35.919.866 D srv  log_server_r: request:  
+72.35.919.867 D srv  log_server_r: response: {"status":"ok"}
+73.05.960.314 I srv  log_server_r: request: GET /health 127.0.0.1 200
+73.05.960.324 D srv  log_server_r: request:  
+73.05.960.325 D srv  log_server_r: response: {"status":"ok"}
+73.36.002.776 I srv  log_server_r: request: GET /health 127.0.0.1 200
+73.36.002.778 D srv  log_server_r: request:  
+73.36.002.779 D srv  log_server_r: response: {"status":"ok"}
+74.06.045.345 I srv  log_server_r: request: GET /health 127.0.0.1 200
+74.06.045.356 D srv  log_server_r: request:  
+74.06.045.356 D srv  log_server_r: response: {"status":"ok"}
+74.36.086.010 I srv  log_server_r: request: GET /health 127.0.0.1 200
+74.36.086.024 D srv  log_server_r: request:  
+74.36.086.024 D srv  log_server_r: response: {"status":"ok"}
+75.06.128.150 I srv  log_server_r: request: GET /health 127.0.0.1 200
+75.06.128.153 D srv  log_server_r: request:  
+75.06.128.153 D srv  log_server_r: response: {"status":"ok"}
+75.36.175.454 I srv  log_server_r: request: GET /health 127.0.0.1 200
+75.36.175.458 D srv  log_server_r: request:  
+75.36.175.458 D srv  log_server_r: response: {"status":"ok"}
+76.06.216.294 I srv  log_server_r: request: GET /health 127.0.0.1 200
+76.06.216.296 D srv  log_server_r: request:  
+76.06.216.296 D srv  log_server_r: response: {"status":"ok"}
+76.36.257.562 I srv  log_server_r: request: GET /health 127.0.0.1 200
+76.36.257.565 D srv  log_server_r: request:  
+76.36.257.565 D srv  log_server_r: response: {"status":"ok"}
+77.06.297.785 I srv  log_server_r: request: GET /health 127.0.0.1 200
+77.06.297.789 D srv  log_server_r: request:  
+77.06.297.789 D srv  log_server_r: response: {"status":"ok"}
+77.36.341.537 I srv  log_server_r: request: GET /health 127.0.0.1 200
+77.36.341.547 D srv  log_server_r: request:  
+77.36.341.548 D srv  log_server_r: response: {"status":"ok"}
+78.06.382.472 I srv  log_server_r: request: GET /health 127.0.0.1 200
+78.06.382.474 D srv  log_server_r: request:  
+78.06.382.475 D srv  log_server_r: response: {"status":"ok"}
+78.36.421.174 I srv  log_server_r: request: GET /health 127.0.0.1 200
+78.36.421.185 D srv  log_server_r: request:  
+78.36.421.185 D srv  log_server_r: response: {"status":"ok"}
+79.06.461.938 I srv  log_server_r: request: GET /health 127.0.0.1 200
+79.06.461.941 D srv  log_server_r: request:  
+79.06.461.941 D srv  log_server_r: response: {"status":"ok"}
+79.36.505.172 I srv  log_server_r: request: GET /health 127.0.0.1 200
+79.36.505.175 D srv  log_server_r: request:  
+79.36.505.176 D srv  log_server_r: response: {"status":"ok"}
+80.06.546.099 I srv  log_server_r: request: GET /health 127.0.0.1 200
+80.06.546.102 D srv  log_server_r: request:  
+80.06.546.102 D srv  log_server_r: response: {"status":"ok"}
+80.36.586.986 I srv  log_server_r: request: GET /health 127.0.0.1 200
+80.36.586.989 D srv  log_server_r: request:  
+80.36.586.989 D srv  log_server_r: response: {"status":"ok"}
+81.06.627.279 I srv  log_server_r: request: GET /health 127.0.0.1 200
+81.06.627.282 D srv  log_server_r: request:  
+81.06.627.282 D srv  log_server_r: response: {"status":"ok"}
+81.36.667.249 I srv  log_server_r: request: GET /health 127.0.0.1 200
+81.36.667.252 D srv  log_server_r: request:  
+81.36.667.252 D srv  log_server_r: response: {"status":"ok"}
+82.06.706.867 I srv  log_server_r: request: GET /health 127.0.0.1 200
+82.06.706.870 D srv  log_server_r: request:  
+82.06.706.870 D srv  log_server_r: response: {"status":"ok"}
+82.36.747.381 I srv  log_server_r: request: GET /health 127.0.0.1 200
+82.36.747.383 D srv  log_server_r: request:  
+82.36.747.383 D srv  log_server_r: response: {"status":"ok"}
+83.06.787.199 I srv  log_server_r: request: GET /health 127.0.0.1 200
+83.06.787.203 D srv  log_server_r: request:  
+83.06.787.203 D srv  log_server_r: response: {"status":"ok"}
+83.36.829.094 I srv  log_server_r: request: GET /health 127.0.0.1 200
+83.36.829.097 D srv  log_server_r: request:  
+83.36.829.097 D srv  log_server_r: response: {"status":"ok"}
+84.06.869.333 I srv  log_server_r: request: GET /health 127.0.0.1 200
+84.06.869.335 D srv  log_server_r: request:  
+84.06.869.335 D srv  log_server_r: response: {"status":"ok"}
+84.36.908.383 I srv  log_server_r: request: GET /health 127.0.0.1 200
+84.36.908.385 D srv  log_server_r: request:  
+84.36.908.386 D srv  log_server_r: response: {"status":"ok"}
+85.06.948.228 I srv  log_server_r: request: GET /health 127.0.0.1 200
+85.06.948.231 D srv  log_server_r: request:  
+85.06.948.232 D srv  log_server_r: response: {"status":"ok"}
+85.36.988.917 I srv  log_server_r: request: GET /health 127.0.0.1 200
+85.36.988.920 D srv  log_server_r: request:  
+85.36.988.920 D srv  log_server_r: response: {"status":"ok"}
+86.07.030.227 I srv  log_server_r: request: GET /health 127.0.0.1 200
+86.07.030.230 D srv  log_server_r: request:  
+86.07.030.230 D srv  log_server_r: response: {"status":"ok"}
+86.37.069.499 I srv  log_server_r: request: GET /health 127.0.0.1 200
+86.37.069.573 D srv  log_server_r: request:  
+86.37.069.574 D srv  log_server_r: response: {"status":"ok"}
+87.07.111.471 I srv  log_server_r: request: GET /health 127.0.0.1 200
+87.07.111.476 D srv  log_server_r: request:  
+87.07.111.476 D srv  log_server_r: response: {"status":"ok"}
+87.37.154.067 I srv  log_server_r: request: GET /health 127.0.0.1 200
+87.37.154.081 D srv  log_server_r: request:  
+87.37.154.081 D srv  log_server_r: response: {"status":"ok"}
+88.07.196.915 I srv  log_server_r: request: GET /health 127.0.0.1 200
+88.07.196.918 D srv  log_server_r: request:  
+88.07.196.918 D srv  log_server_r: response: {"status":"ok"}
+88.37.238.018 I srv  log_server_r: request: GET /health 127.0.0.1 200
+88.37.238.020 D srv  log_server_r: request:  
+88.37.238.020 D srv  log_server_r: response: {"status":"ok"}
+89.07.280.957 I srv  log_server_r: request: GET /health 127.0.0.1 200
+89.07.280.960 D srv  log_server_r: request:  
+89.07.280.960 D srv  log_server_r: response: {"status":"ok"}
+89.37.321.371 I srv  log_server_r: request: GET /health 127.0.0.1 200
+89.37.321.384 D srv  log_server_r: request:  
+89.37.321.385 D srv  log_server_r: response: {"status":"ok"}
+90.07.365.420 I srv  log_server_r: request: GET /health 127.0.0.1 200
+90.07.365.423 D srv  log_server_r: request:  
+90.07.365.424 D srv  log_server_r: response: {"status":"ok"}
+90.37.407.470 I srv  log_server_r: request: GET /health 127.0.0.1 200
+90.37.407.474 D srv  log_server_r: request:  
+90.37.407.474 D srv  log_server_r: response: {"status":"ok"}
+91.07.449.516 I srv  log_server_r: request: GET /health 127.0.0.1 200
+91.07.449.518 D srv  log_server_r: request:  
+91.07.449.519 D srv  log_server_r: response: {"status":"ok"}
+91.37.490.687 I srv  log_server_r: request: GET /health 127.0.0.1 200
+91.37.490.689 D srv  log_server_r: request:  
+91.37.490.690 D srv  log_server_r: response: {"status":"ok"}
+92.07.531.183 I srv  log_server_r: request: GET /health 127.0.0.1 200
+92.07.531.186 D srv  log_server_r: request:  
+92.07.531.186 D srv  log_server_r: response: {"status":"ok"}
+92.37.571.569 I srv  log_server_r: request: GET /health 127.0.0.1 200
+92.37.571.572 D srv  log_server_r: request:  
+92.37.571.573 D srv  log_server_r: response: {"status":"ok"}
+93.07.613.871 I srv  log_server_r: request: GET /health 127.0.0.1 200
+93.07.613.876 D srv  log_server_r: request:  
+93.07.613.876 D srv  log_server_r: response: {"status":"ok"}
+93.37.655.233 I srv  log_server_r: request: GET /health 127.0.0.1 200
+93.37.655.236 D srv  log_server_r: request:  
+93.37.655.237 D srv  log_server_r: response: {"status":"ok"}
+94.07.696.628 I srv  log_server_r: request: GET /health 127.0.0.1 200
+94.07.696.631 D srv  log_server_r: request:  
+94.07.696.631 D srv  log_server_r: response: {"status":"ok"}
+94.37.737.039 I srv  log_server_r: request: GET /health 127.0.0.1 200
+94.37.737.044 D srv  log_server_r: request:  
+94.37.737.044 D srv  log_server_r: response: {"status":"ok"}
+95.07.777.770 I srv  log_server_r: request: GET /health 127.0.0.1 200
+95.07.777.775 D srv  log_server_r: request:  
+95.07.777.775 D srv  log_server_r: response: {"status":"ok"}
+95.37.819.606 I srv  log_server_r: request: GET /health 127.0.0.1 200
+95.37.819.609 D srv  log_server_r: request:  
+95.37.819.609 D srv  log_server_r: response: {"status":"ok"}
+96.07.860.417 I srv  log_server_r: request: GET /health 127.0.0.1 200
+96.07.860.422 D srv  log_server_r: request:  
+96.07.860.423 D srv  log_server_r: response: {"status":"ok"}
+96.37.903.883 I srv  log_server_r: request: GET /health 127.0.0.1 200
+96.37.903.886 D srv  log_server_r: request:  
+96.37.903.886 D srv  log_server_r: response: {"status":"ok"}
+97.07.944.249 I srv  log_server_r: request: GET /health 127.0.0.1 200
+97.07.944.252 D srv  log_server_r: request:  
+97.07.944.252 D srv  log_server_r: response: {"status":"ok"}
+97.37.984.497 I srv  log_server_r: request: GET /health 127.0.0.1 200
+97.37.984.507 D srv  log_server_r: request:  
+97.37.984.508 D srv  log_server_r: response: {"status":"ok"}
+98.08.026.769 I srv  log_server_r: request: GET /health 127.0.0.1 200
+98.08.026.773 D srv  log_server_r: request:  
+98.08.026.774 D srv  log_server_r: response: {"status":"ok"}
+98.38.066.253 I srv  log_server_r: request: GET /health 127.0.0.1 200
+98.38.066.255 D srv  log_server_r: request:  
+98.38.066.255 D srv  log_server_r: response: {"status":"ok"}
+99.08.106.667 I srv  log_server_r: request: GET /health 127.0.0.1 200
+99.08.106.672 D srv  log_server_r: request:  
+99.08.106.672 D srv  log_server_r: response: {"status":"ok"}
+99.38.147.282 I srv  log_server_r: request: GET /health 127.0.0.1 200
+99.38.147.285 D srv  log_server_r: request:  
+99.38.147.285 D srv  log_server_r: response: {"status":"ok"}
+100.08.189.123 I srv  log_server_r: request: GET /health 127.0.0.1 200
+100.08.189.126 D srv  log_server_r: request:  
+100.08.189.127 D srv  log_server_r: response: {"status":"ok"}
+100.38.231.056 I srv  log_server_r: request: GET /health 127.0.0.1 200
+100.38.231.058 D srv  log_server_r: request:  
+100.38.231.058 D srv  log_server_r: response: {"status":"ok"}
+101.08.271.373 I srv  log_server_r: request: GET /health 127.0.0.1 200
+101.08.271.375 D srv  log_server_r: request:  
+101.08.271.375 D srv  log_server_r: response: {"status":"ok"}
+101.38.313.363 I srv  log_server_r: request: GET /health 127.0.0.1 200
+101.38.313.365 D srv  log_server_r: request:  
+101.38.313.366 D srv  log_server_r: response: {"status":"ok"}
+102.08.356.184 I srv  log_server_r: request: GET /health 127.0.0.1 200
+102.08.356.186 D srv  log_server_r: request:  
+102.08.356.186 D srv  log_server_r: response: {"status":"ok"}
+102.38.398.467 I srv  log_server_r: request: GET /health 127.0.0.1 200
+102.38.398.469 D srv  log_server_r: request:  
+102.38.398.470 D srv  log_server_r: response: {"status":"ok"}
+103.08.438.097 I srv  log_server_r: request: GET /health 127.0.0.1 200
+103.08.438.100 D srv  log_server_r: request:  
+103.08.438.100 D srv  log_server_r: response: {"status":"ok"}
+103.38.479.258 I srv  log_server_r: request: GET /health 127.0.0.1 200
+103.38.479.261 D srv  log_server_r: request:  
+103.38.479.261 D srv  log_server_r: response: {"status":"ok"}
+104.08.519.441 I srv  log_server_r: request: GET /health 127.0.0.1 200
+104.08.519.443 D srv  log_server_r: request:  
+104.08.519.443 D srv  log_server_r: response: {"status":"ok"}
+104.38.560.718 I srv  log_server_r: request: GET /health 127.0.0.1 200
+104.38.560.725 D srv  log_server_r: request:  
+104.38.560.725 D srv  log_server_r: response: {"status":"ok"}
+105.08.602.915 I srv  log_server_r: request: GET /health 127.0.0.1 200
+105.08.602.918 D srv  log_server_r: request:  
+105.08.602.919 D srv  log_server_r: response: {"status":"ok"}
+105.38.643.606 I srv  log_server_r: request: GET /health 127.0.0.1 200
+105.38.643.617 D srv  log_server_r: request:  
+105.38.643.617 D srv  log_server_r: response: {"status":"ok"}
+106.08.686.246 I srv  log_server_r: request: GET /health 127.0.0.1 200
+106.08.686.249 D srv  log_server_r: request:  
+106.08.686.250 D srv  log_server_r: response: {"status":"ok"}
+106.38.728.275 I srv  log_server_r: request: GET /health 127.0.0.1 200
+106.38.728.287 D srv  log_server_r: request:  
+106.38.728.287 D srv  log_server_r: response: {"status":"ok"}
+107.08.767.692 I srv  log_server_r: request: GET /health 127.0.0.1 200
+107.08.767.694 D srv  log_server_r: request:  
+107.08.767.694 D srv  log_server_r: response: {"status":"ok"}
+107.38.810.227 I srv  log_server_r: request: GET /health 127.0.0.1 200
+107.38.810.230 D srv  log_server_r: request:  
+107.38.810.230 D srv  log_server_r: response: {"status":"ok"}
+108.08.852.461 I srv  log_server_r: request: GET /health 127.0.0.1 200
+108.08.852.466 D srv  log_server_r: request:  
+108.08.852.467 D srv  log_server_r: response: {"status":"ok"}
+108.38.895.852 I srv  log_server_r: request: GET /health 127.0.0.1 200
+108.38.895.854 D srv  log_server_r: request:  
+108.38.895.855 D srv  log_server_r: response: {"status":"ok"}
+109.08.935.720 I srv  log_server_r: request: GET /health 127.0.0.1 200
+109.08.935.722 D srv  log_server_r: request:  
+109.08.935.723 D srv  log_server_r: response: {"status":"ok"}
+109.38.976.872 I srv  log_server_r: request: GET /health 127.0.0.1 200
+109.38.976.875 D srv  log_server_r: request:  
+109.38.976.875 D srv  log_server_r: response: {"status":"ok"}
+110.09.018.441 I srv  log_server_r: request: GET /health 127.0.0.1 200
+110.09.018.443 D srv  log_server_r: request:  
+110.09.018.443 D srv  log_server_r: response: {"status":"ok"}
+110.39.059.781 I srv  log_server_r: request: GET /health 127.0.0.1 200
+110.39.059.796 D srv  log_server_r: request:  
+110.39.059.796 D srv  log_server_r: response: {"status":"ok"}
+111.09.100.715 I srv  log_server_r: request: GET /health 127.0.0.1 200
+111.09.100.720 D srv  log_server_r: request:  
+111.09.100.721 D srv  log_server_r: response: {"status":"ok"}
+111.39.143.998 I srv  log_server_r: request: GET /health 127.0.0.1 200
+111.39.144.003 D srv  log_server_r: request:  
+111.39.144.003 D srv  log_server_r: response: {"status":"ok"}
+112.09.184.901 I srv  log_server_r: request: GET /health 127.0.0.1 200
+112.09.184.905 D srv  log_server_r: request:  
+112.09.184.906 D srv  log_server_r: response: {"status":"ok"}
+112.39.227.167 I srv  log_server_r: request: GET /health 127.0.0.1 200
+112.39.227.170 D srv  log_server_r: request:  
+112.39.227.170 D srv  log_server_r: response: {"status":"ok"}
+113.09.269.170 I srv  log_server_r: request: GET /health 127.0.0.1 200
+113.09.269.172 D srv  log_server_r: request:  
+113.09.269.172 D srv  log_server_r: response: {"status":"ok"}
+113.39.310.560 I srv  log_server_r: request: GET /health 127.0.0.1 200
+113.39.310.566 D srv  log_server_r: request:  
+113.39.310.566 D srv  log_server_r: response: {"status":"ok"}
+114.09.350.159 I srv  log_server_r: request: GET /health 127.0.0.1 200
+114.09.350.160 D srv  log_server_r: request:  
+114.09.350.160 D srv  log_server_r: response: {"status":"ok"}
+114.39.389.247 I srv  log_server_r: request: GET /health 127.0.0.1 200
+114.39.389.252 D srv  log_server_r: request:  
+114.39.389.252 D srv  log_server_r: response: {"status":"ok"}
+115.09.430.356 I srv  log_server_r: request: GET /health 127.0.0.1 200
+115.09.430.360 D srv  log_server_r: request:  
+115.09.430.361 D srv  log_server_r: response: {"status":"ok"}
+115.39.472.061 I srv  log_server_r: request: GET /health 127.0.0.1 200
+115.39.472.063 D srv  log_server_r: request:  
+115.39.472.063 D srv  log_server_r: response: {"status":"ok"}
+116.09.514.073 I srv  log_server_r: request: GET /health 127.0.0.1 200
+116.09.514.083 D srv  log_server_r: request:  
+116.09.514.084 D srv  log_server_r: response: {"status":"ok"}
+116.39.554.930 I srv  log_server_r: request: GET /health 127.0.0.1 200
+116.39.554.932 D srv  log_server_r: request:  
+116.39.554.932 D srv  log_server_r: response: {"status":"ok"}
+117.09.596.842 I srv  log_server_r: request: GET /health 127.0.0.1 200
+117.09.596.844 D srv  log_server_r: request:  
+117.09.596.844 D srv  log_server_r: response: {"status":"ok"}
+117.39.638.412 I srv  log_server_r: request: GET /health 127.0.0.1 200
+117.39.638.414 D srv  log_server_r: request:  
+117.39.638.414 D srv  log_server_r: response: {"status":"ok"}
+118.09.678.193 I srv  log_server_r: request: GET /health 127.0.0.1 200
+118.09.678.195 D srv  log_server_r: request:  
+118.09.678.196 D srv  log_server_r: response: {"status":"ok"}
+118.39.718.535 I srv  log_server_r: request: GET /health 127.0.0.1 200
+118.39.718.537 D srv  log_server_r: request:  
+118.39.718.537 D srv  log_server_r: response: {"status":"ok"}
+119.09.758.415 I srv  log_server_r: request: GET /health 127.0.0.1 200
+119.09.758.418 D srv  log_server_r: request:  
+119.09.758.418 D srv  log_server_r: response: {"status":"ok"}
+119.39.799.321 I srv  log_server_r: request: GET /health 127.0.0.1 200
+119.39.799.325 D srv  log_server_r: request:  
+119.39.799.325 D srv  log_server_r: response: {"status":"ok"}
+120.09.838.350 I srv  log_server_r: request: GET /health 127.0.0.1 200
+120.09.838.352 D srv  log_server_r: request:  
+120.09.838.352 D srv  log_server_r: response: {"status":"ok"}
+120.39.878.053 I srv  log_server_r: request: GET /health 127.0.0.1 200
+120.39.878.057 D srv  log_server_r: request:  
+120.39.878.058 D srv  log_server_r: response: {"status":"ok"}
+121.09.919.994 I srv  log_server_r: request: GET /health 127.0.0.1 200
+121.09.919.996 D srv  log_server_r: request:  
+121.09.919.997 D srv  log_server_r: response: {"status":"ok"}
+121.39.960.852 I srv  log_server_r: request: GET /health 127.0.0.1 200
+121.39.960.855 D srv  log_server_r: request:  
+121.39.960.855 D srv  log_server_r: response: {"status":"ok"}
+122.10.001.331 I srv  log_server_r: request: GET /health 127.0.0.1 200
+122.10.001.335 D srv  log_server_r: request:  
+122.10.001.335 D srv  log_server_r: response: {"status":"ok"}
+122.40.042.978 I srv  log_server_r: request: GET /health 127.0.0.1 200
+122.40.042.980 D srv  log_server_r: request:  
+122.40.042.981 D srv  log_server_r: response: {"status":"ok"}
+123.10.084.183 I srv  log_server_r: request: GET /health 127.0.0.1 200
+123.10.084.185 D srv  log_server_r: request:  
+123.10.084.185 D srv  log_server_r: response: {"status":"ok"}
+123.40.125.892 I srv  log_server_r: request: GET /health 127.0.0.1 200
+123.40.125.895 D srv  log_server_r: request:  
+123.40.125.896 D srv  log_server_r: response: {"status":"ok"}
+124.10.166.522 I srv  log_server_r: request: GET /health 127.0.0.1 200
+124.10.166.527 D srv  log_server_r: request:  
+124.10.166.527 D srv  log_server_r: response: {"status":"ok"}
+124.40.209.217 I srv  log_server_r: request: GET /health 127.0.0.1 200
+124.40.209.221 D srv  log_server_r: request:  
+124.40.209.221 D srv  log_server_r: response: {"status":"ok"}
+125.10.250.761 I srv  log_server_r: request: GET /health 127.0.0.1 200
+125.10.250.765 D srv  log_server_r: request:  
+125.10.250.765 D srv  log_server_r: response: {"status":"ok"}
+125.40.292.485 I srv  log_server_r: request: GET /health 127.0.0.1 200
+125.40.292.488 D srv  log_server_r: request:  
+125.40.292.488 D srv  log_server_r: response: {"status":"ok"}
+126.10.334.831 I srv  log_server_r: request: GET /health 127.0.0.1 200
+126.10.334.834 D srv  log_server_r: request:  
+126.10.334.835 D srv  log_server_r: response: {"status":"ok"}
+126.40.375.441 I srv  log_server_r: request: GET /health 127.0.0.1 200
+126.40.375.445 D srv  log_server_r: request:  
+126.40.375.445 D srv  log_server_r: response: {"status":"ok"}
+127.10.415.694 I srv  log_server_r: request: GET /health 127.0.0.1 200
+127.10.415.696 D srv  log_server_r: request:  
+127.10.415.697 D srv  log_server_r: response: {"status":"ok"}
+127.40.456.490 I srv  log_server_r: request: GET /health 127.0.0.1 200
+127.40.456.494 D srv  log_server_r: request:  
+127.40.456.495 D srv  log_server_r: response: {"status":"ok"}
+128.10.496.833 I srv  log_server_r: request: GET /health 127.0.0.1 200
+128.10.496.844 D srv  log_server_r: request:  
+128.10.496.845 D srv  log_server_r: response: {"status":"ok"}
+128.40.537.855 I srv  log_server_r: request: GET /health 127.0.0.1 200
+128.40.537.930 D srv  log_server_r: request:  
+128.40.537.940 D srv  log_server_r: response: {"status":"ok"}
+129.10.577.724 I srv  log_server_r: request: GET /health 127.0.0.1 200
+129.10.577.728 D srv  log_server_r: request:  
+129.10.577.728 D srv  log_server_r: response: {"status":"ok"}
+129.40.619.403 I srv  log_server_r: request: GET /health 127.0.0.1 200
+129.40.619.413 D srv  log_server_r: request:  
+129.40.619.414 D srv  log_server_r: response: {"status":"ok"}
+130.10.662.586 I srv  log_server_r: request: GET /health 127.0.0.1 200
+130.10.662.597 D srv  log_server_r: request:  
+130.10.662.597 D srv  log_server_r: response: {"status":"ok"}
+130.40.704.887 I srv  log_server_r: request: GET /health 127.0.0.1 200
+130.40.704.890 D srv  log_server_r: request:  
+130.40.704.890 D srv  log_server_r: response: {"status":"ok"}
+131.10.747.459 I srv  log_server_r: request: GET /health 127.0.0.1 200
+131.10.747.461 D srv  log_server_r: request:  
+131.10.747.461 D srv  log_server_r: response: {"status":"ok"}
+131.40.790.403 I srv  log_server_r: request: GET /health 127.0.0.1 200
+131.40.790.414 D srv  log_server_r: request:  
+131.40.790.414 D srv  log_server_r: response: {"status":"ok"}
+132.10.830.324 I srv  log_server_r: request: GET /health 127.0.0.1 200
+132.10.830.327 D srv  log_server_r: request:  
+132.10.830.327 D srv  log_server_r: response: {"status":"ok"}
+132.40.872.948 I srv  log_server_r: request: GET /health 127.0.0.1 200
+132.40.872.951 D srv  log_server_r: request:  
+132.40.872.952 D srv  log_server_r: response: {"status":"ok"}
+133.10.916.807 I srv  log_server_r: request: GET /health 127.0.0.1 200
+133.10.916.811 D srv  log_server_r: request:  
+133.10.916.812 D srv  log_server_r: response: {"status":"ok"}
+133.40.956.939 I srv  log_server_r: request: GET /health 127.0.0.1 200
+133.40.956.944 D srv  log_server_r: request:  
+133.40.956.944 D srv  log_server_r: response: {"status":"ok"}
+134.10.998.534 I srv  log_server_r: request: GET /health 127.0.0.1 200
+134.10.998.540 D srv  log_server_r: request:  
+134.10.998.540 D srv  log_server_r: response: {"status":"ok"}
+134.41.038.993 I srv  log_server_r: request: GET /health 127.0.0.1 200
+134.41.038.994 D srv  log_server_r: request:  
+134.41.038.995 D srv  log_server_r: response: {"status":"ok"}
+135.11.083.051 I srv  log_server_r: request: GET /health 127.0.0.1 200
+135.11.083.053 D srv  log_server_r: request:  
+135.11.083.053 D srv  log_server_r: response: {"status":"ok"}
+135.41.125.767 I srv  log_server_r: request: GET /health 127.0.0.1 200
+135.41.125.770 D srv  log_server_r: request:  
+135.41.125.770 D srv  log_server_r: response: {"status":"ok"}
+136.11.168.565 I srv  log_server_r: request: GET /health 127.0.0.1 200
+136.11.168.567 D srv  log_server_r: request:  
+136.11.168.567 D srv  log_server_r: response: {"status":"ok"}
+136.41.210.484 I srv  log_server_r: request: GET /health 127.0.0.1 200
+136.41.210.487 D srv  log_server_r: request:  
+136.41.210.488 D srv  log_server_r: response: {"status":"ok"}
+137.11.250.013 I srv  log_server_r: request: GET /health 127.0.0.1 200
+137.11.250.017 D srv  log_server_r: request:  
+137.11.250.018 D srv  log_server_r: response: {"status":"ok"}
+137.41.291.913 I srv  log_server_r: request: GET /health 127.0.0.1 200
+137.41.291.918 D srv  log_server_r: request:  
+137.41.291.918 D srv  log_server_r: response: {"status":"ok"}
+138.11.333.041 I srv  log_server_r: request: GET /health 127.0.0.1 200
+138.11.333.044 D srv  log_server_r: request:  
+138.11.333.045 D srv  log_server_r: response: {"status":"ok"}
+138.41.373.736 I srv  log_server_r: request: GET /health 127.0.0.1 200
+138.41.373.738 D srv  log_server_r: request:  
+138.41.373.738 D srv  log_server_r: response: {"status":"ok"}
+139.11.414.127 I srv  log_server_r: request: GET /health 127.0.0.1 200
+139.11.414.205 D srv  log_server_r: request:  
+139.11.414.206 D srv  log_server_r: response: {"status":"ok"}
+139.41.455.638 I srv  log_server_r: request: GET /health 127.0.0.1 200
+139.41.455.641 D srv  log_server_r: request:  
+139.41.455.641 D srv  log_server_r: response: {"status":"ok"}
+140.11.497.235 I srv  log_server_r: request: GET /health 127.0.0.1 200
+140.11.497.245 D srv  log_server_r: request:  
+140.11.497.245 D srv  log_server_r: response: {"status":"ok"}
+140.41.537.744 I srv  log_server_r: request: GET /health 127.0.0.1 200
+140.41.537.747 D srv  log_server_r: request:  
+140.41.537.747 D srv  log_server_r: response: {"status":"ok"}
+141.11.579.319 I srv  log_server_r: request: GET /health 127.0.0.1 200
+141.11.579.325 D srv  log_server_r: request:  
+141.11.579.325 D srv  log_server_r: response: {"status":"ok"}
+141.41.623.493 I srv  log_server_r: request: GET /health 127.0.0.1 200
+141.41.623.496 D srv  log_server_r: request:  
+141.41.623.497 D srv  log_server_r: response: {"status":"ok"}
+142.11.663.816 I srv  log_server_r: request: GET /health 127.0.0.1 200
+142.11.663.819 D srv  log_server_r: request:  
+142.11.663.819 D srv  log_server_r: response: {"status":"ok"}
+142.41.706.411 I srv  log_server_r: request: GET /health 127.0.0.1 200
+142.41.706.422 D srv  log_server_r: request:  
+142.41.706.423 D srv  log_server_r: response: {"status":"ok"}
+143.11.747.055 I srv  log_server_r: request: GET /health 127.0.0.1 200
+143.11.747.065 D srv  log_server_r: request:  
+143.11.747.066 D srv  log_server_r: response: {"status":"ok"}
+143.41.788.495 I srv  log_server_r: request: GET /health 127.0.0.1 200
+143.41.788.497 D srv  log_server_r: request:  
+143.41.788.497 D srv  log_server_r: response: {"status":"ok"}
+144.11.830.349 I srv  log_server_r: request: GET /health 127.0.0.1 200
+144.11.830.354 D srv  log_server_r: request:  
+144.11.830.355 D srv  log_server_r: response: {"status":"ok"}
+144.41.870.380 I srv  log_server_r: request: GET /health 127.0.0.1 200
+144.41.870.382 D srv  log_server_r: request:  
+144.41.870.383 D srv  log_server_r: response: {"status":"ok"}
+145.11.910.307 I srv  log_server_r: request: GET /health 127.0.0.1 200
+145.11.910.309 D srv  log_server_r: request:  
+145.11.910.309 D srv  log_server_r: response: {"status":"ok"}
+145.41.950.300 I srv  log_server_r: request: GET /health 127.0.0.1 200
+145.41.950.303 D srv  log_server_r: request:  
+145.41.950.303 D srv  log_server_r: response: {"status":"ok"}
+146.11.992.495 I srv  log_server_r: request: GET /health 127.0.0.1 200
+146.11.992.498 D srv  log_server_r: request:  
+146.11.992.499 D srv  log_server_r: response: {"status":"ok"}
+146.42.034.665 I srv  log_server_r: request: GET /health 127.0.0.1 200
+146.42.034.677 D srv  log_server_r: request:  
+146.42.034.677 D srv  log_server_r: response: {"status":"ok"}
+147.12.078.099 I srv  log_server_r: request: GET /health 127.0.0.1 200
+147.12.078.105 D srv  log_server_r: request:  
+147.12.078.105 D srv  log_server_r: response: {"status":"ok"}
+147.42.121.322 I srv  log_server_r: request: GET /health 127.0.0.1 200
+147.42.121.327 D srv  log_server_r: request:  
+147.42.121.327 D srv  log_server_r: response: {"status":"ok"}
+148.12.161.961 I srv  log_server_r: request: GET /health 127.0.0.1 200
+148.12.161.964 D srv  log_server_r: request:  
+148.12.161.964 D srv  log_server_r: response: {"status":"ok"}
+148.42.206.214 I srv  log_server_r: request: GET /health 127.0.0.1 200
+148.42.206.221 D srv  log_server_r: request:  
+148.42.206.221 D srv  log_server_r: response: {"status":"ok"}
+149.12.249.398 I srv  log_server_r: request: GET /health 127.0.0.1 200
+149.12.249.401 D srv  log_server_r: request:  
+149.12.249.401 D srv  log_server_r: response: {"status":"ok"}
+149.42.290.293 I srv  log_server_r: request: GET /health 127.0.0.1 200
+149.42.290.295 D srv  log_server_r: request:  
+149.42.290.296 D srv  log_server_r: response: {"status":"ok"}
+150.12.330.338 I srv  log_server_r: request: GET /health 127.0.0.1 200
+150.12.330.341 D srv  log_server_r: request:  
+150.12.330.341 D srv  log_server_r: response: {"status":"ok"}
+150.42.370.793 I srv  log_server_r: request: GET /health 127.0.0.1 200
+150.42.370.797 D srv  log_server_r: request:  
+150.42.370.798 D srv  log_server_r: response: {"status":"ok"}
+151.12.411.284 I srv  log_server_r: request: GET /health 127.0.0.1 200
+151.12.411.288 D srv  log_server_r: request:  
+151.12.411.288 D srv  log_server_r: response: {"status":"ok"}
+151.42.450.900 I srv  log_server_r: request: GET /health 127.0.0.1 200
+151.42.450.903 D srv  log_server_r: request:  
+151.42.450.903 D srv  log_server_r: response: {"status":"ok"}
+152.12.491.514 I srv  log_server_r: request: GET /health 127.0.0.1 200
+152.12.491.518 D srv  log_server_r: request:  
+152.12.491.518 D srv  log_server_r: response: {"status":"ok"}
+152.42.531.558 I srv  log_server_r: request: GET /health 127.0.0.1 200
+152.42.531.561 D srv  log_server_r: request:  
+152.42.531.561 D srv  log_server_r: response: {"status":"ok"}
+153.12.572.927 I srv  log_server_r: request: GET /health 127.0.0.1 200
+153.12.572.929 D srv  log_server_r: request:  
+153.12.572.929 D srv  log_server_r: response: {"status":"ok"}
+153.42.612.260 I srv  log_server_r: request: GET /health 127.0.0.1 200
+153.42.612.262 D srv  log_server_r: request:  
+153.42.612.262 D srv  log_server_r: response: {"status":"ok"}
+154.12.653.878 I srv  log_server_r: request: GET /health 127.0.0.1 200
+154.12.653.881 D srv  log_server_r: request:  
+154.12.653.881 D srv  log_server_r: response: {"status":"ok"}
+154.42.693.985 I srv  log_server_r: request: GET /health 127.0.0.1 200
+154.42.693.988 D srv  log_server_r: request:  
+154.42.693.988 D srv  log_server_r: response: {"status":"ok"}
+155.12.735.734 I srv  log_server_r: request: GET /health 127.0.0.1 200
+155.12.735.739 D srv  log_server_r: request:  
+155.12.735.739 D srv  log_server_r: response: {"status":"ok"}
+155.42.777.024 I srv  log_server_r: request: GET /health 127.0.0.1 200
+155.42.777.026 D srv  log_server_r: request:  
+155.42.777.027 D srv  log_server_r: response: {"status":"ok"}
+156.12.816.574 I srv  log_server_r: request: GET /health 127.0.0.1 200
+156.12.816.578 D srv  log_server_r: request:  
+156.12.816.578 D srv  log_server_r: response: {"status":"ok"}
+156.42.857.649 I srv  log_server_r: request: GET /health 127.0.0.1 200
+156.42.857.651 D srv  log_server_r: request:  
+156.42.857.651 D srv  log_server_r: response: {"status":"ok"}
+157.12.900.233 I srv  log_server_r: request: GET /health 127.0.0.1 200
+157.12.900.236 D srv  log_server_r: request:  
+157.12.900.236 D srv  log_server_r: response: {"status":"ok"}
+157.42.942.881 I srv  log_server_r: request: GET /health 127.0.0.1 200
+157.42.942.883 D srv  log_server_r: request:  
+157.42.942.883 D srv  log_server_r: response: {"status":"ok"}
+158.12.983.653 I srv  log_server_r: request: GET /health 127.0.0.1 200
+158.12.983.657 D srv  log_server_r: request:  
+158.12.983.658 D srv  log_server_r: response: {"status":"ok"}
+158.43.028.496 I srv  log_server_r: request: GET /health 127.0.0.1 200
+158.43.028.498 D srv  log_server_r: request:  
+158.43.028.499 D srv  log_server_r: response: {"status":"ok"}
+159.13.069.929 I srv  log_server_r: request: GET /health 127.0.0.1 200
+159.13.069.934 D srv  log_server_r: request:  
+159.13.069.934 D srv  log_server_r: response: {"status":"ok"}
+159.43.110.605 I srv  log_server_r: request: GET /health 127.0.0.1 200
+159.43.110.608 D srv  log_server_r: request:  
+159.43.110.608 D srv  log_server_r: response: {"status":"ok"}
+160.13.150.576 I srv  log_server_r: request: GET /health 127.0.0.1 200
+160.13.150.578 D srv  log_server_r: request:  
+160.13.150.578 D srv  log_server_r: response: {"status":"ok"}
+160.43.192.616 I srv  log_server_r: request: GET /health 127.0.0.1 200
+160.43.192.618 D srv  log_server_r: request:  
+160.43.192.618 D srv  log_server_r: response: {"status":"ok"}
+161.13.234.846 I srv  log_server_r: request: GET /health 127.0.0.1 200
+161.13.234.851 D srv  log_server_r: request:  
+161.13.234.851 D srv  log_server_r: response: {"status":"ok"}
+161.43.277.080 I srv  log_server_r: request: GET /health 127.0.0.1 200
+161.43.277.082 D srv  log_server_r: request:  
+161.43.277.083 D srv  log_server_r: response: {"status":"ok"}
+162.13.318.139 I srv  log_server_r: request: GET /health 127.0.0.1 200
+162.13.318.142 D srv  log_server_r: request:  
+162.13.318.142 D srv  log_server_r: response: {"status":"ok"}
+162.43.360.619 I srv  log_server_r: request: GET /health 127.0.0.1 200
+162.43.360.622 D srv  log_server_r: request:  
+162.43.360.622 D srv  log_server_r: response: {"status":"ok"}
+163.13.402.603 I srv  log_server_r: request: GET /health 127.0.0.1 200
+163.13.402.605 D srv  log_server_r: request:  
+163.13.402.605 D srv  log_server_r: response: {"status":"ok"}
+163.43.443.007 I srv  log_server_r: request: GET /health 127.0.0.1 200
+163.43.443.010 D srv  log_server_r: request:  
+163.43.443.010 D srv  log_server_r: response: {"status":"ok"}
+164.13.483.849 I srv  log_server_r: request: GET /health 127.0.0.1 200
+164.13.483.851 D srv  log_server_r: request:  
+164.13.483.852 D srv  log_server_r: response: {"status":"ok"}
+164.43.524.106 I srv  log_server_r: request: GET /health 127.0.0.1 200
+164.43.524.108 D srv  log_server_r: request:  
+164.43.524.108 D srv  log_server_r: response: {"status":"ok"}
+165.13.565.577 I srv  log_server_r: request: GET /health 127.0.0.1 200
+165.13.565.579 D srv  log_server_r: request:  
+165.13.565.579 D srv  log_server_r: response: {"status":"ok"}
+165.43.604.924 I srv  log_server_r: request: GET /health 127.0.0.1 200
+165.43.604.926 D srv  log_server_r: request:  
+165.43.604.927 D srv  log_server_r: response: {"status":"ok"}
+166.13.645.985 I srv  log_server_r: request: GET /health 127.0.0.1 200
+166.13.645.987 D srv  log_server_r: request:  
+166.13.645.988 D srv  log_server_r: response: {"status":"ok"}
+166.43.686.422 I srv  log_server_r: request: GET /health 127.0.0.1 200
+166.43.686.424 D srv  log_server_r: request:  
+166.43.686.425 D srv  log_server_r: response: {"status":"ok"}
+167.13.728.750 I srv  log_server_r: request: GET /health 127.0.0.1 200
+167.13.728.752 D srv  log_server_r: request:  
+167.13.728.753 D srv  log_server_r: response: {"status":"ok"}
+167.43.772.412 I srv  log_server_r: request: GET /health 127.0.0.1 200
+167.43.772.423 D srv  log_server_r: request:  
+167.43.772.423 D srv  log_server_r: response: {"status":"ok"}
+168.13.812.456 I srv  log_server_r: request: GET /health 127.0.0.1 200
+168.13.812.461 D srv  log_server_r: request:  
+168.13.812.461 D srv  log_server_r: response: {"status":"ok"}
+168.43.853.287 I srv  log_server_r: request: GET /health 127.0.0.1 200
+168.43.853.290 D srv  log_server_r: request:  
+168.43.853.290 D srv  log_server_r: response: {"status":"ok"}
+169.13.895.676 I srv  log_server_r: request: GET /health 127.0.0.1 200
+169.13.895.678 D srv  log_server_r: request:  
+169.13.895.678 D srv  log_server_r: response: {"status":"ok"}
+169.43.936.711 I srv  log_server_r: request: GET /health 127.0.0.1 200
+169.43.936.714 D srv  log_server_r: request:  
+169.43.936.714 D srv  log_server_r: response: {"status":"ok"}
+170.13.977.667 I srv  log_server_r: request: GET /health 127.0.0.1 200
+170.13.977.670 D srv  log_server_r: request:  
+170.13.977.670 D srv  log_server_r: response: {"status":"ok"}
+170.44.016.758 I srv  log_server_r: request: GET /health 127.0.0.1 200
+170.44.016.761 D srv  log_server_r: request:  
+170.44.016.761 D srv  log_server_r: response: {"status":"ok"}
+171.14.059.638 I srv  log_server_r: request: GET /health 127.0.0.1 200
+171.14.059.641 D srv  log_server_r: request:  
+171.14.059.641 D srv  log_server_r: response: {"status":"ok"}
+171.44.098.478 I srv  log_server_r: request: GET /health 127.0.0.1 200
+171.44.098.483 D srv  log_server_r: request:  
+171.44.098.483 D srv  log_server_r: response: {"status":"ok"}
+172.14.139.774 I srv  log_server_r: request: GET /health 127.0.0.1 200
+172.14.139.776 D srv  log_server_r: request:  
+172.14.139.777 D srv  log_server_r: response: {"status":"ok"}
+172.44.179.023 I srv  log_server_r: request: GET /health 127.0.0.1 200
+172.44.179.027 D srv  log_server_r: request:  
+172.44.179.027 D srv  log_server_r: response: {"status":"ok"}
+173.14.218.816 I srv  log_server_r: request: GET /health 127.0.0.1 200
+173.14.218.818 D srv  log_server_r: request:  
+173.14.218.818 D srv  log_server_r: response: {"status":"ok"}
+173.44.259.619 I srv  log_server_r: request: GET /health 127.0.0.1 200
+173.44.259.622 D srv  log_server_r: request:  
+173.44.259.623 D srv  log_server_r: response: {"status":"ok"}
+174.14.300.878 I srv  log_server_r: request: GET /health 127.0.0.1 200
+174.14.300.881 D srv  log_server_r: request:  
+174.14.300.881 D srv  log_server_r: response: {"status":"ok"}
+174.44.342.051 I srv  log_server_r: request: GET /health 127.0.0.1 200
+174.44.342.054 D srv  log_server_r: request:  
+174.44.342.054 D srv  log_server_r: response: {"status":"ok"}
+175.14.384.782 I srv  log_server_r: request: GET /health 127.0.0.1 200
+175.14.384.784 D srv  log_server_r: request:  
+175.14.384.785 D srv  log_server_r: response: {"status":"ok"}
+175.44.427.392 I srv  log_server_r: request: GET /health 127.0.0.1 200
+175.44.427.394 D srv  log_server_r: request:  
+175.44.427.394 D srv  log_server_r: response: {"status":"ok"}
+176.14.470.013 I srv  log_server_r: request: GET /health 127.0.0.1 200
+176.14.470.018 D srv  log_server_r: request:  
+176.14.470.018 D srv  log_server_r: response: {"status":"ok"}
+176.44.511.560 I srv  log_server_r: request: GET /health 127.0.0.1 200
+176.44.511.562 D srv  log_server_r: request:  
+176.44.511.562 D srv  log_server_r: response: {"status":"ok"}
+177.14.553.256 I srv  log_server_r: request: GET /health 127.0.0.1 200
+177.14.553.260 D srv  log_server_r: request:  
+177.14.553.260 D srv  log_server_r: response: {"status":"ok"}
+177.44.596.405 I srv  log_server_r: request: GET /health 127.0.0.1 200
+177.44.596.408 D srv  log_server_r: request:  
+177.44.596.409 D srv  log_server_r: response: {"status":"ok"}
+178.14.636.132 I srv  log_server_r: request: GET /health 127.0.0.1 200
+178.14.636.134 D srv  log_server_r: request:  
+178.14.636.134 D srv  log_server_r: response: {"status":"ok"}
+178.44.676.790 I srv  log_server_r: request: GET /health 127.0.0.1 200
+178.44.676.793 D srv  log_server_r: request:  
+178.44.676.793 D srv  log_server_r: response: {"status":"ok"}
+179.14.716.291 I srv  log_server_r: request: GET /health 127.0.0.1 200
+179.14.716.296 D srv  log_server_r: request:  
+179.14.716.296 D srv  log_server_r: response: {"status":"ok"}
+179.44.757.403 I srv  log_server_r: request: GET /health 127.0.0.1 200
+179.44.757.406 D srv  log_server_r: request:  
+179.44.757.407 D srv  log_server_r: response: {"status":"ok"}
+180.14.795.898 I srv  log_server_r: request: GET /health 127.0.0.1 200
+180.14.795.903 D srv  log_server_r: request:  
+180.14.795.903 D srv  log_server_r: response: {"status":"ok"}
+180.44.837.298 I srv  log_server_r: request: GET /health 127.0.0.1 200
+180.44.837.300 D srv  log_server_r: request:  
+180.44.837.300 D srv  log_server_r: response: {"status":"ok"}
+181.14.879.217 I srv  log_server_r: request: GET /health 127.0.0.1 200
+181.14.879.220 D srv  log_server_r: request:  
+181.14.879.220 D srv  log_server_r: response: {"status":"ok"}
+181.44.920.902 I srv  log_server_r: request: GET /health 127.0.0.1 200
+181.44.920.906 D srv  log_server_r: request:  
+181.44.920.907 D srv  log_server_r: response: {"status":"ok"}
+182.14.960.256 I srv  log_server_r: request: GET /health 127.0.0.1 200
+182.14.960.261 D srv  log_server_r: request:  
+182.14.960.261 D srv  log_server_r: response: {"status":"ok"}
+182.45.001.177 I srv  log_server_r: request: GET /health 127.0.0.1 200
+182.45.001.180 D srv  log_server_r: request:  
+182.45.001.180 D srv  log_server_r: response: {"status":"ok"}
+183.15.041.887 I srv  log_server_r: request: GET /health 127.0.0.1 200
+183.15.041.889 D srv  log_server_r: request:  
+183.15.041.889 D srv  log_server_r: response: {"status":"ok"}
+183.45.082.161 I srv  log_server_r: request: GET /health 127.0.0.1 200
+183.45.082.164 D srv  log_server_r: request:  
+183.45.082.165 D srv  log_server_r: response: {"status":"ok"}
+184.15.122.918 I srv  log_server_r: request: GET /health 127.0.0.1 200
+184.15.122.921 D srv  log_server_r: request:  
+184.15.122.922 D srv  log_server_r: response: {"status":"ok"}
+184.45.163.564 I srv  log_server_r: request: GET /health 127.0.0.1 200
+184.45.163.566 D srv  log_server_r: request:  
+184.45.163.567 D srv  log_server_r: response: {"status":"ok"}
+185.15.204.852 I srv  log_server_r: request: GET /health 127.0.0.1 200
+185.15.204.857 D srv  log_server_r: request:  
+185.15.204.857 D srv  log_server_r: response: {"status":"ok"}
+185.45.244.746 I srv  log_server_r: request: GET /health 127.0.0.1 200
+185.45.244.749 D srv  log_server_r: request:  
+185.45.244.750 D srv  log_server_r: response: {"status":"ok"}
+186.15.285.088 I srv  log_server_r: request: GET /health 127.0.0.1 200
+186.15.285.091 D srv  log_server_r: request:  
+186.15.285.091 D srv  log_server_r: response: {"status":"ok"}
+186.45.326.421 I srv  log_server_r: request: GET /health 127.0.0.1 200
+186.45.326.442 D srv  log_server_r: request:  
+186.45.326.443 D srv  log_server_r: response: {"status":"ok"}
+187.15.367.268 I srv  log_server_r: request: GET /health 127.0.0.1 200
+187.15.367.269 D srv  log_server_r: request:  
+187.15.367.269 D srv  log_server_r: response: {"status":"ok"}
+187.45.409.288 I srv  log_server_r: request: GET /health 127.0.0.1 200
+187.45.409.290 D srv  log_server_r: request:  
+187.45.409.291 D srv  log_server_r: response: {"status":"ok"}
+188.15.450.128 I srv  log_server_r: request: GET /health 127.0.0.1 200
+188.15.450.133 D srv  log_server_r: request:  
+188.15.450.133 D srv  log_server_r: response: {"status":"ok"}
+188.45.488.597 I srv  log_server_r: request: GET /health 127.0.0.1 200
+188.45.488.607 D srv  log_server_r: request:  
+188.45.488.608 D srv  log_server_r: response: {"status":"ok"}
+189.15.528.224 I srv  log_server_r: request: GET /health 127.0.0.1 200
+189.15.528.235 D srv  log_server_r: request:  
+189.15.528.235 D srv  log_server_r: response: {"status":"ok"}
+189.45.570.501 I srv  log_server_r: request: GET /health 127.0.0.1 200
+189.45.570.504 D srv  log_server_r: request:  
+189.45.570.504 D srv  log_server_r: response: {"status":"ok"}
+190.15.611.020 I srv  log_server_r: request: GET /health 127.0.0.1 200
+190.15.611.023 D srv  log_server_r: request:  
+190.15.611.024 D srv  log_server_r: response: {"status":"ok"}
+190.45.650.907 I srv  log_server_r: request: GET /health 127.0.0.1 200
+190.45.650.910 D srv  log_server_r: request:  
+190.45.650.911 D srv  log_server_r: response: {"status":"ok"}
+191.15.691.559 I srv  log_server_r: request: GET /health 127.0.0.1 200
+191.15.691.631 D srv  log_server_r: request:  
+191.15.691.632 D srv  log_server_r: response: {"status":"ok"}
+191.45.734.442 I srv  log_server_r: request: GET /health 127.0.0.1 200
+191.45.734.445 D srv  log_server_r: request:  
+191.45.734.445 D srv  log_server_r: response: {"status":"ok"}
+192.15.775.152 I srv  log_server_r: request: GET /health 127.0.0.1 200
+192.15.775.155 D srv  log_server_r: request:  
+192.15.775.155 D srv  log_server_r: response: {"status":"ok"}
+192.45.815.555 I srv  log_server_r: request: GET /health 127.0.0.1 200
+192.45.815.558 D srv  log_server_r: request:  
+192.45.815.559 D srv  log_server_r: response: {"status":"ok"}
+193.15.857.033 I srv  log_server_r: request: GET /health 127.0.0.1 200
+193.15.857.036 D srv  log_server_r: request:  
+193.15.857.036 D srv  log_server_r: response: {"status":"ok"}
+193.45.896.492 I srv  log_server_r: request: GET /health 127.0.0.1 200
+193.45.896.494 D srv  log_server_r: request:  
+193.45.896.494 D srv  log_server_r: response: {"status":"ok"}
+194.15.935.815 I srv  log_server_r: request: GET /health 127.0.0.1 200
+194.15.935.820 D srv  log_server_r: request:  
+194.15.935.820 D srv  log_server_r: response: {"status":"ok"}
+194.45.975.750 I srv  log_server_r: request: GET /health 127.0.0.1 200
+194.45.975.754 D srv  log_server_r: request:  
+194.45.975.754 D srv  log_server_r: response: {"status":"ok"}
+195.16.019.915 I srv  log_server_r: request: GET /health 127.0.0.1 200
+195.16.019.920 D srv  log_server_r: request:  
+195.16.019.920 D srv  log_server_r: response: {"status":"ok"}
+195.46.060.659 I srv  log_server_r: request: GET /health 127.0.0.1 200
+195.46.060.666 D srv  log_server_r: request:  
+195.46.060.666 D srv  log_server_r: response: {"status":"ok"}
+196.16.102.888 I srv  log_server_r: request: GET /health 127.0.0.1 200
+196.16.102.893 D srv  log_server_r: request:  
+196.16.102.893 D srv  log_server_r: response: {"status":"ok"}
+196.46.142.926 I srv  log_server_r: request: GET /health 127.0.0.1 200
+196.46.142.928 D srv  log_server_r: request:  
+196.46.142.928 D srv  log_server_r: response: {"status":"ok"}
+197.16.186.205 I srv  log_server_r: request: GET /health 127.0.0.1 200
+197.16.186.208 D srv  log_server_r: request:  
+197.16.186.208 D srv  log_server_r: response: {"status":"ok"}
+197.46.227.059 I srv  log_server_r: request: GET /health 127.0.0.1 200
+197.46.227.061 D srv  log_server_r: request:  
+197.46.227.061 D srv  log_server_r: response: {"status":"ok"}
+198.16.268.470 I srv  log_server_r: request: GET /health 127.0.0.1 200
+198.16.268.475 D srv  log_server_r: request:  
+198.16.268.475 D srv  log_server_r: response: {"status":"ok"}
+198.46.311.668 I srv  log_server_r: request: GET /health 127.0.0.1 200
+198.46.311.672 D srv  log_server_r: request:  
+198.46.311.672 D srv  log_server_r: response: {"status":"ok"}
+199.16.354.028 I srv  log_server_r: request: GET /health 127.0.0.1 200
+199.16.354.039 D srv  log_server_r: request:  
+199.16.354.040 D srv  log_server_r: response: {"status":"ok"}
+199.46.398.003 I srv  log_server_r: request: GET /health 127.0.0.1 200
+199.46.398.008 D srv  log_server_r: request:  
+199.46.398.008 D srv  log_server_r: response: {"status":"ok"}
+200.16.441.227 I srv  log_server_r: request: GET /health 127.0.0.1 200
+200.16.441.262 D srv  log_server_r: request:  
+200.16.441.262 D srv  log_server_r: response: {"status":"ok"}
+200.46.483.135 I srv  log_server_r: request: GET /health 127.0.0.1 200
+200.46.483.137 D srv  log_server_r: request:  
+200.46.483.137 D srv  log_server_r: response: {"status":"ok"}
+201.16.524.186 I srv  log_server_r: request: GET /health 127.0.0.1 200
+201.16.524.187 D srv  log_server_r: request:  
+201.16.524.188 D srv  log_server_r: response: {"status":"ok"}
+201.46.567.262 I srv  log_server_r: request: GET /health 127.0.0.1 200
+201.46.567.264 D srv  log_server_r: request:  
+201.46.567.265 D srv  log_server_r: response: {"status":"ok"}
+202.16.609.452 I srv  log_server_r: request: GET /health 127.0.0.1 200
+202.16.609.463 D srv  log_server_r: request:  
+202.16.609.463 D srv  log_server_r: response: {"status":"ok"}
+202.46.648.832 I srv  log_server_r: request: GET /health 127.0.0.1 200
+202.46.648.836 D srv  log_server_r: request:  
+202.46.648.836 D srv  log_server_r: response: {"status":"ok"}
+203.16.689.316 I srv  log_server_r: request: GET /health 127.0.0.1 200
+203.16.689.326 D srv  log_server_r: request:  
+203.16.689.327 D srv  log_server_r: response: {"status":"ok"}
+203.46.731.749 I srv  log_server_r: request: GET /health 127.0.0.1 200
+203.46.731.754 D srv  log_server_r: request:  
+203.46.731.755 D srv  log_server_r: response: {"status":"ok"}
+204.16.774.977 I srv  log_server_r: request: GET /health 127.0.0.1 200
+204.16.774.983 D srv  log_server_r: request:  
+204.16.774.983 D srv  log_server_r: response: {"status":"ok"}
+204.46.815.945 I srv  log_server_r: request: GET /health 127.0.0.1 200
+204.46.815.948 D srv  log_server_r: request:  
+204.46.815.948 D srv  log_server_r: response: {"status":"ok"}
+205.16.855.176 I srv  log_server_r: request: GET /health 127.0.0.1 200
+205.16.855.178 D srv  log_server_r: request:  
+205.16.855.179 D srv  log_server_r: response: {"status":"ok"}
+205.46.896.184 I srv  log_server_r: request: GET /health 127.0.0.1 200
+205.46.896.190 D srv  log_server_r: request:  
+205.46.896.190 D srv  log_server_r: response: {"status":"ok"}
+206.16.937.473 I srv  log_server_r: request: GET /health 127.0.0.1 200
+206.16.937.476 D srv  log_server_r: request:  
+206.16.937.477 D srv  log_server_r: response: {"status":"ok"}
+206.46.980.312 I srv  log_server_r: request: GET /health 127.0.0.1 200
+206.46.980.314 D srv  log_server_r: request:  
+206.46.980.315 D srv  log_server_r: response: {"status":"ok"}
+207.17.019.729 I srv  log_server_r: request: GET /health 127.0.0.1 200
+207.17.019.731 D srv  log_server_r: request:  
+207.17.019.732 D srv  log_server_r: response: {"status":"ok"}
+207.47.061.023 I srv  log_server_r: request: GET /health 127.0.0.1 200
+207.47.061.028 D srv  log_server_r: request:  
+207.47.061.028 D srv  log_server_r: response: {"status":"ok"}
+208.17.101.556 I srv  log_server_r: request: GET /health 127.0.0.1 200
+208.17.101.567 D srv  log_server_r: request:  
+208.17.101.567 D srv  log_server_r: response: {"status":"ok"}
+208.47.143.960 I srv  log_server_r: request: GET /health 127.0.0.1 200
+208.47.143.972 D srv  log_server_r: request:  
+208.47.143.972 D srv  log_server_r: response: {"status":"ok"}
+209.17.186.245 I srv  log_server_r: request: GET /health 127.0.0.1 200
+209.17.186.250 D srv  log_server_r: request:  
+209.17.186.251 D srv  log_server_r: response: {"status":"ok"}
+209.47.227.246 I srv  log_server_r: request: GET /health 127.0.0.1 200
+209.47.227.249 D srv  log_server_r: request:  
+209.47.227.249 D srv  log_server_r: response: {"status":"ok"}
+210.17.269.158 I srv  log_server_r: request: GET /health 127.0.0.1 200
+210.17.269.162 D srv  log_server_r: request:  
+210.17.269.162 D srv  log_server_r: response: {"status":"ok"}
+210.47.310.948 I srv  log_server_r: request: GET /health 127.0.0.1 200
+210.47.310.953 D srv  log_server_r: request:  
+210.47.310.954 D srv  log_server_r: response: {"status":"ok"}
+211.17.353.572 I srv  log_server_r: request: GET /health 127.0.0.1 200
+211.17.353.574 D srv  log_server_r: request:  
+211.17.353.575 D srv  log_server_r: response: {"status":"ok"}
+211.47.395.707 I srv  log_server_r: request: GET /health 127.0.0.1 200
+211.47.395.710 D srv  log_server_r: request:  
+211.47.395.711 D srv  log_server_r: response: {"status":"ok"}
+212.17.435.529 I srv  log_server_r: request: GET /health 127.0.0.1 200
+212.17.435.530 D srv  log_server_r: request:  
+212.17.435.531 D srv  log_server_r: response: {"status":"ok"}
+212.47.473.787 I srv  log_server_r: request: GET /health 127.0.0.1 200
+212.47.473.789 D srv  log_server_r: request:  
+212.47.473.790 D srv  log_server_r: response: {"status":"ok"}
+213.17.514.736 I srv  log_server_r: request: GET /health 127.0.0.1 200
+213.17.514.741 D srv  log_server_r: request:  
+213.17.514.741 D srv  log_server_r: response: {"status":"ok"}
+213.47.555.006 I srv  log_server_r: request: GET /health 127.0.0.1 200
+213.47.555.011 D srv  log_server_r: request:  
+213.47.555.011 D srv  log_server_r: response: {"status":"ok"}
+214.17.596.709 I srv  log_server_r: request: GET /health 127.0.0.1 200
+214.17.596.711 D srv  log_server_r: request:  
+214.17.596.711 D srv  log_server_r: response: {"status":"ok"}
+214.47.637.173 I srv  log_server_r: request: GET /health 127.0.0.1 200
+214.47.637.179 D srv  log_server_r: request:  
+214.47.637.179 D srv  log_server_r: response: {"status":"ok"}
+215.17.679.240 I srv  log_server_r: request: GET /health 127.0.0.1 200
+215.17.679.250 D srv  log_server_r: request:  
+215.17.679.250 D srv  log_server_r: response: {"status":"ok"}
+215.47.721.918 I srv  log_server_r: request: GET /health 127.0.0.1 200
+215.47.721.922 D srv  log_server_r: request:  
+215.47.721.922 D srv  log_server_r: response: {"status":"ok"}
+216.17.763.438 I srv  log_server_r: request: GET /health 127.0.0.1 200
+216.17.763.441 D srv  log_server_r: request:  
+216.17.763.442 D srv  log_server_r: response: {"status":"ok"}
+216.47.804.848 I srv  log_server_r: request: GET /health 127.0.0.1 200
+216.47.804.851 D srv  log_server_r: request:  
+216.47.804.851 D srv  log_server_r: response: {"status":"ok"}
+217.17.844.942 I srv  log_server_r: request: GET /health 127.0.0.1 200
+217.17.844.944 D srv  log_server_r: request:  
+217.17.844.944 D srv  log_server_r: response: {"status":"ok"}
+217.47.885.228 I srv  log_server_r: request: GET /health 127.0.0.1 200
+217.47.885.230 D srv  log_server_r: request:  
+217.47.885.230 D srv  log_server_r: response: {"status":"ok"}
+218.17.927.172 I srv  log_server_r: request: GET /health 127.0.0.1 200
+218.17.927.176 D srv  log_server_r: request:  
+218.17.927.176 D srv  log_server_r: response: {"status":"ok"}
+218.47.967.312 I srv  log_server_r: request: GET /health 127.0.0.1 200
+218.47.967.314 D srv  log_server_r: request:  
+218.47.967.314 D srv  log_server_r: response: {"status":"ok"}
+219.18.008.078 I srv  log_server_r: request: GET /health 127.0.0.1 200
+219.18.008.080 D srv  log_server_r: request:  
+219.18.008.081 D srv  log_server_r: response: {"status":"ok"}
+219.48.048.064 I srv  log_server_r: request: GET /health 127.0.0.1 200
+219.48.048.075 D srv  log_server_r: request:  
+219.48.048.075 D srv  log_server_r: response: {"status":"ok"}
+220.18.089.580 I srv  log_server_r: request: GET /health 127.0.0.1 200
+220.18.089.582 D srv  log_server_r: request:  
+220.18.089.582 D srv  log_server_r: response: {"status":"ok"}
+220.48.129.723 I srv  log_server_r: request: GET /health 127.0.0.1 200
+220.48.129.739 D srv  log_server_r: request:  
+220.48.129.740 D srv  log_server_r: response: {"status":"ok"}
+221.18.171.127 I srv  log_server_r: request: GET /health 127.0.0.1 200
+221.18.171.128 D srv  log_server_r: request:  
+221.18.171.129 D srv  log_server_r: response: {"status":"ok"}
+221.48.212.269 I srv  log_server_r: request: GET /health 127.0.0.1 200
+221.48.212.274 D srv  log_server_r: request:  
+221.48.212.274 D srv  log_server_r: response: {"status":"ok"}
+222.18.252.093 I srv  log_server_r: request: GET /health 127.0.0.1 200
+222.18.252.096 D srv  log_server_r: request:  
+222.18.252.096 D srv  log_server_r: response: {"status":"ok"}
+222.48.293.727 I srv  log_server_r: request: GET /health 127.0.0.1 200
+222.48.293.730 D srv  log_server_r: request:  
+222.48.293.730 D srv  log_server_r: response: {"status":"ok"}
+223.18.336.880 I srv  log_server_r: request: GET /health 127.0.0.1 200
+223.18.336.883 D srv  log_server_r: request:  
+223.18.336.883 D srv  log_server_r: response: {"status":"ok"}
+223.48.380.542 I srv  log_server_r: request: GET /health 127.0.0.1 200
+223.48.380.544 D srv  log_server_r: request:  
+223.48.380.545 D srv  log_server_r: response: {"status":"ok"}
+224.18.421.354 I srv  log_server_r: request: GET /health 127.0.0.1 200
+224.18.421.356 D srv  log_server_r: request:  
+224.18.421.357 D srv  log_server_r: response: {"status":"ok"}
+224.48.462.238 I srv  log_server_r: request: GET /health 127.0.0.1 200
+224.48.462.242 D srv  log_server_r: request:  
+224.48.462.242 D srv  log_server_r: response: {"status":"ok"}
+225.18.503.510 I srv  log_server_r: request: GET /health 127.0.0.1 200
+225.18.503.513 D srv  log_server_r: request:  
+225.18.503.513 D srv  log_server_r: response: {"status":"ok"}
+225.48.544.165 I srv  log_server_r: request: GET /health 127.0.0.1 200
+225.48.544.166 D srv  log_server_r: request:  
+225.48.544.167 D srv  log_server_r: response: {"status":"ok"}
+226.18.585.623 I srv  log_server_r: request: GET /health 127.0.0.1 200
+226.18.585.634 D srv  log_server_r: request:  
+226.18.585.634 D srv  log_server_r: response: {"status":"ok"}
+226.48.628.484 I srv  log_server_r: request: GET /health 127.0.0.1 200
+226.48.628.486 D srv  log_server_r: request:  
+226.48.628.487 D srv  log_server_r: response: {"status":"ok"}
+227.18.668.081 I srv  log_server_r: request: GET /health 127.0.0.1 200
+227.18.668.084 D srv  log_server_r: request:  
+227.18.668.084 D srv  log_server_r: response: {"status":"ok"}
+227.48.708.784 I srv  log_server_r: request: GET /health 127.0.0.1 200
+227.48.708.787 D srv  log_server_r: request:  
+227.48.708.787 D srv  log_server_r: response: {"status":"ok"}
+228.18.748.775 I srv  log_server_r: request: GET /health 127.0.0.1 200
+228.18.748.778 D srv  log_server_r: request:  
+228.18.748.779 D srv  log_server_r: response: {"status":"ok"}
+228.48.793.494 I srv  log_server_r: request: GET /health 127.0.0.1 200
+228.48.793.496 D srv  log_server_r: request:  
+228.48.793.497 D srv  log_server_r: response: {"status":"ok"}
+229.18.836.155 I srv  log_server_r: request: GET /health 127.0.0.1 200
+229.18.836.160 D srv  log_server_r: request:  
+229.18.836.160 D srv  log_server_r: response: {"status":"ok"}
+229.48.876.873 I srv  log_server_r: request: GET /health 127.0.0.1 200
+229.48.876.890 D srv  log_server_r: request:  
+229.48.876.890 D srv  log_server_r: response: {"status":"ok"}
+230.18.918.597 I srv  log_server_r: request: GET /health 127.0.0.1 200
+230.18.918.600 D srv  log_server_r: request:  
+230.18.918.600 D srv  log_server_r: response: {"status":"ok"}
+230.48.961.005 I srv  log_server_r: request: GET /health 127.0.0.1 200
+230.48.961.007 D srv  log_server_r: request:  
+230.48.961.007 D srv  log_server_r: response: {"status":"ok"}
+231.19.001.873 I srv  log_server_r: request: GET /health 127.0.0.1 200
+231.19.001.876 D srv  log_server_r: request:  
+231.19.001.876 D srv  log_server_r: response: {"status":"ok"}
+231.49.040.749 I srv  log_server_r: request: GET /health 127.0.0.1 200
+231.49.040.751 D srv  log_server_r: request:  
+231.49.040.751 D srv  log_server_r: response: {"status":"ok"}
+232.19.082.614 I srv  log_server_r: request: GET /health 127.0.0.1 200
+232.19.082.619 D srv  log_server_r: request:  
+232.19.082.619 D srv  log_server_r: response: {"status":"ok"}
+232.49.125.149 I srv  log_server_r: request: GET /health 127.0.0.1 200
+232.49.125.155 D srv  log_server_r: request:  
+232.49.125.155 D srv  log_server_r: response: {"status":"ok"}
+233.10.832.222 D que    start_loop: processing new tasks
+233.10.832.227 D que    start_loop: terminate
+233.10.832.228 I srv    operator(): operator(): cleaning up before exit...

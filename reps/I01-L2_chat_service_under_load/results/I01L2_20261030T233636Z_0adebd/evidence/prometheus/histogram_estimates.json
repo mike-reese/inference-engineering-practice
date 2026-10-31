@@ -1,0 +1,38 @@
+[
+  {
+    "metric": "ttft",
+    "quantile": 0.5,
+    "query": "histogram_quantile(0.5, sum by (le) (ie_client_ttft_seconds_bucket{phase=\"normal\"}))",
+    "seconds": 0.040322580645161296
+  },
+  {
+    "metric": "ttft",
+    "quantile": 0.95,
+    "query": "histogram_quantile(0.95, sum by (le) (ie_client_ttft_seconds_bucket{phase=\"normal\"}))",
+    "seconds": 0.1425
+  },
+  {
+    "metric": "ttft",
+    "quantile": 0.99,
+    "query": "histogram_quantile(0.99, sum by (le) (ie_client_ttft_seconds_bucket{phase=\"normal\"}))",
+    "seconds": 0.1485
+  },
+  {
+    "metric": "e2e",
+    "quantile": 0.5,
+    "query": "histogram_quantile(0.5, sum by (le) (ie_client_e2e_seconds_bucket{phase=\"normal\"}))",
+    "seconds": 0.24615384615384617
+  },
+  {
+    "metric": "e2e",
+    "quantile": 0.95,
+    "query": "histogram_quantile(0.95, sum by (le) (ie_client_e2e_seconds_bucket{phase=\"normal\"}))",
+    "seconds": 0.385
+  },
+  {
+    "metric": "e2e",
+    "quantile": 0.99,
+    "query": "histogram_quantile(0.99, sum by (le) (ie_client_e2e_seconds_bucket{phase=\"normal\"}))",
+    "seconds": 0.397
+  }
+]

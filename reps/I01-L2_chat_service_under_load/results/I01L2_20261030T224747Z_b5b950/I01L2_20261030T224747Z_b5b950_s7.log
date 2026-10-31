@@ -1,0 +1,1072 @@
+0.00.000.509 I build: 6500 (a7a98e0ff) with cc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 for x86_64-linux-gnu
+0.00.000.545 I system info: n_threads = 8, n_threads_batch = 8, total_threads = 16
+0.00.000.545 I 
+0.00.000.585 I system_info: n_threads = 8 (n_threads_batch = 8) / 16 | CUDA : ARCHS = 610 | USE_GRAPHS = 1 | PEER_MAX_BATCH_SIZE = 128 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | BMI2 = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | 
+0.00.000.587 I 
+0.00.000.664 I main: binding port with default address family
+0.00.001.781 I main: HTTP server is listening, hostname: 0.0.0.0, port: 8080, http threads: 15
+0.00.001.783 I main: loading model
+0.00.001.789 I srv    load_model: loading model '/model/model.gguf'
+0.00.059.867 I llama_model_load_from_file_impl: using device CUDA0 (NVIDIA GeForce GTX 1080 Ti) (0000:01:00.0) - 10196 MiB free
+0.00.089.713 I llama_model_loader: loaded meta data with 25 key-value pairs and 290 tensors from /model/model.gguf (version GGUF V3 (latest))
+0.00.089.741 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.00.089.754 I llama_model_loader: - kv   0:                       general.architecture str              = qwen2
+0.00.089.755 I llama_model_loader: - kv   1:                               general.type str              = model
+0.00.089.757 I llama_model_loader: - kv   2:                               general.name str              = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.089.759 I llama_model_loader: - kv   3:                           general.finetune str              = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.089.759 I llama_model_loader: - kv   4:                         general.size_label str              = 494M
+0.00.089.762 I llama_model_loader: - kv   5:                          qwen2.block_count u32              = 24
+0.00.089.763 I llama_model_loader: - kv   6:                       qwen2.context_length u32              = 32768
+0.00.089.763 I llama_model_loader: - kv   7:                     qwen2.embedding_length u32              = 896
+0.00.089.763 I llama_model_loader: - kv   8:                  qwen2.feed_forward_length u32              = 4864
+0.00.089.764 I llama_model_loader: - kv   9:                 qwen2.attention.head_count u32              = 14
+0.00.089.764 I llama_model_loader: - kv  10:              qwen2.attention.head_count_kv u32              = 2
+0.00.089.772 I llama_model_loader: - kv  11:                       qwen2.rope.freq_base f32              = 1000000.000000
+0.00.089.773 I llama_model_loader: - kv  12:     qwen2.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.00.089.774 I llama_model_loader: - kv  13:                          general.file_type u32              = 0
+0.00.089.774 I llama_model_loader: - kv  14:               general.quantization_version u32              = 2
+0.00.089.774 I llama_model_loader: - kv  15:                       tokenizer.ggml.model str              = gpt2
+0.00.089.775 I llama_model_loader: - kv  16:                         tokenizer.ggml.pre str              = qwen2
+0.00.111.243 I llama_model_loader: - kv  17:                      tokenizer.ggml.tokens arr[str,151936]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+0.00.116.185 I llama_model_loader: - kv  18:                  tokenizer.ggml.token_type arr[i32,151936]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.00.138.725 I llama_model_loader: - kv  19:                      tokenizer.ggml.merges arr[str,151387]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+0.00.138.829 I llama_model_loader: - kv  20:                tokenizer.ggml.eos_token_id u32              = 151645
+0.00.138.832 I llama_model_loader: - kv  21:            tokenizer.ggml.padding_token_id u32              = 151643
+0.00.138.833 I llama_model_loader: - kv  22:                tokenizer.ggml.bos_token_id u32              = 151643
+0.00.138.834 I llama_model_loader: - kv  23:               tokenizer.ggml.add_bos_token bool             = false
+0.00.138.840 I llama_model_loader: - kv  24:                    tokenizer.chat_template str              = {%- if tools %}\n    {{- '<|im_start|>...
+0.00.138.843 I llama_model_loader: - type  f32:  290 tensors
+0.00.138.847 I print_info: file format = GGUF V3 (latest)
+0.00.138.847 I print_info: file type   = all F32
+0.00.138.851 I print_info: file size   = 1.84 GiB (32.00 BPW) 
+0.00.245.458 D init_tokenizer: initializing tokenizer for type 2
+0.00.268.807 D load: control token: 151660 '<|fim_middle|>' is not marked as EOG
+0.00.268.816 D load: control token: 151659 '<|fim_prefix|>' is not marked as EOG
+0.00.268.817 D load: control token: 151653 '<|vision_end|>' is not marked as EOG
+0.00.268.817 D load: control token: 151648 '<|box_start|>' is not marked as EOG
+0.00.268.818 D load: control token: 151646 '<|object_ref_start|>' is not marked as EOG
+0.00.269.040 D load: control token: 151649 '<|box_end|>' is not marked as EOG
+0.00.271.950 D load: control token: 151655 '<|image_pad|>' is not marked as EOG
+0.00.272.261 D load: control token: 151651 '<|quad_end|>' is not marked as EOG
+0.00.275.682 D load: control token: 151647 '<|object_ref_end|>' is not marked as EOG
+0.00.280.503 D load: control token: 151652 '<|vision_start|>' is not marked as EOG
+0.00.285.998 D load: control token: 151654 '<|vision_pad|>' is not marked as EOG
+0.00.290.354 D load: control token: 151656 '<|video_pad|>' is not marked as EOG
+0.00.291.031 D load: control token: 151644 '<|im_start|>' is not marked as EOG
+0.00.292.421 D load: control token: 151661 '<|fim_suffix|>' is not marked as EOG
+0.00.293.677 D load: control token: 151650 '<|quad_start|>' is not marked as EOG
+0.00.308.668 I load: printing all EOG tokens:
+0.00.308.674 I load:   - 151643 ('<|endoftext|>')
+0.00.308.675 I load:   - 151645 ('<|im_end|>')
+0.00.308.676 I load:   - 151662 ('<|fim_pad|>')
+0.00.308.676 I load:   - 151663 ('<|repo_name|>')
+0.00.308.677 I load:   - 151664 ('<|file_sep|>')
+0.00.309.202 I load: special tokens cache size = 22
+0.00.366.689 I load: token to piece cache size = 0.9310 MB
+0.00.366.708 I print_info: arch             = qwen2
+0.00.366.708 I print_info: vocab_only       = 0
+0.00.366.709 I print_info: n_ctx_train      = 32768
+0.00.366.709 I print_info: n_embd           = 896
+0.00.366.709 I print_info: n_layer          = 24
+0.00.366.717 I print_info: n_head           = 14
+0.00.366.719 I print_info: n_head_kv        = 2
+0.00.366.719 I print_info: n_rot            = 64
+0.00.366.720 I print_info: n_swa            = 0
+0.00.366.721 I print_info: is_swa_any       = 0
+0.00.366.721 I print_info: n_embd_head_k    = 64
+0.00.366.721 I print_info: n_embd_head_v    = 64
+0.00.366.722 I print_info: n_gqa            = 7
+0.00.366.724 I print_info: n_embd_k_gqa     = 128
+0.00.366.725 I print_info: n_embd_v_gqa     = 128
+0.00.366.726 I print_info: f_norm_eps       = 0.0e+00
+0.00.366.726 I print_info: f_norm_rms_eps   = 1.0e-06
+0.00.366.727 I print_info: f_clamp_kqv      = 0.0e+00
+0.00.366.727 I print_info: f_max_alibi_bias = 0.0e+00
+0.00.366.727 I print_info: f_logit_scale    = 0.0e+00
+0.00.366.727 I print_info: f_attn_scale     = 0.0e+00
+0.00.366.729 I print_info: n_ff             = 4864
+0.00.366.729 I print_info: n_expert         = 0
+0.00.366.729 I print_info: n_expert_used    = 0
+0.00.366.729 I print_info: causal attn      = 1
+0.00.366.729 I print_info: pooling type     = -1
+0.00.366.730 I print_info: rope type        = 2
+0.00.366.730 I print_info: rope scaling     = linear
+0.00.366.731 I print_info: freq_base_train  = 1000000.0
+0.00.366.731 I print_info: freq_scale_train = 1
+0.00.366.731 I print_info: n_ctx_orig_yarn  = 32768
+0.00.366.731 I print_info: rope_finetuned   = unknown
+0.00.366.732 I print_info: model type       = 1B
+0.00.366.733 I print_info: model params     = 494.03 M
+0.00.366.734 I print_info: general.name     = 7ae557604adf67be50417f59c2c2f167def9a775
+0.00.366.736 I print_info: vocab type       = BPE
+0.00.366.737 I print_info: n_vocab          = 151936
+0.00.366.737 I print_info: n_merges         = 151387
+0.00.366.737 I print_info: BOS token        = 151643 '<|endoftext|>'
+0.00.366.738 I print_info: EOS token        = 151645 '<|im_end|>'
+0.00.366.738 I print_info: EOT token        = 151645 '<|im_end|>'
+0.00.366.738 I print_info: PAD token        = 151643 '<|endoftext|>'
+0.00.366.738 I print_info: LF token         = 198 'Ċ'
+0.00.366.739 I print_info: FIM PRE token    = 151659 '<|fim_prefix|>'
+0.00.366.739 I print_info: FIM SUF token    = 151661 '<|fim_suffix|>'
+0.00.366.739 I print_info: FIM MID token    = 151660 '<|fim_middle|>'
+0.00.366.739 I print_info: FIM PAD token    = 151662 '<|fim_pad|>'
+0.00.366.740 I print_info: FIM REP token    = 151663 '<|repo_name|>'
+0.00.366.740 I print_info: FIM SEP token    = 151664 '<|file_sep|>'
+0.00.366.740 I print_info: EOG token        = 151643 '<|endoftext|>'
+0.00.366.741 I print_info: EOG token        = 151645 '<|im_end|>'
+0.00.366.741 I print_info: EOG token        = 151662 '<|fim_pad|>'
+0.00.366.741 I print_info: EOG token        = 151663 '<|repo_name|>'
+0.00.366.741 I print_info: EOG token        = 151664 '<|file_sep|>'
+0.00.366.741 I print_info: max token length = 256
+0.00.366.748 I load_tensors: loading model tensors, this can take a while... (mmap = true)
+0.00.366.830 D load_tensors: layer   0 assigned to device CUDA0, is_swa = 0
+0.00.366.830 D load_tensors: layer   1 assigned to device CUDA0, is_swa = 0
+0.00.366.830 D load_tensors: layer   2 assigned to device CUDA0, is_swa = 0
+0.00.366.830 D load_tensors: layer   3 assigned to device CUDA0, is_swa = 0
+0.00.366.831 D load_tensors: layer   4 assigned to device CUDA0, is_swa = 0
+0.00.366.831 D load_tensors: layer   5 assigned to device CUDA0, is_swa = 0
+0.00.366.831 D load_tensors: layer   6 assigned to device CUDA0, is_swa = 0
+0.00.366.831 D load_tensors: layer   7 assigned to device CUDA0, is_swa = 0
+0.00.366.831 D load_tensors: layer   8 assigned to device CUDA0, is_swa = 0
+0.00.366.832 D load_tensors: layer   9 assigned to device CUDA0, is_swa = 0
+0.00.366.832 D load_tensors: layer  10 assigned to device CUDA0, is_swa = 0
+0.00.366.832 D load_tensors: layer  11 assigned to device CUDA0, is_swa = 0
+0.00.366.832 D load_tensors: layer  12 assigned to device CUDA0, is_swa = 0
+0.00.366.832 D load_tensors: layer  13 assigned to device CUDA0, is_swa = 0
+0.00.366.833 D load_tensors: layer  14 assigned to device CUDA0, is_swa = 0
+0.00.366.833 D load_tensors: layer  15 assigned to device CUDA0, is_swa = 0
+0.00.366.833 D load_tensors: layer  16 assigned to device CUDA0, is_swa = 0
+0.00.366.833 D load_tensors: layer  17 assigned to device CUDA0, is_swa = 0
+0.00.366.833 D load_tensors: layer  18 assigned to device CUDA0, is_swa = 0
+0.00.366.834 D load_tensors: layer  19 assigned to device CUDA0, is_swa = 0
+0.00.366.834 D load_tensors: layer  20 assigned to device CUDA0, is_swa = 0
+0.00.366.834 D load_tensors: layer  21 assigned to device CUDA0, is_swa = 0
+0.00.366.834 D load_tensors: layer  22 assigned to device CUDA0, is_swa = 0
+0.00.366.835 D load_tensors: layer  23 assigned to device CUDA0, is_swa = 0
+0.00.366.835 D load_tensors: layer  24 assigned to device CUDA0, is_swa = 0
+0.00.366.877 D create_tensor: loading tensor token_embd.weight
+0.00.366.887 D create_tensor: loading tensor output_norm.weight
+0.00.366.896 D create_tensor: loading tensor token_embd.weight
+0.00.366.906 D create_tensor: loading tensor blk.0.attn_norm.weight
+0.00.366.913 D create_tensor: loading tensor blk.0.attn_q.weight
+0.00.366.922 D create_tensor: loading tensor blk.0.attn_k.weight
+0.00.366.936 D create_tensor: loading tensor blk.0.attn_v.weight
+0.00.366.943 D create_tensor: loading tensor blk.0.attn_output.weight
+0.00.366.951 D create_tensor: loading tensor blk.0.attn_q.bias
+0.00.366.958 D create_tensor: loading tensor blk.0.attn_k.bias
+0.00.366.967 D create_tensor: loading tensor blk.0.attn_v.bias
+0.00.366.977 D create_tensor: loading tensor blk.0.ffn_norm.weight
+0.00.366.985 D create_tensor: loading tensor blk.0.ffn_gate.weight
+0.00.366.992 D create_tensor: loading tensor blk.0.ffn_down.weight
+0.00.366.997 D create_tensor: loading tensor blk.0.ffn_up.weight
+0.00.367.001 D create_tensor: loading tensor blk.1.attn_norm.weight
+0.00.367.005 D create_tensor: loading tensor blk.1.attn_q.weight
+0.00.367.009 D create_tensor: loading tensor blk.1.attn_k.weight
+0.00.367.013 D create_tensor: loading tensor blk.1.attn_v.weight
+0.00.367.016 D create_tensor: loading tensor blk.1.attn_output.weight
+0.00.367.021 D create_tensor: loading tensor blk.1.attn_q.bias
+0.00.367.024 D create_tensor: loading tensor blk.1.attn_k.bias
+0.00.367.028 D create_tensor: loading tensor blk.1.attn_v.bias
+0.00.367.033 D create_tensor: loading tensor blk.1.ffn_norm.weight
+0.00.367.036 D create_tensor: loading tensor blk.1.ffn_gate.weight
+0.00.367.040 D create_tensor: loading tensor blk.1.ffn_down.weight
+0.00.367.047 D create_tensor: loading tensor blk.1.ffn_up.weight
+0.00.367.054 D create_tensor: loading tensor blk.2.attn_norm.weight
+0.00.367.061 D create_tensor: loading tensor blk.2.attn_q.weight
+0.00.367.068 D create_tensor: loading tensor blk.2.attn_k.weight
+0.00.367.075 D create_tensor: loading tensor blk.2.attn_v.weight
+0.00.367.081 D create_tensor: loading tensor blk.2.attn_output.weight
+0.00.367.088 D create_tensor: loading tensor blk.2.attn_q.bias
+0.00.367.096 D create_tensor: loading tensor blk.2.attn_k.bias
+0.00.367.105 D create_tensor: loading tensor blk.2.attn_v.bias
+0.00.367.111 D create_tensor: loading tensor blk.2.ffn_norm.weight
+0.00.367.118 D create_tensor: loading tensor blk.2.ffn_gate.weight
+0.00.367.124 D create_tensor: loading tensor blk.2.ffn_down.weight
+0.00.367.130 D create_tensor: loading tensor blk.2.ffn_up.weight
+0.00.367.137 D create_tensor: loading tensor blk.3.attn_norm.weight
+0.00.367.143 D create_tensor: loading tensor blk.3.attn_q.weight
+0.00.367.150 D create_tensor: loading tensor blk.3.attn_k.weight
+0.00.367.157 D create_tensor: loading tensor blk.3.attn_v.weight
+0.00.367.163 D create_tensor: loading tensor blk.3.attn_output.weight
+0.00.367.170 D create_tensor: loading tensor blk.3.attn_q.bias
+0.00.367.180 D create_tensor: loading tensor blk.3.attn_k.bias
+0.00.367.187 D create_tensor: loading tensor blk.3.attn_v.bias
+0.00.367.194 D create_tensor: loading tensor blk.3.ffn_norm.weight
+0.00.367.201 D create_tensor: loading tensor blk.3.ffn_gate.weight
+0.00.367.208 D create_tensor: loading tensor blk.3.ffn_down.weight
+0.00.367.214 D create_tensor: loading tensor blk.3.ffn_up.weight
+0.00.367.222 D create_tensor: loading tensor blk.4.attn_norm.weight
+0.00.367.228 D create_tensor: loading tensor blk.4.attn_q.weight
+0.00.367.235 D create_tensor: loading tensor blk.4.attn_k.weight
+0.00.367.243 D create_tensor: loading tensor blk.4.attn_v.weight
+0.00.367.250 D create_tensor: loading tensor blk.4.attn_output.weight
+0.00.367.260 D create_tensor: loading tensor blk.4.attn_q.bias
+0.00.367.267 D create_tensor: loading tensor blk.4.attn_k.bias
+0.00.367.275 D create_tensor: loading tensor blk.4.attn_v.bias
+0.00.367.282 D create_tensor: loading tensor blk.4.ffn_norm.weight
+0.00.367.290 D create_tensor: loading tensor blk.4.ffn_gate.weight
+0.00.367.297 D create_tensor: loading tensor blk.4.ffn_down.weight
+0.00.367.304 D create_tensor: loading tensor blk.4.ffn_up.weight
+0.00.367.312 D create_tensor: loading tensor blk.5.attn_norm.weight
+0.00.367.319 D create_tensor: loading tensor blk.5.attn_q.weight
+0.00.367.326 D create_tensor: loading tensor blk.5.attn_k.weight
+0.00.367.333 D create_tensor: loading tensor blk.5.attn_v.weight
+0.00.367.348 D create_tensor: loading tensor blk.5.attn_output.weight
+0.00.367.354 D create_tensor: loading tensor blk.5.attn_q.bias
+0.00.367.361 D create_tensor: loading tensor blk.5.attn_k.bias
+0.00.367.367 D create_tensor: loading tensor blk.5.attn_v.bias
+0.00.367.373 D create_tensor: loading tensor blk.5.ffn_norm.weight
+0.00.367.380 D create_tensor: loading tensor blk.5.ffn_gate.weight
+0.00.367.386 D create_tensor: loading tensor blk.5.ffn_down.weight
+0.00.367.392 D create_tensor: loading tensor blk.5.ffn_up.weight
+0.00.367.399 D create_tensor: loading tensor blk.6.attn_norm.weight
+0.00.367.406 D create_tensor: loading tensor blk.6.attn_q.weight
+0.00.367.412 D create_tensor: loading tensor blk.6.attn_k.weight
+0.00.367.422 D create_tensor: loading tensor blk.6.attn_v.weight
+0.00.367.429 D create_tensor: loading tensor blk.6.attn_output.weight
+0.00.367.435 D create_tensor: loading tensor blk.6.attn_q.bias
+0.00.367.442 D create_tensor: loading tensor blk.6.attn_k.bias
+0.00.367.449 D create_tensor: loading tensor blk.6.attn_v.bias
+0.00.367.456 D create_tensor: loading tensor blk.6.ffn_norm.weight
+0.00.367.463 D create_tensor: loading tensor blk.6.ffn_gate.weight
+0.00.367.470 D create_tensor: loading tensor blk.6.ffn_down.weight
+0.00.367.477 D create_tensor: loading tensor blk.6.ffn_up.weight
+0.00.367.485 D create_tensor: loading tensor blk.7.attn_norm.weight
+0.00.367.492 D create_tensor: loading tensor blk.7.attn_q.weight
+0.00.367.502 D create_tensor: loading tensor blk.7.attn_k.weight
+0.00.367.509 D create_tensor: loading tensor blk.7.attn_v.weight
+0.00.367.517 D create_tensor: loading tensor blk.7.attn_output.weight
+0.00.367.524 D create_tensor: loading tensor blk.7.attn_q.bias
+0.00.367.532 D create_tensor: loading tensor blk.7.attn_k.bias
+0.00.367.540 D create_tensor: loading tensor blk.7.attn_v.bias
+0.00.367.548 D create_tensor: loading tensor blk.7.ffn_norm.weight
+0.00.367.556 D create_tensor: loading tensor blk.7.ffn_gate.weight
+0.00.367.564 D create_tensor: loading tensor blk.7.ffn_down.weight
+0.00.367.572 D create_tensor: loading tensor blk.7.ffn_up.weight
+0.00.367.580 D create_tensor: loading tensor blk.8.attn_norm.weight
+0.00.367.591 D create_tensor: loading tensor blk.8.attn_q.weight
+0.00.367.598 D create_tensor: loading tensor blk.8.attn_k.weight
+0.00.367.606 D create_tensor: loading tensor blk.8.attn_v.weight
+0.00.367.615 D create_tensor: loading tensor blk.8.attn_output.weight
+0.00.367.622 D create_tensor: loading tensor blk.8.attn_q.bias
+0.00.367.630 D create_tensor: loading tensor blk.8.attn_k.bias
+0.00.367.638 D create_tensor: loading tensor blk.8.attn_v.bias
+0.00.367.647 D create_tensor: loading tensor blk.8.ffn_norm.weight
+0.00.367.655 D create_tensor: loading tensor blk.8.ffn_gate.weight
+0.00.367.663 D create_tensor: loading tensor blk.8.ffn_down.weight
+0.00.367.672 D create_tensor: loading tensor blk.8.ffn_up.weight
+0.00.367.681 D create_tensor: loading tensor blk.9.attn_norm.weight
+0.00.367.692 D create_tensor: loading tensor blk.9.attn_q.weight
+0.00.367.700 D create_tensor: loading tensor blk.9.attn_k.weight
+0.00.367.710 D create_tensor: loading tensor blk.9.attn_v.weight
+0.00.367.719 D create_tensor: loading tensor blk.9.attn_output.weight
+0.00.367.728 D create_tensor: loading tensor blk.9.attn_q.bias
+0.00.367.737 D create_tensor: loading tensor blk.9.attn_k.bias
+0.00.367.745 D create_tensor: loading tensor blk.9.attn_v.bias
+0.00.367.755 D create_tensor: loading tensor blk.9.ffn_norm.weight
+0.00.367.764 D create_tensor: loading tensor blk.9.ffn_gate.weight
+0.00.367.774 D create_tensor: loading tensor blk.9.ffn_down.weight
+0.00.367.784 D create_tensor: loading tensor blk.9.ffn_up.weight
+0.00.367.795 D create_tensor: loading tensor blk.10.attn_norm.weight
+0.00.367.803 D create_tensor: loading tensor blk.10.attn_q.weight
+0.00.367.809 D create_tensor: loading tensor blk.10.attn_k.weight
+0.00.367.817 D create_tensor: loading tensor blk.10.attn_v.weight
+0.00.367.824 D create_tensor: loading tensor blk.10.attn_output.weight
+0.00.367.831 D create_tensor: loading tensor blk.10.attn_q.bias
+0.00.367.840 D create_tensor: loading tensor blk.10.attn_k.bias
+0.00.367.848 D create_tensor: loading tensor blk.10.attn_v.bias
+0.00.367.856 D create_tensor: loading tensor blk.10.ffn_norm.weight
+0.00.367.864 D create_tensor: loading tensor blk.10.ffn_gate.weight
+0.00.367.872 D create_tensor: loading tensor blk.10.ffn_down.weight
+0.00.367.883 D create_tensor: loading tensor blk.10.ffn_up.weight
+0.00.367.891 D create_tensor: loading tensor blk.11.attn_norm.weight
+0.00.367.897 D create_tensor: loading tensor blk.11.attn_q.weight
+0.00.367.905 D create_tensor: loading tensor blk.11.attn_k.weight
+0.00.367.912 D create_tensor: loading tensor blk.11.attn_v.weight
+0.00.367.919 D create_tensor: loading tensor blk.11.attn_output.weight
+0.00.367.925 D create_tensor: loading tensor blk.11.attn_q.bias
+0.00.367.933 D create_tensor: loading tensor blk.11.attn_k.bias
+0.00.367.940 D create_tensor: loading tensor blk.11.attn_v.bias
+0.00.367.946 D create_tensor: loading tensor blk.11.ffn_norm.weight
+0.00.367.953 D create_tensor: loading tensor blk.11.ffn_gate.weight
+0.00.367.962 D create_tensor: loading tensor blk.11.ffn_down.weight
+0.00.367.969 D create_tensor: loading tensor blk.11.ffn_up.weight
+0.00.367.976 D create_tensor: loading tensor blk.12.attn_norm.weight
+0.00.367.982 D create_tensor: loading tensor blk.12.attn_q.weight
+0.00.367.989 D create_tensor: loading tensor blk.12.attn_k.weight
+0.00.367.997 D create_tensor: loading tensor blk.12.attn_v.weight
+0.00.368.007 D create_tensor: loading tensor blk.12.attn_output.weight
+0.00.368.013 D create_tensor: loading tensor blk.12.attn_q.bias
+0.00.368.020 D create_tensor: loading tensor blk.12.attn_k.bias
+0.00.368.028 D create_tensor: loading tensor blk.12.attn_v.bias
+0.00.368.034 D create_tensor: loading tensor blk.12.ffn_norm.weight
+0.00.368.044 D create_tensor: loading tensor blk.12.ffn_gate.weight
+0.00.368.051 D create_tensor: loading tensor blk.12.ffn_down.weight
+0.00.368.057 D create_tensor: loading tensor blk.12.ffn_up.weight
+0.00.368.064 D create_tensor: loading tensor blk.13.attn_norm.weight
+0.00.368.070 D create_tensor: loading tensor blk.13.attn_q.weight
+0.00.368.076 D create_tensor: loading tensor blk.13.attn_k.weight
+0.00.368.083 D create_tensor: loading tensor blk.13.attn_v.weight
+0.00.368.090 D create_tensor: loading tensor blk.13.attn_output.weight
+0.00.368.096 D create_tensor: loading tensor blk.13.attn_q.bias
+0.00.368.103 D create_tensor: loading tensor blk.13.attn_k.bias
+0.00.368.109 D create_tensor: loading tensor blk.13.attn_v.bias
+0.00.368.118 D create_tensor: loading tensor blk.13.ffn_norm.weight
+0.00.368.125 D create_tensor: loading tensor blk.13.ffn_gate.weight
+0.00.368.131 D create_tensor: loading tensor blk.13.ffn_down.weight
+0.00.368.138 D create_tensor: loading tensor blk.13.ffn_up.weight
+0.00.368.150 D create_tensor: loading tensor blk.14.attn_norm.weight
+0.00.368.157 D create_tensor: loading tensor blk.14.attn_q.weight
+0.00.368.164 D create_tensor: loading tensor blk.14.attn_k.weight
+0.00.368.171 D create_tensor: loading tensor blk.14.attn_v.weight
+0.00.368.177 D create_tensor: loading tensor blk.14.attn_output.weight
+0.00.368.183 D create_tensor: loading tensor blk.14.attn_q.bias
+0.00.368.190 D create_tensor: loading tensor blk.14.attn_k.bias
+0.00.368.200 D create_tensor: loading tensor blk.14.attn_v.bias
+0.00.368.206 D create_tensor: loading tensor blk.14.ffn_norm.weight
+0.00.368.213 D create_tensor: loading tensor blk.14.ffn_gate.weight
+0.00.368.219 D create_tensor: loading tensor blk.14.ffn_down.weight
+0.00.368.226 D create_tensor: loading tensor blk.14.ffn_up.weight
+0.00.368.237 D create_tensor: loading tensor blk.15.attn_norm.weight
+0.00.368.243 D create_tensor: loading tensor blk.15.attn_q.weight
+0.00.368.249 D create_tensor: loading tensor blk.15.attn_k.weight
+0.00.368.256 D create_tensor: loading tensor blk.15.attn_v.weight
+0.00.368.262 D create_tensor: loading tensor blk.15.attn_output.weight
+0.00.368.269 D create_tensor: loading tensor blk.15.attn_q.bias
+0.00.368.275 D create_tensor: loading tensor blk.15.attn_k.bias
+0.00.368.284 D create_tensor: loading tensor blk.15.attn_v.bias
+0.00.368.290 D create_tensor: loading tensor blk.15.ffn_norm.weight
+0.00.368.296 D create_tensor: loading tensor blk.15.ffn_gate.weight
+0.00.368.302 D create_tensor: loading tensor blk.15.ffn_down.weight
+0.00.368.308 D create_tensor: loading tensor blk.15.ffn_up.weight
+0.00.368.312 D create_tensor: loading tensor blk.16.attn_norm.weight
+0.00.368.315 D create_tensor: loading tensor blk.16.attn_q.weight
+0.00.368.320 D create_tensor: loading tensor blk.16.attn_k.weight
+0.00.368.325 D create_tensor: loading tensor blk.16.attn_v.weight
+0.00.368.330 D create_tensor: loading tensor blk.16.attn_output.weight
+0.00.368.335 D create_tensor: loading tensor blk.16.attn_q.bias
+0.00.368.348 D create_tensor: loading tensor blk.16.attn_k.bias
+0.00.368.354 D create_tensor: loading tensor blk.16.attn_v.bias
+0.00.368.359 D create_tensor: loading tensor blk.16.ffn_norm.weight
+0.00.368.365 D create_tensor: loading tensor blk.16.ffn_gate.weight
+0.00.368.370 D create_tensor: loading tensor blk.16.ffn_down.weight
+0.00.368.376 D create_tensor: loading tensor blk.16.ffn_up.weight
+0.00.368.381 D create_tensor: loading tensor blk.17.attn_norm.weight
+0.00.368.384 D create_tensor: loading tensor blk.17.attn_q.weight
+0.00.368.388 D create_tensor: loading tensor blk.17.attn_k.weight
+0.00.368.391 D create_tensor: loading tensor blk.17.attn_v.weight
+0.00.368.395 D create_tensor: loading tensor blk.17.attn_output.weight
+0.00.368.400 D create_tensor: loading tensor blk.17.attn_q.bias
+0.00.368.404 D create_tensor: loading tensor blk.17.attn_k.bias
+0.00.368.407 D create_tensor: loading tensor blk.17.attn_v.bias
+0.00.368.411 D create_tensor: loading tensor blk.17.ffn_norm.weight
+0.00.368.414 D create_tensor: loading tensor blk.17.ffn_gate.weight
+0.00.368.418 D create_tensor: loading tensor blk.17.ffn_down.weight
+0.00.368.422 D create_tensor: loading tensor blk.17.ffn_up.weight
+0.00.368.425 D create_tensor: loading tensor blk.18.attn_norm.weight
+0.00.368.429 D create_tensor: loading tensor blk.18.attn_q.weight
+0.00.368.433 D create_tensor: loading tensor blk.18.attn_k.weight
+0.00.368.436 D create_tensor: loading tensor blk.18.attn_v.weight
+0.00.368.441 D create_tensor: loading tensor blk.18.attn_output.weight
+0.00.368.444 D create_tensor: loading tensor blk.18.attn_q.bias
+0.00.368.448 D create_tensor: loading tensor blk.18.attn_k.bias
+0.00.368.452 D create_tensor: loading tensor blk.18.attn_v.bias
+0.00.368.455 D create_tensor: loading tensor blk.18.ffn_norm.weight
+0.00.368.460 D create_tensor: loading tensor blk.18.ffn_gate.weight
+0.00.368.463 D create_tensor: loading tensor blk.18.ffn_down.weight
+0.00.368.467 D create_tensor: loading tensor blk.18.ffn_up.weight
+0.00.368.470 D create_tensor: loading tensor blk.19.attn_norm.weight
+0.00.368.474 D create_tensor: loading tensor blk.19.attn_q.weight
+0.00.368.478 D create_tensor: loading tensor blk.19.attn_k.weight
+0.00.368.482 D create_tensor: loading tensor blk.19.attn_v.weight
+0.00.368.486 D create_tensor: loading tensor blk.19.attn_output.weight
+0.00.368.490 D create_tensor: loading tensor blk.19.attn_q.bias
+0.00.368.493 D create_tensor: loading tensor blk.19.attn_k.bias
+0.00.368.497 D create_tensor: loading tensor blk.19.attn_v.bias
+0.00.368.500 D create_tensor: loading tensor blk.19.ffn_norm.weight
+0.00.368.504 D create_tensor: loading tensor blk.19.ffn_gate.weight
+0.00.368.508 D create_tensor: loading tensor blk.19.ffn_down.weight
+0.00.368.512 D create_tensor: loading tensor blk.19.ffn_up.weight
+0.00.368.516 D create_tensor: loading tensor blk.20.attn_norm.weight
+0.00.368.520 D create_tensor: loading tensor blk.20.attn_q.weight
+0.00.368.525 D create_tensor: loading tensor blk.20.attn_k.weight
+0.00.368.529 D create_tensor: loading tensor blk.20.attn_v.weight
+0.00.368.532 D create_tensor: loading tensor blk.20.attn_output.weight
+0.00.368.536 D create_tensor: loading tensor blk.20.attn_q.bias
+0.00.368.540 D create_tensor: loading tensor blk.20.attn_k.bias
+0.00.368.544 D create_tensor: loading tensor blk.20.attn_v.bias
+0.00.368.548 D create_tensor: loading tensor blk.20.ffn_norm.weight
+0.00.368.551 D create_tensor: loading tensor blk.20.ffn_gate.weight
+0.00.368.555 D create_tensor: loading tensor blk.20.ffn_down.weight
+0.00.368.559 D create_tensor: loading tensor blk.20.ffn_up.weight
+0.00.368.563 D create_tensor: loading tensor blk.21.attn_norm.weight
+0.00.368.567 D create_tensor: loading tensor blk.21.attn_q.weight
+0.00.368.571 D create_tensor: loading tensor blk.21.attn_k.weight
+0.00.368.575 D create_tensor: loading tensor blk.21.attn_v.weight
+0.00.368.582 D create_tensor: loading tensor blk.21.attn_output.weight
+0.00.368.588 D create_tensor: loading tensor blk.21.attn_q.bias
+0.00.368.594 D create_tensor: loading tensor blk.21.attn_k.bias
+0.00.368.601 D create_tensor: loading tensor blk.21.attn_v.bias
+0.00.368.608 D create_tensor: loading tensor blk.21.ffn_norm.weight
+0.00.368.615 D create_tensor: loading tensor blk.21.ffn_gate.weight
+0.00.368.622 D create_tensor: loading tensor blk.21.ffn_down.weight
+0.00.368.630 D create_tensor: loading tensor blk.21.ffn_up.weight
+0.00.368.642 D create_tensor: loading tensor blk.22.attn_norm.weight
+0.00.368.648 D create_tensor: loading tensor blk.22.attn_q.weight
+0.00.368.653 D create_tensor: loading tensor blk.22.attn_k.weight
+0.00.368.657 D create_tensor: loading tensor blk.22.attn_v.weight
+0.00.368.661 D create_tensor: loading tensor blk.22.attn_output.weight
+0.00.368.665 D create_tensor: loading tensor blk.22.attn_q.bias
+0.00.368.670 D create_tensor: loading tensor blk.22.attn_k.bias
+0.00.368.674 D create_tensor: loading tensor blk.22.attn_v.bias
+0.00.368.678 D create_tensor: loading tensor blk.22.ffn_norm.weight
+0.00.368.682 D create_tensor: loading tensor blk.22.ffn_gate.weight
+0.00.368.686 D create_tensor: loading tensor blk.22.ffn_down.weight
+0.00.368.690 D create_tensor: loading tensor blk.22.ffn_up.weight
+0.00.368.696 D create_tensor: loading tensor blk.23.attn_norm.weight
+0.00.368.701 D create_tensor: loading tensor blk.23.attn_q.weight
+0.00.368.705 D create_tensor: loading tensor blk.23.attn_k.weight
+0.00.368.710 D create_tensor: loading tensor blk.23.attn_v.weight
+0.00.368.714 D create_tensor: loading tensor blk.23.attn_output.weight
+0.00.368.719 D create_tensor: loading tensor blk.23.attn_q.bias
+0.00.368.723 D create_tensor: loading tensor blk.23.attn_k.bias
+0.00.368.727 D create_tensor: loading tensor blk.23.attn_v.bias
+0.00.368.732 D create_tensor: loading tensor blk.23.ffn_norm.weight
+0.00.368.737 D create_tensor: loading tensor blk.23.ffn_gate.weight
+0.00.368.741 D create_tensor: loading tensor blk.23.ffn_down.weight
+0.00.368.747 D create_tensor: loading tensor blk.23.ffn_up.weight
+0.00.368.754 D load_tensors: tensor 'token_embd.weight' (f32) (and 0 others) cannot be used with preferred buffer type CUDA_Host, using CPU instead
+0.00.404.894 I load_tensors: offloading 24 repeating layers to GPU
+0.00.404.898 I load_tensors: offloading output layer to GPU
+0.00.404.898 I load_tensors: offloaded 25/25 layers to GPU
+0.00.404.904 I load_tensors:        CUDA0 model buffer size =  1884.59 MiB
+0.00.404.905 I load_tensors:   CPU_Mapped model buffer size =   519.31 MiB
+...........................................................
+0.00.694.315 I llama_context: constructing llama_context
+0.00.694.322 I llama_context: n_seq_max     = 1
+0.00.694.323 I llama_context: n_ctx         = 4096
+0.00.694.323 I llama_context: n_ctx_per_seq = 4096
+0.00.694.323 I llama_context: n_batch       = 2048
+0.00.694.324 I llama_context: n_ubatch      = 512
+0.00.694.324 I llama_context: causal_attn   = 1
+0.00.694.327 I llama_context: flash_attn    = auto
+0.00.694.327 I llama_context: kv_unified    = false
+0.00.694.331 I llama_context: freq_base     = 1000000.0
+0.00.694.332 I llama_context: freq_scale    = 1
+0.00.694.333 W llama_context: n_ctx_per_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+0.00.694.358 D set_abort_callback: call
+0.00.695.112 I llama_context:  CUDA_Host  output buffer size =     0.58 MiB
+0.00.695.119 D create_memory: n_ctx = 4096 (padded)
+0.00.695.137 D llama_kv_cache: layer   0: dev = CUDA0
+0.00.695.154 D llama_kv_cache: layer   1: dev = CUDA0
+0.00.695.157 D llama_kv_cache: layer   2: dev = CUDA0
+0.00.695.159 D llama_kv_cache: layer   3: dev = CUDA0
+0.00.695.160 D llama_kv_cache: layer   4: dev = CUDA0
+0.00.695.162 D llama_kv_cache: layer   5: dev = CUDA0
+0.00.695.163 D llama_kv_cache: layer   6: dev = CUDA0
+0.00.695.165 D llama_kv_cache: layer   7: dev = CUDA0
+0.00.695.167 D llama_kv_cache: layer   8: dev = CUDA0
+0.00.695.168 D llama_kv_cache: layer   9: dev = CUDA0
+0.00.695.170 D llama_kv_cache: layer  10: dev = CUDA0
+0.00.695.172 D llama_kv_cache: layer  11: dev = CUDA0
+0.00.695.174 D llama_kv_cache: layer  12: dev = CUDA0
+0.00.695.175 D llama_kv_cache: layer  13: dev = CUDA0
+0.00.695.176 D llama_kv_cache: layer  14: dev = CUDA0
+0.00.695.178 D llama_kv_cache: layer  15: dev = CUDA0
+0.00.695.179 D llama_kv_cache: layer  16: dev = CUDA0
+0.00.695.181 D llama_kv_cache: layer  17: dev = CUDA0
+0.00.695.182 D llama_kv_cache: layer  18: dev = CUDA0
+0.00.695.184 D llama_kv_cache: layer  19: dev = CUDA0
+0.00.695.185 D llama_kv_cache: layer  20: dev = CUDA0
+0.00.695.187 D llama_kv_cache: layer  21: dev = CUDA0
+0.00.695.188 D llama_kv_cache: layer  22: dev = CUDA0
+0.00.695.189 D llama_kv_cache: layer  23: dev = CUDA0
+0.00.695.348 I llama_kv_cache:      CUDA0 KV buffer size =    48.00 MiB
+0.00.695.504 I llama_kv_cache: size =   48.00 MiB (  4096 cells,  24 layers,  1/1 seqs), K (f16):   24.00 MiB, V (f16):   24.00 MiB
+0.00.695.508 D llama_context: enumerating backends
+0.00.695.515 D llama_context: backend_ptrs.size() = 2
+0.00.695.516 D llama_context: max_nodes = 2328
+0.00.695.686 D llama_context: reserving full memory module
+0.00.695.691 D llama_context: worst-case: n_tokens = 512, n_seqs = 1, n_outputs = 1
+0.00.695.692 D graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
+0.00.696.213 I llama_context: Flash Attention was auto, set to enabled
+0.00.696.217 D graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
+0.00.700.278 D graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
+0.00.701.041 D graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs =  1, n_outputs =  512
+0.00.701.709 I llama_context:      CUDA0 compute buffer size =   310.01 MiB
+0.00.701.714 I llama_context:  CUDA_Host compute buffer size =     9.76 MiB
+0.00.701.714 I llama_context: graph nodes  = 823
+0.00.701.714 I llama_context: graph splits = 2
+0.00.701.718 D clear_adapter_lora: call
+0.00.702.987 I common_init_from_params: added <|endoftext|> logit bias = -inf
+0.00.702.991 I common_init_from_params: added <|im_end|> logit bias = -inf
+0.00.702.992 I common_init_from_params: added <|fim_pad|> logit bias = -inf
+0.00.702.992 I common_init_from_params: added <|repo_name|> logit bias = -inf
+0.00.702.993 I common_init_from_params: added <|file_sep|> logit bias = -inf
+0.00.702.998 I common_init_from_params: setting dry_penalty_last_n to ctx_size = 4096
+0.00.702.998 W common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+0.00.703.000 D set_warmup: value = 1
+0.00.723.887 D set_warmup: value = 0
+0.00.738.367 I srv          init: initializing slots, n_slots = 1
+0.00.738.370 I slot         init: id  0 | task -1 | new slot n_ctx_slot = 4096
+0.00.738.371 D slot        reset: id  0 | task -1 | 
+0.00.738.474 I srv          init: Enable thinking? 0
+0.00.738.475 I main: model loaded
+0.00.738.503 I main: chat template, chat_template: {%- if tools %}
+    {{- '<|im_start|>system\n' }}
+    {%- if messages[0]['role'] == 'system' %}
+        {{- messages[0]['content'] }}
+    {%- else %}
+        {{- 'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.' }}
+    {%- endif %}
+    {{- "\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>" }}
+    {%- for tool in tools %}
+        {{- "\n" }}
+        {{- tool | tojson }}
+    {%- endfor %}
+    {{- "\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n" }}
+{%- else %}
+    {%- if messages[0]['role'] == 'system' %}
+        {{- '<|im_start|>system\n' + messages[0]['content'] + '<|im_end|>\n' }}
+    {%- else %}
+        {{- '<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n' }}
+    {%- endif %}
+{%- endif %}
+{%- for message in messages %}
+    {%- if (message.role == "user") or (message.role == "system" and not loop.first) or (message.role == "assistant" and not message.tool_calls) %}
+        {{- '<|im_start|>' + message.role + '\n' + message.content + '<|im_end|>' + '\n' }}
+    {%- elif message.role == "assistant" %}
+        {{- '<|im_start|>' + message.role }}
+        {%- if message.content %}
+            {{- '\n' + message.content }}
+        {%- endif %}
+        {%- for tool_call in message.tool_calls %}
+            {%- if tool_call.function is defined %}
+                {%- set tool_call = tool_call.function %}
+            {%- endif %}
+            {{- '\n<tool_call>\n{"name": "' }}
+            {{- tool_call.name }}
+            {{- '", "arguments": ' }}
+            {{- tool_call.arguments | tojson }}
+            {{- '}\n</tool_call>' }}
+        {%- endfor %}
+        {{- '<|im_end|>\n' }}
+    {%- elif message.role == "tool" %}
+        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != "tool") %}
+            {{- '<|im_start|>user' }}
+        {%- endif %}
+        {{- '\n<tool_response>\n' }}
+        {{- message.content }}
+        {{- '\n</tool_response>' }}
+        {%- if loop.last or (messages[loop.index0 + 1].role != "tool") %}
+            {{- '<|im_end|>\n' }}
+        {%- endif %}
+    {%- endif %}
+{%- endfor %}
+{%- if add_generation_prompt %}
+    {{- '<|im_start|>assistant\n' }}
+{%- endif %}
+, example_format: '<|im_start|>system
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+Hello<|im_end|>
+<|im_start|>assistant
+Hi there<|im_end|>
+<|im_start|>user
+How are you?<|im_end|>
+<|im_start|>assistant
+'
+0.00.738.514 I main: server is listening on http://0.0.0.0:8080 - starting the main loop
+0.00.738.515 D que    start_loop: processing new tasks
+0.00.738.516 D que    start_loop: update slots
+0.00.738.517 I srv  update_slots: all slots are idle
+0.00.738.517 D srv  kv_cache_cle: clearing KV cache
+0.00.738.674 D que    start_loop: waiting for new tasks
+0.00.856.281 D srv  add_waiting_: add task 0 to waiting list. current waiting = 0 (before add)
+0.00.856.286 D que          post: new task, id = 0, front = 1
+0.00.856.306 D que    start_loop: processing new tasks
+0.00.856.308 D que    start_loop: processing task, id = 0
+0.00.856.370 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.00.856.373 D srv          send: sending result for task id = 0
+0.00.856.373 D srv          send: task id = 0 pushed to result queue
+0.00.856.381 D que    start_loop: update slots
+0.00.856.381 I srv  update_slots: all slots are idle
+0.00.856.382 D que    start_loop: waiting for new tasks
+0.00.856.386 D srv  remove_waiti: remove task 0 from waiting list. current waiting = 1 (before remove)
+0.00.856.527 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.00.856.543 D srv  log_server_r: request:  
+0.00.856.552 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.01.855.396 D srv  add_waiting_: add task 1 to waiting list. current waiting = 0 (before add)
+0.01.855.403 D que          post: new task, id = 1, front = 1
+0.01.855.416 D que    start_loop: processing new tasks
+0.01.855.418 D que    start_loop: processing task, id = 1
+0.01.855.476 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.01.855.477 D srv          send: sending result for task id = 1
+0.01.855.478 D srv          send: task id = 1 pushed to result queue
+0.01.855.483 D que    start_loop: update slots
+0.01.855.484 I srv  update_slots: all slots are idle
+0.01.855.485 D que    start_loop: waiting for new tasks
+0.01.855.487 D srv  remove_waiti: remove task 1 from waiting list. current waiting = 1 (before remove)
+0.01.855.584 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.01.855.584 D srv  log_server_r: request:  
+0.01.855.589 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.02.855.731 D srv  add_waiting_: add task 2 to waiting list. current waiting = 0 (before add)
+0.02.855.733 D que          post: new task, id = 2, front = 1
+0.02.855.755 D que    start_loop: processing new tasks
+0.02.855.756 D que    start_loop: processing task, id = 2
+0.02.855.805 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.02.855.806 D srv          send: sending result for task id = 2
+0.02.855.807 D srv          send: task id = 2 pushed to result queue
+0.02.855.809 D que    start_loop: update slots
+0.02.855.809 I srv  update_slots: all slots are idle
+0.02.855.809 D que    start_loop: waiting for new tasks
+0.02.855.836 D srv  remove_waiti: remove task 2 from waiting list. current waiting = 1 (before remove)
+0.02.855.921 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.02.855.923 D srv  log_server_r: request:  
+0.02.855.928 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.03.855.578 D srv  add_waiting_: add task 3 to waiting list. current waiting = 0 (before add)
+0.03.855.580 D que          post: new task, id = 3, front = 1
+0.03.855.603 D que    start_loop: processing new tasks
+0.03.855.605 D que    start_loop: processing task, id = 3
+0.03.855.654 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.03.855.655 D srv          send: sending result for task id = 3
+0.03.855.656 D srv          send: task id = 3 pushed to result queue
+0.03.855.658 D que    start_loop: update slots
+0.03.855.659 I srv  update_slots: all slots are idle
+0.03.855.659 D que    start_loop: waiting for new tasks
+0.03.855.681 D srv  remove_waiti: remove task 3 from waiting list. current waiting = 1 (before remove)
+0.03.855.767 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.03.855.768 D srv  log_server_r: request:  
+0.03.855.773 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.04.779.362 I srv  log_server_r: request: GET /health 127.0.0.1 200
+0.04.779.366 D srv  log_server_r: request:  
+0.04.779.366 D srv  log_server_r: response: {"status":"ok"}
+0.04.855.732 D srv  add_waiting_: add task 4 to waiting list. current waiting = 0 (before add)
+0.04.855.736 D que          post: new task, id = 4, front = 1
+0.04.855.744 D que    start_loop: processing new tasks
+0.04.855.747 D que    start_loop: processing task, id = 4
+0.04.855.811 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.04.855.812 D srv          send: sending result for task id = 4
+0.04.855.866 D srv          send: task id = 4 pushed to result queue
+0.04.855.873 D que    start_loop: update slots
+0.04.855.874 I srv  update_slots: all slots are idle
+0.04.855.874 D que    start_loop: waiting for new tasks
+0.04.855.877 D srv  remove_waiti: remove task 4 from waiting list. current waiting = 1 (before remove)
+0.04.856.003 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.04.856.005 D srv  log_server_r: request:  
+0.04.856.012 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.05.855.978 D srv  add_waiting_: add task 5 to waiting list. current waiting = 0 (before add)
+0.05.855.981 D que          post: new task, id = 5, front = 1
+0.05.855.989 D que    start_loop: processing new tasks
+0.05.855.990 D que    start_loop: processing task, id = 5
+0.05.856.024 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.05.856.024 D srv          send: sending result for task id = 5
+0.05.856.024 D srv          send: task id = 5 pushed to result queue
+0.05.856.026 D que    start_loop: update slots
+0.05.856.027 I srv  update_slots: all slots are idle
+0.05.856.027 D que    start_loop: waiting for new tasks
+0.05.856.031 D srv  remove_waiti: remove task 5 from waiting list. current waiting = 1 (before remove)
+0.05.856.115 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.05.856.116 D srv  log_server_r: request:  
+0.05.856.121 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.06.817.334 I srv  log_server_r: request: GET /health 127.0.0.1 200
+0.06.817.337 D srv  log_server_r: request:  
+0.06.817.337 D srv  log_server_r: response: {"status":"ok"}
+0.06.856.372 D srv  add_waiting_: add task 6 to waiting list. current waiting = 0 (before add)
+0.06.856.562 D que          post: new task, id = 6, front = 1
+0.06.856.656 D que    start_loop: processing new tasks
+0.06.856.665 D que    start_loop: processing task, id = 6
+0.06.856.717 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.06.856.718 D srv          send: sending result for task id = 6
+0.06.856.718 D srv          send: task id = 6 pushed to result queue
+0.06.856.780 D srv  remove_waiti: remove task 6 from waiting list. current waiting = 1 (before remove)
+0.06.856.910 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.06.856.910 D srv  log_server_r: request:  
+0.06.856.919 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.06.856.949 D que    start_loop: update slots
+0.06.856.950 I srv  update_slots: all slots are idle
+0.06.856.951 D que    start_loop: waiting for new tasks
+0.07.855.931 D srv  add_waiting_: add task 7 to waiting list. current waiting = 0 (before add)
+0.07.855.934 D que          post: new task, id = 7, front = 1
+0.07.855.970 D que    start_loop: processing new tasks
+0.07.855.972 D que    start_loop: processing task, id = 7
+0.07.856.007 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.07.856.008 D srv          send: sending result for task id = 7
+0.07.856.008 D srv          send: task id = 7 pushed to result queue
+0.07.856.010 D que    start_loop: update slots
+0.07.856.010 I srv  update_slots: all slots are idle
+0.07.856.011 D que    start_loop: waiting for new tasks
+0.07.856.015 D srv  remove_waiti: remove task 7 from waiting list. current waiting = 1 (before remove)
+0.07.856.104 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.07.856.105 D srv  log_server_r: request:  
+0.07.856.110 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.08.855.883 D srv  add_waiting_: add task 8 to waiting list. current waiting = 0 (before add)
+0.08.855.888 D que          post: new task, id = 8, front = 1
+0.08.855.898 D que    start_loop: processing new tasks
+0.08.855.899 D que    start_loop: processing task, id = 8
+0.08.855.950 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.08.855.952 D srv          send: sending result for task id = 8
+0.08.855.953 D srv          send: task id = 8 pushed to result queue
+0.08.855.956 D que    start_loop: update slots
+0.08.855.957 I srv  update_slots: all slots are idle
+0.08.855.957 D que    start_loop: waiting for new tasks
+0.08.855.962 D srv  remove_waiti: remove task 8 from waiting list. current waiting = 1 (before remove)
+0.08.856.119 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.08.856.121 D srv  log_server_r: request:  
+0.08.856.126 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.08.856.862 I srv  log_server_r: request: GET /health 127.0.0.1 200
+0.08.856.864 D srv  log_server_r: request:  
+0.08.856.865 D srv  log_server_r: response: {"status":"ok"}
+0.09.856.014 D srv  add_waiting_: add task 9 to waiting list. current waiting = 0 (before add)
+0.09.856.017 D que          post: new task, id = 9, front = 1
+0.09.856.049 D que    start_loop: processing new tasks
+0.09.856.051 D que    start_loop: processing task, id = 9
+0.09.856.091 D srv  process_sing: n_idle_slots = 1, n_processing_slots = 0
+0.09.856.093 D srv          send: sending result for task id = 9
+0.09.856.093 D srv          send: task id = 9 pushed to result queue
+0.09.856.096 D que    start_loop: update slots
+0.09.856.097 I srv  update_slots: all slots are idle
+0.09.856.097 D que    start_loop: waiting for new tasks
+0.09.856.101 D srv  remove_waiti: remove task 9 from waiting list. current waiting = 1 (before remove)
+0.09.856.201 I srv  log_server_r: request: GET /metrics 172.18.0.5 200
+0.09.856.202 D srv  log_server_r: request:  
+0.09.856.207 D srv  log_server_r: response: # HELP llamacpp:prompt_tokens_total Number of prompt tokens processed.
+# TYPE llamacpp:prompt_tokens_total counter
+llamacpp:prompt_tokens_total 0
+# HELP llamacpp:prompt_seconds_total Prompt process time
+# TYPE llamacpp:prompt_seconds_total counter
+llamacpp:prompt_seconds_total 0
+# HELP llamacpp:tokens_predicted_total Number of generation tokens processed.
+# TYPE llamacpp:tokens_predicted_total counter
+llamacpp:tokens_predicted_total 0
+# HELP llamacpp:tokens_predicted_seconds_total Predict process time
+# TYPE llamacpp:tokens_predicted_seconds_total counter
+llamacpp:tokens_predicted_seconds_total 0
+# HELP llamacpp:n_decode_total Total number of llama_decode() calls
+# TYPE llamacpp:n_decode_total counter
+llamacpp:n_decode_total 0
+# HELP llamacpp:n_past_max Largest observed n_past.
+# TYPE llamacpp:n_past_max counter
+llamacpp:n_past_max 0
+# HELP llamacpp:n_busy_slots_per_decode Average number of busy slots per llama_decode() call
+# TYPE llamacpp:n_busy_slots_per_decode counter
+llamacpp:n_busy_slots_per_decode 0
+# HELP llamacpp:prompt_tokens_seconds Average prompt throughput in tokens/s.
+# TYPE llamacpp:prompt_tokens_seconds gauge
+llamacpp:prompt_tokens_seconds 0
+# HELP llamacpp:predicted_tokens_seconds Average generation throughput in tokens/s.
+# TYPE llamacpp:predicted_tokens_seconds gauge
+llamacpp:predicted_tokens_seconds 0
+# HELP llamacpp:requests_processing Number of requests processing.
+# TYPE llamacpp:requests_processing gauge
+llamacpp:requests_processing 0
+# HELP llamacpp:requests_deferred Number of requests deferred.
+# TYPE llamacpp:requests_deferred gauge
+llamacpp:requests_deferred 0
+
+0.10.007.765 I srv  log_server_r: request: GET /props 172.18.0.1 200
+0.10.007.768 D srv  log_server_r: request:  
+0.10.007.780 D srv  log_server_r: response: {"default_generation_settings":{"id":0,"id_task":-1,"n_ctx":4096,"speculative":false,"is_processing":false,"params":{"n_predict":-1,"seed":0,"temperature":0.0,"dynatemp_range":0.0,"dynatemp_exponent":1.0,"top_k":40,"top_p":0.949999988079071,"min_p":0.05000000074505806,"top_n_sigma":-1.0,"xtc_probability":0.0,"xtc_threshold":0.10000000149011612,"typical_p":1.0,"repeat_last_n":64,"repeat_penalty":1.0,"presence_penalty":0.0,"frequency_penalty":0.0,"dry_multiplier":0.0,"dry_base":1.75,"dry_allowed_length":2,"dry_penalty_last_n":4096,"dry_sequence_breakers":["\n",":","\"","*"],"mirostat":0,"mirostat_tau":5.0,"mirostat_eta":0.10000000149011612,"stop":[],"max_tokens":-1,"n_keep":0,"n_discard":0,"ignore_eos":false,"stream":true,"logit_bias":[],"n_probs":0,"min_keep":0,"grammar":"","grammar_lazy":false,"grammar_triggers":[],"preserved_tokens":[],"chat_format":"Content-only","reasoning_format":"none","reasoning_in_content":false,"thinking_forced_open":false,"samplers":["penalties","dry","top_n_sigma","top_k","typ_p","top_p","min_p","xtc","temperature"],"speculative.n_max":16,"speculative.n_min":0,"speculative.p_min":0.75,"timings_per_token":false,"post_sampling_probs":false,"lora":[]},"prompt":"","next_token":{"has_next_token":true,"has_new_line":false,"n_remain":-1,"n_decoded":0,"stopping_word":""}},"total_slots":1,"model_path":"/model/model.gguf","modalities":{"vision":false,"audio":false},"endpoint_slots":true,"endpoint_props":false,"endpoint_metrics":true,"webui":true,"chat_template":"{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- messages[0]['content'] }}\n    {%- else %}\n        {{- 'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.' }}\n    {%- endif %}\n    {{- \"\\n\\n# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}\n    {%- else %}\n        {{- '<|im_start|>system\\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) or (message.role == \"assistant\" and not message.tool_calls) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {{- '<|im_start|>' + message.role }}\n        {%- if message.content %}\n            {{- '\\n' + message.content }}\n        {%- endif %}\n        {%- for tool_call in message.tool_calls %}\n            {%- if tool_call.function is defined %}\n                {%- set tool_call = tool_call.function %}\n            {%- endif %}\n            {{- '\\n<tool_call>\\n{\"name\": \"' }}\n            {{- tool_call.name }}\n            {{- '\", \"arguments\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- '}\\n</tool_call>' }}\n        {%- endfor %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n{%- endif %}\n","bos_token":"<|endoftext|>","eos_token":"<|im_end|>","build_info":"b6500-a7a98e0ff"}
+0.10.917.011 I srv  log_server_r: request: GET /health 127.0.0.1 200
+0.10.917.017 D srv  log_server_r: request:  
+0.10.917.017 D srv  log_server_r: response: {"status":"ok"}
+0.11.052.164 D que    start_loop: processing new tasks
+0.11.052.167 D que    start_loop: terminate
+0.11.052.168 I srv    operator(): operator(): cleaning up before exit...

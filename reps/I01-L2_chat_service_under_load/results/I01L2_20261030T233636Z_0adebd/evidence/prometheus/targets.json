@@ -1,0 +1,118 @@
+{
+  "status": "success",
+  "data": {
+    "activeTargets": [
+      {
+        "discoveredLabels": {
+          "__address__": "client:9410",
+          "__always_scrape_classic_histograms__": "false",
+          "__convert_classic_histograms_to_nhcb__": "false",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "1s",
+          "__scrape_native_histograms__": "false",
+          "__scrape_timeout__": "1s",
+          "job": "client"
+        },
+        "labels": {
+          "instance": "client:9410",
+          "job": "client"
+        },
+        "scrapePool": "client",
+        "scrapeUrl": "http://client:9410/metrics",
+        "globalUrl": "http://client:9410/metrics",
+        "lastError": "",
+        "lastScrape": "2026-10-30T23:39:42.231200558Z",
+        "lastScrapeDuration": 0.003006466,
+        "health": "up",
+        "scrapeInterval": "1s",
+        "scrapeTimeout": "1s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "dcgm:9400",
+          "__always_scrape_classic_histograms__": "false",
+          "__convert_classic_histograms_to_nhcb__": "false",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "1s",
+          "__scrape_native_histograms__": "false",
+          "__scrape_timeout__": "1s",
+          "job": "dcgm"
+        },
+        "labels": {
+          "instance": "dcgm:9400",
+          "job": "dcgm"
+        },
+        "scrapePool": "dcgm",
+        "scrapeUrl": "http://dcgm:9400/metrics",
+        "globalUrl": "http://dcgm:9400/metrics",
+        "lastError": "",
+        "lastScrape": "2026-10-30T23:39:42.404357426Z",
+        "lastScrapeDuration": 0.000477985,
+        "health": "up",
+        "scrapeInterval": "1s",
+        "scrapeTimeout": "1s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "node:9100",
+          "__always_scrape_classic_histograms__": "false",
+          "__convert_classic_histograms_to_nhcb__": "false",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "1s",
+          "__scrape_native_histograms__": "false",
+          "__scrape_timeout__": "1s",
+          "job": "node"
+        },
+        "labels": {
+          "instance": "node:9100",
+          "job": "node"
+        },
+        "scrapePool": "node",
+        "scrapeUrl": "http://node:9100/metrics",
+        "globalUrl": "http://node:9100/metrics",
+        "lastError": "",
+        "lastScrape": "2026-10-30T23:39:43.220185538Z",
+        "lastScrapeDuration": 0.00326819,
+        "health": "up",
+        "scrapeInterval": "1s",
+        "scrapeTimeout": "1s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "server:8080",
+          "__always_scrape_classic_histograms__": "false",
+          "__convert_classic_histograms_to_nhcb__": "false",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "1s",
+          "__scrape_native_histograms__": "false",
+          "__scrape_timeout__": "1s",
+          "job": "server"
+        },
+        "labels": {
+          "instance": "server:8080",
+          "job": "server"
+        },
+        "scrapePool": "server",
+        "scrapeUrl": "http://server:8080/metrics",
+        "globalUrl": "http://server:8080/metrics",
+        "lastError": "",
+        "lastScrape": "2026-10-30T23:39:42.979894553Z",
+        "lastScrapeDuration": 0.000423842,
+        "health": "up",
+        "scrapeInterval": "1s",
+        "scrapeTimeout": "1s"
+      }
+    ],
+    "droppedTargets": [],
+    "droppedTargetCounts": {
+      "client": 0,
+      "dcgm": 0,
+      "node": 0,
+      "server": 0
+    }
+  }
+}

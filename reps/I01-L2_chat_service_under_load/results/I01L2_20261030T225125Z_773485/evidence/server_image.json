@@ -1,0 +1,11 @@
+{
+  "image_tag": "ie-llama-cpp-server:b6500-cuda12.4-sm61",
+  "image_id": "sha256:b0aa24d3a8f2716955f1b19e1a8a6a8c017bfb138833c77a583ec145a62c1c51",
+  "source_repo": "https://github.com/ggml-org/llama.cpp.git",
+  "source_commit": "a7a98e0fffed794396b3fbad4dcdbbc184963645",
+  "dockerfile_sha256": "9476a36157c1883ba7bbd2bb8b3ef855cd2bcd4e1965ef02a73524eed782b455",
+  "build_args": {"CUDA_VERSION": "12.4.0", "UBUNTU_VERSION": "22.04", "CUDA_DOCKER_ARCH": "61"},
+  "target": "server",
+  "base_images": {"build": "nvidia/cuda@sha256:28326fefd36d43ecf82447e9ca1175db639b931e234019b2807f35a0d1551656", "runtime": "nvidia/cuda@sha256:af8bd179ed3bf69d4b63b19a763662a6141f0f62ef099283f68d0b14b4bab0e3"},
+  "built_at_utc": "2026-10-29T20:54:59Z"
+}

@@ -99,39 +99,136 @@ uv run pytest tests/
 
 Fixture rows (P2a–P2c, and the methods behind P3e, P4b–P4d, P5c–P5e) are tested in `tests/test_chat_records.py` against K5, K6/K7, K11, K15 and K16. Run rows are tested in `test_i01_l2.py` against the measured run's saved evidence.
 
-| Row | Check | Must equal | Tol. | Measured |
-| --- | --- | --- | --- | --- |
-| P1a | Source/build | K1 + own image | Exact | |
-| P1b | ISL | 64/256/1024 | Exact | |
-| P1c | Greedy output IDs | HF output, K2 | Exact | |
-| P1d | Output count | 32 | Exact | |
-| P2a | Fixture TTFT, ms | 65.012786 | 1e-6 | |
-| P2b | Fixture e2e, ms | 274.035202 | 1e-6 | |
-| P2c | Gap sum, ms | 207.8986 | 1e-6 | |
-| P2d | Events/usage/status | Raw response | Exact | |
-| P2e | Normal exact ITL/EOF | Unavailable | Exact | |
-| P2f | Failure completeness | K12 boundaries | Exact | |
-| P3a | Requests/errors/usage | Raw totals | Exact | |
-| P3b | Bucket/count | Reconstruction | Exact | |
-| P3c | Histogram sum, s | Raw sum | 1e-12 | |
-| P3d | Engine token counters | Usage totals | Exact | |
-| P3e | Engine seconds | Truncated sum | 1e-9 | |
-| P3f | Host identity | K13 + live host | Exact | |
-| P3g | Targets/rule/recovery | K12/K14 | Exact | |
-| P4a | Count/peak per replay | 8 / 1 | Exact | |
-| P4b | Locust summary | Matched bucket/rank | Exact | |
-| P4c | Half-P50 difference, ms | At most 15 | Condition | |
-| P4d | Repeat-P50 range, ms | At most 15 | Condition | |
-| P4e | Log/capture P50 difference | Within ±15 ms | Condition | |
-| P4f | Observer P50 difference | Within ±15 ms | Condition | |
-| P5a | Requests joined | Client count | Exact | |
-| P5b | Log prompt tokens | Usage | Exact | |
-| P5c | Offset interval, ms | Nonempty, width | ≤ 0.25 | |
-| P5d | Smallest segment, ms | ≥ 0 | Exact | |
-| P5e | Segment sum − TTFT, e2e, ms | 0 | 1e-9 | |
-| P5f | Launch→send − prompt_ms | 0 to 0.1 ms | Condition | |
-| P5g | Send→release − predicted_ms | −0.1 to 0 ms | Condition | |
+Measured run `I01L2_20261031T000505Z_b7369e`, protocol commit `bce7031`. **45 of 47 run checks pass; P4c and P4d fail.** All fixture tests pass (57).
 
-## Results 
+| Row | Check | Must equal | Tol. | Measured | Pass |
+| --- | --- | --- | --- | --- | --- |
+| P1a | Source/build | K1 + own image | Exact | commit `a7a98e0f…3645`, Dockerfile sha256 and build args equal K1; running server image `sha256:b0aa24d3a8f2…1c51` equals the built image | Yes |
+| P1b | ISL | 64/256/1024 | Exact | HF input 64/256/1024; `prompt_tokens` = ISL in all 231 records with usage | Yes |
+| P1c | Greedy output IDs | HF output, K2 | Exact | HF output = K2 at each ISL; server IDs equal HF in 24/24 diagnostic records | Yes |
+| P1d | Output count | 32 | Exact | 32 HF and server IDs per ISL; `completion_tokens` = 32 in all 231 complete records | Yes |
+| P2a | Fixture TTFT, ms | 65.012786 | 1e-6 | 65.012786 (K5 fixture) | Yes |
+| P2b | Fixture e2e, ms | 274.035202 | 1e-6 | 274.035202 (K5 fixture) | Yes |
+| P2c | Gap sum, ms | 207.8986 | 1e-6 | 207.8986 over 31 gaps (K5 fixture) | Yes |
+| P2d | Events/usage/status | Raw response | Exact | 210 complete records with saved events: status 200, role-only first event, first content at `first_content_ns`, one finish, final usage and timings, ordered clocks | Yes |
+| P2e | Normal exact ITL/EOF | Unavailable | Exact | unavailable with reasons in all 233 records; none of the 186 normal-path records carries `logprobs` | Yes |
+| P2f | Failure completeness | K12 boundaries | Exact | mid-stream kill: HTTP 200, incomplete, `APIConnectionError`, no usage, TTFT 40.101 ms, attempt 439.328 ms, e2e null. Server down: no status or headers, `APIConnectionError` after 2.114 ms | Yes |
+| P3a | Requests/errors/usage | Raw totals | Exact | per phase and outcome at 3 checkpoints (102, 207, 212 exported records) | Yes |
+| P3b | Bucket/count | Reconstruction | Exact | TTFT and e2e buckets and counts per phase at 3 checkpoints | Yes |
+| P3c | Histogram sum, s | Raw sum | 1e-12 | TTFT and e2e sums per phase at 3 checkpoints | Yes |
+| P3d | Engine token counters | Usage totals | Exact | `after_replay` 45,696 prompt / 3,264 predicted; `final` 192 / 96. `before_failure` 0 / 0 (see note) | Yes |
+| P3e | Engine seconds | Truncated sum | 1e-9 | `after_replay` 5.486 / 22.920 s; `final` 0.080 / 0.651 s; `before_failure` 0 / 0 | Yes |
+| P3f | Host identity | K13 + live host | Exact | `omarchy-desktop`, 16 CPUs, 67,340,988,416 bytes, GPU `GPU-2204ae42…c3b546`, driver 580.178.04; same in Node and DCGM series | Yes |
+| P3g | Targets/rule/recovery | K12/K14 | Exact | 4 targets up; rule inactive → pending → firing → inactive; health 503 ×5 then 200; 3/3 recovery requests complete | Yes |
+| P4a | Count/peak per replay | 8 / 1 | Exact | 9 replays × 8 complete; 3 warm-ups each; no request overlaps another | Yes |
+| P4b | Locust summary | Matched bucket/rank | Exact | 60/60 steps rebuild exactly | Yes |
+| P4c | Half-P50 difference, ms | At most 15 | Condition | max \|difference\| 22.179 (ISL 256, block 2, step 20); next 14.170 (ISL 256, block 1) | **No** |
+| P4d | Repeat-P50 range, ms | At most 15 | Condition | ISL 64: 9.355; 256: 12.271; 1024: **15.145** | **No** |
+| P4e | Log/capture P50 difference | Within ±15 ms | Condition | −11.974, +0.801, +1.197 | Yes |
+| P4f | Observer P50 difference | Within ±15 ms | Condition | −14.983, −2.328, −7.804 | Yes |
+| P5a | Requests joined | Client count | Exact | 186/186 server-start-0 records joined; 165 decomposed (the 21 observer-off records save no events) | Yes |
+| P5b | Log prompt tokens | Usage | Exact | 165/165 | Yes |
+| P5c | Offset interval, ms | Nonempty, width | ≤ 0.25 | width 0.055884 (half-width 0.027942) | Yes |
+| P5d | Smallest segment, ms | ≥ 0 | Exact | 0.027942 | Yes |
+| P5e | Segment sum − TTFT, e2e, ms | 0 | 1e-9 | max \|difference\| 1.1e-13 | Yes |
+| P5f | Launch→send − prompt_ms | 0 to 0.1 ms | Condition | 0.009 to 0.086 over 72 measured requests | Yes |
+| P5g | Send→release − predicted_ms | −0.1 to 0 ms | Condition | −0.082 to −0.006 over 72 measured requests | Yes |
+
+- **P3d/P3e at `before_failure`:** that snapshot is of server start 7, the server freshly restarted after the logging control, before it served any request. Its 0 = 0 agreement is true but tests nothing. The other two checkpoints carry the comparison.
+- **P4c/P4d failures** are reported, not retuned (spec P4). Results below.
+
+## Results
+
+**Run:** `I01L2_20261031T000505Z_b7369e`, 2026-10-31 00:05:05–00:08:13 UTC, protocol commit `bce7031`. 233 requests: 231 complete, 2 failed on purpose (failure test). Cleanup left no project containers.
+
+### Verdict: TTFT increase measured; e2e stability guard failed
+
+TTFT P50 rises by 91.0 ms from ISL 64 to 1024, with nearly the same value in all three blocks, and engine prompt time rises with it. The e2e stability guard failed (P4c, P4d). Under the frozen rule the failures are reported, not retuned. The guard measures e2e, and the variation it caught is in decode time, which TTFT does not include (next section).
+
+| Contrast | Per-block differences, ms | Mean, ms | 95% bootstrap (N = 3 blocks) |
+| --- | --- | --- | --- |
+| TTFT P50, ISL 1024 − 64 | 94.905, 88.966, 89.033 | 90.968 | [88.966, 94.905] |
+| Engine `prompt_ms` P50, ISL 1024 − 64 | 91.021, 87.606, 87.688 | 88.771 | — |
+
+Both rise in the same direction. Had the guard passed, this would have met the "supported" rule.
+
+### Why the guard failed
+
+The guard is on e2e, and the e2e spread comes from decode, not prefill:
+
+| ISL, block | TTFT P50 | e2e P50 | Half-P50 diff | Engine decode P50 |
+| --- | --- | --- | --- | --- |
+| 64, 0 | 24.331 | 240.481 | −4.726 | 216.081 |
+| 64, 1 | 24.045 | 231.126 | +2.508 | 206.837 |
+| 64, 2 | 24.114 | 234.507 | +11.984 | 209.083 |
+| 256, 0 | 35.014 | 250.362 | +7.146 | 214.286 |
+| 256, 1 | 35.485 | 257.009 | −14.170 | 219.558 |
+| 256, 2 | 34.795 | 244.738 | **−22.179** | 209.694 |
+| 1024, 0 | 119.236 | **342.113** | +2.606 | 220.404 |
+| 1024, 1 | 113.011 | 326.968 | +3.312 | 213.048 |
+| 1024, 2 | 113.147 | 330.930 | −9.259 | 215.562 |
+
+All values in ms. In step 20 (ISL 256, block 2), per-request decode times were 211, 236, 219, 225, 207, 209, 207, 207 ms, and e2e followed them. Across blocks, TTFT P50 moved at most 0.29 ms (ISL 64), 0.69 ms (256) and 6.23 ms (1024); e2e moved 9.4, 12.3 and 15.1 ms. Per-request decode times cluster at 205–212 ms, with others spread from 213 to 258 ms. In the pre-freeze rehearsal, DCGM showed the SM clock mostly at 1974 MHz with drops to 1733 and 1569 MHz. The GPU clocks were not locked (Configuration). The 1 s DCGM samples can't attribute individual requests to a clock state, so this explanation is likely but unproven.
+
+### Pooled measured requests (24 per ISL)
+
+| ISL | TTFT P50 / P95 / P99 | e2e P50 / P95 / P99 | Locust P50 / P95 / P99 | Engine prompt / decode P50 |
+| --- | --- | --- | --- | --- |
+| 64 | 24.154 / 29.052 / 30.065 | 236.362 / 248.783 / 261.736 | 240 / 250 / 270 | 20.338 / 210.724 |
+| 256 | 34.882 / 40.998 / 41.661 | 250.362 / 275.328 / 275.523 | 250 / 280 / 280 | 30.782 / 214.287 |
+| 1024 | 114.466 / 129.400 / 134.551 | 334.288 / 368.856 / 372.966 | 330 / 370 / 370 | 108.943 / 217.927 |
+
+All values in ms. Raw values use NumPy linear quantiles; Locust's use its 2-significant-digit buckets. All ISLs are within the lab budgets (TTFT P95 150 ms, e2e P95 400 ms).
+
+**Held-back ISL 256:** the line through ISL 64 and 1024 TTFT P50s predicts 42.357 ms; observed 35.098; miss −7.259 ms. TTFT is not linear in ISL between these points.
+
+### Where each millisecond goes (medians, ms, measured requests)
+
+| Segment | Clock | ISL 64 | ISL 256 | ISL 1024 |
+| --- | --- | --- | --- | --- |
+| client before connect | client | 0.839 | 0.847 | 0.880 |
+| network to server | client → pcap | 0.499 | 0.506 | 0.524 |
+| server receive | pcap → log | 0.041 | 0.047 | 0.047 |
+| template + tokenize | log | 1.859 | 2.059 | 3.058 |
+| queue | log | 0.126 | 0.141 | 0.161 |
+| launch → first result (prefill) | log | 20.352 | 30.794 | 108.966 |
+| server send | log → pcap | 0.061 | 0.081 | 0.082 |
+| network to client | pcap → client | 0.271 | 0.337 | 0.327 |
+| client parse | client | 0.114 | 0.116 | 0.114 |
+| decode (first send → release) | log | 210.711 | 214.272 | 217.911 |
+| send rest + network/client rest | log → pcap → client | 0.687 | 0.706 | 0.718 |
+
+Cross-clock segments carry the log-offset bound of ±0.028 ms. Prefill grows by 88.6 ms from ISL 64 to 1024 and accounts for nearly all the TTFT change. Template/tokenize grows by 1.2 ms. Decode grows by 7.2 ms, well inside its own band spread. Network and client segments stay below 1 ms each.
+
+### Controls (ISL 256, on − off or diagnostic − normal, P50 ms)
+
+| Control | e2e, pairs 1/2/3 | TTFT, pairs 1/2/3 |
+| --- | --- | --- |
+| Diagnostic (`logprobs`) | +279.731 / +288.055 / +292.500 | +10.425 / +8.437 / +11.182 |
+| Observers | −14.983 / −2.328 / −7.804 | −3.195 / −0.335 / −2.610 |
+| Debug log + capture | −11.974 / +0.801 / +1.197 | −3.028 / −0.332 / +0.353 |
+
+`logprobs` more than doubles e2e, so diagnostic records stay out of the normal results (K8). The observer and logging differences have mixed signs and sit within the decode-band spread. They show no cost, but they are not proof that instrumentation is free.
+
+### Histogram estimates versus raw (normal phase, all ISLs, N = 72)
+
+| Quantile | TTFT raw / estimate / diff | e2e raw / estimate / diff |
+| --- | --- | --- |
+| P50 | 34.882 / 40.323 / +5.440 | 251.877 / 253.846 / +1.969 |
+| P95 | 121.969 / 142.500 / +20.531 | 349.205 / 385.000 / +35.795 |
+| P99 | 131.896 / 148.500 / +16.604 | 372.456 / 397.000 / +24.544 |
+
+All values in ms. Prometheus `histogram_quantile` interpolates linearly inside a bucket, so tail estimates land far from the raw values when a bucket is wide (0.1–0.15 s for the TTFT tail, 0.3–0.4 s for the e2e tail). The bucket counts themselves are exact (P3b).
+
+### Failure and recovery
+
+The server was killed 0.3 s into a 512-token generation. The client saw HTTP 200, first content at 40.1 ms, then `APIConnectionError` at 439.3 ms: a stream can start successfully and still fail. With the server down, the next request failed to connect after 2.1 ms. The `InferenceServerDown` rule went pending 1.0 s and firing 3.0 s after the kill. After the recreate, health returned 503 five times (model loading) and 200 at 4.8 s. All 3 recovery requests completed, and the rule returned to inactive at 6.1 s.
+
+### Limits
+
+- The e2e stability guard failed, so the TTFT contrast does not carry the formal "supported" label. The contrast itself is consistent across blocks (above).
+- GPU clocks were not locked. Decode bands are visible in the engine timings, but individual requests can't be tied to a clock state.
+- The spec's Task step 6 figures (distributions/CDFs, request timelines, per-ISL segment timelines) are not drawn yet.
+- The failure request's pcap is incomplete (Inspection point 4).
 
 ## Why It Matters

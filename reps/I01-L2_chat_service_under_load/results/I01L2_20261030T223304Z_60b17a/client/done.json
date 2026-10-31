@@ -1,0 +1,342 @@
+{
+  "ok": true,
+  "finished_utc_ns": 1793399621185980272,
+  "steps": [
+    {
+      "step": 0,
+      "phase": "warmup",
+      "isl": 64,
+      "locust": [
+        {
+          "name": "warmup isl=64",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 250,
+          "p95_ms": 300,
+          "response_times": {
+            "300": 1,
+            "230": 1,
+            "250": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "phase": "normal",
+      "isl": 64,
+      "locust": [
+        {
+          "name": "normal isl=64",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 240,
+          "p95_ms": 250,
+          "response_times": {
+            "250": 2,
+            "240": 2,
+            "230": 4
+          }
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "phase": "warmup",
+      "isl": 256,
+      "locust": [
+        {
+          "name": "warmup isl=256",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 280,
+          "p95_ms": 290,
+          "response_times": {
+            "260": 1,
+            "290": 1,
+            "280": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "phase": "normal",
+      "isl": 256,
+      "locust": [
+        {
+          "name": "normal isl=256",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 250,
+          "p95_ms": 260,
+          "response_times": {
+            "260": 3,
+            "250": 5
+          }
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "phase": "warmup",
+      "isl": 1024,
+      "locust": [
+        {
+          "name": "warmup isl=1024",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 332.918189,
+          "p95_ms": 340,
+          "response_times": {
+            "330": 2,
+            "340": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "phase": "normal",
+      "isl": 1024,
+      "locust": [
+        {
+          "name": "normal isl=1024",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 350,
+          "p95_ms": 360,
+          "response_times": {
+            "360": 1,
+            "350": 3,
+            "340": 3,
+            "330": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "phase": "warmup",
+      "isl": 256,
+      "locust": [
+        {
+          "name": "warmup isl=256",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 250,
+          "p95_ms": 250,
+          "response_times": {
+            "250": 3
+          }
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "phase": "normal",
+      "isl": 256,
+      "locust": [
+        {
+          "name": "normal isl=256",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 270,
+          "p95_ms": 280,
+          "response_times": {
+            "250": 1,
+            "270": 4,
+            "280": 1,
+            "260": 2
+          }
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "phase": "warmup",
+      "isl": 1024,
+      "locust": [
+        {
+          "name": "warmup isl=1024",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 350,
+          "p95_ms": 360,
+          "response_times": {
+            "350": 1,
+            "340": 1,
+            "360": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "phase": "normal",
+      "isl": 1024,
+      "locust": [
+        {
+          "name": "normal isl=1024",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 350,
+          "p95_ms": 360,
+          "response_times": {
+            "350": 2,
+            "340": 4,
+            "360": 2
+          }
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "phase": "warmup",
+      "isl": 64,
+      "locust": [
+        {
+          "name": "warmup isl=64",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 231.566854,
+          "p95_ms": 240,
+          "response_times": {
+            "240": 1,
+            "230": 2
+          }
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "phase": "normal",
+      "isl": 64,
+      "locust": [
+        {
+          "name": "normal isl=64",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 240,
+          "p95_ms": 250,
+          "response_times": {
+            "250": 3,
+            "240": 4,
+            "230": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "phase": "warmup",
+      "isl": 1024,
+      "locust": [
+        {
+          "name": "warmup isl=1024",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 340,
+          "p95_ms": 350,
+          "response_times": {
+            "340": 1,
+            "350": 1,
+            "330": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "phase": "normal",
+      "isl": 1024,
+      "locust": [
+        {
+          "name": "normal isl=1024",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 340,
+          "p95_ms": 350,
+          "response_times": {
+            "340": 3,
+            "350": 1,
+            "330": 4
+          }
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "phase": "warmup",
+      "isl": 64,
+      "locust": [
+        {
+          "name": "warmup isl=64",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 240,
+          "p95_ms": 240,
+          "response_times": {
+            "230": 1,
+            "240": 2
+          }
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "phase": "normal",
+      "isl": 64,
+      "locust": [
+        {
+          "name": "normal isl=64",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 230,
+          "p95_ms": 240,
+          "response_times": {
+            "240": 3,
+            "230": 5
+          }
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "phase": "warmup",
+      "isl": 256,
+      "locust": [
+        {
+          "name": "warmup isl=256",
+          "num_requests": 3,
+          "num_failures": 0,
+          "median_ms": 250,
+          "p95_ms": 250,
+          "response_times": {
+            "250": 2,
+            "240": 1
+          }
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "phase": "normal",
+      "isl": 256,
+      "locust": [
+        {
+          "name": "normal isl=256",
+          "num_requests": 8,
+          "num_failures": 0,
+          "median_ms": 250,
+          "p95_ms": 260,
+          "response_times": {
+            "240": 1,
+            "260": 1,
+            "250": 6
+          }
+        }
+      ]
+    }
+  ]
+}

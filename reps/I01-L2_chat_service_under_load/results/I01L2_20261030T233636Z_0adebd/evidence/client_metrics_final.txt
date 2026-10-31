@@ -1,0 +1,261 @@
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.76816128e+08
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 8.7785472e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.79340340348e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 5.44
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 8.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 65536.0
+# HELP ie_client_requests_total Finished request attempts
+# TYPE ie_client_requests_total counter
+ie_client_requests_total{outcome="complete",phase="warmup"} 72.0
+ie_client_requests_total{outcome="incomplete",phase="warmup"} 0.0
+ie_client_requests_total{outcome="complete",phase="normal"} 72.0
+ie_client_requests_total{outcome="incomplete",phase="normal"} 0.0
+ie_client_requests_total{outcome="complete",phase="diagnostic"} 15.0
+ie_client_requests_total{outcome="incomplete",phase="diagnostic"} 0.0
+ie_client_requests_total{outcome="complete",phase="control"} 51.0
+ie_client_requests_total{outcome="incomplete",phase="control"} 0.0
+ie_client_requests_total{outcome="complete",phase="failure"} 0.0
+ie_client_requests_total{outcome="incomplete",phase="failure"} 2.0
+# HELP ie_client_requests_created Finished request attempts
+# TYPE ie_client_requests_created gauge
+ie_client_requests_created{outcome="complete",phase="warmup"} 1.7934034055839205e+09
+ie_client_requests_created{outcome="incomplete",phase="warmup"} 1.7934034055839322e+09
+ie_client_requests_created{outcome="complete",phase="normal"} 1.7934034055840473e+09
+ie_client_requests_created{outcome="incomplete",phase="normal"} 1.7934034055840542e+09
+ie_client_requests_created{outcome="complete",phase="diagnostic"} 1.793403405584144e+09
+ie_client_requests_created{outcome="incomplete",phase="diagnostic"} 1.79340340558415e+09
+ie_client_requests_created{outcome="complete",phase="control"} 1.793403405584238e+09
+ie_client_requests_created{outcome="incomplete",phase="control"} 1.7934034055842457e+09
+ie_client_requests_created{outcome="complete",phase="failure"} 1.7934034055844014e+09
+ie_client_requests_created{outcome="incomplete",phase="failure"} 1.793403405584408e+09
+# HELP ie_client_in_flight Requests in progress
+# TYPE ie_client_in_flight gauge
+ie_client_in_flight{phase="warmup"} 0.0
+ie_client_in_flight{phase="normal"} 0.0
+ie_client_in_flight{phase="diagnostic"} 0.0
+ie_client_in_flight{phase="control"} 0.0
+ie_client_in_flight{phase="failure"} 0.0
+# HELP ie_client_ttft_seconds Send to first content, complete requests
+# TYPE ie_client_ttft_seconds histogram
+ie_client_ttft_seconds_bucket{le="0.025",phase="warmup"} 6.0
+ie_client_ttft_seconds_bucket{le="0.05",phase="warmup"} 61.0
+ie_client_ttft_seconds_bucket{le="0.075",phase="warmup"} 63.0
+ie_client_ttft_seconds_bucket{le="0.1",phase="warmup"} 63.0
+ie_client_ttft_seconds_bucket{le="0.15",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="0.2",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="0.25",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="0.3",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="0.4",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="0.5",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="0.75",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="1.0",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="2.0",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="5.0",phase="warmup"} 72.0
+ie_client_ttft_seconds_bucket{le="+Inf",phase="warmup"} 72.0
+ie_client_ttft_seconds_count{phase="warmup"} 72.0
+ie_client_ttft_seconds_sum{phase="warmup"} 3.3324218570000004
+ie_client_ttft_seconds_bucket{le="0.025",phase="normal"} 17.0
+ie_client_ttft_seconds_bucket{le="0.05",phase="normal"} 48.0
+ie_client_ttft_seconds_bucket{le="0.075",phase="normal"} 48.0
+ie_client_ttft_seconds_bucket{le="0.1",phase="normal"} 48.0
+ie_client_ttft_seconds_bucket{le="0.15",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="0.2",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="0.25",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="0.3",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="0.4",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="0.5",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="0.75",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="1.0",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="2.0",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="5.0",phase="normal"} 72.0
+ie_client_ttft_seconds_bucket{le="+Inf",phase="normal"} 72.0
+ie_client_ttft_seconds_count{phase="normal"} 72.0
+ie_client_ttft_seconds_sum{phase="normal"} 4.217828862999999
+ie_client_ttft_seconds_bucket{le="0.025",phase="diagnostic"} 0.0
+ie_client_ttft_seconds_bucket{le="0.05",phase="diagnostic"} 11.0
+ie_client_ttft_seconds_bucket{le="0.075",phase="diagnostic"} 14.0
+ie_client_ttft_seconds_bucket{le="0.1",phase="diagnostic"} 14.0
+ie_client_ttft_seconds_bucket{le="0.15",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="0.2",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="0.25",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="0.3",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="0.4",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="0.5",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="0.75",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="1.0",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="2.0",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="5.0",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_bucket{le="+Inf",phase="diagnostic"} 15.0
+ie_client_ttft_seconds_count{phase="diagnostic"} 15.0
+ie_client_ttft_seconds_sum{phase="diagnostic"} 0.795877685
+ie_client_ttft_seconds_bucket{le="0.025",phase="control"} 0.0
+ie_client_ttft_seconds_bucket{le="0.05",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.075",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.1",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.15",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.2",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.25",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.3",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.4",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.5",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="0.75",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="1.0",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="2.0",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="5.0",phase="control"} 51.0
+ie_client_ttft_seconds_bucket{le="+Inf",phase="control"} 51.0
+ie_client_ttft_seconds_count{phase="control"} 51.0
+ie_client_ttft_seconds_sum{phase="control"} 1.8551526360000004
+ie_client_ttft_seconds_bucket{le="0.025",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.05",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.075",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.1",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.15",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.2",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.25",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.3",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.4",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.5",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="0.75",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="1.0",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="2.0",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="5.0",phase="failure"} 0.0
+ie_client_ttft_seconds_bucket{le="+Inf",phase="failure"} 0.0
+ie_client_ttft_seconds_count{phase="failure"} 0.0
+ie_client_ttft_seconds_sum{phase="failure"} 0.0
+# HELP ie_client_ttft_seconds_created Send to first content, complete requests
+# TYPE ie_client_ttft_seconds_created gauge
+ie_client_ttft_seconds_created{phase="warmup"} 1.7934034055839689e+09
+ie_client_ttft_seconds_created{phase="normal"} 1.7934034055840836e+09
+ie_client_ttft_seconds_created{phase="diagnostic"} 1.7934034055841756e+09
+ie_client_ttft_seconds_created{phase="control"} 1.7934034055842705e+09
+ie_client_ttft_seconds_created{phase="failure"} 1.7934034055844355e+09
+# HELP ie_client_e2e_seconds Send to protocol complete, complete requests
+# TYPE ie_client_e2e_seconds histogram
+ie_client_e2e_seconds_bucket{le="0.025",phase="warmup"} 0.0
+ie_client_e2e_seconds_bucket{le="0.05",phase="warmup"} 0.0
+ie_client_e2e_seconds_bucket{le="0.075",phase="warmup"} 0.0
+ie_client_e2e_seconds_bucket{le="0.1",phase="warmup"} 0.0
+ie_client_e2e_seconds_bucket{le="0.15",phase="warmup"} 0.0
+ie_client_e2e_seconds_bucket{le="0.2",phase="warmup"} 0.0
+ie_client_e2e_seconds_bucket{le="0.25",phase="warmup"} 34.0
+ie_client_e2e_seconds_bucket{le="0.3",phase="warmup"} 54.0
+ie_client_e2e_seconds_bucket{le="0.4",phase="warmup"} 63.0
+ie_client_e2e_seconds_bucket{le="0.5",phase="warmup"} 63.0
+ie_client_e2e_seconds_bucket{le="0.75",phase="warmup"} 72.0
+ie_client_e2e_seconds_bucket{le="1.0",phase="warmup"} 72.0
+ie_client_e2e_seconds_bucket{le="2.0",phase="warmup"} 72.0
+ie_client_e2e_seconds_bucket{le="5.0",phase="warmup"} 72.0
+ie_client_e2e_seconds_bucket{le="+Inf",phase="warmup"} 72.0
+ie_client_e2e_seconds_count{phase="warmup"} 72.0
+ie_client_e2e_seconds_sum{phase="warmup"} 21.318158749
+ie_client_e2e_seconds_bucket{le="0.025",phase="normal"} 0.0
+ie_client_e2e_seconds_bucket{le="0.05",phase="normal"} 0.0
+ie_client_e2e_seconds_bucket{le="0.075",phase="normal"} 0.0
+ie_client_e2e_seconds_bucket{le="0.1",phase="normal"} 0.0
+ie_client_e2e_seconds_bucket{le="0.15",phase="normal"} 0.0
+ie_client_e2e_seconds_bucket{le="0.2",phase="normal"} 0.0
+ie_client_e2e_seconds_bucket{le="0.25",phase="normal"} 39.0
+ie_client_e2e_seconds_bucket{le="0.3",phase="normal"} 48.0
+ie_client_e2e_seconds_bucket{le="0.4",phase="normal"} 72.0
+ie_client_e2e_seconds_bucket{le="0.5",phase="normal"} 72.0
+ie_client_e2e_seconds_bucket{le="0.75",phase="normal"} 72.0
+ie_client_e2e_seconds_bucket{le="1.0",phase="normal"} 72.0
+ie_client_e2e_seconds_bucket{le="2.0",phase="normal"} 72.0
+ie_client_e2e_seconds_bucket{le="5.0",phase="normal"} 72.0
+ie_client_e2e_seconds_bucket{le="+Inf",phase="normal"} 72.0
+ie_client_e2e_seconds_count{phase="normal"} 72.0
+ie_client_e2e_seconds_sum{phase="normal"} 19.554813940999995
+ie_client_e2e_seconds_bucket{le="0.025",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.05",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.075",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.1",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.15",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.2",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.25",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.3",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.4",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.5",phase="diagnostic"} 0.0
+ie_client_e2e_seconds_bucket{le="0.75",phase="diagnostic"} 15.0
+ie_client_e2e_seconds_bucket{le="1.0",phase="diagnostic"} 15.0
+ie_client_e2e_seconds_bucket{le="2.0",phase="diagnostic"} 15.0
+ie_client_e2e_seconds_bucket{le="5.0",phase="diagnostic"} 15.0
+ie_client_e2e_seconds_bucket{le="+Inf",phase="diagnostic"} 15.0
+ie_client_e2e_seconds_count{phase="diagnostic"} 15.0
+ie_client_e2e_seconds_sum{phase="diagnostic"} 8.250704674
+ie_client_e2e_seconds_bucket{le="0.025",phase="control"} 0.0
+ie_client_e2e_seconds_bucket{le="0.05",phase="control"} 0.0
+ie_client_e2e_seconds_bucket{le="0.075",phase="control"} 0.0
+ie_client_e2e_seconds_bucket{le="0.1",phase="control"} 0.0
+ie_client_e2e_seconds_bucket{le="0.15",phase="control"} 0.0
+ie_client_e2e_seconds_bucket{le="0.2",phase="control"} 0.0
+ie_client_e2e_seconds_bucket{le="0.25",phase="control"} 23.0
+ie_client_e2e_seconds_bucket{le="0.3",phase="control"} 51.0
+ie_client_e2e_seconds_bucket{le="0.4",phase="control"} 51.0
+ie_client_e2e_seconds_bucket{le="0.5",phase="control"} 51.0
+ie_client_e2e_seconds_bucket{le="0.75",phase="control"} 51.0
+ie_client_e2e_seconds_bucket{le="1.0",phase="control"} 51.0
+ie_client_e2e_seconds_bucket{le="2.0",phase="control"} 51.0
+ie_client_e2e_seconds_bucket{le="5.0",phase="control"} 51.0
+ie_client_e2e_seconds_bucket{le="+Inf",phase="control"} 51.0
+ie_client_e2e_seconds_count{phase="control"} 51.0
+ie_client_e2e_seconds_sum{phase="control"} 12.787737961999998
+ie_client_e2e_seconds_bucket{le="0.025",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.05",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.075",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.1",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.15",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.2",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.25",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.3",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.4",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.5",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="0.75",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="1.0",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="2.0",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="5.0",phase="failure"} 0.0
+ie_client_e2e_seconds_bucket{le="+Inf",phase="failure"} 0.0
+ie_client_e2e_seconds_count{phase="failure"} 0.0
+ie_client_e2e_seconds_sum{phase="failure"} 0.0
+# HELP ie_client_e2e_seconds_created Send to protocol complete, complete requests
+# TYPE ie_client_e2e_seconds_created gauge
+ie_client_e2e_seconds_created{phase="warmup"} 1.7934034055840092e+09
+ie_client_e2e_seconds_created{phase="normal"} 1.7934034055841148e+09
+ie_client_e2e_seconds_created{phase="diagnostic"} 1.7934034055842087e+09
+ie_client_e2e_seconds_created{phase="control"} 1.7934034055843005e+09
+ie_client_e2e_seconds_created{phase="failure"} 1.7934034055844684e+09
+# HELP ie_client_tokens_total Tokens from final usage
+# TYPE ie_client_tokens_total counter
+ie_client_tokens_total{direction="input",phase="warmup"} 23616.0
+ie_client_tokens_total{direction="output",phase="warmup"} 2304.0
+ie_client_tokens_total{direction="input",phase="normal"} 32256.0
+ie_client_tokens_total{direction="output",phase="normal"} 2304.0
+ie_client_tokens_total{direction="input",phase="diagnostic"} 4416.0
+ie_client_tokens_total{direction="output",phase="diagnostic"} 480.0
+ie_client_tokens_total{direction="input",phase="control"} 12480.0
+ie_client_tokens_total{direction="output",phase="control"} 1632.0
+ie_client_tokens_total{direction="input",phase="failure"} 0.0
+ie_client_tokens_total{direction="output",phase="failure"} 0.0
+# HELP ie_client_tokens_created Tokens from final usage
+# TYPE ie_client_tokens_created gauge
+ie_client_tokens_created{direction="input",phase="warmup"} 1.7934034055839405e+09
+ie_client_tokens_created{direction="output",phase="warmup"} 1.7934034055839477e+09
+ie_client_tokens_created{direction="input",phase="normal"} 1.7934034055840604e+09
+ie_client_tokens_created{direction="output",phase="normal"} 1.7934034055840662e+09
+ie_client_tokens_created{direction="input",phase="diagnostic"} 1.7934034055841558e+09
+ie_client_tokens_created{direction="output",phase="diagnostic"} 1.7934034055841615e+09
+ie_client_tokens_created{direction="input",phase="control"} 1.7934034055842514e+09
+ie_client_tokens_created{direction="output",phase="control"} 1.7934034055842566e+09
+ie_client_tokens_created{direction="input",phase="failure"} 1.793403405584414e+09
+ie_client_tokens_created{direction="output",phase="failure"} 1.7934034055844197e+09
