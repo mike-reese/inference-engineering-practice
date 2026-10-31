@@ -1,0 +1,12 @@
+groups:
+  - name: i01_l2
+    rules: 
+      - alert: InferenceServerDown
+        expr: up{job="server"} == 0
+        for: 2s
+        labels:
+          severity: warning
+        annotations:
+          summary: "The inference server's metricws target is uncreachable"
+
+

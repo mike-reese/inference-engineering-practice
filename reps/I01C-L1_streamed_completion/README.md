@@ -225,7 +225,7 @@ Prefix reuse changes how much prefill work the engine performs. In the hazard re
 - `inference_analysis.completion.completion_record(events, send_ns)` in `src/inference_analysis/completion.py` (new): builds one request's `CompletionRecord` from the stream's `(t_ns, event)` pairs and the send time. Counts every event with `stop` false as a chunk, the empty end-of-sequence chunk included. Takes the counts, stop reason and `timings` from the event with `stop` true, and raises `ValueError` when there is none. Tested in `tests/test_completion.py`. `I01-L2` and I02 build on it.
 - `inference_analysis.kv_cache.kv_cache_shape` (from I01A-L1): reused unchanged, with `dtype_bytes=2` for the f16 cache.
 - `scripts/llama_cpp_server.py` (from I01A-L1): starts and stops the server for `rep.py` and the test fixture. Reused unchanged; only the flags differ.
-- The rep's other helpers live in `rep.py`, with copies in `test_i01c_l1.py`; the shared native streaming collector and load generator are introduced in `I01-L2` (owner approval, 2026-10-28); `I02A-L1` later inspects the OpenAI SDK stream:
+- The rep's other helpers live in `rep.py`, with copies in `test_i01c_l1.py`; the shared chat streaming collector and load generator are introduced in `I01-L2` (owner approval, 2026-10-28); `I02A-L1` later inspects the OpenAI SDK stream:
   - `stream_request` / `stream_completion`: reads the send time before `with client.stream(...)`, records each `data:` line with its arrival time, and builds the record.
   - `read_metrics(client, url)`: parses `/metrics` with `text_string_to_metric_families` into a dict keyed by sample name.
   - `shared_prefix(a, b)` (test file): the number of leading token IDs two prompts share.

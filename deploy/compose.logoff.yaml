@@ -1,0 +1,20 @@
+services:
+  server:
+    command:
+      - "--model"
+      - "/model/model.gguf"
+      - "--port"
+      - "8080"
+      - "--host"
+      - "0.0.0.0"
+      - "--ctx-size"
+      - "4096"
+      - "--parallel"
+      - "1"
+      - "--temp"
+      - "0"
+      - "--seed"
+      - "0"
+      - "--n-gpu-layers"
+      - "99"
+      - "--metrics"
