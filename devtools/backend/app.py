@@ -16,7 +16,8 @@ from collectors.logs import LogCollector
 from collectors.records import RecordsCollector
 
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
-PROXIES = {"grafana": "http://127.0.0.1:7730", "prometheus": "http://127.0.0.1:7790"}
+PROXIES = {"grafana": "http://127.0.0.1:7730", "prometheus": "http://127.0.0.1:7790",
+           "runner": "http://127.0.0.1:7701"}  # the host runner (scripts/runner.py), started by make devtools
 
 
 async def live(request: web.Request) -> web.StreamResponse:
@@ -130,6 +131,14 @@ async def run_source(request: web.Request) -> web.Response:
         raise web.HTTPNotFound(text="source not copied for this run (TRACE=code copies it)")
 
 
+async def run_kernel(request: web.Request) -> web.Response:
+    try:
+        return web.json_response(await asyncio.to_thread(runs.kernel_sections, request.match_info["run_id"],
+                                                         int(request.match_info["kernel_id"])))
+    except OSError:
+        raise web.HTTPNotFound(text="no trace/sections.csv in this run (TRACE=kernels exports it)")
+
+
 async def run_file(request: web.Request) -> web.FileResponse:
     """Download one file of a run (the pcap for Wireshark, the Nsight reports for the Nsight UIs)."""
     run = runs.find_run(request.match_info["run_id"])
@@ -149,7 +158,7 @@ async def proxy(request: web.Request) -> web.StreamResponse:
         return await forward(request, target, headers)
     except aiohttp.ClientConnectorError:
         raise web.HTTPBadGateway(text=f"{request.match_info['service']} is not answering at {target}: "
-                                      f"is the devtools project up (make devtools)?")
+                                      f"start it with make devtools (or make runner for the runner)")
 
 
 async def forward(request: web.Request, target: str, headers: dict) -> web.StreamResponse:
@@ -180,8 +189,18 @@ async def collectors(app: web.Application):
     await app["http"].close()
 
 
+@web.middleware
+async def revalidate(request: web.Request, handler):
+    """The page and its modules: the browser must check the ETag on every load (a 304 when unchanged).
+    Without it, Chromium reused a cached app.js older than index.html, and the newer tabs fell back to infra."""
+    response = await handler(request)
+    if request.path == "/" or request.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 def make_app() -> web.Application:
-    app = web.Application(client_max_size=64 * 1024 ** 2)
+    app = web.Application(client_max_size=64 * 1024 ** 2, middlewares=[revalidate])
     app["bus"] = Bus()
     app.cleanup_ctx.append(collectors)
     r = app.router
@@ -202,7 +221,8 @@ def make_app() -> web.Application:
     r.add_get("/api/runs/{run_id}/raw", run_raw)
     r.add_get("/api/runs/{run_id}/source", run_source)
     r.add_get("/api/runs/{run_id}/file", run_file)
-    r.add_route("*", "/{service:grafana|prometheus}{tail:(/.*)?}", proxy)
+    r.add_get("/api/runs/{run_id}/kernels/{kernel_id}", run_kernel)
+    r.add_route("*", "/{service:grafana|prometheus|runner}{tail:(/.*)?}", proxy)
     r.add_static("/static", FRONTEND)
     return app
 

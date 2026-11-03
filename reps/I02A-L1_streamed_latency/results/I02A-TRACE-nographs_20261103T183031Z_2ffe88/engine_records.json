@@ -1,0 +1,44 @@
+{
+  "I02A-TRACE-nographs_20261103T183031Z_2ffe88-warmup": {
+    "request_id": 2,
+    "perf_metrics": {
+      "first_iter": 1,
+      "last_iter": 64,
+      "timing_metrics": {
+        "server_arrival_time": 317424.721191,
+        "arrival_time": 317424.734208,
+        "first_scheduled_time": 317424.738289,
+        "first_token_time": 317426.64521,
+        "server_first_token_time": 317426.649128,
+        "last_token_time": 317427.983057
+      },
+      "kv_cache_metrics": {
+        "num_total_allocated_blocks": 2,
+        "num_new_allocated_blocks": 2,
+        "num_reused_blocks": 0,
+        "num_missed_blocks": 0
+      }
+    }
+  },
+  "I02A-TRACE-nographs_20261103T183031Z_2ffe88-measured": {
+    "request_id": 3,
+    "perf_metrics": {
+      "first_iter": 66,
+      "last_iter": 129,
+      "timing_metrics": {
+        "server_arrival_time": 317428.095512,
+        "arrival_time": 317428.096095,
+        "first_scheduled_time": 317428.098439,
+        "first_token_time": 317428.139227,
+        "server_first_token_time": 317428.140317,
+        "last_token_time": 317429.346638
+      },
+      "kv_cache_metrics": {
+        "num_total_allocated_blocks": 2,
+        "num_new_allocated_blocks": 2,
+        "num_reused_blocks": 0,
+        "num_missed_blocks": 0
+      }
+    }
+  }
+}

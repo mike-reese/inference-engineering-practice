@@ -33,12 +33,23 @@ TRACE_LEVELS = {
                            "--cpuctxsw=none --cuda-graph-trace=node --capture-range=cudaProfilerApi "
                            "--capture-range-end=stop --kill=none",
                  "profile_range": "1-129", "graphs": True},
+    # code: graphs off, so each kernel keeps the op, shapes and Python stack that launched it (owner ruling
+    # 2026-11-03). Inside a graph replay there are no per-op launches to attribute.
     "code": {"prefix": "", "torch_trace": "/trace/torch_trace.json", "profile_range": "66-129", "graphs": False},
-    "kernels": {"prefix": "ncu --target-processes all --profile-from-start off --section SpeedOfLight "
-                          "--section MemoryWorkloadAnalysis --section SourceCounters --import-source yes "
-                          f"--metrics {NCU_METRICS} -o /trace/kernels -f",
-                "profile_range": "67-67", "graphs": False},
+    # kernels: graphs on, as in the measured run; --graph-profiling node profiles each kernel inside the replay.
+    # --set full: every section (occupancy, launch stats, warp states, scheduler, instructions, roofline):
+    # 41 replay passes per kernel, against 12 for the earlier 3 sections (measured 2026-11-03, ncu 2026.3.1).
+    "kernels": {"prefix": "ncu --target-processes all --profile-from-start off --graph-profiling node --set full "
+                          f"--import-source yes --metrics {NCU_METRICS} -o /trace/kernels -f",
+                "profile_range": "67-67", "graphs": True},
+    # nographs: no profiler, CUDA graphs off. Against a measured run it shows what graphs save.
+    "nographs": {"graphs": False, "profiler": False},
 }
+
+
+def has_profiler(trace: str) -> bool:
+    """Off and nographs run the normal image with no profiler; the other levels add compose.profile.yaml."""
+    return trace != "off" and TRACE_LEVELS[trace].get("profiler", True)
 
 
 def profiler_range(engine_range: str) -> str:
@@ -92,7 +103,7 @@ class Stack:
                 "TORCH_TRACE": level.get("torch_trace", "")}
 
     def compose(self, *args: str, capture: bool = False, check: bool = True) -> subprocess.CompletedProcess:
-        files = ["-f", str(COMPOSE_FILE)] + (["-f", str(PROFILE_FILE)] if self.trace != "off" else [])
+        files = ["-f", str(COMPOSE_FILE)] + (["-f", str(PROFILE_FILE)] if has_profiler(self.trace) else [])
         cmd = ["docker", "compose", "-p", self.project, *files, *args]
         return subprocess.run(cmd, env=self.env(), check=check, text=True, capture_output=capture)
 
@@ -137,7 +148,7 @@ class Stack:
     def down(self) -> None:
         logs = self.compose("logs", "--no-color", "--timestamps", "server", capture=True).stdout
         (self.run_dir / f"server_s{self.server_start}.log").write_text(logs)
-        if self.trace != "off":
+        if has_profiler(self.trace):
             # Under a profiler, PID 1 is the profiler's launcher (ncu's dash wrapper ignores SIGTERM as PID 1), so
             # compose's SIGTERM never reaches the engine. Stop the engine itself; the profiler then writes its report.
             self.compose("exec", "-T", "server", "pkill", "-TERM", "-f", "^/usr/bin/python /usr/local/bin/trtllm-serve",
@@ -165,9 +176,16 @@ class Stack:
         if self.trace == "kernels" and (trace / "kernels.ncu-rep").exists():
             self.in_trace_image(f"ncu -i /trace/kernels.ncu-rep --page raw --csv --metrics {NCU_METRICS} "
                                 "> /trace/kernels.csv")
-            self.in_trace_image("mkdir -p /trace/sass && ncu -i /trace/kernels.ncu-rep --page source --csv "
+            # Made here, world-writable like trace/: the container runs as root, and split_sass writes into the
+            # folder as this user. A root-owned sass/ fails with Permission denied (run 20261103T175947Z).
+            (trace / "sass").mkdir(exist_ok=True)
+            (trace / "sass").chmod(0o777)
+            self.in_trace_image("ncu -i /trace/kernels.ncu-rep --page source --csv "
                                 "--print-source sass > /trace/sass/all.csv")
             split_sass(trace / "sass" / "all.csv")
+            # Every section's metrics and rule findings per kernel (occupancy, warp states, ...), long format.
+            self.in_trace_image("ncu -i /trace/kernels.ncu-rep --page details --csv --print-details all "
+                                "> /trace/sections.csv")
         if self.trace == "code" and (trace / "torch_trace.json").exists():
             self.copy_sources()
 

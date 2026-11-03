@@ -1,0 +1,86 @@
+# What the devtools runner (scripts/runner.py) may run for this rep. It runs only these commands, from the repo root,
+# with these arguments: nothing typed in the browser reaches a shell. "{rep}" is this folder, relative to the repo.
+id = "I02A-L1"
+title = "Streamed latency"
+spec = "README.md"
+# The runner refuses to start while a container of these projects exists (a run from the terminal, a stuck stack).
+compose_projects = ["ie-i02a-l1", "ie-i02a-l1-test"]
+# Progress a profiler prints in a container's log rather than in rep.py's output: the Run tab shows the newest match.
+[progress_log]
+service = "server"
+pattern = '==PROF== Profiling "([^"]+)" - (\d+)'
+label = "Nsight Compute: kernel {2} ({1})"
+
+[[actions]]
+id = "off"
+group = "run"
+label = "Measured run"
+description = "One warm-up and one measured streamed request. Client, wire and engine times; no profiler."
+measured = true
+graphs = true
+minutes = 2
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "off", "--progress", "json"]
+
+[[actions]]
+id = "timeline"
+group = "run"
+label = "Timeline (Nsight Systems)"
+description = "Every kernel, copy and executor iteration on the run clock, CUDA graphs on. About 20-40% slower."
+measured = false
+graphs = true
+minutes = 4
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "timeline", "--progress", "json"]
+
+[[actions]]
+id = "code"
+group = "run"
+label = "Code (PyTorch profiler)"
+description = "Each kernel with the op, tensor shapes and Python stack that launched it. CUDA graphs off; about 50x slower per token."
+measured = false
+graphs = false
+minutes = 6
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "code", "--progress", "json"]
+
+[[actions]]
+id = "kernels"
+group = "run"
+label = "Kernels (Nsight Compute, full set)"
+description = "Every kernel of one decode step, replayed about 41 times each for all sections and rule findings. CUDA graphs on. Not on the run clock."
+measured = false
+graphs = true
+minutes = 40
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "kernels", "--progress", "json"]
+
+[[actions]]
+id = "nographs"
+group = "run"
+label = "No graphs (no profiler)"
+description = "Same request with CUDA graphs off and no profiler: against a measured run it shows what graphs save."
+measured = false
+graphs = false
+minutes = 3
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "nographs", "--progress", "json"]
+
+[[actions]]
+id = "check"
+group = "check"
+label = "Pass check (5 checks)"
+description = "make check: the five pass checks on a fresh stack (project ie-i02a-l1-test)."
+minutes = 3
+command = ["uv", "run", "--no-sync", "pytest", "-q", "{rep}/test_i02a_l1.py"]
+
+[[actions]]
+id = "k4"
+group = "check"
+label = "K4: break check 1 on purpose"
+description = "Default skip_special_tokens against false: the token-count check fails, then passes."
+minutes = 3
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--k4"]
+
+[[actions]]
+id = "source"
+group = "check"
+label = "Where each engine time is stamped"
+description = "Reads the installed TensorRT-LLM source for the six /perf_metrics stamps (K18)."
+minutes = 1
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--source"]

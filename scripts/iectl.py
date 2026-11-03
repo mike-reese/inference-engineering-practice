@@ -263,8 +263,15 @@ def cmd_profile(args) -> int:
                 ok=done.returncode == 0)
 
 
+# --tabs: per tab, what the page shows after a real mouse click on it.
+TAB_STATE = """JSON.stringify({hash: location.hash, on: document.querySelector('#tabs button.on')?.dataset.view,
+  known: Object.keys(window.devtools?.views ?? {}), chars: document.getElementById('view').innerText.length,
+  text: document.getElementById('view').innerText.slice(0, 160)})"""
+
+
 def cmd_snapshot(args) -> int:
-    """Headless Chromium on a devtools view: screenshot, an expression's value, console errors (CDP)."""
+    """Headless Chromium on a devtools view: screenshot, an expression's value, console errors (CDP).
+    --tabs clicks every header tab instead and checks that its view renders."""
     import asyncio
     import base64
     import tempfile
@@ -300,23 +307,59 @@ def cmd_snapshot(args) -> int:
                                 errors.append(data["params"]["exceptionDetails"].get("exception", {}).get("description"))
                             if data.get("method") == "Runtime.consoleAPICalled" and data["params"]["type"] == "error":
                                 errors.append(str(data["params"]["args"])[:500])
+                            if data.get("method") == "Log.entryAdded" and data["params"]["entry"]["level"] == "error":
+                                entry = data["params"]["entry"]  # failed loads: an API 500, a missing module
+                                errors.append(f"{entry['text']} {entry.get('url', '')}".strip()[:500])
                             if data.get("id") == mine:
                                 return data.get("result")
 
+                    async def evaluate(expression):
+                        result = await call("Runtime.evaluate", expression=expression, returnByValue=True,
+                                            awaitPromise=True)
+                        return result["result"].get("value")
+
                     await call("Runtime.enable")
                     await call("Page.enable")
+                    await call("Log.enable")
+                    # Headless pages start hidden: requestAnimationFrame never fires and every view stays empty.
+                    await call("Page.bringToFront")
+                    await call("Emulation.setFocusEmulationEnabled", enabled=True)
                     await call("Page.navigate", url=f"{DEVTOOLS}/#{args.view}")
                     await asyncio.sleep(args.wait)
-                    value = await call("Runtime.evaluate", expression=args.eval, returnByValue=True, awaitPromise=True)
+                    if args.tabs:
+                        value = await click_tabs(call, evaluate, errors)
+                    else:
+                        value = await evaluate(args.eval)
                     shot = await call("Page.captureScreenshot", captureBeyondViewport=True)
                     Path(args.out).write_bytes(base64.b64decode(shot["data"]))
-                    return value["result"].get("value"), errors
+                    return value, errors
         finally:
             proc.terminate()
 
+    async def click_tabs(call, evaluate, errors):
+        """Click each tab with real mouse events, as a person would; the tab passes when the hash, the
+        highlighted tab and a non-empty view all match it, the served app.js knows it, and nothing errored."""
+        names = await evaluate("[...document.querySelectorAll('#tabs button')].map((b) => b.dataset.view)")
+        tabs = []
+        for name in names:
+            x, y = await evaluate(f"(() => {{ const r = document.querySelector('#tabs button[data-view={name}]')"
+                                  ".getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()")
+            before = len(errors)
+            for kind in ("mousePressed", "mouseReleased"):
+                await call("Input.dispatchMouseEvent", type=kind, x=x, y=y, button="left", clickCount=1)
+            await asyncio.sleep(args.wait)
+            seen = json.loads(await evaluate(TAB_STATE))
+            tab_errors = errors[before:]
+            ok = (seen["hash"] == f"#{name}" and seen["on"] == name and name in seen["known"]
+                  and seen["chars"] > 0 and not tab_errors)
+            tabs.append({"tab": name, "ok": ok, "hash": seen["hash"], "highlighted": seen["on"],
+                         "app_js_knows_it": name in seen["known"], "view_chars": seen["chars"],
+                         "view_text": seen["text"], "errors": tab_errors})
+        return tabs
+
     value, errors = asyncio.run(shoot())
-    return emit("snapshot", {"view": args.view, "png": args.out, "value": value, "console_errors": errors},
-                ok=not errors)
+    ok = not errors and (not args.tabs or all(t["ok"] for t in value))
+    return emit("snapshot", {"view": args.view, "png": args.out, "value": value, "console_errors": errors}, ok=ok)
 
 
 def cmd_overhead(args) -> int:
@@ -380,11 +423,14 @@ def build_parser() -> argparse.ArgumentParser:
     add("metrics", cmd_metrics, "a run's metrics with formulas and input spans", (["run"], {}), (["--request"], {}))
     add("raw", cmd_raw, "the raw source of a span: file and pointer", (["run"], {}), (["file"], {}),
         (["pointer"], {"nargs": "?", "default": ""}))
-    add("profile", cmd_profile, "a traced run: timeline (nsys), code (PyTorch ops, stacks), kernels (ncu)",
-        (["level"], {"choices": ["timeline", "code", "kernels"]}),
+    add("profile", cmd_profile, "a labeled run: timeline (nsys), code (PyTorch ops, stacks), kernels (ncu), "
+        "nographs (no profiler, CUDA graphs off)",
+        (["level"], {"choices": ["timeline", "code", "kernels", "nographs"]}),
         (["--rep"], {"default": "I02A-L1_streamed_latency"}))
     add("snapshot", cmd_snapshot, "headless render of a view: screenshot, value of --eval, console errors",
-        (["view"], {"help": "the URL hash, e.g. trace/<run>"}), (["--out"], {"default": "devtools.png"}),
+        (["view"], {"nargs": "?", "default": "", "help": "the URL hash, e.g. trace/<run>"}),
+        (["--out"], {"default": "devtools.png"}),
+        (["--tabs"], {"action": "store_true", "help": "click every header tab; fail on one that does not render"}),
         (["--eval"], {"default": "document.querySelector('main').innerText.slice(0, 2000)"}),
         (["--wait"], {"type": float, "default": 4.0}))
     add("overhead", cmd_overhead, "the rep's measured request with the devtools down, then up",

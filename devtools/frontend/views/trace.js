@@ -51,11 +51,12 @@ export class TraceView {
     this.runId = null; this.request = null; this.run = null; this.error = null;
     this.level = "0 architecture"; this.step = 0; this.window = null; this.lit = new Set();
     this.playing = null; this.speed = 5; this.iteration = "all"; this.raw = null; this.source = null; this.dirty = true;
+    this.kernel = null; // {id, data}: the Nsight Compute kernel whose sections are shown
   }
 
   open(params, state) {
     const [run, request] = params;
-    if (run && run !== this.runId) { this.runId = run; this.run = null; this.request = request ?? null; this.load(); }
+    if (run && run !== this.runId) { this.runId = run; this.run = null; this.kernel = null; this.request = request ?? null; this.load(); }
     else if (request) { this.request = request; this.reset(); }
     this.dirty = true;
   }
@@ -135,6 +136,17 @@ export class TraceView {
     if (!m) return;
     this.source = await getJSON(`/api/runs/${encodeURIComponent(this.runId)}/source?file=${encodeURIComponent(m[1])}&line=${m[2]}`)
       .catch((e) => ({ error: String(e) }));
+    this.dirty = true; this.redraw();
+  }
+
+  async showKernel(id) {
+    if (!this.run.profiles.ncu.sections_file) {
+      this.kernel = { id, data: { error: "This run has no sections export (trace/sections.csv). TRACE=kernels runs made after 2026-11-03 have one; the SASS button still works." } };
+      this.dirty = true; this.redraw(); return;
+    }
+    this.kernel = { id, data: null };
+    this.dirty = true; this.redraw();
+    this.kernel.data = await getJSON(`/api/runs/${encodeURIComponent(this.runId)}/kernels/${id}`).catch((e) => ({ error: String(e) }));
     this.dirty = true; this.redraw();
   }
 
@@ -250,8 +262,101 @@ export class TraceView {
       <td>${ms(k.duration, 2)}</td><td>${ms((k.dram_read_bytes ?? 0) / 1e6, 2)}</td><td>${ms((k.l2_bytes ?? 0) / 1e6, 2)}</td>
       <td>${ms(k.dram_pct_of_peak, 1)}</td><td>${ms(k.sm_pct_of_peak, 1)}</td></tr>`).join("");
     return `<div class="dim">iteration ${escape(ncu.iteration)} · ${ncu.kernels.length} kernels · DRAM read ${ms(ncu.dram_read_bytes / 1e6, 1)} MB · ${escape(ncu.note)}</div>
+      ${this.kernelStrip(ncu)}
       <table class="ncu"><tr><th>id</th><th>layer</th><th>kernel</th><th>grid × block</th><th>µs</th><th>DRAM read MB</th><th>L2 MB</th>
       <th>DRAM % peak</th><th>SM % peak</th></tr>${rows}</table>`;
+  }
+
+  // One executor iteration from Nsight Systems: each CPU launch call, the kernels it started, GPU idle gaps.
+  // With CUDA graphs a decode step is one cudaGraphLaunch fanning out to every kernel node; without, one call each.
+  iterationGraph() {
+    const all = this.spans().filter((s) => s.level === "hardware" && s.component === "gpu" && s.name !== "sample"
+      && s.attrs.iteration != null);
+    if (!all.length) return "<p class=dim>No kernel timeline in this run (TRACE=timeline records one).</p>";
+    const its = [...new Set(all.map((s) => s.attrs.iteration))].sort((a, b) => a - b);
+    const it = this.iteration !== "all" && its.includes(+this.iteration) ? +this.iteration : (its[1] ?? its[0]);
+    const ks = all.filter((s) => s.attrs.iteration === it).sort((a, b) => a.start_ns - b.start_ns);
+    const a = Math.min(...ks.map((k) => k.attrs.launch_ns ?? k.start_ns)), b = Math.max(...ks.map((k) => k.end_ns));
+    const Wg = 1200, x = (ns) => ((ns - a) / (b - a)) * Wg;
+    const calls = new Map(); // one CPU launch call -> the kernels it started
+    for (const k of ks) {
+      const key = `${k.attrs.launch_ns}|${k.attrs.launch}`;
+      if (!calls.has(key)) calls.set(key, { ns: k.attrs.launch_ns, api: k.attrs.launch ?? "?", kernels: [] });
+      calls.get(key).kernels.push(k);
+    }
+    let busy = 0, idle = [], end = ks[0].start_ns;
+    for (const k of ks) {
+      if (k.start_ns > end) idle.push([end, k.start_ns]);
+      busy += k.end_ns - Math.max(k.start_ns, end > k.start_ns ? Math.min(end, k.end_ns) : k.start_ns);
+      end = Math.max(end, k.end_ns);
+    }
+    const idleNs = idle.reduce((t, [p, q]) => t + q - p, 0);
+    const maxLayer = Math.max(...ks.map((k) => k.attrs.layer ?? -1));
+    const color = (k) => k.attrs.layer == null ? "#555c6a" : k.attrs.layer === maxLayer ? "#bc8cff" : k.attrs.layer % 2 ? "#3d7ab8" : "#2d5a8a";
+    const fan = [...calls.values()].filter((c) => c.ns != null).map((c) => c.kernels.map((k) =>
+      `<line class="fan" x1="${x(c.ns)}" y1="40" x2="${x(k.start_ns)}" y2="92"/>`).join("")).join("");
+    const ticks = [...calls.values()].filter((c) => c.ns != null).map((c) =>
+      `<line class="call ${c.kernels.length > 1 ? "graph" : ""}" x1="${x(c.ns)}" x2="${x(c.ns)}" y1="22" y2="40"><title>${escape(c.api)} → ${c.kernels.length} kernel(s)</title></line>`).join("");
+    const rects = ks.map((k) => `<rect class="kern" data-id="${escape(k.id)}" x="${x(k.start_ns)}" y="94" width="${Math.max(0.6, x(k.end_ns) - x(k.start_ns))}" height="26"
+      fill="${color(k)}" stroke="${k.attrs.graph_node ? "#e3b341" : "none"}"><title>${escape(k.name)} · layer ${k.attrs.layer ?? "–"} · ${ms(k.attrs.duration_us, 1)} µs${k.attrs.graph_node ? ` · graph node ${k.attrs.graph_node}` : ""}</title></rect>`).join("");
+    const gaps = idle.filter(([p, q]) => q - p > 2000).map(([p, q]) => `<rect class="idle" x="${x(p)}" y="124" width="${Math.max(0.6, x(q) - x(p))}" height="8"><title>GPU idle ${ms((q - p) / 1e3, 1)} µs</title></rect>`).join("");
+    const bands = [], seen = new Set();
+    for (const k of ks) {
+      const l = k.attrs.layer;
+      if (l == null || seen.has(l)) continue;
+      seen.add(l);
+      const last = ks.filter((q) => q.attrs.layer === l).at(-1);
+      bands.push(`<text class="band" x="${x(k.start_ns) + 1}" y="146">${l === maxLayer ? "head" : `L${l}`}</text><line class="bandline" x1="${x(k.start_ns)}" x2="${x(last.end_ns)}" y1="136" y2="136"/>`);
+    }
+    const apis = {};
+    for (const c of calls.values()) apis[c.api] = (apis[c.api] ?? 0) + 1;
+    const graphNodes = ks.filter((k) => k.attrs.graph_node).length;
+    return `<div class="dim">iteration ${it} (pick another in the top bar) · ${ks.length} kernels, ${graphNodes} of them graph nodes ·
+        ${calls.size} CPU launch calls: ${Object.entries(apis).map(([k, v]) => `${escape(k)} ×${v}`).join(", ")}<br>
+        launch to last kernel ${ms((b - a) / 1e6, 3)} ms · GPU busy ${ms(busy / 1e6, 3)} ms · GPU idle between kernels ${ms(idleNs / 1e6, 3)} ms
+        · layer from the RMSNorm heuristic; "head" = final norm, lm_head, sampling</div>
+      <svg class="itergraph" viewBox="0 0 ${Wg} 152" preserveAspectRatio="none">
+        <text class="lanelabel" x="2" y="16">CPU: launch calls</text>${ticks}${fan}
+        <text class="lanelabel" x="2" y="88">GPU: kernels (gold edge = graph node)</text>${rects}${gaps}${bands.join("")}</svg>`;
+  }
+
+  // Nsight Compute: every kernel of the profiled iteration in launch order; width = replay duration,
+  // up = DRAM % of peak, down = SM % of peak. Click one for all its sections and rule findings.
+  kernelStrip(ncu) {
+    const ks = [...ncu.kernels].sort((p, q) => p.id - q.id), Ws = 1200, total = ks.reduce((t, k) => t + (k.duration ?? 0), 0);
+    let at = 0;
+    const bars = ks.map((k) => {
+      const w = ((k.duration ?? 0) / total) * Ws, x0 = at; at += w;
+      const up = 0.5 * (k.dram_pct_of_peak ?? 0), down = 0.5 * (k.sm_pct_of_peak ?? 0);
+      return `<g class="kbar ${this.kernel?.id === k.id ? "on" : ""}" data-kernel="${k.id}"><rect class="hit" x="${x0}" y="0" width="${Math.max(w, 0.8)}" height="120"/>
+        <rect class="dram" x="${x0}" y="${60 - up}" width="${Math.max(w - 0.3, 0.5)}" height="${up}"/>
+        <rect class="sm" x="${x0}" y="60" width="${Math.max(w - 0.3, 0.5)}" height="${down}"/>
+        ${k.findings ? `<circle class="finding" cx="${x0 + w / 2}" cy="4" r="2.5"/>` : ""}
+        <title>#${k.id} layer ${k.layer ?? "–"} · ${escape(k.name.slice(0, 80))}
+${ms(k.duration, 2)} µs · DRAM ${ms(k.dram_pct_of_peak, 0)} % · SM ${ms(k.sm_pct_of_peak, 0)} %${k.occupancy_achieved_pct != null ? ` · occupancy ${ms(k.occupancy_achieved_pct, 0)} %` : ""}${k.top_finding ? `
+${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))}` : ""}</title></g>`;
+    }).join("");
+    return `<svg class="kstrip" viewBox="0 0 ${Ws} 120" preserveAspectRatio="none"><line class="axis" x1="0" x2="${Ws}" y1="60" y2="60"/>${bars}</svg>
+      <div class="dim">launch order, width = duration under replay (${ms(total / 1000, 3)} ms in all) · blue up = DRAM % of peak ·
+        green down = SM % of peak · dot = a rule finding with advice · CUDA graphs ${ncu.graphs === false ? "off" : ncu.graphs ? "on" : "–"}</div>
+      ${this.kernelSections()}`;
+  }
+
+  kernelSections() {
+    if (!this.kernel) return "<p class=dim>Click a kernel above or a row below for its sections.</p>";
+    const d = this.kernel.data, k = this.run.profiles.ncu.kernels.find((q) => q.id === this.kernel.id);
+    if (!d) return `<p>Loading kernel ${this.kernel.id} …</p>`;
+    if (d.error) return `<div class="kdetail"><h3>#${k.id} · layer ${k.layer ?? "–"}</h3><p class="err">${escape(d.error)}</p>
+      <button class="sass" data-k="${k.id}">SASS</button></div>`;
+    const rules = d.rules.map((r) => `<li class="rule ${escape(r.type)}"><b>${escape(r.type)} ${escape(r.name)}</b> (${escape(r.section)})
+      ${r.speedup != null ? ` · estimated speedup ${ms(r.speedup, 1)} % (${escape(r.speedup_type ?? "")})` : ""}<br>${escape(r.description)}</li>`).join("");
+    const secs = d.sections.map((sec) => `<details ${sec.name.includes("Speed Of Light") || sec.name === "Occupancy" ? "open" : ""}><summary>${escape(sec.name)}</summary>
+      ${sec.items.map((item) => `${item.label ? `<div class="label">${escape(item.label)}</div>` : ""}<table class="ncu">${item.metrics.map((m) =>
+        `<tr><td>${escape(m.name)}</td><td>${escape(m.value)}</td><td class="dim">${escape(m.unit)}</td></tr>`).join("")}</table>`).join("")}</details>`).join("");
+    return `<div class="kdetail"><h3>#${k.id} · layer ${k.layer ?? "–"}</h3><div class="dim" title="${escape(k.name)}">${escape(k.name.slice(0, 160))}</div>
+      <div>grid ${escape(k.grid)} × block ${escape(k.block)} · ${ms(k.duration, 2)} µs · <button class="sass" data-k="${k.id}">SASS</button></div>
+      <div class="label">rule findings (${d.rules.length})</div><ul class="rules">${rules || "<li class=dim>none</li>"}</ul>
+      <div class="label">sections (${d.sections.length})</div>${secs || "<p class=dim>No sections export in this run.</p>"}</div>`;
   }
 
   render(state) {
@@ -271,7 +376,7 @@ export class TraceView {
     const iterations = [...new Set(this.spans().map((s) => s.attrs.iteration).filter((x) => x != null))].sort((a, b) => a - b);
     const runs = Object.values(state.runs).sort((a, b) => b.mtime - a.mtime);
     this.root.innerHTML = `<div class="trace">
-      ${traced ? `<div class="banner">TRACE=${escape(labels.trace)} run: profiled, CUDA graphs ${labels.graphs ? "on" : "off"}, iterations ${escape(labels.profile_range)}. Not a measured run.</div>` : ""}
+      ${traced ? `<div class="banner">TRACE=${escape(labels.trace)} run: ${labels.profiler === false ? "no profiler" : `profiled, iterations ${escape(labels.profile_range)}`}, CUDA graphs ${labels.graphs ? "on" : "off"}. Not a measured run.</div>` : ""}
       <div class="controls">
         <select class="run">${runs.map((r) => `<option ${r.run_id === this.runId ? "selected" : ""}>${escape(r.run_id)}</option>`).join("")}</select>
         <select class="request">${this.run.requests.map((r) => `<option ${r === this.request ? "selected" : ""}>${escape(r)}</option>`).join("")}</select>
@@ -285,6 +390,7 @@ export class TraceView {
       </div>
       ${this.map(current, previous)}
       ${this.lanes(this.spans(), current)}
+      <details class="iterpanel" ${this.run.spans.some((s) => s.component === "gpu" && s.attrs?.launch) ? "open" : ""}><summary>one iteration: CPU launches → GPU kernels (Nsight Systems)</summary>${this.iterationGraph()}</details>
       <div class="tracebody"><section class="detail">${this.detail(current)}</section>
         <section class="side">
           <details open><summary>metrics as they are calculated</summary>${this.metrics()}</details>
@@ -325,7 +431,14 @@ export class TraceView {
       const all = this.steps(), i = all.findIndex((s) => this.lit.has(s.id));
       this.go(i < 0 ? this.step : i);
     }));
-    this.root.querySelectorAll("tr[data-k]").forEach((tr) => (tr.onclick = () => this.showSass(this.run.profiles.ncu.kernels.find((k) => String(k.id) === tr.dataset.k))));
+    this.root.querySelectorAll("tr[data-k]").forEach((tr) => (tr.onclick = () => this.showKernel(+tr.dataset.k)));
+    this.root.querySelectorAll("[data-kernel]").forEach((g) => (g.onclick = () => this.showKernel(+g.dataset.kernel)));
+    this.root.querySelectorAll("button.sass").forEach((b) => (b.onclick = () => this.showSass(this.run.profiles.ncu.kernels.find((k) => String(k.id) === b.dataset.k))));
+    this.root.querySelectorAll(".itergraph [data-id]").forEach((el) => (el.onclick = () => {
+      this.level = "3 hardware and code";
+      this.iteration = String(this.run.spans.find((s) => s.id === el.dataset.id)?.attrs.iteration ?? this.iteration);
+      this.go(this.steps().findIndex((s) => s.id === el.dataset.id));
+    }));
     document.onkeydown = (e) => {
       if (!this.root.querySelector(".trace") || e.target.tagName === "SELECT") return;
       if (e.key === "ArrowRight") this.go(this.step + 1);

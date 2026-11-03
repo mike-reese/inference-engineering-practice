@@ -88,3 +88,35 @@ a { color: var(--accent); }
 .segbar { display: flex; height: 22px; margin: 6px 0; } .seg { color: #0f1115; font-size: 10px; overflow: hidden; cursor: pointer; padding-left: 2px; }
 ol.stack { margin: 4px 0; padding-left: 20px; font-size: 11px; } .err { color: var(--down); }
 @media (max-width: 900px) { .infra, .tracebody { grid-template-columns: 1fr; } .links { display: none; } }
+.iterpanel { margin: 8px 0; } .iterpanel summary, .side summary { cursor: pointer; }
+.itergraph, .kstrip { width: 100%; background: var(--panel); border: 1px solid var(--line); }
+.itergraph { height: 170px; } .kstrip { height: 140px; margin-top: 6px; }
+.itergraph .lanelabel { fill: var(--dim); font-size: 10px; pointer-events: none; }
+.itergraph .fan { stroke: #58a6ff; stroke-opacity: 0.18; vector-effect: non-scaling-stroke; }
+.itergraph .call { stroke: var(--dim); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.itergraph .call.graph { stroke: #e3b341; stroke-width: 3; }
+.itergraph .kern { cursor: pointer; vector-effect: non-scaling-stroke; stroke-width: 1; }
+.itergraph .idle { fill: var(--down); }
+.itergraph .band { fill: var(--dim); font-size: 9px; } .itergraph .bandline { stroke: var(--line); vector-effect: non-scaling-stroke; }
+.kstrip .hit { fill: transparent; cursor: pointer; } .kstrip .dram { fill: #58a6ff; } .kstrip .sm { fill: #3fb950; }
+.kstrip .axis { stroke: var(--line); vector-effect: non-scaling-stroke; } .kstrip .finding { fill: #e3b341; }
+.kstrip .kbar:hover .hit, .kstrip .kbar.on .hit { fill: rgba(227, 179, 65, 0.25); }
+.kdetail { border: 1px solid var(--line); border-radius: 4px; padding: 8px; margin: 8px 0; }
+.rules { margin: 0; padding-left: 16px; } .rule { margin-bottom: 6px; } .rule.OPT b { color: #e3b341; } .rule.WRN b { color: var(--down); }
+.runview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+@media (max-width: 1100px) { .runview { grid-template-columns: 1fr; } }
+.runview .picker button { background: var(--panel); color: var(--dim); border: 1px solid var(--line); border-radius: 4px;
+  font: inherit; padding: 3px 8px; margin: 0 6px 6px 0; cursor: pointer; }
+.runview .picker button.on { color: var(--text); border-color: var(--accent); }
+.actions { display: grid; gap: 8px; margin-bottom: 12px; }
+.action { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--starting); border-radius: 4px; padding: 8px; }
+.action.measured { border-left-color: var(--up); }
+.action .argv, .job .argv { display: block; color: var(--dim); font-size: 11px; margin: 6px 0; overflow-wrap: anywhere; }
+.action button.start { background: var(--accent); color: #0f1115; border: 0; border-radius: 4px; font: inherit; padding: 3px 12px; cursor: pointer; }
+.action button.start:disabled { background: var(--line); color: var(--dim); cursor: not-allowed; }
+.jobstate.running { color: var(--starting); } .jobstate.ok { color: var(--up); } .jobstate.failed { color: var(--down); }
+.joblinks { margin: 6px 0 10px; } .joblinks a, .history a { color: var(--accent); }
+.steps { margin: 0 0 10px; padding-left: 22px; } .steps li.live { color: var(--starting); }
+.joblog { background: var(--panel); border: 1px solid var(--line); padding: 8px; max-height: 480px; overflow: auto; font-size: 11px; white-space: pre-wrap; }
+.history { margin: 0; padding-left: 16px; }
+.logprogress { color: var(--starting); margin-bottom: 10px; }

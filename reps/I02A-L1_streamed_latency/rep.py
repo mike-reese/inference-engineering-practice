@@ -23,7 +23,7 @@ import httpx
 REP_DIR = Path(__file__).resolve().parent
 REPO = REP_DIR.parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
-from compose_stack import TRACE_IMAGE, TRACE_LEVELS, Stack, prepare_run_dir  # noqa: E402
+from compose_stack import TRACE_IMAGE, TRACE_LEVELS, Stack, has_profiler, prepare_run_dir  # noqa: E402
 
 from inference_analysis.efficiency import efficiency  # noqa: E402
 from inference_analysis.latency import N_TTFT, latency_records  # noqa: E402
@@ -60,6 +60,15 @@ SOURCE_STAMPS = {  # K18: the file each engine time is set in, and the text that
     "last_token_time": ("_torch/pyexecutor/py_executor.py", "update_perf_metrics("),
     "server_first_token_time": ("serve/openai_server.py", "server_first_token_time = get_steady_clock_now"),
 }
+
+
+PROGRESS = False  # --progress json
+
+
+def progress(step: str, **data) -> None:
+    """--progress json: one line per step as it starts, for the devtools runner (scripts/runner.py)."""
+    if PROGRESS:
+        print("@@progress " + json.dumps({"step": step, "wall_ns": time.time_ns(), **data}), flush=True)
 
 
 def run(*cmd: str) -> str:
@@ -142,6 +151,7 @@ def run_stack(run_id: str, trace: str = "off") -> dict:
     config = ENGINE_CONFIG + ("cuda_graph_config: null\n" if level.get("graphs") is False else "")
     run_dir = prepare_run_dir(RESULTS_DIR, run_id, config)
     save_json(run_dir / "labels.json", {"trace": trace, "measured": trace == "off", "graphs": level.get("graphs", True),
+                                        "profiler": has_profiler(trace),
                                         "profile_range": level.get("profile_range")})
     basis = execution_basis()
     stack = Stack(PROJECT, RESULTS_DIR, run_id, trace=trace)
@@ -149,18 +159,25 @@ def run_stack(run_id: str, trace: str = "off") -> dict:
     slow = trace == "kernels"  # Nsight Compute replays each kernel: the profiled iteration takes minutes
     sampler = GpuSampler(run_dir / "gpu.csv")
     try:
+        progress("stack up")
         base = stack.up()
         basis["version"] = httpx.get(f"{base}/version", timeout=5).json()
+        progress("warm-up request")
         stack.run_step(step("warmup", f"{run_id}-warmup"), timeout_s=600 if trace != "off" else 60)
+        progress("drain /perf_metrics")
         drained = read_perf_metrics(base, poll_s=2.0)
+        progress("measured request", note="minutes under Nsight Compute" if slow else None)
         stack.run_step(step("diagnostic", measured_id, **({"timeout_s": 7200} if slow else {})),
                        timeout_s=7200 if slow else 600 if trace != "off" else 60)
+        progress("read /perf_metrics twice")
         first, second = read_perf_metrics(base, poll_s=2.0), read_perf_metrics(base)
-        if trace != "off":  # the profiler's stop fires at the next iteration: one more request closes the capture
+        if has_profiler(trace):  # the profiler's stop fires at the next iteration: one more request closes the capture
+            progress("closer request (ends the profiler range)")
             stack.run_step(step("closer", f"{run_id}-closer"), timeout_s=7200 if slow else 600)
             read_perf_metrics(base)
     finally:
         sampler.stop()
+        progress("stack down")
         stack.down()
     save_json(run_dir / "basis.json", basis)
     save_json(run_dir / "perf_metrics.json", {"warmup_drain": drained, "first": first, "second": second})
@@ -171,7 +188,10 @@ def run_stack(run_id: str, trace: str = "off") -> dict:
         joined[measured_id] = first[0]
     save_json(run_dir / "engine_records.json", joined)
     stack.chown()
+    progress("decode capture (tshark)")
     tsv = stack.pcap_frames() if stack.pcap().exists() else ""
+    if has_profiler(trace):
+        progress("export profiler reports")
     stack.export_trace()
     stack.chown()
     return {"run_dir": run_dir, "stack": stack, "measured_id": measured_id, "drained": drained, "first": first,
@@ -277,7 +297,11 @@ def main() -> None:
     parser.add_argument("--trace", default=os.environ.get("TRACE", "off"), choices=list(TRACE_LEVELS))
     parser.add_argument("--k4", action="store_true")
     parser.add_argument("--source", action="store_true")
+    parser.add_argument("--progress", choices=["none", "json"], default="none",
+                        help="json: one @@progress line per step (the devtools runner reads them)")
     args = parser.parse_args()
+    global PROGRESS
+    PROGRESS = args.progress == "json"
     if args.k4:
         return k4_demo()
     if args.source:
@@ -286,16 +310,21 @@ def main() -> None:
         run("docker", "image", "inspect", TRACE_IMAGE)  # fails clearly: run `make images` first
     prefix = "I02A" if args.trace == "off" else f"I02A-TRACE-{args.trace}"
     run_id = datetime.now(timezone.utc).strftime(f"{prefix}_%Y%m%dT%H%M%SZ_") + secrets.token_hex(3)
+    progress("run", run_id=run_id, trace=args.trace)
     prompt = offline_prompt(MESSAGES)
     result = run_stack(run_id, args.trace)
     save_json(result["run_dir"] / "prompt.json", prompt)
+    progress("analysis")
     latency = analyze(result, prompt)
     print_table(run_id, result, prompt, latency)
+    progress("run.json")
     out = write_run(result["run_dir"])
     print(f"\nrun.json: {out}  ({len(json.loads(out.read_text())['spans'])} spans)")
     print(f"devtools: http://127.0.0.1:7700/#trace/{run_id}")
+    progress("done", run_id=run_id)
     if args.trace != "off":
-        print(f"TRACE={args.trace}: profiled run, labeled; not a measured result.")
+        kind = "profiled run" if has_profiler(args.trace) else "unprofiled comparison run (CUDA graphs off)"
+        print(f"TRACE={args.trace}: {kind}, labeled; not a measured result.")
 
 
 if __name__ == "__main__":

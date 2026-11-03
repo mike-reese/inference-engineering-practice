@@ -4,6 +4,7 @@ import { LifecycleView } from "./views/lifecycle.js";
 import { LogsView } from "./views/logs.js";
 import { MetricsView } from "./views/metrics.js";
 import { RequestsView } from "./views/requests.js";
+import { RunView } from "./views/run.js";
 import { RunsView } from "./views/runs.js";
 import { TraceView } from "./views/trace.js";
 import { ToolsView } from "./views/tools.js";
@@ -76,7 +77,7 @@ const root = document.getElementById("view");
 const views = {
   infra: new InfraView(root), lifecycle: new LifecycleView(root), logs: new LogsView(root),
   metrics: new MetricsView(root), requests: new RequestsView(root), runs: new RunsView(root),
-  trace: new TraceView(root), tools: new ToolsView(root),
+  trace: new TraceView(root), tools: new ToolsView(root), run: new RunView(root),
 };
 let active = "infra";
 let pending = false;

@@ -47,7 +47,71 @@ def ncu(path: Path, run: Run) -> None:
         kernels.append(k)
     for k, layer in zip(kernels, layer_of([k["name"] for k in kernels])):
         k["layer"] = layer
+    details = root / "trace" / "sections.csv"
+    by_kernel = sections(details) if details.exists() else {}
+    for k in kernels:
+        k.update(headline(by_kernel.get(k["id"])))
     total = sum(k.get("dram_read_bytes", 0) for k in kernels)
     run.profiles["ncu"] = {"file": str(path.relative_to(root)), "iteration": run.labels.get("profile_range"),
-                           "kernels": kernels, "dram_read_bytes": total,
-                           "note": "one iteration, each kernel replayed with caches flushed; not on the run clock"}
+                           "kernels": kernels, "dram_read_bytes": total, "graphs": run.labels.get("graphs"),
+                           "sections_file": str(details.relative_to(root)) if details.exists() else None,
+                           "note": "one iteration, each kernel replayed with caches flushed at base clocks; "
+                                   "not on the run clock"}
+
+
+# The values the kernel strip shows from the sections (display names as ncu prints them), when collected.
+HEADLINE = {("Occupancy", "Achieved Occupancy"): "occupancy_achieved_pct",
+            ("Occupancy", "Theoretical Occupancy"): "occupancy_theoretical_pct",
+            ("Launch Statistics", "Waves Per SM"): "waves_per_sm",
+            ("Warp State Statistics", "Warp Cycles Per Issued Instruction"): "cycles_per_issue"}
+
+
+def sections(path: Path) -> dict[int, dict]:
+    """trace/sections.csv (`ncu --page details --csv --print-details all`): one row per metric or rule finding.
+    Rows without a rule finding stop after "Metric Value" (17 of 21 columns).
+    Returns kernel id -> {"sections": [{name, items: [{label, metrics: [{name, unit, value}]}]}],
+    "rules": [{section, name, type, description, speedup_type, speedup}]}, in the file's order."""
+    out = {}
+    with path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            # Skip what is not a metric or rule row: ncu prints the NUMA affinity table (5 columns, its "GPU ID"
+            # looks like a kernel ID) and an NVLink note per kernel into the same output.
+            if not row.get("ID", "").isdigit() or (row.get("Metric Value") is None and row.get("Rule Name") is None):
+                continue
+            kernel = out.setdefault(int(row["ID"]), {"sections": [], "rules": []})
+            section = row["Section Name"]
+            if row.get("Rule Name"):
+                kernel["rules"].append({"section": section, "name": row["Rule Name"], "type": row["Rule Type"],
+                                        "description": row["Rule Description"],
+                                        "speedup_type": row.get("Estimated Speedup Type") or None,
+                                        "speedup": float(row["Estimated Speedup"]) if row.get("Estimated Speedup")
+                                        else None})
+                continue
+            if not kernel["sections"] or kernel["sections"][-1]["name"] != section:
+                kernel["sections"].append({"name": section, "items": []})
+            items = kernel["sections"][-1]["items"]
+            label = row.get("Body Item Label", "")
+            if not items or items[-1]["label"] != label:
+                items.append({"label": label, "metrics": []})
+            items[-1]["metrics"].append({"name": row["Metric Name"], "unit": row["Metric Unit"],
+                                         "value": row["Metric Value"]})
+    return out
+
+
+def headline(kernel: dict | None) -> dict:
+    if not kernel:
+        return {}
+    out = {}
+    for section in kernel["sections"]:
+        for item in section["items"]:
+            for m in item["metrics"]:
+                key = HEADLINE.get((section["name"], m["name"]))
+                if key and m["value"] not in ("", "n/a"):
+                    out[key] = float(m["value"].replace(",", ""))
+    opt = [r for r in kernel["rules"] if r["type"] == "OPT"]
+    out["findings"] = len(opt)
+    best = max(opt, key=lambda r: r["speedup"] or 0, default=None)
+    if best:
+        out["top_finding"] = {"name": best["name"], "speedup_pct": best["speedup"],
+                              "description": best["description"][:300]}
+    return out

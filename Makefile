@@ -2,8 +2,8 @@ PY := uv run --no-sync python
 IECTL := $(PY) scripts/iectl.py
 TRACE ?= off
 
-.PHONY: doctor images devtools devtools-up-quiet devtools-down devtools-restart rep profile k4 source test-unit check \
-	snapshot overhead status lifecycle
+.PHONY: doctor images devtools devtools-up-quiet devtools-down devtools-restart runner runner-down rep profile k4 source test-unit check \
+	snapshot tabs overhead status lifecycle
 
 doctor:
 	$(IECTL) doctor
@@ -17,13 +17,27 @@ images:
 # The devtools and the monitoring it hosts (own project ie-devtools): http://127.0.0.1:7700
 devtools:
 	REPO_HOST=$(CURDIR) docker compose -f deploy/devtools.yaml up -d --build
+	@$(MAKE) --no-print-directory runner
 	@echo "devtools: http://127.0.0.1:7700"
 
 devtools-up-quiet:
 	REPO_HOST=$(CURDIR) docker compose -f deploy/devtools.yaml up -d --wait
+	@$(MAKE) --no-print-directory runner
 
-devtools-down:
+devtools-down: runner-down
 	docker compose -f deploy/devtools.yaml down
+
+# The host runner behind the Run tab (scripts/runner.py, 127.0.0.1:7701): runs the commands reps/*/rep.toml declare.
+RUNNER_STATE := $(HOME)/.local/state/inference-engineering
+runner:
+	@mkdir -p $(RUNNER_STATE)
+	@if curl -sf http://127.0.0.1:7701/runner/health >/dev/null; then echo "runner: already up"; \
+	else nohup $(PY) scripts/runner.py >> $(RUNNER_STATE)/runner.log 2>&1 & \
+	echo "runner: http://127.0.0.1:7701 (log $(RUNNER_STATE)/runner.log)"; fi
+
+runner-down:  ## a running job keeps running (own session); restart with make runner after a runner change
+	@if [ -f $(RUNNER_STATE)/runner.pid ] && kill $$(cat $(RUNNER_STATE)/runner.pid) 2>/dev/null; then \
+	echo "runner: stopped"; else echo "runner: not running"; fi; rm -f $(RUNNER_STATE)/runner.pid
 
 devtools-restart:  ## after a backend change (the code runs from the mounted repo)
 	REPO_HOST=$(CURDIR) docker compose -f deploy/devtools.yaml restart devtools
@@ -49,6 +63,9 @@ check:  ## step 9: the five pass checks on a fresh stack
 
 snapshot:  ## make snapshot VIEW=trace/<run>
 	$(IECTL) snapshot "$(VIEW)" --out devtools.png
+
+tabs:  ## click every devtools tab in headless Chromium (CDP); fails on a tab that does not render
+	$(IECTL) snapshot --tabs --wait 2 --out devtools.png
 
 overhead:
 	$(IECTL) overhead --runs 2
