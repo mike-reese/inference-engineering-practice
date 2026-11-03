@@ -6,20 +6,20 @@ The serving engine (TensorRT-LLM) sends response headers before the engine has a
 ## Task 
 We have a new GPU compared to I01-L2.
 
-We will swap to using TensorRT-LLM as our serving engine, running in a container (the NGC image plus the NVML patch, built from `deploy/tensorrt-llm/Dockerfile`), and cut over the I01-L2 Compose stack: server, client and the tcpdump capture sidecar. The stack driver moves to `scripts/compose_stack.py`. We'll send one warm-up request, drain `/perf_metrics`, and then send a measured streamed request. We count the prompt's tokens offline with the tokenizer and then read `/perf_metrics` twice, and decode the capture with `tshark` and `pcap_streams`. A new function (`latency_records`) turns the client record, the engine record and the captured stream into TTFT, ITL, end-to-end latency and the segments between them, each named by its clock. Outputs are the raw records, both `/perf_metrics` reads, the pcap, the offline count and the latency records.
+We will swap to using TensorRT-LLM as our serving engine, running in a container (the NGC image plus the NVML patch, built from `deploy/server/Dockerfile`), and cut over the I01-L2 Compose stack: server, client and the tcpdump capture sidecar. The stack driver moves to `scripts/compose_stack.py`. We'll send one warm-up request, drain `/perf_metrics`, and then send a measured streamed request. We count the prompt's tokens offline with the tokenizer and then read `/perf_metrics` twice, and decode the capture with `tshark` and `pcap_streams`. A new function (`latency_records`) turns the client record, the engine record and the captured stream into TTFT, ITL, end-to-end latency and the segments between them, each named by its clock. Outputs are the raw records, both `/perf_metrics` reads, the pcap, the offline count and the latency records.
 
 ## Configuration
 
 | Item | This rep |
 | --- | --- |
-| Engine | TensorRT-LLM 1.2.1, PyTorch backend, `trtllm-serve` in a container; image = `nvcr.io/nvidia/tensorrt-llm/release:1.2.1@sha256:33cd085b…f927b9` + NVML patch layer, built from `deploy/tensorrt-llm/Dockerfile` (CUDA 13.1, torch 2.10.0a0+b4e4ee81d3.nv25.12, transformers 4.57.3 inside the image) |
+| Engine | TensorRT-LLM 1.2.1, PyTorch backend, `trtllm-serve` in a container; image = `nvcr.io/nvidia/tensorrt-llm/release:1.2.1@sha256:33cd085b…f927b9` + NVML patch layer, built from `deploy/server/Dockerfile` (CUDA 13.1, torch 2.10.0a0+b4e4ee81d3.nv25.12, transformers 4.57.3 inside the image) |
 | Local engine patch | NVML call in `tensorrt_llm/_utils.py` changed to `byref(cc_settings)` (upstream issue 18816); `_utils.py` sha256 `0619e389…3661c` before, `85570e359efb2e36263e032a6ef7a4c55705c621cbe8143f880a21a53856207e` after |
 | Model and revision | `Qwen2.5-0.5B-Instruct` @ `7ae557604adf67be50417f59c2c2f167def9a775`, BF16 weights, local directory `~/.local/share/inference-engineering/models/Qwen2.5-0.5B-Instruct/<revision>` mounted read-only at `/model`; engine and offline tokenizer read the same files |
-| Command (`server`) | `trtllm-serve serve /model --backend pytorch --host 0.0.0.0 --port 8000 --max_batch_size 1 --max_seq_len 2048 --config /config/config.yaml`; published on `127.0.0.1`, host port from `docker compose port server 8000` |
+| Command (`server`) | `trtllm-serve serve /model --backend pytorch --host 0.0.0.0 --port 8080 --max_batch_size 1 --max_seq_len 2048 --config /config/config.yaml`; published on `127.0.0.1`, host port from `docker compose port server 8080` |
 | Engine config (YAML) | `return_perf_metrics: true`, `perf_metrics_max_requests: 100`, `kv_cache_config.enable_block_reuse: false`, `kv_cache_config.free_gpu_memory_fraction: 0.5`; written into the run folder, mounted at `/config` |
-| Engine environment | `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`; `gpus: all`; healthcheck `curl -sf http://127.0.0.1:8000/health` |
-| Capture (`capture`) | `tcpdump --immediate-mode -i eth0 -p -n -s 0 -U --time-stamp-precision=nano -w /cap/<run id>_s<N>.pcap 'tcp port 8000'`, `network_mode: service:server`, `NET_RAW` only; tcpdump 4.99.4, TShark 4.2.5; run folder world-writable |
-| Client (`client`) | I01-L2 image rebuilt with the client change: `locust_load.py` running `send_one(..., diagnostic=True)` from `scripts/chat_client.py`; `SERVER_BASE_URL=http://server:8000/v1`; OpenAI SDK 3.35.1, httpx2 2.16.0, Locust 2.47.0 |
+| Engine environment | `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`; `gpus: all`; healthcheck `curl -sf http://127.0.0.1:8080/health` |
+| Capture (`capture`) | `tcpdump --immediate-mode -i eth0 -p -n -s 0 -U --time-stamp-precision=nano -w /cap/<run id>_s<N>.pcap 'tcp port 8080'`, `network_mode: service:server`, `NET_RAW` only; tcpdump 4.99.4, TShark 4.2.5; run folder world-writable |
+| Client (`client`) | I01-L2 image rebuilt with the client change: `locust_load.py` running `send_one(..., diagnostic=True)` from `scripts/chat_client.py`; `SERVER_BASE_URL=http://server:8080/v1`; OpenAI SDK 3.35.1, httpx2 2.16.0, Locust 2.47.0 |
 | Request | system `You are a concise assistant for an inference team.`; user `Why does decode slow down as the KV cache grows?`; `max_tokens=64`, `temperature=0`, `seed=0`, `stream=True`, `stream_options={"include_usage": True}`, `logprobs=True`, `top_logprobs=1`; `extra_body={"ignore_eos": True, "skip_special_tokens": False}`; header `X-Request-ID` |
 | Order | `compose up -d --wait server capture client` → 1 warm-up (not measured) → drain `/perf_metrics` → 1 measured request → read `/perf_metrics` (poll ≤ 2 s) → read again → save server log → `compose down` → decode the pcap |
 | Libraries | transformers 5.20.2, httpx 0.28.1, huggingface_hub 2.3.0, pytest 9.1.1, torch 2.15.0+cu134; Python 3.12.14 |
@@ -31,73 +31,76 @@ We will swap to using TensorRT-LLM as our serving engine, running in a container
 
 One measured request. Times in ms from send on the client clock unless named; engine times converted from seconds; wire times converted from the epoch with the record's `anchor_pair`.
 
+Run `I02A_20261103T164324Z_348959` (2026-11-03), request `…-measured`. Open it in the devtools: `#trace/<run id>`.
+
 | Point | Value | Reported (source) | What it means | How we know (second source) | Difference |
 | --- | --- | --- | --- | --- | --- |
-| 1 offline | Prompt tokens, offline | | | | |
-| 2 stream | Raw SSE lines (`curl -N`, hand check) | | | | |
-| 2 stream | Response headers (`headers_ns`) | | | | |
-| 2 stream | First body read: time | | | | |
-| 2 stream | First body read: contents | | | | |
-| 2 stream | First token event (TTFT) | | | | |
-| 2 stream | Protocol completion, `[DONE]` (end-to-end) | | | | |
-| 2 stream | Client-side first wire byte, transport EOF | | | | |
-| 3 tokens | Events, total | | | | |
-| 3 tokens | Token events | | | | |
-| 3 tokens | `logprobs.content` records per token event | | | | |
-| 3 tokens | `logprobs.content` records, total | | | | |
-| 3 tokens | `usage.prompt_tokens` | | | | |
-| 3 tokens | `usage.completion_tokens`, running and final | | | | |
-| 3 tokens | `usage.prompt_tokens_details.cached_tokens` | | | | |
-| 3 tokens | `finish_reason` | | | | |
-| 3 tokens | Token gaps (exact ITL), count and range | | | | |
-| 3 tokens | Mean ITL, client | | | | |
-| 3 tokens | Perceived tokens per second | | | | |
-| 4 wire | Chat requests in the captured TCP stream, `X-Request-ID` | | | | |
-| 4 wire | Request's last byte at the server | | | | |
-| 4 wire | Response headers on the wire | | | | |
-| 4 wire | First token event on the wire | | | | |
-| 4 wire | Token events on the wire (count, frames) | | | | |
-| 4 wire | Mean ITL, wire | | | | |
-| 4 wire | `[DONE]` on the wire | | | | |
-| 5 engine | `/perf_metrics` first read: entries | | | | |
-| 5 engine | Raw entry (`timing_metrics`, seconds) | | | | |
-| 5 engine | `request_id` | | | | |
-| 5 engine | Iterations (`last_iter − first_iter + 1`) | | | | |
-| 5 engine | `kv_cache_metrics` | | | | |
-| 5 engine | Queue (`first_scheduled_time − arrival_time`) | | | | |
-| 5 engine | TTFT, engine (`first_token_time − arrival_time`) | | | | |
-| 5 engine | HTTP-layer TTFT (`server_first_token_time − server_arrival_time`) | | | | |
-| 5 engine | Decode span (`last_token_time − first_token_time`) | | | | |
-| 5 engine | Mean ITL, engine (span / (completion tokens − 1)) | | | | |
-| 5 engine | End-to-end, engine (`last_token_time − arrival_time`) | | | | |
-| 5 engine | Handler, template, tokenization (`arrival_time − server_arrival_time`) | | | | |
-| 5 engine | `/perf_metrics` second read: entries | | | | |
+| 1 offline | Prompt tokens, offline | 34 (`apply_chat_template`) | Template + system + user | `usage.prompt_tokens` 34 | 0 |
+| 2 stream | Raw SSE lines (`curl -N`, hand check) | Not recorded | `hand_check_1` holds a browser GET, not `curl -N` | – | – |
+| 2 stream | Response headers (`headers_ns`) | 4.858 ms | Sent before any token | Wire headers 4.463 | −0.395 |
+| 2 stream | First body read: time | 34.957 ms | First bytes the SDK reads | Wire first data 34.910 | −0.047 |
+| 2 stream | First body read: contents | Role event only, `usage` 0 completion | Not a token | Body read base64 | – |
+| 2 stream | First token event (TTFT) | 35.564 ms | Client TTFT | Wire 34.910; engine 29.478 | −0.654; −6.086 |
+| 2 stream | Protocol completion, `[DONE]` (end-to-end) | 321.604 ms | Client end-to-end | Wire `[DONE]` 321.134 | −0.469 |
+| 2 stream | Client-side first wire byte, transport EOF | 2.123 ms; EOF Unavailable | Headers write starts; SDK closes at `[DONE]` | `transport_trace` | – |
+| 3 tokens | Events, total | 66 | Role + 64 tokens + usage | Wire `data:` events | 0 |
+| 3 tokens | Token events | 64 | One per token | Wire 64 | 0 |
+| 3 tokens | `logprobs.content` records per token event | 1 | Evidence rule holds | – | – |
+| 3 tokens | `logprobs.content` records, total | 64 | – | `completion_tokens` 64 | 0 |
+| 3 tokens | `usage.prompt_tokens` | 34 | – | Offline 34 | 0 |
+| 3 tokens | `usage.completion_tokens`, running and final | 0, 1, …, 64 | Running count per event | Records 64 | 0 |
+| 3 tokens | `usage.prompt_tokens_details.cached_tokens` | 0 | Block reuse off | `kv_cache_metrics.num_reused_blocks` 0 | 0 |
+| 3 tokens | `finish_reason` | `length` | `ignore_eos`, `max_tokens` 64 | – | – |
+| 3 tokens | Token gaps (exact ITL), count and range | 63; 1.706–14.377 ms | Per-token delivery | Wire gaps | – |
+| 3 tokens | Mean ITL, client | 4.531 ms | (last − first) / 63 | Engine 4.547 | −0.016 |
+| 3 tokens | Perceived tokens per second | 220.7 | 1000 / mean ITL | – | – |
+| 4 wire | Chat requests in the captured TCP stream, `X-Request-ID` | 1, `…-measured` | Join by ID | Client record | – |
+| 4 wire | Request's last byte at the server | 2.348 ms | Request fully sent | Client send 0 | +2.348 |
+| 4 wire | Response headers on the wire | 4.463 ms | Before the first token | Engine first token 29.478 | −25.015 |
+| 4 wire | First token event on the wire | 34.910 ms | Wire TTFT | Client 35.564 | +0.654 |
+| 4 wire | Token events on the wire (count, frames) | 64, 64 frames | One frame per token | Client 64 | 0 |
+| 4 wire | Mean ITL, wire | 4.533 ms | – | Client 4.531 | +0.002 |
+| 4 wire | `[DONE]` on the wire | 321.134 ms | Wire end-to-end | Client 321.604 | +0.469 |
+| 5 engine | `/perf_metrics` first read: entries | 1 | One request in flight | Drain after warm-up: 1 | – |
+| 5 engine | Raw entry (`timing_metrics`, seconds) | arrival 310996.266094 … last 310996.582041 | CLOCK_MONOTONIC s | Client `perf_counter_ns` | – |
+| 5 engine | `request_id` | 3 (`int`) | Engine-internal; not the header ID | K10 | – |
+| 5 engine | Iterations (`last_iter − first_iter + 1`) | 129 − 66 + 1 = 64 | One token per iteration | `completion_tokens` 64 | 0 |
+| 5 engine | `kv_cache_metrics` | 2 allocated, 2 new, 0 reused | 98 tokens in 2 blocks | `cached_tokens` 0 | – |
+| 5 engine | Queue (`first_scheduled_time − arrival_time`) | 2.169 ms | Wait for a slot | – | – |
+| 5 engine | TTFT, engine (`first_token_time − arrival_time`) | 29.478 ms | Prefill 27.309 + queue | Client 35.564 | −6.086 |
+| 5 engine | HTTP-layer TTFT (`server_first_token_time − server_arrival_time`) | 31.370 ms | Handler view | Client 35.564 | −4.194 |
+| 5 engine | Decode span (`last_token_time − first_token_time`) | 286.469 ms | 63 gaps | Client 285.468 | −1.001 |
+| 5 engine | Mean ITL, engine (span / (completion tokens − 1)) | 4.547 ms | – | Client 4.531 | +0.016 |
+| 5 engine | End-to-end, engine (`last_token_time − arrival_time`) | 315.947 ms | – | Client 321.604 | −5.657 |
+| 5 engine | Handler, template, tokenization (`arrival_time − server_arrival_time`) | 0.589 ms | Before the executor | – | – |
+| 5 engine | `/perf_metrics` second read: entries | 0 | The read drains | – | – |
 
 Segments of client TTFT (each named by the clocks at its two ends; they must sum to client TTFT):
 
 | Segment | Clocks | ms |
 | --- | --- | --- |
-| send → request's last byte on the wire | client → pcap | |
-| wire → `server_arrival_time` | pcap → engine | |
-| `server_arrival_time` → `arrival_time` | engine | |
-| `arrival_time` → `first_scheduled_time` | engine | |
-| `first_scheduled_time` → `first_token_time` | engine | |
-| `first_token_time` → `server_first_token_time` | engine | |
-| `server_first_token_time` → first token on the wire | engine → pcap | |
-| wire → client first token event | pcap → client | |
-| `last_token_time` → `[DONE]` on the wire (end-to-end tail) | engine → pcap | |
-| `[DONE]` on the wire → protocol completion (end-to-end tail) | pcap → client | |
+| send → request's last byte on the wire | client → pcap | 2.348 |
+| wire → `server_arrival_time` | pcap → engine | 0.607 |
+| `server_arrival_time` → `arrival_time` | engine | 0.589 |
+| `arrival_time` → `first_scheduled_time` | engine | 2.169 |
+| `first_scheduled_time` → `first_token_time` | engine | 27.309 |
+| `first_token_time` → `server_first_token_time` | engine | 1.303 |
+| `server_first_token_time` → first token on the wire | engine → pcap | 0.584 |
+| wire → client first token event | pcap → client | 0.655 |
+| sum of the 8 | | 35.564 = client TTFT |
+| `last_token_time` → `[DONE]` on the wire (end-to-end tail) | engine → pcap | 1.643 |
+| `[DONE]` on the wire → protocol completion (end-to-end tail) | pcap → client | 0.469 |
 
-Where each engine time is stamped (TensorRT-LLM 1.2.1 installed source):
+Where each engine time is stamped (TensorRT-LLM 1.2.1 installed source, `make source`):
 
 | Field | File:line | Stamped when |
 | --- | --- | --- |
-| `server_arrival_time` | | |
-| `arrival_time` | | |
-| `first_scheduled_time` | | |
-| `first_token_time` | | |
-| `server_first_token_time` | | |
-| `last_token_time` | | |
+| `server_arrival_time` | `serve/responses_utils.py:1930` | Handler receives the request |
+| `arrival_time` | `llmapi/llm.py:388` | LLM API submits it, after template and tokenization |
+| `first_scheduled_time` | `_torch/pyexecutor/seq_slot_manager.py:29` | Scheduler gives it a slot |
+| `first_token_time` | `_torch/pyexecutor/py_executor.py:2649` → C++ `updatePerfMetrics` | First response handling after prefill |
+| `server_first_token_time` | `serve/openai_server.py:500` (`chat_stream_generator`) | First output reaches the HTTP handler |
+| `last_token_time` | `_torch/pyexecutor/py_executor.py:2649` → C++ `updatePerfMetrics` | Every response handling; last one stays |
 
 ## Pass Check 
 All tests must pass. Five checks (owner ruling 2026-10-31). Measured values: 60 requests, 3 stack starts, 2026-10-31.
@@ -202,6 +205,56 @@ and `segments` parts with `latency_records`.
 
 ## Results 
 
+**Run:** `I02A_20261103T164324Z_348959`, 2026-11-03. **Pass check:** `make check` 5 of 5 passed on a fresh stack
+(project `ie-i02a-l1-test`); `make test-unit` 33 passed.
+
+| Quantity | Client | Wire | Engine |
+| --- | --- | --- | --- |
+| TTFT, ms | 35.564 | 34.910 | 29.478 |
+| Mean ITL, ms | 4.531 | 4.533 | 4.547 |
+| End-to-end, ms | 321.604 | 321.134 | 315.947 |
+
+- **Prefill dominates TTFT:** 27.309 of 35.564 ms (77%). Queue 2.169, handler and template 0.589, the two network
+  legs 2.348 and 0.655, engine-to-handler 1.303.
+- **Slower than the spec's measurements (2026-10-31):** TTFT 35.6 vs about 20 ms, ITL 4.5 vs about 3.4 ms, and the TTFT
+  remainder 6.09 ms is just above the measured range (3.22 to 5.97). The SM clock was 2742 MHz during the request, so a
+  low clock does not explain it. Cause not found; `devtools/overhead.json` measures whether the devtools add to it.
+- **Decode efficiency:** decode MBU 0.485 (218 GB/s of 448 GB/s Published), from 0.989 GB per step (weights + KV) and
+  the engine ITL. Nsight Compute measured 1.013 GB DRAM read for one decode step (`TRACE=kernels`), 2.5% above the
+  estimate. Prefill MFU is Unavailable (peak tensor FLOPS not yet sourced; I03); achieved 1.23 TFLOP/s.
+- **K4 (`make k4`):** default `skip_special_tokens` gives 58 records for 64 tokens, and check 1 fails; `false` gives
+  64 = 64. The spec measured 56; the count depends on where the answer ends.
+- **Profiled runs (labeled, not measured):** `TRACE=timeline` (Nsight Systems, CUDA graphs on, 29,891 kernels mapped
+  to their iteration and request), `TRACE=code` (PyTorch profiler with Python stacks, iterations 66–129, 211 kernels
+  per decode step), `TRACE=kernels` (Nsight Compute, iteration 67, 242 kernels, 12 replay passes each).
+- **Iteration numbering:** `/perf_metrics` counts iterations from 1; the executor's NVTX labels and
+  `TLLM_PROFILE_START_STOP` count from 0. Checked by time: `first_iter` 66 starts in NVTX label 65.
+- **Open: `server_arrival_time` is stamped at the headers, not the full request.** It is set in a pure ASGI middleware
+  (`serve/responses_utils.py:1930`), which runs once uvicorn has parsed the headers; the body is read later. In run
+  `I02A_20261103T173059Z_b3fec0` the warm-up's body frame came 0.43 ms after its headers frame, and segment
+  "wire → `server_arrival_time`" was −0.187 ms; the evidence rule stopped the analysis. Segments 1–2 should end at the
+  request's headers frame, with the body's arrival inside segment 3. Pending owner decision.
+
 ## Why It Matters 
 
+- **TTFT is a client time that must hold a token.** TensorRT-LLM sends headers about 25 ms before it has a token, and
+  the first body read holds only the role event. A load test that times headers or the first read reports a TTFT
+  shorter than prefill.
+- **Every latency has an owner.** The 8 segments split client TTFT across three clocks. Prefill is 27.3 of 35.6 ms;
+  the network and the HTTP layer are under 2 ms each. Tuning targets come from the segment that grows, not the total.
+- **`/perf_metrics` drains on read.** Correlation rests on isolation (one request, a drain before, one record after).
+  Any other reader, such as a dashboard, breaks the join.
+- **The wire is the referee.** The capture agrees with the SDK to 0.002 ms on mean ITL, so client-side parsing is not
+  where latency hides.
+
 ## Toolkit
+
+| Tool | Use |
+| --- | --- |
+| `make rep` | One measured run: stack up, warm-up, drain, measured request, analysis, `run.json` |
+| `make rep TRACE=timeline` / `code` / `kernels` | Labeled profiled runs: Nsight Systems, PyTorch profiler with stacks, Nsight Compute |
+| `make check` | The five pass checks on a fresh stack |
+| `make k4`, `make source` | Walkthrough additions 3 and 2 |
+| `make devtools` | Devtools at `http://127.0.0.1:7700`: Infrastructure, Lifecycle, Requests, Runs, Trace, Metrics, Logs, Tools |
+| `scripts/iectl.py` | Agent CLI: `status`, `wait`, `logs`, `lifecycle`, `runs`, `run`, `spans`, `metrics`, `raw`, `snapshot`, `overhead` |
+| `latency_records`, `pcap_streams`, `efficiency` | The analysis functions in `src/inference_analysis/` |

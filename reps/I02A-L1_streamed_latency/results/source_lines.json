@@ -1,0 +1,59 @@
+{
+  "server_arrival_time": [
+    {
+      "file": "serve/responses_utils.py",
+      "line": 1930,
+      "text": "\"server_arrival_time\"] = get_steady_clock_now_in_seconds()"
+    }
+  ],
+  "arrival_time": [
+    {
+      "file": "llmapi/llm.py",
+      "line": 388,
+      "text": "arrival_time = steady_clock_now("
+    }
+  ],
+  "first_scheduled_time": [
+    {
+      "file": "_torch/pyexecutor/seq_slot_manager.py",
+      "line": 29,
+      "text": "llm_req.set_first_scheduled_time()"
+    }
+  ],
+  "first_token_time": [
+    {
+      "file": "_torch/pyexecutor/py_executor.py",
+      "line": 2649,
+      "text": "request.update_perf_metrics(self.iter_counter)"
+    }
+  ],
+  "last_token_time": [
+    {
+      "file": "_torch/pyexecutor/py_executor.py",
+      "line": 2649,
+      "text": "request.update_perf_metrics(self.iter_counter)"
+    }
+  ],
+  "server_first_token_time": [
+    {
+      "file": "serve/openai_server.py",
+      "line": 500,
+      "text": "raw_request.state.server_first_token_time = get_steady_clock_now_in_seconds()"
+    },
+    {
+      "file": "serve/openai_server.py",
+      "line": 529,
+      "text": "raw_request.state.server_first_token_time = get_steady_clock_now_in_seconds()"
+    },
+    {
+      "file": "serve/openai_server.py",
+      "line": 708,
+      "text": "raw_request.state.server_first_token_time = get_steady_clock_now_in_seconds()"
+    },
+    {
+      "file": "serve/openai_server.py",
+      "line": 778,
+      "text": "raw_request.state.server_first_token_time = get_steady_clock_now_in_seconds()"
+    }
+  ]
+}

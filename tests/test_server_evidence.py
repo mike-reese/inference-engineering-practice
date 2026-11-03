@@ -1,6 +1,6 @@
 import pytest
 
-from inference_analysis.server_evidence import join_requests, log_tasks, pcap_streams
+from inference_analysis.server_evidence import pcap_streams
 
 HEADER = "frame.time_epoch\ttcp.stream\ttcp.dstport\ttcp.flags.syn\ttcp.payload"
 REQUEST = b"POST /v1/chat/completions HTTP/1.1\r\nHost: server:8080\r\nX-Request-ID: run-0007\r\n\r\n"
@@ -37,6 +37,8 @@ def test_chat_stream_boundaries_in_utc_ns():
         "request_last_ns": 100_000_000_400,
         "response_first_ns": 100_000_020_000,
         "first_content_ns": 100_000_031_000,
+        "token_event_ns": [],  # no logprobs records: not a diagnostic request
+        "done_ns": 100_000_090_000,
         "last_data_ns": 100_000_090_000,
     }}
 
@@ -59,43 +61,23 @@ def test_a_reused_connection_is_refused():
         pcap_streams("\n".join([HEADER, *reused]))
 
 
-LOG = """\
-0.04.799.294 I srv  log_server_r: request: GET /health 127.0.0.1 200
-0.06.309.321 D request: {"model":"local","stream":true,"messages":[{"role":"system","content":"x"}]}
-0.06.311.223 D que          post: new task, id = 0/1, front = 0
-0.06.311.346 I slot launch_slot_: id  0 | task 0 | processing task
-0.06.311.350 D que          post: new task, id = 1, front = 0
-0.06.311.354 I slot update_slots: id  0 | task 0 | new prompt, n_ctx_slot = 4096, n_keep = 0, n_prompt_tokens = 64
-0.06.352.943 D srv          send: sending result for task id = 0
-0.06.361.968 D srv          send: sending result for task id = 0
-0.06.603.843 I slot      release: id  0 | task 0 | stop processing: n_past = 95, truncated = 0
-0.06.604.004 I srv  log_server_r: request: POST /v1/chat/completions 172.18.0.7 200
-"""
+def token(text: str) -> bytes:
+    return ('data: {"choices":[{"index":0,"delta":{"content":"%s"},"logprobs":{"content":[{"token":"%s"}]}}]}\n\n'
+            % (text, text)).encode()
 
 
-def test_log_task_times_in_microseconds_since_log_start():
-    assert log_tasks(LOG) == [{
-        "task": 0, "handler_us": 6_309_321, "post_us": 6_311_223, "launch_us": 6_311_346, "n_prompt": 64,
-        "first_send_us": 6_352_943, "release_us": 6_603_843, "access_us": 6_604_004,
-    }]
-
-
-def record(request_id: str, utc_ns: int, prompt_tokens: int | None) -> dict:
-    usage = None if prompt_tokens is None else {"prompt_tokens": prompt_tokens}
-    return {"request_id": request_id, "anchor_pair": {"utc_ns": utc_ns, "monotonic_ns": 0}, "usage": usage}
-
-
-def test_join_matches_send_order_to_task_order_and_skips_uncaptured_records():
-    streams = {"a": {}, "b": {}}
-    tasks = [{"task": 0, "n_prompt": 64}, {"task": 33, "n_prompt": 256}]
-    records = [record("b", 2, 256), record("never-reached-server", 3, None), record("a", 1, 64)]
-    joined = join_requests(records, streams, tasks)
-    assert [(row["record"]["request_id"], row["task"]["task"]) for row in joined] == [("a", 0), ("b", 33)]
-
-
-def test_join_refuses_a_count_or_prompt_mismatch():
-    streams = {"a": {}, "b": {}}
-    with pytest.raises(ValueError):
-        join_requests([record("a", 1, 64), record("b", 2, 64)], streams, [{"task": 0, "n_prompt": 64}])
-    with pytest.raises(ValueError):
-        join_requests([record("a", 1, 64)], {"a": {}}, [{"task": 0, "n_prompt": 256}])
+def test_token_events_and_done_frame():
+    """Three frames after the headers, the second holding two token events; [DONE] before the terminator frame."""
+    chunked = [
+        frame("100.000000300", 0, True, REQUEST),
+        frame("100.000020000", 0, False, HEADERS),
+        frame("100.000030000", 0, False, ROLE + token("a")),
+        frame("100.000033000", 0, False, token("b") + token("c")),
+        frame("100.000036000", 0, False, token("d")),
+        frame("100.000040000", 0, False, DONE),
+        frame("100.000041000", 0, False, b"0\r\n\r\n"),
+    ]
+    stream = pcap_streams("\n".join([HEADER, *chunked]))["run-0007"]
+    assert stream["token_event_ns"] == [100_000_030_000, 100_000_033_000, 100_000_033_000, 100_000_036_000]
+    assert stream["done_ns"] == 100_000_040_000
+    assert stream["last_data_ns"] == 100_000_041_000

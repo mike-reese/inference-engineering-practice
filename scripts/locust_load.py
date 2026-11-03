@@ -32,7 +32,9 @@ def run_step(client, transport: ObservedTransport, metrics: ClientMetrics, recor
             item = pending.pop(0)
             with metrics.in_flight.labels(phase).track_inprogress():
                 record = send_one(client, transport, item["request_id"], item["messages"], item["max_tokens"],
-                                  diagnostic=step.get("diagnostic", False), detail=step.get("detail", True))
+                                  diagnostic=step.get("diagnostic", False), detail=step.get("detail", True),
+                                  timeout_s=step.get("timeout_s"),
+                                  skip_special_tokens=step.get("skip_special_tokens", False))
             record["phase"] = phase
             record["isl"] = step["isl"]
             record["block"] = step.get("block")

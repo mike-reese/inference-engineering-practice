@@ -103,7 +103,8 @@ def make_client() -> tuple[OpenAI, ObservedTransport]:
     return client, transport
 
 def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, messages: list[dict], max_tokens: int,
-             diagnostic: bool = False, detail: bool = True) -> dict:
+             diagnostic: bool = False, detail: bool = True, timeout_s: float | None = None,
+             skip_special_tokens: bool | None = False) -> dict:
     record = {
         "request_id": request_id,
         "headers_ns": None,
@@ -113,7 +114,6 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
         "status": None,
         "events": [],
         "usage": None,
-        "timings": None,
         "finish_reason": None,
         "error": None,
         "body_reads": [],
@@ -128,7 +128,8 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
     token_options = {"logprobs": True, "top_logprobs": 1} if diagnostic else {"logprobs": False}
 
     try:
-        with client.chat.completions.with_streaming_response.create(
+        api = client.with_options(timeout=timeout_s) if timeout_s else client  # profiled runs: minutes per token
+        with api.chat.completions.with_streaming_response.create(
             model="local",
             messages=messages,
             max_tokens=max_tokens,
@@ -137,7 +138,9 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
             stream=True,
             stream_options={"include_usage": True},
             **token_options,
-            extra_body={"cache_prompt": False, "ignore_eos": True},
+            # skip_special_tokens None: leave the engine's default (True), for the K4 demonstration only.
+            extra_body={"ignore_eos": True, **({} if skip_special_tokens is None
+                                                else {"skip_special_tokens": skip_special_tokens})},
             extra_headers={"X-Request-ID": request_id},
         ) as response:
             record["headers_ns"] = time.perf_counter_ns()
@@ -156,7 +159,6 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
                         record["finish_reason"] = choice.finish_reason
                 if chunk.usage is not None:
                     record["usage"] = chunk.usage.model_dump()
-                    record["timings"] = chunk.model_dump().get("timings")
 
             record["protocol_complete_ns"] = time.perf_counter_ns()
     except openai.APIStatusError as exc:

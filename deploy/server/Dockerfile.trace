@@ -1,0 +1,13 @@
+# Trace-only variant of the engine image (TRACE=code|kernels). Never used for measured runs.
+# 1. The PyTorch profiler hook records the Python stack per op (with_stack=True): file and line per kernel.
+# 2. The hang detector's 300 s timeout reads TLLM_HANG_TIMEOUT: under Nsight Compute one iteration takes minutes.
+FROM ie-tensorrt-llm:1.2.1-nvml-byref
+
+ARG PKG=/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor
+
+RUN sed -i 's/with_modules=True)/with_modules=True, with_stack=True)/' "${PKG}/py_executor.py" \
+ && grep -q "with_stack=True" "${PKG}/py_executor.py" \
+ && sed -i -e 's/^import asyncio$/import asyncio\nimport os/' \
+      -e 's/timeout if timeout is not None else 300/timeout if timeout is not None else int(os.environ.get("TLLM_HANG_TIMEOUT", "300"))/' \
+      "${PKG}/hang_detector.py" \
+ && grep -q 'TLLM_HANG_TIMEOUT' "${PKG}/hang_detector.py"

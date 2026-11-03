@@ -1,3 +1,5 @@
+# Runs in the devtools project on the host network. The engine and client targets come from the devtools backend
+# (http_sd): whichever rep stack is up, at its published port. Never /perf_metrics or /metrics: both drain (K9).
 global:
   scrape_interval: 1s
   evaluation_interval: 1s
@@ -7,14 +9,17 @@ rule_files:
 
 scrape_configs:
   - job_name: server
-    static_configs:
-      - targets: ["server:8080"]
+    metrics_path: /prometheus/metrics
+    http_sd_configs:
+      - url: "http://127.0.0.1:7700/api/prometheus/targets?service=server&port=8080"
+        refresh_interval: 2s
   - job_name: client
-    static_configs:
-      - targets: ["client:9410"]
+    http_sd_configs:
+      - url: "http://127.0.0.1:7700/api/prometheus/targets?service=client&port=9410"
+        refresh_interval: 2s
   - job_name: node
     static_configs:
-      - targets: ["node:9100"]
+      - targets: ["127.0.0.1:7791"]
   - job_name: dcgm
     static_configs:
-      - targets: ["dcgm:9400"]
+      - targets: ["127.0.0.1:7794"]

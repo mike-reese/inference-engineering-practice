@@ -1,0 +1,96 @@
+# The devtools and the monitoring it hosts: their own Compose project, so a rep's `compose down` never stops them.
+# Host network, bound to 127.0.0.1 only: the backend reaches each rep stack at its published ports, and Prometheus
+# and Grafana sit behind the backend's proxy (/prometheus, /grafana).
+name: "ie-devtools"
+services:
+  devtools:
+    build:
+      context: ../devtools
+    image: "ie-devtools:dev"
+    network_mode: host
+    gpus: "all"   # nvidia-smi inside the container
+    pid: "host"   # host /proc: maps a GPU process to its container
+    environment:
+      DEVTOOLS_HOST: "127.0.0.1"
+      DEVTOOLS_PORT: "7700"
+      REPO: "/repo"
+      PYTHONDONTWRITEBYTECODE: "1"
+      REPO_HOST: "${REPO_HOST:-}"   # the repo's host path (make devtools sets it): maps mounts to /repo
+    # Run the code from the mounted repo, so a change needs a restart (make devtools-restart), not a rebuild.
+    command: ["python", "-u", "/repo/devtools/backend/app.py"]
+    volumes:
+      # Read-only mount, but the Docker API is still root-equivalent: local machine only; read endpoints only.
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "..:/repo:ro"   # run folders and the trace adapters (src/inference_analysis/trace)
+    mem_limit: 1g
+  prometheus:
+    image: "prom/prometheus:v3.13.5@sha256:aafa9d694e6a883c02db516d9f6e5b84e14195f49a2a6456a4cca815edda72b9"
+    network_mode: host
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=2h"
+      - "--storage.tsdb.retention.size=128MB"
+      - "--web.listen-address=127.0.0.1:7790"
+      - "--web.external-url=http://127.0.0.1:7700/prometheus/"
+      - "--web.route-prefix=/prometheus/"
+    volumes:
+      - "../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+      - "../monitoring/rules.yml:/etc/prometheus/rules.yml:ro"
+      - "prometheus-data:/prometheus"
+    mem_limit: 512m
+  node:
+    image: "prom/node-exporter:v1.12.1@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0"
+    network_mode: host
+    pid: host
+    command:
+      - "--web.listen-address=127.0.0.1:7791"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/host/root"
+      - "--collector.disable-defaults"
+      - "--collector.cpu"
+      - "--collector.meminfo"
+      - "--collector.loadavg"
+      - "--collector.uname"
+      - "--collector.stat"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/host/root:ro,rslave"
+    mem_limit: 128m
+  dcgm:
+    image: "nvidia/dcgm-exporter:4.3.1-4.4.1-ubuntu22.04@sha256:64f322a826599664a1fe5ea4e3f76b7b0984142050e7047d63ae1d6687b4b1aa"
+    network_mode: host
+    gpus: "all"
+    devices:
+      - "/dev/nvidia-uvm:/dev/nvidia-uvm"
+      - "/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools"
+    command: ["-c", "1000", "-f", "/etc/dcgm-exporter/selected.csv", "-a", "127.0.0.1:7794"]
+    volumes:
+      - "../monitoring/dcgm.csv:/etc/dcgm-exporter/selected.csv:ro"
+    mem_limit: 1g
+  grafana:
+    image: "grafana/grafana:13.3.0@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205"
+    network_mode: host
+    environment:
+      GF_SERVER_HTTP_ADDR: "127.0.0.1"
+      GF_SERVER_HTTP_PORT: "7730"
+      GF_SERVER_ROOT_URL: "http://127.0.0.1:7700/grafana/"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+      GF_LIVE_MAX_CONNECTIONS: "0"
+    volumes:
+      - "../monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro"
+      - "../monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro"
+      - "../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro"
+    mem_limit: 1g
+volumes:
+  prometheus-data: {}

@@ -1,0 +1,21 @@
+{
+  "run_id": "K4_20261103T172626Z_3c139c",
+  "default": {
+    "skip_special_tokens": "engine default",
+    "events": 60,
+    "token_events": 58,
+    "records": 58,
+    "completion_tokens": 64,
+    "text": "2 plus 2 is 4.\nHuman: What is the answer to 2 + 2?\nuser\nThe answer to 2 + 2 is 4. What is the answer to 2 + 2?\nuser\nWhat is the answer to 2",
+    "check_1_holds": false
+  },
+  "false": {
+    "skip_special_tokens": false,
+    "events": 66,
+    "token_events": 64,
+    "records": 64,
+    "completion_tokens": 64,
+    "text": "2 plus 2 is 4.<|im_end|>\n<|endoftext|>Human: What is the answer to 2 + 2?<|im_end|>\n<|im_start|>user\nThe answer to 2 + 2 is 4. What is the answer to 2 + 2?<|im_end|>\n<|im_start|>user\nWhat is the answer to 2",
+    "check_1_holds": true
+  }
+}

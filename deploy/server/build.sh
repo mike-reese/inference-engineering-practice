@@ -2,69 +2,41 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PINNED_COMMIT="a7a98e0fffed794396b3fbad4dcdbbc184963645"
-IMAGE_TAG="ie-llama-cpp-server:b6500-cuda12.4-sm61"
-REPO_URL="https://github.com/ggml-org/llama.cpp.git"
-SOURCE_FOLDER="$HOME/Work/Code/Personal/inference-engineering-misc/ie-llama-cpp-clone"
+IMAGE_TAG="ie-tensorrt-llm:1.2.1-nvml-byref"
+BASE_IMAGE="nvcr.io/nvidia/tensorrt-llm/release:1.2.1@sha256:33cd085b772947bd22b7273886539331420404e5d2a4a039945241945ff927b9"
+PATCHED_FILE="/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py"
 LOG_PATH="$SCRIPT_DIR/build.log"
-EXPECTED_DOCKERFILE_SHA256="9476a36157c1883ba7bbd2bb8b3ef855cd2bcd4e1965ef02a73524eed782b455"
 
-if [ ! -d "$SOURCE_FOLDER/.git" ]; then
-  git clone "$REPO_URL" "$SOURCE_FOLDER"
-fi 
-
-git -C "$SOURCE_FOLDER" checkout --quiet "$PINNED_COMMIT"
-
-# Verify source exists before building
-ACTUAL_COMMIT="$(git -C "$SOURCE_FOLDER" rev-parse HEAD)"
-if [ "$ACTUAL_COMMIT" != "$PINNED_COMMIT" ]; then
-  echo "ERROR: source is at $ACTUAL_COMMIT, expected $PINNED_COMMIT" >&2
-  exit 1
-fi
-
-if [ -n "$(git -C "$SOURCE_FOLDER" status --porcelain)" ]; then
-  echo "ERROR: source folder has local changes; refusing to build" >&2
-  exit 1
-fi 
-
-DOCKERFILE="$SOURCE_FOLDER/.devops/cuda.Dockerfile"
-ACTUAL_DOCKERFILE_SHA256="$(sha256sum "$DOCKERFILE" | cut -d ' ' -f 1)"
-if [ "$ACTUAL_DOCKERFILE_SHA256" != "$EXPECTED_DOCKERFILE_SHA256" ]; then
-  echo "ERROR: Dockerfile sha256 is $ACTUAL_DOCKERFILE_SHA256, expected $EXPECTED_DOCKERFILE_SHA256" >&2
-  exit 1
-fi
 
 # Build the server image, saving the full log
 docker build \
-  -f "$DOCKERFILE" \
-  --target server \
-  --build-arg CUDA_VERSION=12.4.0 \
-  --build-arg UBUNTU_VERSION=22.04 \
-  --build-arg CUDA_DOCKER_ARCH=61 \
   --no-cache \
   --progress=plain \
   -t "$IMAGE_TAG" \
-  "$SOURCE_FOLDER" 2>&1 | tee "$LOG_PATH"
+  "$SCRIPT_DIR" 2>&1 | tee "$LOG_PATH"
 
-# Record the build's identity
+
+# Record the build's identity, read back from the built image
 IMAGE_ID="$(docker image inspect "$IMAGE_TAG" --format '{{.Id}}')"
-DEVEL_BASE="nvidia/cuda:12.4.0-devel-ubuntu22.04"
-RUNTIME_BASE="nvidia/cuda:12.4.0-runtime-ubuntu22.04"
-DEVEL_DIGEST="$(docker image inspect "$DEVEL_BASE" --format '{{index .RepoDigests 0}}')"
-RUNTIME_DIGEST="$(docker image inspect "$RUNTIME_BASE" --format '{{index .RepoDigests 0}}')"
+DOCKERFILE_SHA256="$(sha256sum "$SCRIPT_DIR/Dockerfile" | cut -d ' ' -f 1)"
+PATCHED_SHA256="$(docker run --rm --entrypoint sha256sum "$IMAGE_TAG" "$PATCHED_FILE" | cut -d ' ' -f 1)"
+ENGINE_VERSION="$(docker run --rm --entrypoint python3 "$IMAGE_TAG" -c \
+  'import importlib.metadata as m; print(m.version("tensorrt_llm"))')"
 
-cat > "$SCRIPT_DIR/image.json" <<EOF
+cat > "$SCRIPT_DIR/image.json" <<JSON
 {
   "image_tag": "$IMAGE_TAG",
   "image_id": "$IMAGE_ID",
-  "source_repo": "$REPO_URL",
-  "source_commit": "$ACTUAL_COMMIT",
-  "dockerfile_sha256": "$ACTUAL_DOCKERFILE_SHA256",
-  "build_args": {"CUDA_VERSION": "12.4.0", "UBUNTU_VERSION": "22.04", "CUDA_DOCKER_ARCH": "61"},
-  "target": "server",
-  "base_images": {"build": "$DEVEL_DIGEST", "runtime": "$RUNTIME_DIGEST"},
+  "base_image": "$BASE_IMAGE",
+  "dockerfile_sha256": "$DOCKERFILE_SHA256",
+  "engine_version": "$ENGINE_VERSION",
+  "local_patch": {
+    "file": "$PATCHED_FILE",
+    "sha256_after": "$PATCHED_SHA256",
+    "source": "https://github.com/NVIDIA/TensorRT-LLM/issues/18816"
+  },
   "built_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 }
-EOF
+JSON
 
 echo "Built $IMAGE_TAG -> $IMAGE_ID"

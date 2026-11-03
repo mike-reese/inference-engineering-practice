@@ -6,10 +6,8 @@ import numpy as np
 import pytest
 
 from inference_analysis.chat_records import (
-    causal_pairs,
     chat_durations,
     content_event_gaps,
-    engine_counter_seconds,
     half_p50_difference_ms,
     held_back_line_miss_ms,
     histogram_counts,
@@ -17,9 +15,7 @@ from inference_analysis.chat_records import (
     locust_median_ms,
     locust_percentile_ms,
     locust_response_times,
-    log_offset_bounds,
     paired_bootstrap_interval,
-    request_segments,
     service_output_throughput,
 )
 
@@ -100,116 +96,6 @@ def test_connection_failure_has_no_headers_content_or_e2e():
 def test_gaps_refuse_a_record_without_saved_events():
     with pytest.raises(ValueError):
         content_event_gaps(k5_record() | {"detail": False, "events": []})
-
-
-def test_each_request_is_truncated_before_summing():
-    timings = [{"prompt_ms": 1.9, "predicted_ms": 10.5}, {"prompt_ms": 2.9, "predicted_ms": 20.99}]
-    assert engine_counter_seconds(timings, "prompt") == pytest.approx(0.003, abs=1e-12)
-    assert engine_counter_seconds(timings, "generation") == pytest.approx(0.030, abs=1e-12)
-
-
-def test_k11_reference_totals():
-    timings = json.loads((FIXTURES / "k11_engine_timings.json").read_text())
-    assert len(timings) == 176
-    assert engine_counter_seconds(timings, "prompt") == pytest.approx(7.838, abs=1e-9)
-    assert engine_counter_seconds(timings, "generation") == pytest.approx(41.795, abs=1e-9)
-
-
-def test_k11_raw_decimal_sum_is_the_wrong_representation():
-    timings = json.loads((FIXTURES / "k11_engine_timings.json").read_text())
-    raw_prompt_ms = sum(t["prompt_ms"] for t in timings)
-    raw_generation_ms = sum(t["predicted_ms"] for t in timings)
-    assert raw_prompt_ms - engine_counter_seconds(timings, "prompt") * 1e3 == pytest.approx(81.691, abs=1e-6)
-    assert raw_generation_ms - engine_counter_seconds(timings, "generation") * 1e3 == pytest.approx(84.711, abs=1e-6)
-
-
-def test_rejects_negative_time_and_unknown_phase():
-    with pytest.raises(ValueError):
-        engine_counter_seconds([{"prompt_ms": -0.5}], "prompt")
-    with pytest.raises(ValueError):
-        engine_counter_seconds([], "decode")
-
-
-TTFT_SEGMENTS = ["client_before_connect", "network_to_server", "server_receive", "template_tokenize", "queue",
-                 "launch_to_first_result", "server_send", "network_to_client", "client_parse"]
-
-
-def pilot2() -> list[dict]:
-    return json.loads((FIXTURES / "k15_pilot2.json").read_text())
-
-
-def pilot2_offset(rows: list[dict]) -> int:
-    low, high = log_offset_bounds([pair for row in rows for pair in causal_pairs(row["stream"], row["task"])])
-    return (low + high) // 2
-
-
-def test_bounds_take_the_tightest_pair_on_each_side():
-    pairs = [
-        {"pcap_ns": 1_000_500, "log_us": 1_000, "log_after_pcap": True},
-        {"pcap_ns": 2_000_700, "log_us": 2_000, "log_after_pcap": True},
-        {"pcap_ns": 3_000_900, "log_us": 3_000, "log_after_pcap": False},
-        {"pcap_ns": 4_001_000, "log_us": 4_000, "log_after_pcap": False},
-    ]
-    assert log_offset_bounds(pairs) == (700, 900)
-
-
-def test_contradicting_or_one_sided_pairs_raise():
-    with pytest.raises(ValueError):
-        log_offset_bounds([{"pcap_ns": 900, "log_us": 0, "log_after_pcap": True},
-                           {"pcap_ns": 700, "log_us": 0, "log_after_pcap": False}])
-    with pytest.raises(ValueError):
-        log_offset_bounds([{"pcap_ns": 900, "log_us": 0, "log_after_pcap": True}])
-
-
-def test_k15_pilot2_offset_interval():
-    rows = pilot2()
-    assert len(rows) == 99
-    low, high = log_offset_bounds([pair for row in rows for pair in causal_pairs(row["stream"], row["task"])])
-    assert (low, high) == (1793225063705705159, 1793225063705781634)
-    assert (high - low) / 1e6 == pytest.approx(0.076475, abs=1e-9)
-
-
-def test_k15_segments_are_positive_and_sum_to_ttft_and_e2e():
-    rows = pilot2()
-    offset = pilot2_offset(rows)
-    for row in rows:
-        record = row["record"]
-        segments = request_segments(record, row["stream"], row["task"], offset)
-        assert [s["name"] for s in segments["ttft"]] == TTFT_SEGMENTS
-        assert all(s["ms"] > 0 for s in segments["ttft"] + segments["e2e"])
-        ttft_ms = (record["first_content_ns"] - record["send_ns"]) / 1e6
-        e2e_ms = (record["protocol_complete_ns"] - record["send_ns"]) / 1e6
-        assert sum(s["ms"] for s in segments["ttft"]) == pytest.approx(ttft_ms, abs=1e-9)
-        assert sum(s["ms"] for s in segments["e2e"]) == pytest.approx(e2e_ms, abs=1e-9)
-
-
-# K16 prints template_tokenize as 2.309; the exact even-N median is 2.3085, rounded half up in the table.
-K16_ISL_64 = {"client_before_connect": 0.856, "network_to_server": 0.508, "server_receive": 0.052,
-              "template_tokenize": 2.3085, "queue": 0.135, "launch_to_first_result": 21.132,
-              "server_send": 0.073, "network_to_client": 0.312, "client_parse": 0.115}
-
-
-def test_k16_isl_64_medians():
-    rows = pilot2()
-    offset = pilot2_offset(rows)
-    measured = [request_segments(r["record"], r["stream"], r["task"], offset)["ttft"]
-                for r in rows if r["record"]["isl"] == 64 and r["record"]["phase"] == "normal"]
-    assert len(measured) == 24
-    for i, name in enumerate(TTFT_SEGMENTS):
-        assert statistics.median(segments[i]["ms"] for segments in measured) == pytest.approx(K16_ISL_64[name], abs=5e-4)
-
-
-def test_negative_segment_raises():
-    row = pilot2()[0]
-    late_offset = pilot2_offset(pilot2()) + 10_000_000
-    with pytest.raises(ValueError):
-        request_segments(row["record"], row["stream"], row["task"], late_offset)
-
-
-def test_record_without_transport_detail_raises():
-    row = pilot2()[0]
-    with pytest.raises(ValueError):
-        request_segments(row["record"] | {"detail": False}, row["stream"], row["task"], pilot2_offset(pilot2()))
 
 
 # K6/K7 (spec I01-L2, Known results): the author's steady pilot, 3 repeats x 3 ISLs x 8 measured requests.

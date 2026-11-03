@@ -1,0 +1,19 @@
+# Traced runs only (TRACE=timeline|code|kernels): never the measured run. Added by compose_stack.Stack.
+# The trace image adds with_stack to the engine's PyTorch profiler and a settable hang timeout
+# (deploy/server/Dockerfile.trace). SYS_ADMIN gives the profilers CPU sampling, native stacks and GPU counters.
+services:
+  server:
+    image: "ie-tensorrt-llm:1.2.1-nvml-byref-trace"
+    cap_add: ["SYS_ADMIN"]
+    stop_grace_period: 10m   # the profiler writes its report on exit
+    environment:
+      TLLM_PROFILE_START_STOP: "${PROFILE_RANGE:?}"
+      TLLM_LLMAPI_ENABLE_NVTX: "1"
+      TLLM_TORCH_PROFILE_TRACE: "${TORCH_TRACE:-}"
+      TLLM_HANG_TIMEOUT: "7200"   # Nsight Compute replays each kernel ~35 times: an iteration takes minutes
+    volumes:
+      - "${RESULTS_DIR:?}/${RUN_ID:?}/trace:/trace"
+    # Through the image's own entrypoint (overriding it breaks the TensorRT import); exec so the profiler is PID 1.
+    command: ["bash", "-c", "exec ${TRACE_PREFIX:-} trtllm-serve serve /model --backend pytorch --host 0.0.0.0 --port 8080 --max_batch_size 1 --max_seq_len 2048 --config /config/config.yaml"]
+    healthcheck:
+      start_period: 900s

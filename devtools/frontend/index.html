@@ -1,0 +1,28 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IE Devtools</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <strong>IE Devtools</strong>
+    <nav id="tabs">
+      <button class="on" data-view="infra">Infrastructure</button>
+      <button data-view="lifecycle">Lifecycle</button>
+      <button data-view="requests">Requests</button>
+      <button data-view="runs">Runs</button>
+      <button data-view="trace">Trace</button>
+      <button data-view="metrics">Metrics</button>
+      <button data-view="logs">Logs</button>
+      <button data-view="tools">Tools</button>
+    </nav>
+    <span id="link" class="link">connecting</span>
+  </header>
+  <main id="view"></main>
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>
