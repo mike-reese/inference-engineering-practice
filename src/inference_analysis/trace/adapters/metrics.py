@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from ..schema import Metric, Run
+from ...latency import N_TTFT
 from .common import find
 
 ENGINE = "{rid}/engine/{f}"
@@ -69,12 +70,13 @@ def latency(path: Path, run: Run) -> None:
                      ("wire headers", "response headers frame - send", (send, response.id if response else None),
                       w["headers_ms"])]
             seg_ends = [send, max(last_sent, key=lambda s: s.start_ns).id if last_sent else None,
-                        e("server_arrival_time"), e("arrival_time"), e("first_scheduled_time"),
+                        e("arrival_time"), e("first_scheduled_time"),
                         e("first_token_time"), e("server_first_token_time"),
                         wire_tokens[0].id if wire_tokens else None, first_tok]
             tail_ends = [e("last_token_time"), done, f"{rid}/client/protocol_complete"]
-            for i, s in enumerate(rec["segments"]):  # 8 TTFT segments, then the 2 end-to-end tail segments
-                ends = (seg_ends[i], seg_ends[i + 1]) if i < 8 else (tail_ends[i - 8], tail_ends[i - 7])
+            for i, s in enumerate(rec["segments"]):  # N_TTFT TTFT segments, then the 2 end-to-end tail segments
+                ends = (seg_ends[i], seg_ends[i + 1]) if i < N_TTFT else (tail_ends[i - N_TTFT],
+                                                                          tail_ends[i - N_TTFT + 1])
                 rows.append((f"segment {i + 1}: {s['name']}", f"[{s['clocks']}] end - start", ends, s["ms"]))
         for name, formula, inputs, value in rows:
             inputs = tuple(i for i in inputs if i in known)

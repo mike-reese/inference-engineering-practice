@@ -12,14 +12,18 @@ NS_PER_MS = 1_000_000
 
 TTFT_SEGMENTS = (  # (name, clocks): each starts where the previous ended; they sum to client TTFT
     ("send → request's last byte on the wire", "client → pcap"),
-    ("wire → server_arrival_time", "pcap → engine"),
-    ("server_arrival_time → arrival_time", "engine"),
+    ("wire → arrival_time", "pcap → engine"),
     ("arrival_time → first_scheduled_time", "engine"),
     ("first_scheduled_time → first_token_time", "engine"),
     ("first_token_time → server_first_token_time", "engine"),
     ("server_first_token_time → first token on the wire", "engine → pcap"),
     ("wire → client first token event", "pcap → client"),
 )
+# server_arrival_time is not a boundary: TensorRT-LLM stamps it in an ASGI middleware once the headers are parsed,
+# before the body is read (serve/responses_utils.py:1930), so it can precede the request's last byte. A request has
+# arrived when all of it is in (I01-L2); arrival_time (llmapi/llm.py:388) follows the body read, parse, template and
+# tokenization. server_arrival_time is reported as a labeled point instead.
+N_TTFT = len(TTFT_SEGMENTS)
 TAIL_SEGMENTS = (
     ("last_token_time → [DONE] on the wire", "engine → pcap"),
     ("[DONE] on the wire → protocol completion", "pcap → client"),
@@ -48,7 +52,8 @@ def latency_records(record: dict, perf_entry: dict, stream: dict | None = None) 
     client.mean_itl_ms = (last token event - first token event) / (n - 1);  perceived_tps = 1000 / mean_itl_ms
     engine.queue_ms = first_scheduled_time - arrival_time;  engine.ttft_ms = first_token_time - arrival_time
     engine.decode_span_ms = last_token_time - first_token_time;  engine.e2e_ms = last_token_time - arrival_time
-    engine.http_ttft_ms = server_first_token_time - server_arrival_time
+    engine.http_ttft_ms = server_first_token_time - server_arrival_time (from headers parsed)
+    engine.headers_parsed_ms = server_arrival_time on the client clock (a labeled point, not a segment boundary)
     engine.mean_itl_ms = decode_span_ms / (completion_tokens - 1)
     remainder = client - engine for ttft, e2e and mean ITL
     wire: headers, first token event, [DONE] from send; mean ITL over the token events on the wire
@@ -141,7 +146,10 @@ def latency_records(record: dict, perf_entry: dict, stream: dict | None = None) 
     }
     if not events:
         raise ValueError(f"{record['request_id']}: no token event on the wire (not a diagnostic request?)")
-    bounds = [0.0, wire_ms(stream["request_last_ns"]), engine_ms("server_arrival_time"), engine_ms("arrival_time"),
+    if timing["server_arrival_time"] > timing["arrival_time"]:
+        raise ValueError(f"{record['request_id']}: server_arrival_time after arrival_time")
+    out["engine"]["headers_parsed_ms"] = engine_ms("server_arrival_time")
+    bounds = [0.0, wire_ms(stream["request_last_ns"]), engine_ms("arrival_time"),
               engine_ms("first_scheduled_time"), engine_ms("first_token_time"), engine_ms("server_first_token_time"),
               wire_ms(events[0]), client["ttft_ms"]]
     segments = [{"name": n, "clocks": c, "ms": b - a} for (n, c), a, b in zip(TTFT_SEGMENTS, bounds, bounds[1:])]

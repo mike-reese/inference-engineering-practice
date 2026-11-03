@@ -26,7 +26,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 from compose_stack import TRACE_IMAGE, TRACE_LEVELS, Stack, prepare_run_dir  # noqa: E402
 
 from inference_analysis.efficiency import efficiency  # noqa: E402
-from inference_analysis.latency import latency_records  # noqa: E402
+from inference_analysis.latency import N_TTFT, latency_records  # noqa: E402
 from inference_analysis.server_evidence import pcap_streams  # noqa: E402
 from inference_analysis.trace.build import write_run  # noqa: E402
 
@@ -223,10 +223,10 @@ def print_table(run_id: str, result: dict, prompt: dict, latency: dict) -> None:
         print(f"{name:<28}" + "".join(fmt(v) for v in values[:3]) + f"{fmt(values[3]):>15}")
     print(f"perceived TPS {c['perceived_tps']:.1f}" if c["perceived_tps"] else f"exact ITL Unavailable: {c['unavailable']}")
     if "segments" in lat:
-        print("\nsegments (client TTFT = the first 8):")
+        print(f"\nsegments (client TTFT = the first {N_TTFT}):")
         for s in lat["segments"]:
             print(f"  {s['ms']:8.3f}  {s['name']:<52} [{s['clocks']}]")
-        print(f"  {sum(s['ms'] for s in lat['segments'][:8]):8.3f}  sum of the 8 = client TTFT {c['ttft_ms']:.3f}")
+        print(f"  {sum(s['ms'] for s in lat['segments'][:N_TTFT]):8.3f}  sum of the {N_TTFT} = client TTFT {c['ttft_ms']:.3f}")
 
 
 def k4_demo() -> None:

@@ -122,5 +122,5 @@ def test_5_the_wire(measured):
     assert abs(lat["wire"]["mean_itl_ms"] - lat["client"]["mean_itl_ms"]) <= 0.05
     assert min(s["ms"] for s in lat["segments"]) > 0
     headers_wire_ms = lat["wire"]["headers_ms"]
-    first_token_ms = sum(s["ms"] for s in lat["segments"][:5])  # send -> first_token_time, on the client clock
+    first_token_ms = sum(s["ms"] for s in lat["segments"][:4])  # send -> first_token_time, on the client clock
     assert headers_wire_ms - first_token_ms < 0

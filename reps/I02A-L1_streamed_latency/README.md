@@ -72,22 +72,24 @@ Run `I02A_20261103T164324Z_348959` (2026-11-03), request `…-measured`. Open it
 | 5 engine | Decode span (`last_token_time − first_token_time`) | 286.469 ms | 63 gaps | Client 285.468 | −1.001 |
 | 5 engine | Mean ITL, engine (span / (completion tokens − 1)) | 4.547 ms | – | Client 4.531 | +0.016 |
 | 5 engine | End-to-end, engine (`last_token_time − arrival_time`) | 315.947 ms | – | Client 321.604 | −5.657 |
-| 5 engine | Handler, template, tokenization (`arrival_time − server_arrival_time`) | 0.589 ms | Before the executor | – | – |
+| 5 engine | Body read, parse, template, tokenization (`arrival_time − server_arrival_time`) | 0.589 ms | Before the executor | – | – |
+| 5 engine | Headers parsed (`server_arrival_time`, ASGI middleware) | 2.955 ms | A labeled point, not a boundary | Request's last byte 2.348 | +0.607 |
 | 5 engine | `/perf_metrics` second read: entries | 0 | The read drains | – | – |
 
-Segments of client TTFT (each named by the clocks at its two ends; they must sum to client TTFT):
+Segments of client TTFT (each named by the clocks at its two ends; they must sum to client TTFT). `server_arrival_time`
+is not a boundary: it is stamped once the headers are parsed, before the body is read, so it can precede the request's
+last byte. "wire → `arrival_time`" holds the server-side receive, body read, parse, template and tokenization.
 
 | Segment | Clocks | ms |
 | --- | --- | --- |
 | send → request's last byte on the wire | client → pcap | 2.348 |
-| wire → `server_arrival_time` | pcap → engine | 0.607 |
-| `server_arrival_time` → `arrival_time` | engine | 0.589 |
+| wire → `arrival_time` | pcap → engine | 1.196 |
 | `arrival_time` → `first_scheduled_time` | engine | 2.169 |
 | `first_scheduled_time` → `first_token_time` | engine | 27.309 |
 | `first_token_time` → `server_first_token_time` | engine | 1.303 |
 | `server_first_token_time` → first token on the wire | engine → pcap | 0.584 |
 | wire → client first token event | pcap → client | 0.655 |
-| sum of the 8 | | 35.564 = client TTFT |
+| sum of the 7 | | 35.564 = client TTFT |
 | `last_token_time` → `[DONE]` on the wire (end-to-end tail) | engine → pcap | 1.643 |
 | `[DONE]` on the wire → protocol completion (end-to-end tail) | pcap → client | 0.469 |
 
@@ -95,7 +97,7 @@ Where each engine time is stamped (TensorRT-LLM 1.2.1 installed source, `make so
 
 | Field | File:line | Stamped when |
 | --- | --- | --- |
-| `server_arrival_time` | `serve/responses_utils.py:1930` | Handler receives the request |
+| `server_arrival_time` | `serve/responses_utils.py:1930` | ASGI middleware: headers parsed, body not yet read |
 | `arrival_time` | `llmapi/llm.py:388` | LLM API submits it, after template and tokenization |
 | `first_scheduled_time` | `_torch/pyexecutor/seq_slot_manager.py:29` | Scheduler gives it a slot |
 | `first_token_time` | `_torch/pyexecutor/py_executor.py:2649` → C++ `updatePerfMetrics` | First response handling after prefill |
@@ -214,8 +216,8 @@ and `segments` parts with `latency_records`.
 | Mean ITL, ms | 4.531 | 4.533 | 4.547 |
 | End-to-end, ms | 321.604 | 321.134 | 315.947 |
 
-- **Prefill dominates TTFT:** 27.309 of 35.564 ms (77%). Queue 2.169, handler and template 0.589, the two network
-  legs 2.348 and 0.655, engine-to-handler 1.303.
+- **Prefill dominates TTFT:** 27.309 of 35.564 ms (77%). Queue 2.169; request's last byte → `arrival_time` (receive,
+  body, template, tokenization) 1.196; the two network legs 2.348 and 0.655; engine-to-handler 1.303.
 - **Slower than the spec's measurements (2026-10-31):** TTFT 35.6 vs about 20 ms, ITL 4.5 vs about 3.4 ms, and the TTFT
   remainder 6.09 ms is just above the measured range (3.22 to 5.97). The SM clock was 2742 MHz during the request, so a
   low clock does not explain it. Cause not found; `devtools/overhead.json` measures whether the devtools add to it.
@@ -229,18 +231,19 @@ and `segments` parts with `latency_records`.
   per decode step), `TRACE=kernels` (Nsight Compute, iteration 67, 242 kernels, 12 replay passes each).
 - **Iteration numbering:** `/perf_metrics` counts iterations from 1; the executor's NVTX labels and
   `TLLM_PROFILE_START_STOP` count from 0. Checked by time: `first_iter` 66 starts in NVTX label 65.
-- **Open: `server_arrival_time` is stamped at the headers, not the full request.** It is set in a pure ASGI middleware
-  (`serve/responses_utils.py:1930`), which runs once uvicorn has parsed the headers; the body is read later. In run
-  `I02A_20261103T173059Z_b3fec0` the warm-up's body frame came 0.43 ms after its headers frame, and segment
-  "wire → `server_arrival_time`" was −0.187 ms; the evidence rule stopped the analysis. Segments 1–2 should end at the
-  request's headers frame, with the body's arrival inside segment 3. Pending owner decision.
+- **`server_arrival_time` is stamped at the headers, not the full request** (owner ruling 2026-11-03). It is set in an
+  ASGI middleware (`serve/responses_utils.py:1930`) once uvicorn has parsed the headers; the body is read later. In run
+  `I02A_20261103T173059Z_b3fec0` the warm-up's body frame came 0.43 ms after its headers frame, and the old segment
+  "wire → `server_arrival_time`" was −0.187 ms. As in I01-L2, a request arrives when all of it is in: the segments now
+  run from the request's last byte straight to `arrival_time` (7 TTFT segments), and `server_arrival_time` is a labeled
+  point. This run's `latency.json` was recomputed from its raw records under the revised split.
 
 ## Why It Matters 
 
 - **TTFT is a client time that must hold a token.** TensorRT-LLM sends headers about 25 ms before it has a token, and
   the first body read holds only the role event. A load test that times headers or the first read reports a TTFT
   shorter than prefill.
-- **Every latency has an owner.** The 8 segments split client TTFT across three clocks. Prefill is 27.3 of 35.6 ms;
+- **Every latency has an owner.** The 7 segments split client TTFT across three clocks. Prefill is 27.3 of 35.6 ms;
   the network and the HTTP layer are under 2 ms each. Tuning targets come from the segment that grows, not the total.
 - **`/perf_metrics` drains on read.** Correlation rests on isolation (one request, a drain before, one record after).
   Any other reader, such as a dashboard, breaks the join.

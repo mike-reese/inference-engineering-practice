@@ -9,7 +9,8 @@ from .common import run_dir
 
 # Where TensorRT-LLM 1.2.1 sets each stamp (K18), and the component it belongs to.
 STAMPS = {
-    "server_arrival_time": ("http", "serve/responses_utils.py:1929", "middleware: request arrives (uvicorn)"),
+    "server_arrival_time": ("http", "serve/responses_utils.py:1930",
+                            "ASGI middleware: headers parsed, body not yet read"),
     "arrival_time": ("llm_api", "llmapi/llm.py:388", "LLM.generate_async: template and tokens done"),
     "first_scheduled_time": ("scheduler", "_torch/pyexecutor/seq_slot_manager.py:29", "gets a sequence slot"),
     "first_token_time": ("executor", "_torch/pyexecutor/py_executor.py:2649", "first token generated"),
@@ -17,7 +18,7 @@ STAMPS = {
     "last_token_time": ("executor", "_torch/pyexecutor/py_executor.py:2649", "last token generated"),
 }
 DATA_FORM = {  # what the request is at each stamp (level 2b's "the data changes form")
-    "server_arrival_time": "HTTP body bytes (JSON)",
+    "server_arrival_time": "HTTP headers parsed; the JSON body not yet read",
     "arrival_time": "token IDs (prompt_tokens) in a GenerationRequest",
     "first_scheduled_time": "an LlmRequest in a slot; KV blocks allocated",
     "first_token_time": "logits -> sampled token ID (prefill done)",
@@ -40,7 +41,7 @@ def engine(path: Path, run: Run) -> None:
                   "last_iter": perf["last_iter"], "kv_cache": perf.get("kv_cache_metrics")}
         raw = {"file": file, "pointer": f"/{rid}"}
         run.spans += [
-            Span(f"{rid}/engine/http", "server", "http", "handler: template, tokenize", t["server_arrival_time"],
+            Span(f"{rid}/engine/http", "server", "http", "handler: body read, parse, template, tokenize", t["server_arrival_time"],
                  t["arrival_time"], rid, {}, raw),
             Span(f"{rid}/engine/queue", "server", "scheduler", "queue (executor pickup)", t["arrival_time"],
                  t["first_scheduled_time"], rid, {}, raw),

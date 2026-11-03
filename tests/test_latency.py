@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from inference_analysis.latency import latency_records
+from inference_analysis.latency import N_TTFT, latency_records
 
 MS = 1_000_000
 UTC0 = 1_700_000_000_000_000_000
@@ -54,10 +54,11 @@ def test_three_clocks_segments_and_itl():
     assert e["decode_span_ms"] == pytest.approx(7) and e["mean_itl_ms"] == pytest.approx(3.5)
     assert out["remainder"]["ttft_ms"] == pytest.approx(3)
     assert w["mean_itl_ms"] == pytest.approx(3.65)
-    ttft = [s["ms"] for s in out["segments"][:8]]
-    assert ttft == pytest.approx([0.3, 0.2, 0.5, 1, 8, 1, 0.4, 0.6])
+    ttft = [s["ms"] for s in out["segments"][:N_TTFT]]
+    assert ttft == pytest.approx([0.3, 0.7, 1, 8, 1, 0.4, 0.6])
+    assert e["headers_parsed_ms"] == pytest.approx(0.5)  # a labeled point, not a boundary
     assert sum(ttft) == pytest.approx(c["ttft_ms"])
-    tail = [s["ms"] for s in out["segments"][8:]]
+    tail = [s["ms"] for s in out["segments"][N_TTFT:]]
     assert tail == pytest.approx([1.9, 1.1])  # last_token 17 -> [DONE] 18.9 -> protocol completion 20
 
 

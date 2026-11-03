@@ -150,7 +150,8 @@
       "decode_span_ms": 265.0939999730326,
       "e2e_ms": 1078.1389999901876,
       "http_ttft_ms": 833.5749999969266,
-      "mean_itl_ms": 4.207841269413216
+      "mean_itl_ms": 4.207841269413216,
+      "headers_parsed_ms": 40.05592304468155
     },
     "remainder": {
       "ttft_ms": 70.68329698284504,
@@ -171,14 +172,9 @@
         "ms": 39.874875
       },
       {
-        "name": "wire \u2192 server_arrival_time",
+        "name": "wire \u2192 arrival_time",
         "clocks": "pcap \u2192 engine",
-        "ms": 0.18104804468154612
-      },
-      {
-        "name": "server_arrival_time \u2192 arrival_time",
-        "clocks": "engine",
-        "ms": 13.809999942779541
+        "ms": 13.991047987461087
       },
       {
         "name": "arrival_time \u2192 first_scheduled_time",
@@ -368,7 +364,8 @@
       "decode_span_ms": 286.46900004241616,
       "e2e_ms": 315.9469999955036,
       "http_ttft_ms": 31.36999998241663,
-      "mean_itl_ms": 4.547126984800256
+      "mean_itl_ms": 4.547126984800256,
+      "headers_parsed_ms": 2.9552279710769653
     },
     "remainder": {
       "ttft_ms": 6.086488046912578,
@@ -389,14 +386,9 @@
         "ms": 2.347853
       },
       {
-        "name": "wire \u2192 server_arrival_time",
+        "name": "wire \u2192 arrival_time",
         "clocks": "pcap \u2192 engine",
-        "ms": 0.6073749710769651
-      },
-      {
-        "name": "server_arrival_time \u2192 arrival_time",
-        "clocks": "engine",
-        "ms": 0.5890000462532043
+        "ms": 1.1963750173301695
       },
       {
         "name": "arrival_time \u2192 first_scheduled_time",

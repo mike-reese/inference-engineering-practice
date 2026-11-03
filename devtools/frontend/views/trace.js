@@ -210,11 +210,11 @@ export class TraceView {
   metrics() {
     const list = this.run.metrics.filter((m) => m.request_id === this.request);
     const segments = list.filter((m) => m.name.startsWith("segment "));
-    const ttft = segments.slice(0, 8), total = ttft.reduce((t, m) => t + (m.value ?? 0), 0);
+    const ttft = segments.filter((m) => !m.name.includes("[DONE]")), total = ttft.reduce((t, m) => t + (m.value ?? 0), 0);
     const colors = ["#58a6ff", "#3fb950", "#d29922", "#bc8cff", "#f778ba", "#39c5cf", "#e3b341", "#8b949e"];
     const bar = total ? `<div class="segbar">${ttft.map((m, i) => `<span class="seg" data-m="${escape(m.name)}"
         style="width:${(100 * m.value) / total}%;background:${colors[i]}" title="${escape(m.name)} ${ms(m.value, 3)} ms">${ms(m.value, 2)}</span>`).join("")}</div>
-      <div class="dim">client TTFT ${ms(total, 3)} ms = the 8 segments above, each named by its two clocks (click one)</div>` : "";
+      <div class="dim">client TTFT ${ms(total, 3)} ms = the ${ttft.length} segments above, each named by its two clocks (click one)</div>` : "";
     const rows = list.map((m) => `<tr data-m="${escape(m.name)}" class="${this.metric === m.name ? "on" : ""}"><td>${escape(m.name)}</td>
       <td><code>${escape(m.formula)}</code></td><td>${m.value == null ? "Unavailable" : ms(m.value, 3)}</td><td>${escape(m.unit)}</td>
       <td>${m.inputs.length}</td></tr>`).join("");
