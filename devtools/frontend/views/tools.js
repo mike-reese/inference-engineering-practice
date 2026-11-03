@@ -1,5 +1,5 @@
 // Tools view: the hosted tools (Grafana, Prometheus) and a run's files for the desktop tools (Wireshark, Nsight).
-import { escape } from "./util.js";
+import { escape, openInTool } from "./util.js";
 
 const OPENS_IN = [
   [/\.pcap$/, "Wireshark"], [/\.nsys-rep$/, "Nsight Systems"], [/\.ncu-rep$/, "Nsight Compute"],
@@ -8,17 +8,19 @@ const OPENS_IN = [
 ];
 
 export class ToolsView {
-  constructor(root) { this.root = root; this.run = null; }
+  constructor(root) { this.root = root; this.run = null; this.opened = null; }
 
-  open(params) { this.run = params[0] ?? null; }
+  open(params) { this.run = params[0] ?? null; this.opened = null; }
 
   render(state) {
     const runs = Object.values(state.runs).sort((a, b) => b.mtime - a.mtime);
     const run = state.runs[this.run] ?? runs[0];
     const files = (run?.files ?? []).map((f) => {
       const tool = OPENS_IN.find(([re]) => re.test(f));
+      const desktop = /\.(nsys|ncu)-rep$/.test(f)  // opened on this desktop by the host runner
+        ? ` <button class="opentool" data-path="${escape(f)}">Open in ${f.endsWith(".ncu-rep") ? "ncu-ui" : "nsys-ui"}</button>` : "";
       return `<tr><td><a href="/api/runs/${encodeURIComponent(run.run_id)}/file?path=${encodeURIComponent(f)}">${escape(f)}</a></td>
-        <td class="dim">${tool ? tool[1] : ""}</td></tr>`;
+        <td class="dim">${tool ? tool[1] : ""}${desktop}</td></tr>`;
     }).join("");
     this.root.innerHTML = `<section class="tools">
       <div class="label">hosted</div>
@@ -29,8 +31,12 @@ export class ToolsView {
       <li><a href="/api/snapshot" target="_blank">/api/snapshot</a> · <a href="/api/runs" target="_blank">/api/runs</a>
         · the same API iectl reads</li></ul>
       <div class="label">run files · <select class="run">${runs.map((r) => `<option ${r === run ? "selected" : ""}>${escape(r.run_id)}</option>`).join("")}</select></div>
+      ${this.opened ? `<p class="dim">${escape(this.opened)}</p>` : ""}
       ${run ? `<table class="files">${files}</table>` : "<p>No runs yet.</p>"}</section>`;
     const select = this.root.querySelector("select.run");
     if (select) select.onchange = (e) => { location.hash = `tools/${encodeURIComponent(e.target.value)}`; };
+    this.root.querySelectorAll("button.opentool").forEach((b) => (b.onclick = async () => {
+      this.opened = await openInTool(run.run_id, b.dataset.path); this.render(state);
+    }));
   }
 }

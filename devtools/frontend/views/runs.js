@@ -16,7 +16,7 @@ export class RunsView {
         return `<tr><td>${escape(r.run_id)}</td><td>${escape(r.rep)}</td>
           <td class="${traced ? "traced" : ""}">${escape(r.labels?.trace ?? "off")}${traced ? " (not measured)" : ""}</td>
           <td>${r.done}/${r.steps}</td><td>${escape(r.basis?.version?.version ?? "–")}</td><td>${r.file_count}</td>
-          <td><a href="#trace/${encodeURIComponent(r.run_id)}">trace</a> · <a href="#tools/${encodeURIComponent(r.run_id)}">files</a></td></tr>`;
+          <td><a href="#trace/${encodeURIComponent(r.run_id)}">trace</a> · <a href="#tools/${encodeURIComponent(r.run_id)}">files</a> · <a href="#compare/${encodeURIComponent(r.run_id)}">compare</a></td></tr>`;
       }).join("")}</table>`;
   }
 }

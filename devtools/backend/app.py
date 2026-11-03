@@ -93,6 +93,11 @@ async def engine_history(request: web.Request) -> web.Response:
     return web.json_response(out)
 
 
+async def engine_iterations(request: web.Request) -> web.Response:
+    """Every iteration the engines with iteration stats reported (live runs), per container id."""
+    return web.json_response({cid: list(its) for cid, its in request.app["engine"].iterations.items()})
+
+
 async def prometheus_targets(request: web.Request) -> web.Response:
     return web.json_response(request.app["engine"].targets(request.query["service"], int(request.query["port"])))
 
@@ -129,14 +134,6 @@ async def run_source(request: web.Request) -> web.Response:
                                                          int(q["line"])))
     except OSError:
         raise web.HTTPNotFound(text="source not copied for this run (TRACE=code copies it)")
-
-
-async def run_kernel(request: web.Request) -> web.Response:
-    try:
-        return web.json_response(await asyncio.to_thread(runs.kernel_sections, request.match_info["run_id"],
-                                                         int(request.match_info["kernel_id"])))
-    except OSError:
-        raise web.HTTPNotFound(text="no trace/sections.csv in this run (TRACE=kernels exports it)")
 
 
 async def run_file(request: web.Request) -> web.FileResponse:
@@ -213,6 +210,7 @@ def make_app() -> web.Application:
     r.add_get("/api/lifecycle", lifecycles)
     r.add_get("/api/lifecycle/lines", phase_lines)
     r.add_get("/api/engine/history", engine_history)
+    r.add_get("/api/engine/iterations", engine_iterations)
     r.add_get("/api/prometheus/targets", prometheus_targets)
     r.add_get("/api/requests", requests_list)
     r.add_get("/api/runs", run_list)
@@ -221,7 +219,6 @@ def make_app() -> web.Application:
     r.add_get("/api/runs/{run_id}/raw", run_raw)
     r.add_get("/api/runs/{run_id}/source", run_source)
     r.add_get("/api/runs/{run_id}/file", run_file)
-    r.add_get("/api/runs/{run_id}/kernels/{kernel_id}", run_kernel)
     r.add_route("*", "/{service:grafana|prometheus|runner}{tail:(/.*)?}", proxy)
     r.add_static("/static", FRONTEND)
     return app

@@ -1,4 +1,6 @@
 // The shell: one live connection, one shared state, the active view redraws from it.
+import { CompareView } from "./views/compare.js";
+import { EngineView } from "./views/engine.js";
 import { InfraView } from "./views/infra.js";
 import { LifecycleView } from "./views/lifecycle.js";
 import { LogsView } from "./views/logs.js";
@@ -12,6 +14,7 @@ import { ToolsView } from "./views/tools.js";
 const HISTORY = 120; // seconds of sparkline per series
 const KEEP_LOG_LINES = 5000; // per container, in the browser
 const KEEP_ENGINE_SAMPLES = 1800;
+const KEEP_ITERATIONS = 20000; // per engine, as the backend keeps
 
 const state = {
   containers: [],
@@ -25,7 +28,9 @@ const state = {
   lifecycles: {},   // container id -> {container, project, marks}
   logSources: [],   // containers whose logs the backend holds, running or not, newest first
   engineMetrics: {}, // container id -> [{ns, metrics}]
-  engineInfo: {},   // container id -> version, model, command, config
+  engineInfo: {},   // container id -> version, model, command, config, iter_stats
+  engineIterations: {},     // container id -> [iteration] (engine iteration stats, live runs)
+  engineIterationReads: {}, // container id -> {ns, count}: the newest /metrics batch
   requests: {},     // request id -> its summary as it lands (records collector)
   runs: {},         // run id -> run folder summary
 };
@@ -58,6 +63,7 @@ function apply(message) {
     if (samples.length > KEEP_ENGINE_SAMPLES) samples.shift();
   }
   if (topic === "engine_info") state.engineInfo[key] = data;
+  if (topic === "engine_iterations") addIterations(key, data.iterations, data.read_ns);
   if (message.removed) {  // a run folder was deleted: drop it and its requests
     if (topic === "run") delete state.runs[key];
     if (topic === "request") delete state.requests[key];
@@ -73,11 +79,20 @@ function apply(message) {
   }
 }
 
+function addIterations(id, iterations, readNs) { // in arrival order, each once (a batch can arrive twice on connect)
+  const list = (state.engineIterations[id] ??= []);
+  const last = list.at(-1)?.seq ?? 0;
+  const fresh = iterations.filter((it) => it.seq > last);
+  list.push(...fresh);
+  if (list.length > KEEP_ITERATIONS) list.splice(0, list.length - KEEP_ITERATIONS);
+  if (readNs) state.engineIterationReads[id] = { ns: readNs, count: iterations.length };
+}
+
 const root = document.getElementById("view");
 const views = {
-  infra: new InfraView(root), lifecycle: new LifecycleView(root), logs: new LogsView(root),
+  infra: new InfraView(root), engine: new EngineView(root), lifecycle: new LifecycleView(root), logs: new LogsView(root),
   metrics: new MetricsView(root), requests: new RequestsView(root), runs: new RunsView(root),
-  trace: new TraceView(root), tools: new ToolsView(root), run: new RunView(root),
+  trace: new TraceView(root), tools: new ToolsView(root), run: new RunView(root), compare: new CompareView(root),
 };
 let active = "infra";
 let pending = false;
@@ -105,6 +120,15 @@ open(location.hash.slice(1));
 // What happened before this tab opened: GPU samples for the lifecycle lanes, engine counters for the charts.
 fetch("/api/gpu/history").then((r) => r.json()).then((samples) => {
   state.gpuHistory = [...samples, ...state.gpuHistory.filter((s) => s.ns > (samples.at(-1)?.ns ?? 0))];
+  redraw();
+});
+fetch("/api/engine/iterations").then((r) => r.json()).then((byEngine) => {
+  for (const [id, iterations] of Object.entries(byEngine)) {
+    const live = state.engineIterations[id] ?? [];
+    state.engineIterations[id] = [];
+    addIterations(id, iterations, null);
+    addIterations(id, live, null);
+  }
   redraw();
 });
 fetch("/api/engine/history").then((r) => r.json()).then((byEngine) => {

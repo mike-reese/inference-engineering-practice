@@ -12,11 +12,9 @@ from pathlib import Path
 
 REPO = Path(os.environ.get("REPO", "/repo"))
 sys.path.insert(0, str(REPO / "src"))
-from inference_analysis.trace.adapters.ncu import sections  # noqa: E402
 from inference_analysis.trace.build import build_run  # noqa: E402
 
 CACHE = {}  # run id -> (signature, run.json dict)
-SECTIONS = {}  # run id -> (mtime of trace/sections.csv, kernel id -> sections and rule findings)
 
 
 def find_run(run_id: str) -> Path:
@@ -96,11 +94,3 @@ def source(run_id: str, file: str, line: int, context: int = 12) -> dict:
     start = max(1, line - context)
     return {"file": file, "line": line, "start": start, "lines": lines[start - 1: line + context]}
 
-
-def kernel_sections(run_id: str, kernel_id: int) -> dict:
-    """One kernel's Nsight Compute sections and rule findings (trace/sections.csv, TRACE=kernels runs)."""
-    path = find_run(run_id) / "trace" / "sections.csv"
-    mtime = path.stat().st_mtime  # OSError when this run has no sections export
-    if run_id not in SECTIONS or SECTIONS[run_id][0] != mtime:
-        SECTIONS[run_id] = (mtime, sections(path))
-    return {"id": kernel_id, **SECTIONS[run_id][1].get(kernel_id, {"sections": [], "rules": []})}

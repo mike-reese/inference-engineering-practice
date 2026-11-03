@@ -29,9 +29,11 @@ NCU_METRICS = ("gpu__time_duration.sum,dram__bytes_op_read.sum,dram__bytes_op_wr
 # measured request 66-129, checked against /perf_metrics by the adapters). graphs: CUDA graphs on or off.
 TRACE_LEVELS = {
     "off": {},
+    # --gpu-metrics-devices=all: the GPU's own counters (SM activity, DRAM and PCIe throughput, tensor pipe) sampled
+    # at 10 kHz, as rows under the kernels in nsys-ui (metric set gb20x on the RTX 5060 Ti; needs SYS_ADMIN).
     "timeline": {"prefix": "nsys profile -o /trace/timeline -f true --trace=cuda,nvtx,osrt --sample=none "
                            "--cpuctxsw=none --cuda-graph-trace=node --capture-range=cudaProfilerApi "
-                           "--capture-range-end=stop --kill=none",
+                           "--capture-range-end=stop --kill=none --gpu-metrics-devices=all",
                  "profile_range": "1-129", "graphs": True},
     # code: graphs off, so each kernel keeps the op, shapes and Python stack that launched it (owner ruling
     # 2026-11-03). Inside a graph replay there are no per-op launches to attribute.
@@ -39,16 +41,65 @@ TRACE_LEVELS = {
     # kernels: graphs on, as in the measured run; --graph-profiling node profiles each kernel inside the replay.
     # --set full: every section (occupancy, launch stats, warp states, scheduler, instructions, roofline):
     # 41 replay passes per kernel, against 12 for the earlier 3 sections (measured 2026-11-03, ncu 2026.3.1).
-    "kernels": {"prefix": "ncu --target-processes all --profile-from-start off --graph-profiling node --set full "
-                          f"--import-source yes --metrics {NCU_METRICS} -o /trace/kernels -f",
+    "kernels": {"prefix": None,  # ncu_prefix(): its section set, cache and clock control are run options
                 "profile_range": "67-67", "graphs": True},
     # nographs: no profiler, CUDA graphs off. Against a measured run it shows what graphs save.
     "nographs": {"graphs": False, "profiler": False},
+    # live: no profiler, CUDA graphs on, plus the engine's iteration stats (enable_iter_perf_stats) for the devtools'
+    # live Engine view. Labeled not measured: the stats add work to every iteration (owner ruling 2026-11-03).
+    "live": {"graphs": True, "profiler": False, "iter_stats": True},
 }
 
 
+# Run options (rep.py flags, the Run tab's form). Each defaults to what the level ran with before options existed.
+NCU_SETS = {  # what ncu collects; more sections = more replay passes per kernel (ncu 2026.3.1, lm_head matmul)
+    "full": "--set full",  # every section and rule: 41 passes
+    "detailed": "--set detailed",
+    "basic": "--set basic",  # launch stats, occupancy, speed of light
+    "memory": "--section SpeedOfLight --section MemoryWorkloadAnalysis --section SourceCounters",  # 12 passes
+}
+NCU_CACHE = ("all", "none")  # --cache-control: flush caches before every pass (default), or keep them warm
+NCU_CLOCK = ("base", "none")  # --clock-control: lock the GPU to its base clock (default), or leave its own clocks
+LAST_ITERATION = 129  # the measured request's last executor iteration (/perf_metrics numbering); the closer follows
+MAX_KERNEL_ITERATIONS = 3  # a profiled iteration takes about 13 minutes under --set full
+
+
+def ncu_prefix(ncu_set: str = "full", ncu_cache: str = "all", ncu_clock: str = "base") -> str:
+    """Nsight Compute around trtllm-serve. --graph-profiling node profiles each kernel inside a CUDA graph replay."""
+    return ("ncu --target-processes all --profile-from-start off --graph-profiling node "
+            f"{NCU_SETS[ncu_set]} --cache-control {ncu_cache} --clock-control {ncu_clock} "
+            f"--import-source yes --metrics {NCU_METRICS} -o /trace/kernels -f")
+
+
+def trace_settings(trace: str, options: dict | None = None) -> dict:
+    """The profiler prefix and iteration range a level runs with after the run's options, and the options in full
+    (defaults filled in) for labels.json. ValueError names an option the level does not take or a bad value."""
+    level = TRACE_LEVELS[trace]
+    given = {k: v for k, v in (options or {}).items() if v is not None}
+    ncu = {"ncu_set": "full", "ncu_cache": "all", "ncu_clock": "base"}
+    if trace == "kernels":
+        ncu |= {k: given.pop(k) for k in list(given) if k in ncu}
+        if ncu["ncu_set"] not in NCU_SETS or ncu["ncu_cache"] not in NCU_CACHE or ncu["ncu_clock"] not in NCU_CLOCK:
+            raise ValueError(f"Nsight Compute options: {ncu}")
+    rng = given.pop("profile_range", None)
+    if rng is not None and not level.get("profile_range"):
+        raise ValueError(f"TRACE={trace} has no profile range")
+    rng = rng or level.get("profile_range")
+    if rng:
+        a, _, b = rng.partition("-")
+        if not (a.isdigit() and b.isdigit() and 1 <= int(a) <= int(b) <= LAST_ITERATION):
+            raise ValueError(f"profile range {rng!r}: first-last, 1 <= first <= last <= {LAST_ITERATION}")
+        if trace == "kernels" and int(b) - int(a) + 1 > MAX_KERNEL_ITERATIONS:
+            raise ValueError(f"profile range {rng!r}: at most {MAX_KERNEL_ITERATIONS} iterations under Nsight Compute")
+    if given:
+        raise ValueError(f"TRACE={trace} does not take {sorted(given)}")
+    prefix = ncu_prefix(**ncu) if trace == "kernels" else level.get("prefix", "")
+    out = {"profile_range": rng} if rng else {}
+    return {"prefix": prefix, "profile_range": rng, "options": out | (ncu if trace == "kernels" else {})}
+
+
 def has_profiler(trace: str) -> bool:
-    """Off and nographs run the normal image with no profiler; the other levels add compose.profile.yaml."""
+    """Off, nographs and live run the normal image with no profiler; the other levels add compose.profile.yaml."""
     return trace != "off" and TRACE_LEVELS[trace].get("profiler", True)
 
 
@@ -84,7 +135,7 @@ def sh(*cmd: str, capture: bool = True, check: bool = True) -> str:
 
 
 class Stack:
-    def __init__(self, project: str, results_dir: Path, run_id: str, trace: str = "off"):
+    def __init__(self, project: str, results_dir: Path, run_id: str, trace: str = "off", options: dict | None = None):
         if trace not in TRACE_LEVELS:
             raise ValueError(f"TRACE={trace}: use one of {list(TRACE_LEVELS)}")
         self.project = project
@@ -92,14 +143,15 @@ class Stack:
         self.run_id = run_id
         self.run_dir = results_dir / run_id
         self.trace = trace
+        self.settings = trace_settings(trace, options)  # ValueError before anything starts
         self.server_start = 0
         self.next_step = 0
 
     def env(self) -> dict:
         level = TRACE_LEVELS[self.trace]
         return {**os.environ, "RESULTS_DIR": str(self.results_dir), "RUN_ID": self.run_id,
-                "SERVER_START": str(self.server_start), "TRACE_PREFIX": level.get("prefix", ""),
-                "PROFILE_RANGE": profiler_range(level.get("profile_range", "")),
+                "SERVER_START": str(self.server_start), "TRACE_PREFIX": self.settings["prefix"],
+                "PROFILE_RANGE": profiler_range(self.settings["profile_range"] or ""),
                 "TORCH_TRACE": level.get("torch_trace", "")}
 
     def compose(self, *args: str, capture: bool = False, check: bool = True) -> subprocess.CompletedProcess:
@@ -176,14 +228,8 @@ class Stack:
         if self.trace == "kernels" and (trace / "kernels.ncu-rep").exists():
             self.in_trace_image(f"ncu -i /trace/kernels.ncu-rep --page raw --csv --metrics {NCU_METRICS} "
                                 "> /trace/kernels.csv")
-            # Made here, world-writable like trace/: the container runs as root, and split_sass writes into the
-            # folder as this user. A root-owned sass/ fails with Permission denied (run 20261103T175947Z).
-            (trace / "sass").mkdir(exist_ok=True)
-            (trace / "sass").chmod(0o777)
-            self.in_trace_image("ncu -i /trace/kernels.ncu-rep --page source --csv "
-                                "--print-source sass > /trace/sass/all.csv")
-            split_sass(trace / "sass" / "all.csv")
-            # Every section's metrics and rule findings per kernel (occupancy, warp states, ...), long format.
+            # Every section's metrics and rule findings per kernel, long format. The devtools read only the kernel
+            # strip's headline from it (occupancy, waves, finding count); the sections themselves open in ncu-ui.
             self.in_trace_image("ncu -i /trace/kernels.ncu-rep --page details --csv --print-details all "
                                 "> /trace/sections.csv")
         if self.trace == "code" and (trace / "torch_trace.json").exists():
@@ -207,26 +253,6 @@ class Stack:
         """Captures and reports are written by root in the containers (K17): give them back to this user."""
         sh("docker", "run", "--rm", "-v", f"{self.run_dir}:/out", CAPTURE_IMAGE, "chown", "-R",
            f"{os.getuid()}:{os.getgid()}", "/out")
-
-
-def split_sass(path: Path) -> None:
-    """ncu's source page for every kernel, one file per kernel ID (trace/sass/<id>.txt). The export (`--page source
-    --csv`) starts each kernel's table with a `"Kernel Name","<name>"` line, in launch order: the same order and IDs
-    as kernels.csv."""
-    if not path.exists():
-        return
-    current, lines = -1, []
-
-    def flush():
-        if current >= 0:
-            (path.parent / f"{current}.txt").write_text("\n".join(lines))
-
-    for line in path.read_text().splitlines():
-        if line.startswith('"Kernel Name"'):
-            flush()
-            current, lines = current + 1, []
-        lines.append(line)
-    flush()
 
 
 if __name__ == "__main__":

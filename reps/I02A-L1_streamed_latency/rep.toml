@@ -31,6 +31,14 @@ graphs = true
 minutes = 4
 command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "timeline", "--progress", "json"]
 
+[[actions.options]]
+id = "profile_range"
+label = "Profile range"
+arg = "--profile-range"
+pattern = '^\d{1,3}-\d{1,3}$'
+default = "1-129"
+description = "Executor iterations to record, first-last (/perf_metrics numbering): warm-up 1-64, measured request 66-129."
+
 [[actions]]
 id = "code"
 group = "run"
@@ -41,15 +49,55 @@ graphs = false
 minutes = 6
 command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "code", "--progress", "json"]
 
+[[actions.options]]
+id = "profile_range"
+label = "Profile range"
+arg = "--profile-range"
+pattern = '^\d{1,3}-\d{1,3}$'
+default = "66-129"
+description = "Executor iterations to record, first-last: the measured request is 66 (prefill) to 129."
+
 [[actions]]
 id = "kernels"
 group = "run"
-label = "Kernels (Nsight Compute, full set)"
-description = "Every kernel of one decode step, replayed about 41 times each for all sections and rule findings. CUDA graphs on. Not on the run clock."
+label = "Kernels (Nsight Compute)"
+description = "Every kernel of the chosen iterations, each replayed many times for its counters. CUDA graphs on. Not on the run clock."
 measured = false
 graphs = true
-minutes = 40
+minutes = 15
 command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "kernels", "--progress", "json"]
+
+[[actions.options]]
+id = "profile_range"
+label = "Profile range"
+arg = "--profile-range"
+pattern = '^\d{1,3}-\d{1,3}$'
+default = "67-67"
+description = "Executor iterations to profile, at most 3: 66 is the prefill, 67-129 the decode steps. About 13 minutes per iteration with the full set."
+
+[[actions.options]]
+id = "ncu_set"
+label = "Section set"
+arg = "--ncu-set"
+choices = ["full", "detailed", "basic", "memory"]
+default = "full"
+description = "full: every section and rule (41 passes per kernel). memory: speed of light, memory workload, source counters (12 passes). basic and detailed: ncu's own sets."
+
+[[actions.options]]
+id = "ncu_cache"
+label = "Cache control"
+arg = "--ncu-cache"
+choices = ["all", "none"]
+default = "all"
+description = "all: flush the caches before every pass, so each pass starts cold and repeats. none: keep them warm, closer to the real run, less repeatable."
+
+[[actions.options]]
+id = "ncu_clock"
+label = "Clock control"
+arg = "--ncu-clock"
+choices = ["base", "none"]
+default = "base"
+description = "base: lock the GPU to its base clock (2.39 GHz in our report), so results repeat. none: the GPU's own clocks (2.74 GHz in the measured run)."
 
 [[actions]]
 id = "nographs"
@@ -60,6 +108,16 @@ measured = false
 graphs = false
 minutes = 3
 command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "nographs", "--progress", "json"]
+
+[[actions]]
+id = "live"
+group = "run"
+label = "Live (engine iteration stats)"
+description = "The measured run's setup plus the engine's iteration stats (batch, KV blocks, queue, iteration time), streamed to the Engine view. No profiler; labeled not measured."
+measured = false
+graphs = true
+minutes = 2
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "live", "--progress", "json"]
 
 [[actions]]
 id = "check"

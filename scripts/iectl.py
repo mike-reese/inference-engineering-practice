@@ -424,8 +424,8 @@ def build_parser() -> argparse.ArgumentParser:
     add("raw", cmd_raw, "the raw source of a span: file and pointer", (["run"], {}), (["file"], {}),
         (["pointer"], {"nargs": "?", "default": ""}))
     add("profile", cmd_profile, "a labeled run: timeline (nsys), code (PyTorch ops, stacks), kernels (ncu), "
-        "nographs (no profiler, CUDA graphs off)",
-        (["level"], {"choices": ["timeline", "code", "kernels", "nographs"]}),
+        "nographs (no profiler, CUDA graphs off), live (no profiler, engine iteration stats for the Engine view)",
+        (["level"], {"choices": ["timeline", "code", "kernels", "nographs", "live"]}),
         (["--rep"], {"default": "I02A-L1_streamed_latency"}))
     add("snapshot", cmd_snapshot, "headless render of a view: screenshot, value of --eval, console errors",
         (["view"], {"nargs": "?", "default": "", "help": "the URL hash, e.g. trace/<run>"}),

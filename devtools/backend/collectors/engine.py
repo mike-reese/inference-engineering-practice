@@ -1,18 +1,48 @@
-"""Engine collector: each running engine's Prometheus counters, model and version, at its published port.
+"""Engine collector: each running engine's Prometheus counters, model and version, at its published port, and its
+per-iteration stats when the engine was started with them.
 
-Reads /prometheus/metrics, /version and /v1/models only. Never /perf_metrics or /metrics: each read drains the
-engine's buffer (K9), and rep.py must be their only reader.
+Reads /prometheus/metrics, /version and /v1/models. Never /perf_metrics: each read drains the engine's buffer (K9),
+and rep.py must be its only reader.
+/metrics (iteration stats) drains the same way. The collector is its only reader, and reads it only from an engine
+whose config.yaml sets `enable_iter_perf_stats: true` (the `live` run level). Each read waits about 2 s on the engine
+(get_stats_async(2)) and returns every iteration since the previous read, so iterations arrive in ~2 s batches.
 """
 import asyncio
 import collections
 import os
 import re
 import time
+from datetime import datetime, timezone
 
 import aiohttp
 
 SAMPLE = re.compile(r"^([a-zA-Z_:][\w:]*)(\{[^}]*\})?\s+(\S+)")
 KEEP = 1800  # samples per engine: 30 minutes at one per second
+KEEP_ITERATIONS = 20000  # iteration stats per engine
+ITER_STATS = re.compile(r"^enable_iter_perf_stats:\s*true\s*$", re.M)
+
+
+def iteration(stat: dict) -> dict:
+    """One engine iteration (IterationStats as /metrics returns it) -> the fields the Engine view draws.
+    ns: the iteration's start (the stats' timestamp is taken as the step begins), µs resolution. The step time is the
+    start-to-start interval to the next iteration: on run I02A-TRACE-live_20261103T185133Z_55cd9f its median, 3.99 ms,
+    matched the engine's mean ITL from /perf_metrics, 4.06 ms.
+    latency_ms is the engine's iterLatencyMS (median 7.50 ms there): the overlap scheduler records a step's stats after
+    it has launched the next one, so it spans about two steps, plus any wait for work. It is not one step's time.
+    iter is the engine's counter as the stats report it: at a request's end it can repeat (65, 65) and skip (64)."""
+    ib, kv = stat.get("inflightBatchingStats") or {}, stat.get("kvCacheStats") or {}
+    when = datetime.strptime(stat["timestamp"], "%m-%d-%Y %H:%M:%S.%f").replace(tzinfo=timezone.utc)  # container UTC
+    return {"iter": stat["iter"], "ns": int(when.timestamp() * 1e6) * 1000, "latency_ms": stat.get("iterLatencyMS"),
+            "scheduled": ib.get("numScheduledRequests"), "context_requests": ib.get("numContextRequests"),
+            "context_tokens": ib.get("numCtxTokens"), "generation_requests": ib.get("numGenRequests"),
+            "paused": ib.get("numPausedRequests"), "active": stat.get("numActiveRequests"),
+            "new_active": stat.get("numNewActiveRequests"), "queued": stat.get("numQueuedRequests"),
+            "completed": stat.get("numCompletedRequests"), "max_active": stat.get("maxNumActiveRequests"),
+            "queue_latency_ms": stat.get("newActiveRequestsQueueLatencyMS"),
+            "kv_used_blocks": kv.get("usedNumBlocks"), "kv_free_blocks": kv.get("freeNumBlocks"),
+            "kv_max_blocks": kv.get("maxNumBlocks"), "tokens_per_block": kv.get("tokensPerBlock"),
+            "kv_new_blocks": kv.get("allocNewBlocks"), "kv_reused_blocks": kv.get("reusedBlocks"),
+            "kv_hit_rate": kv.get("cacheHitRate"), "gpu_mem_bytes": stat.get("gpuMemUsage")}
 
 
 def parse_prometheus(text: str) -> dict[str, float]:
@@ -47,11 +77,25 @@ def host_path(source: str) -> str | None:
     return None
 
 
+def iter_stats_on(c: dict) -> bool:
+    """The engine's config.yaml (mounted at /config) turns iteration stats on: the live run level."""
+    for m in c.get("mounts", []):
+        local = host_path(m["source"]) if m["destination"] == "/config" else None
+        if local:
+            try:
+                return bool(ITER_STATS.search(open(f"{local}/config.yaml").read()))
+            except OSError:
+                return False
+    return False
+
+
 class EngineCollector:
     def __init__(self, bus):
         self.bus = bus
         self.history = {}  # container id -> deque of {ns, metrics}
         self.info = {}  # container id -> version, models, command, config
+        self.iterations = {}  # container id -> deque of iteration(), for engines with iteration stats
+        self.readers = {}  # container id -> the task reading its /metrics
 
     async def engines(self) -> list[dict]:
         state = self.bus.state.get(("containers", None))
@@ -62,6 +106,10 @@ class EngineCollector:
         address = published(c, 8080)
         if address is None:
             return
+        if c["id"] not in self.readers and iter_stats_on(c):
+            # From the first sight of the container, before it is healthy: a rep's run can be over within seconds
+            # of the health check passing, and the first read must already be waiting on the engine.
+            self.readers[c["id"]] = asyncio.create_task(self.read_iterations(c, address))
         try:
             async with session.get(f"http://{address}/prometheus/metrics") as response:
                 if response.status != 200:
@@ -95,8 +143,33 @@ class EngineCollector:
             if m["destination"] == "/model":
                 info["model_path"] = m["source"]
                 info["model_revision"] = m["source"].rstrip("/").rsplit("/", 1)[-1]
+        info["iter_stats"] = bool(info.get("config") and ITER_STATS.search(info["config"]))
         self.info[c["id"]] = info
         self.bus.publish("engine_info", info, key=c["id"])
+
+    async def read_iterations(self, c: dict, address: str) -> None:
+        """/metrics in a loop while the engine runs. Each read blocks ~2 s on the engine, so it has its own task.
+        Until the server answers (model loading), a read fails and is retried every second."""
+        seq = 0  # arrival order: the view's key, since the engine's iter can repeat
+        timeout = aiohttp.ClientTimeout(total=15)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            while c["id"] in {e["id"] for e in await self.engines()}:
+                try:
+                    async with session.get(f"http://{address}/metrics") as response:
+                        stats = await response.json() if response.status == 200 else []
+                except (aiohttp.ClientError, asyncio.TimeoutError, ValueError):
+                    await asyncio.sleep(1)
+                    continue
+                batch = []
+                for stat in stats:  # the engine's order
+                    seq += 1
+                    batch.append({"seq": seq, **iteration(stat)})
+                if batch:
+                    self.iterations.setdefault(c["id"], collections.deque(maxlen=KEEP_ITERATIONS)).extend(batch)
+                    self.bus.publish("engine_iterations", {"container": c["name"], "project": c["project"],
+                                                           "read_ns": time.time_ns(), "iterations": batch},
+                                     key=c["id"])
+        self.readers.pop(c["id"], None)
 
     def targets(self, service: str, port: int) -> list[dict]:
         """Prometheus http_sd: every running container of a service, at its published port."""

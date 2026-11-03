@@ -23,7 +23,8 @@ import httpx
 REP_DIR = Path(__file__).resolve().parent
 REPO = REP_DIR.parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
-from compose_stack import TRACE_IMAGE, TRACE_LEVELS, Stack, has_profiler, prepare_run_dir  # noqa: E402
+from compose_stack import (NCU_CACHE, NCU_CLOCK, NCU_SETS, TRACE_IMAGE, TRACE_LEVELS, Stack,  # noqa: E402
+                           has_profiler, prepare_run_dir, trace_settings)
 
 from inference_analysis.efficiency import efficiency  # noqa: E402
 from inference_analysis.latency import N_TTFT, latency_records  # noqa: E402
@@ -49,6 +50,7 @@ MESSAGES = [
 ]
 K4_MESSAGES = [{"role": "user", "content": "What is 2 plus 2? Answer briefly."}]
 MAX_TOKENS = 64
+LIVE_HOLD_S = 6  # live level: seconds the stack stays up after the last request (the collector's read cycle is <= ~4 s)
 GPU_QUERY = "utilization.gpu,utilization.memory,memory.used,power.draw,clocks.sm,temperature.gpu,pcie.link.gen.current"
 SOURCE_STAMPS = {  # K18: the file each engine time is set in, and the text that sets it
     "server_arrival_time": ("serve/responses_utils.py", "server_arrival_time"),
@@ -145,16 +147,20 @@ class GpuSampler:
         self.thread.join(timeout=5)
 
 
-def run_stack(run_id: str, trace: str = "off") -> dict:
-    """Start the stack, warm up, drain, send the measured request, read its engine record, stop, decode."""
+def run_stack(run_id: str, trace: str = "off", options: dict | None = None) -> dict:
+    """Start the stack, warm up, drain, send the measured request, read its engine record, stop, decode.
+    options: the profiler's run options (compose_stack.trace_settings); None keeps the level's defaults."""
     level = TRACE_LEVELS[trace]
-    config = ENGINE_CONFIG + ("cuda_graph_config: null\n" if level.get("graphs") is False else "")
+    settings = trace_settings(trace, options)
+    config = ENGINE_CONFIG + ("cuda_graph_config: null\n" if level.get("graphs") is False else "") \
+        + ("enable_iter_perf_stats: true\n" if level.get("iter_stats") else "")  # /metrics for the live Engine view
     run_dir = prepare_run_dir(RESULTS_DIR, run_id, config)
     save_json(run_dir / "labels.json", {"trace": trace, "measured": trace == "off", "graphs": level.get("graphs", True),
-                                        "profiler": has_profiler(trace),
-                                        "profile_range": level.get("profile_range")})
+                                        "profiler": has_profiler(trace), "iter_stats": bool(level.get("iter_stats")),
+                                        "profile_range": settings["profile_range"],
+                                        "options": settings["options"]})
     basis = execution_basis()
-    stack = Stack(PROJECT, RESULTS_DIR, run_id, trace=trace)
+    stack = Stack(PROJECT, RESULTS_DIR, run_id, trace=trace, options=options)
     measured_id = f"{run_id}-measured"
     slow = trace == "kernels"  # Nsight Compute replays each kernel: the profiled iteration takes minutes
     sampler = GpuSampler(run_dir / "gpu.csv")
@@ -175,6 +181,9 @@ def run_stack(run_id: str, trace: str = "off") -> dict:
             progress("closer request (ends the profiler range)")
             stack.run_step(step("closer", f"{run_id}-closer"), timeout_s=7200 if slow else 600)
             read_perf_metrics(base)
+        if level.get("iter_stats"):  # the devtools read /metrics in ~2 s batches (up to ~4 s): let the last one land
+            progress("hold the stack for the Engine view's last iterations")
+            time.sleep(LIVE_HOLD_S)
     finally:
         sampler.stop()
         progress("stack down")
@@ -299,7 +308,18 @@ def main() -> None:
     parser.add_argument("--source", action="store_true")
     parser.add_argument("--progress", choices=["none", "json"], default="none",
                         help="json: one @@progress line per step (the devtools runner reads them)")
+    # Profiler options (labels.json "options"); left out = the level's default.
+    parser.add_argument("--profile-range", help="executor iterations to profile, first-last (measured request: 66-129)")
+    parser.add_argument("--ncu-set", choices=list(NCU_SETS), help="TRACE=kernels: what Nsight Compute collects")
+    parser.add_argument("--ncu-cache", choices=NCU_CACHE, help="TRACE=kernels: flush caches before each pass, or not")
+    parser.add_argument("--ncu-clock", choices=NCU_CLOCK, help="TRACE=kernels: lock base clocks, or not")
     args = parser.parse_args()
+    options = {"profile_range": args.profile_range, "ncu_set": args.ncu_set, "ncu_cache": args.ncu_cache,
+               "ncu_clock": args.ncu_clock}
+    try:
+        trace_settings(args.trace, options)  # a bad option fails here, before a run folder exists
+    except ValueError as error:
+        parser.error(str(error))
     global PROGRESS
     PROGRESS = args.progress == "json"
     if args.k4:
@@ -312,7 +332,7 @@ def main() -> None:
     run_id = datetime.now(timezone.utc).strftime(f"{prefix}_%Y%m%dT%H%M%SZ_") + secrets.token_hex(3)
     progress("run", run_id=run_id, trace=args.trace)
     prompt = offline_prompt(MESSAGES)
-    result = run_stack(run_id, args.trace)
+    result = run_stack(run_id, args.trace, options)
     save_json(result["run_dir"] / "prompt.json", prompt)
     progress("analysis")
     latency = analyze(result, prompt)
@@ -323,7 +343,9 @@ def main() -> None:
     print(f"devtools: http://127.0.0.1:7700/#trace/{run_id}")
     progress("done", run_id=run_id)
     if args.trace != "off":
-        kind = "profiled run" if has_profiler(args.trace) else "unprofiled comparison run (CUDA graphs off)"
+        kind = ("profiled run" if has_profiler(args.trace)
+                else "unprofiled run with engine iteration stats" if TRACE_LEVELS[args.trace].get("iter_stats")
+                else "unprofiled comparison run (CUDA graphs off)")
         print(f"TRACE={args.trace}: {kind}, labeled; not a measured result.")
 
 

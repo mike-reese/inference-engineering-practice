@@ -42,8 +42,6 @@ def ncu(path: Path, run: Run) -> None:
             if metric in cell and cell[metric] not in ("", "n/a"):
                 value = float(cell[metric].replace(",", ""))
                 k[name] = value * SCALE.get(units[header.index(metric)], 1) if unit in ("byte", "us") else value
-        sass = root / "trace" / "sass" / f"{k['id']}.txt"
-        k["sass_file"] = str(sass.relative_to(root)) if sass.exists() else None
         kernels.append(k)
     for k, layer in zip(kernels, layer_of([k["name"] for k in kernels])):
         k["layer"] = layer

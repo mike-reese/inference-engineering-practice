@@ -102,7 +102,7 @@ ol.stack { margin: 4px 0; padding-left: 20px; font-size: 11px; } .err { color: v
 .kstrip .axis { stroke: var(--line); vector-effect: non-scaling-stroke; } .kstrip .finding { fill: #e3b341; }
 .kstrip .kbar:hover .hit, .kstrip .kbar.on .hit { fill: rgba(227, 179, 65, 0.25); }
 .kdetail { border: 1px solid var(--line); border-radius: 4px; padding: 8px; margin: 8px 0; }
-.rules { margin: 0; padding-left: 16px; } .rule { margin-bottom: 6px; } .rule.OPT b { color: #e3b341; } .rule.WRN b { color: var(--down); }
+button.opentool { margin: 4px 6px 4px 0; } table.ncu tr.on td { background: rgba(227, 179, 65, 0.18); }
 .runview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
 @media (max-width: 1100px) { .runview { grid-template-columns: 1fr; } }
 .runview .picker button { background: var(--panel); color: var(--dim); border: 1px solid var(--line); border-radius: 4px;
@@ -118,5 +118,40 @@ ol.stack { margin: 4px 0; padding-left: 20px; font-size: 11px; } .err { color: v
 .joblinks { margin: 6px 0 10px; } .joblinks a, .history a { color: var(--accent); }
 .steps { margin: 0 0 10px; padding-left: 22px; } .steps li.live { color: var(--starting); }
 .joblog { background: var(--panel); border: 1px solid var(--line); padding: 8px; max-height: 480px; overflow: auto; font-size: 11px; white-space: pre-wrap; }
-.history { margin: 0; padding-left: 16px; }
 .logprogress { color: var(--starting); margin-bottom: 10px; }
+.runview input, .runview select, .runview button:not(.start), .compareview button, .compareview select {
+  background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; padding: 2px 6px; }
+.runview button:not(.start), .compareview button { cursor: pointer; }
+.runview input:invalid { border-color: var(--down); }
+.action .options { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 6px 0; }
+.action .option { color: var(--dim); }
+.jobstate.queued { color: var(--accent); } .jobstate.cancelled, .jobstate.lost { color: var(--dim); }
+button.cancel { margin-left: 8px; } .runview button.cancel:hover { border-color: var(--down); color: var(--down); }
+table.history { border-collapse: collapse; width: 100%; margin-top: 4px; }
+table.history td { padding: 2px 8px 2px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.history tr.on td { background: rgba(88, 166, 255, 0.12); }
+.register { display: grid; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 8px; }
+.register label { color: var(--dim); }
+.regaction { display: flex; flex-wrap: wrap; gap: 6px 12px; border-top: 1px solid var(--line); padding-top: 6px; }
+.regok { color: var(--up); white-space: pre-wrap; }
+
+/* Compare view: runs side by side */
+.compareview table { border-collapse: collapse; margin: 8px 0 16px; }
+.compareview th, .compareview td { padding: 3px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.compareview th:first-child, .compareview td:first-child { text-align: left; white-space: normal; }
+.compareview td .delta { color: var(--dim); font-size: 11px; margin-left: 6px; }
+.compareview td .delta.up { color: var(--down); } .compareview td .delta.down { color: var(--up); }
+.compareview .pick { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.compareview .chip { border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; }
+.compareview .chip button { border: 0; padding: 0 4px; }
+
+/* Engine view: per-iteration scheduler state (live runs) */
+.engineview .nowcard { border: 1px solid var(--line); border-radius: 4px; padding: 8px; margin: 8px 0; }
+.engineview .nowcard h3 { margin: 0 0 6px; }
+.engineview .kvbar { height: 6px; background: var(--panel); border: 1px solid var(--line); margin: 4px 0; }
+.engineview .kvbar span { display: block; height: 100%; background: #3fb950; }
+.enginechart { width: 100%; height: 380px; background: var(--panel); border: 1px solid var(--line); margin-top: 6px; cursor: crosshair; }
+.enginechart .pick { fill: rgba(227, 179, 65, 0.25); }
+.enginechart .lanelabel { fill: var(--dim); font-size: 11px; pointer-events: none; }
+.enginechart polyline { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.enginechart .kvline { stroke: #3fb950; } .enginechart .activeline { stroke: #e6edf3; } .enginechart .queuedline { stroke: var(--down); }
