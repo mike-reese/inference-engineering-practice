@@ -13,7 +13,7 @@ import signal
 import sys 
 import time 
 
-from chat_client import ClientMetrics, ObservedTransport, save_record, send_one, make_client 
+from chat_client import ClientMetrics, ObservedTransport, save_record, send_one, make_client, stamp
 
 RECORDS_DIR = Path(os.environ["RECORDS_DIR"])
 
@@ -30,6 +30,7 @@ def run_step(client, transport: ObservedTransport, metrics: ClientMetrics, recor
                 finished.set()
                 raise StopUser()
             item = pending.pop(0)
+            stamp("locust", "task picked request", item["request_id"], time.perf_counter_ns(), phase=phase)
             with metrics.in_flight.labels(phase).track_inprogress():
                 record = send_one(client, transport, item["request_id"], item["messages"], item["max_tokens"],
                                   diagnostic=step.get("diagnostic", False), detail=step.get("detail", True),

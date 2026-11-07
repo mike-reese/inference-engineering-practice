@@ -13,6 +13,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 COMPOSE_FILE = REPO_ROOT / "deploy" / "compose.yaml"
 PROFILE_FILE = REPO_ROOT / "deploy" / "compose.profile.yaml"
+STAMPS_FILE = REPO_ROOT / "deploy" / "compose.stamps.yaml"
 SERVICES = ("server", "capture", "client")
 SERVER_PORT = 8080
 CAPTURE_IMAGE = "ie-capture:alpine3.20"
@@ -48,6 +49,10 @@ TRACE_LEVELS = {
     # live: no profiler, CUDA graphs on, plus the engine's iteration stats (enable_iter_perf_stats) for the devtools'
     # live Engine view. Labeled not measured: the stats add work to every iteration (owner ruling 2026-11-03).
     "live": {"graphs": True, "profiler": False, "iter_stats": True},
+    # components: no profiler, CUDA graphs on, the trace image's component stamps (deploy/compose.stamps.yaml) and
+    # the client's, tailed live by the devtools' Components tab. Labeled not measured: every stamp is a file write.
+    # The profiled levels carry the same stamps (uses_stamps).
+    "components": {"graphs": True, "profiler": False, "stamps": True},
 }
 
 
@@ -103,6 +108,11 @@ def has_profiler(trace: str) -> bool:
     return trace != "off" and TRACE_LEVELS[trace].get("profiler", True)
 
 
+def uses_stamps(trace: str) -> bool:
+    """Component stamps (server and client): the components level and every profiled level, never the measured run."""
+    return has_profiler(trace) or bool(TRACE_LEVELS[trace].get("stamps"))
+
+
 def profiler_range(engine_range: str) -> str:
     """profile_range is in /perf_metrics' numbering (first_iter, last_iter count from 1). TLLM_PROFILE_START_STOP
     counts like the executor's NVTX labels, from 0: one less. Seen on the timeline run: the profiler logged
@@ -155,7 +165,8 @@ class Stack:
                 "TORCH_TRACE": level.get("torch_trace", "")}
 
     def compose(self, *args: str, capture: bool = False, check: bool = True) -> subprocess.CompletedProcess:
-        files = ["-f", str(COMPOSE_FILE)] + (["-f", str(PROFILE_FILE)] if has_profiler(self.trace) else [])
+        files = ["-f", str(COMPOSE_FILE)] + (["-f", str(PROFILE_FILE)] if has_profiler(self.trace) else []) \
+            + (["-f", str(STAMPS_FILE)] if uses_stamps(self.trace) else [])
         cmd = ["docker", "compose", "-p", self.project, *files, *args]
         return subprocess.run(cmd, env=self.env(), check=check, text=True, capture_output=capture)
 

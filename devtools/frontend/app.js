@@ -1,5 +1,6 @@
 // The shell: one live connection, one shared state, the active view redraws from it.
 import { CompareView } from "./views/compare.js";
+import { ComponentsView } from "./views/components.js";
 import { EngineView } from "./views/engine.js";
 import { InfraView } from "./views/infra.js";
 import { LifecycleView } from "./views/lifecycle.js";
@@ -33,7 +34,19 @@ const state = {
   engineIterationReads: {}, // container id -> {ns, count}: the newest /metrics batch
   requests: {},     // request id -> its summary as it lands (records collector)
   runs: {},         // run id -> run folder summary
+  componentStamps: {}, // run id -> [stamp] in seq order (components collector: server, client, wire)
 };
+
+const KEEP_STAMPS = 60000; // per run, as the backend keeps
+function addStamps(runId, stamps) { // each once, in seq order (a batch can arrive twice on connect)
+  const list = (state.componentStamps[runId] ??= []);
+  const last = list.at(-1)?.seq ?? 0;
+  const fresh = stamps.filter((s) => s.seq > last).sort((a, b) => a.seq - b.seq);
+  list.push(...fresh);
+  if (list.length > KEEP_STAMPS) list.splice(0, list.length - KEEP_STAMPS);
+  // the view lists a request's steps in time order: the three sources arrive interleaved
+  if (fresh.length) list.sort((a, b) => a.t0 - b.t0 || a.seq - b.seq);
+}
 
 function remember(name, value) {
   const series = (state.history[name] ??= []);
@@ -64,6 +77,7 @@ function apply(message) {
   }
   if (topic === "engine_info") state.engineInfo[key] = data;
   if (topic === "engine_iterations") addIterations(key, data.iterations, data.read_ns);
+  if (topic === "component_stamps") addStamps(data.run_id, data.stamps);
   if (message.removed) {  // a run folder was deleted: drop it and its requests
     if (topic === "run") delete state.runs[key];
     if (topic === "request") delete state.requests[key];
@@ -93,6 +107,7 @@ const views = {
   infra: new InfraView(root), engine: new EngineView(root), lifecycle: new LifecycleView(root), logs: new LogsView(root),
   metrics: new MetricsView(root), requests: new RequestsView(root), runs: new RunsView(root),
   trace: new TraceView(root), tools: new ToolsView(root), run: new RunView(root), compare: new CompareView(root),
+  components: new ComponentsView(root),
 };
 let active = "infra";
 let pending = false;
@@ -128,6 +143,15 @@ fetch("/api/engine/iterations").then((r) => r.json()).then((byEngine) => {
     state.engineIterations[id] = [];
     addIterations(id, iterations, null);
     addIterations(id, live, null);
+  }
+  redraw();
+});
+fetch("/api/components").then((r) => r.json()).then((byRun) => {
+  for (const [run, stamps] of Object.entries(byRun)) {
+    const live = state.componentStamps[run] ?? [];
+    state.componentStamps[run] = [];
+    addStamps(run, stamps);
+    addStamps(run, live);
   }
   redraw();
 });

@@ -1,0 +1,14 @@
+# Component stamps (every level except off, nographs and live): the trace image's ie_stamps hooks write one JSON line
+# per step a request takes inside the server (HTTP process and executor worker), and the client writes one per SDK,
+# transport and body event. The devtools tail both files while the run is up (Components tab); the run's adapters
+# read them afterwards (Trace, level 0b components). Never the measured run: every stamp is a file write.
+services:
+  server:
+    image: "ie-tensorrt-llm:1.2.1-nvml-byref-trace"
+    environment:
+      IE_SERVER_STAMPS: "/trace/server_stamps.jsonl"
+    volumes:
+      - "${RESULTS_DIR:?}/${RUN_ID:?}/trace:/trace"
+  client:
+    environment:
+      IE_CLIENT_STAMPS: "/records/client_stamps.jsonl"

@@ -120,6 +120,16 @@ minutes = 2
 command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "live", "--progress", "json"]
 
 [[actions]]
+id = "components"
+group = "run"
+label = "Components (live component stamps)"
+description = "The measured run's setup plus a stamp at every component a request passes: client SDK and transport, the server's HTTP handler, template, tokenizer, ZMQ, scheduler, KV blocks, forward, sampler, detokenizer. Streamed to the Components tab. No profiler; labeled not measured."
+measured = false
+graphs = true
+minutes = 2
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "components", "--progress", "json"]
+
+[[actions]]
 id = "check"
 group = "check"
 label = "Pass check (5 checks)"

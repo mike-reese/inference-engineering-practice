@@ -13,6 +13,21 @@ METRICS_PORT = 9410
 PHASES = ("warmup", "normal", "diagnostic", "control", "failure")
 BUCKETS_S = (0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1.0, 2.0, 5.0)
 
+# Component stamps (deploy/compose.stamps.yaml): one JSON line per client step, read live by the devtools.
+# Unset in the measured run: stamp() returns at once and nothing is written.
+STAMPS_PATH = os.environ.get("IE_CLIENT_STAMPS")
+_stamps_file = None
+
+
+def stamp(box: str, name: str, xrid: str, t0: int, t1: int | None = None, **data):
+    global _stamps_file
+    if not STAMPS_PATH:
+        return
+    if _stamps_file is None:
+        _stamps_file = open(STAMPS_PATH, "a", buffering=1)
+    _stamps_file.write(json.dumps({"t0": t0, "t1": t1, "proc": "client", "box": box, "name": name, "xrid": xrid,
+                                   "data": data}, default=str) + "\n")
+
 
 class ClientMetrics:
     def __init__(self):
@@ -61,6 +76,8 @@ class ObservedBody(httpx2.SyncByteStream):
                 "bytes": len(block),
                 "base64": base64.b64encode(block).decode("ascii"),
             })
+            stamp("transport", "body read", self.record["request_id"], self.record["body_reads"][-1]["ns"],
+                  bytes=len(block), text=block.decode("utf-8", "replace"))
             yield block
 
     def close(self):
@@ -82,6 +99,10 @@ class ObservedTransport(httpx2.BaseTransport):
 
         def trace(name, info):
             record["transport_trace"].append({"ns": time.perf_counter_ns(), "name": name})
+            stamp("transport", name, record["request_id"], record["transport_trace"][-1]["ns"])
+
+        stamp("sdk", "HTTP request built", record["request_id"], time.perf_counter_ns(), method=request.method,
+              url=str(request.url), headers=dict(request.headers), body=request.content.decode("utf-8", "replace"))
         
         request.extensions["trace"] = trace
         response = self.inner.handle_request(request)
@@ -125,6 +146,7 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
     if detail:
         transport.records[request_id] = record
     record["send_ns"] = time.perf_counter_ns()
+    stamp("send_one", "send", request_id, record["send_ns"], messages=messages, max_tokens=max_tokens)
     token_options = {"logprobs": True, "top_logprobs": 1} if diagnostic else {"logprobs": False}
 
     try:
@@ -150,6 +172,7 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
                 now = time.perf_counter_ns()
                 if detail:
                     record["events"].append({"ns": now, "event": chunk.model_dump()})
+                stamp("sdk", "SSE event parsed", request_id, now, event=chunk.model_dump())
 
                 if chunk.choices: 
                     choice = chunk.choices[0]
@@ -161,6 +184,8 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
                     record["usage"] = chunk.usage.model_dump()
 
             record["protocol_complete_ns"] = time.perf_counter_ns()
+            stamp("send_one", "protocol complete", request_id, record["protocol_complete_ns"],
+                  finish_reason=record["finish_reason"], usage=record["usage"])
     except openai.APIStatusError as exc:
         record["status"] = exc.status_code
         record["error"] = {"type": type(exc).__name__, "message": str(exc)}

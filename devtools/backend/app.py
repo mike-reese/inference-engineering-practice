@@ -9,6 +9,7 @@ from aiohttp import web
 
 import runs
 from bus import Bus
+from collectors.components import ComponentsCollector
 from collectors.docker import DockerCollector
 from collectors.engine import EngineCollector
 from collectors.gpu import GpuCollector
@@ -98,6 +99,11 @@ async def engine_iterations(request: web.Request) -> web.Response:
     return web.json_response({cid: list(its) for cid, its in request.app["engine"].iterations.items()})
 
 
+async def component_stamps(request: web.Request) -> web.Response:
+    """Every component stamp held, per run (?run= for one): what the Components tab starts from."""
+    return web.json_response(request.app["components"].history(request.query.get("run")))
+
+
 async def prometheus_targets(request: web.Request) -> web.Response:
     return web.json_response(request.app["engine"].targets(request.query["service"], int(request.query["port"])))
 
@@ -177,9 +183,11 @@ async def index(request: web.Request) -> web.FileResponse:
 async def collectors(app: web.Application):
     bus = app["bus"]
     app["gpu"], app["logs"], app["engine"] = GpuCollector(bus), LogCollector(bus), EngineCollector(bus)
+    app["components"] = ComponentsCollector(bus)
     app["http"] = aiohttp.ClientSession(auto_decompress=False)
     tasks = [asyncio.create_task(c.run()) for c in
-             (DockerCollector(bus), app["gpu"], app["logs"], app["engine"], RecordsCollector(bus))]
+             (DockerCollector(bus), app["gpu"], app["logs"], app["engine"], RecordsCollector(bus),
+              app["components"])]
     yield
     for task in tasks:
         task.cancel()
@@ -212,6 +220,7 @@ def make_app() -> web.Application:
     r.add_get("/api/engine/history", engine_history)
     r.add_get("/api/engine/iterations", engine_iterations)
     r.add_get("/api/prometheus/targets", prometheus_targets)
+    r.add_get("/api/components", component_stamps)
     r.add_get("/api/requests", requests_list)
     r.add_get("/api/runs", run_list)
     r.add_get("/api/runs/{run_id}", run_detail)

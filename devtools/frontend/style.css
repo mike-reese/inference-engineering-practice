@@ -155,3 +155,37 @@ table.history tr.on td { background: rgba(88, 166, 255, 0.12); }
 .enginechart .lanelabel { fill: var(--dim); font-size: 11px; pointer-events: none; }
 .enginechart polyline { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .enginechart .kvline { stroke: #3fb950; } .enginechart .activeline { stroke: #e6edf3; } .enginechart .queuedline { stroke: var(--down); }
+
+/* Components (and Trace level 0b): containers as boundaries, components inside, data moving between them */
+.infra .card[data-service] { cursor: pointer; } .infra .card[data-service]:hover { border-color: var(--accent); }
+.compview .controls, .trace .controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.compview button, .compview select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; padding: 2px 8px; }
+.compview a, .trace a { color: var(--accent); }
+.compmap { width: 100%; height: auto; max-height: 72vh; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.compmap .bound rect { fill: none; stroke: var(--dim); stroke-width: 1.5; }
+.compmap .bound.container rect { stroke: #8a90a0; stroke-width: 2; fill: rgba(88,166,255,0.03); }
+.compmap .bound.process rect { stroke-dasharray: 6 4; } .compmap .bound.ipc rect { stroke-dasharray: 2 4; }
+.compmap .bound.network rect { stroke-dasharray: 8 4; stroke: #39c5cf; } .compmap .bound.gpu rect { stroke: #3fb950; }
+.compmap .bound text { fill: var(--dim); font-size: 11px; }
+.compmap .bound.focus rect { stroke: var(--accent); stroke-width: 3; } .compmap .bound.dimmed { opacity: 0.45; }
+.compmap .edge { stroke: #3a4150; stroke-width: 1.5; } .compmap .edge.hot { stroke: #e3b341; stroke-width: 3; }
+.compmap marker path { fill: #3a4150; }
+.compmap .cbox { cursor: pointer; } .compmap .cbox rect { fill: #10141b; stroke: var(--line); }
+.compmap .cbox.seen rect { stroke: #2d5a8a; } .compmap .cbox.on rect { stroke: #e3b341; stroke-width: 3; fill: #2a2412; }
+.compmap .cbox.prev rect { stroke: var(--dim); stroke-dasharray: 4 3; }
+.compmap .cbox text { pointer-events: none; } .compmap .cl { fill: var(--text); font-size: 11.5px; font-weight: bold; }
+.compmap .co { fill: var(--dim); font-size: 9.5px; } .compmap .cs { fill: #58a6ff; font-size: 9.5px; }
+.compmap .packet circle { fill: #e3b341; stroke: #fff; stroke-width: 1.5; }
+.compmap .packet text { fill: #ffd479; font-size: 11px; paint-order: stroke; stroke: #0f1115; stroke-width: 3px; }
+.compbody { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; }
+.cinspect, .csteps { border: 1px solid var(--line); border-radius: 6px; padding: 8px; max-height: 420px; overflow: auto; position: relative; }
+.cinspect h3 { margin: 4px 0; } .nowis { margin: 6px 0; color: #ffd479; }
+.csteps table { border-collapse: collapse; width: 100%; } .csteps td, .csteps th { text-align: left; padding: 2px 6px; vertical-align: top; }
+.csteps tr { cursor: pointer; } .csteps tr.on { background: #2a2412; }
+.chips { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; } .chips span { background: #1d2633; border: 1px solid #2d5a8a; border-radius: 3px; padding: 0 4px; font-size: 11px; }
+.kvblocks { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; } .kvblocks span { background: #13261a; border: 1px solid #3fb950; border-radius: 3px; padding: 0 5px; }
+.kvblocks span.new { background: #3fb950; color: #0f1115; font-weight: bold; }
+table.sched { border-collapse: collapse; } table.sched td, table.sched th { padding: 1px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+.trace .compmap { max-height: 60vh; }
+.compmap .cbox.driven rect { stroke: #3fb950; stroke-width: 3; fill: #13261a; }
+.compmap .edge.drives { stroke-dasharray: 3 3; }

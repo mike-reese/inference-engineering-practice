@@ -1,7 +1,9 @@
 // Trace view: one request of a recorded run, stepped through every level on one clock (CLOCK_MONOTONIC ns).
-// Level 0 architecture (the map), 1 network (frames), 2a client, 2b server, 3 hardware and code (kernels, copies).
+// Level 0 architecture (the map), 0b components (each container's components and the data between them, from the
+// component stamps), 1 network (frames), 2a client, 2b server, 3 hardware and code (kernels, copies).
 // One step control drives every level; the lanes show the same time window; metrics light their input spans.
 import { escape, getJSON, json, ms, openInTool } from "./util.js";
+import { BOX, boxOf, dataForm, inspect, light, mapSVG, packet } from "./components_map.js";
 
 const W = 1200;
 const LANES = [ // [label, test(span)]
@@ -10,6 +12,7 @@ const LANES = [ // [label, test(span)]
   ["wire: server eth0", (s) => s.level === "network"],
   ["server: HTTP (uvicorn)", (s) => s.level === "server" && s.component === "http"],
   ["server: LLM API", (s) => s.level === "server" && s.component === "llm_api"],
+  ["server: IPC (ZMQ)", (s) => s.level === "server" && s.component === "ipc"],
   ["server: scheduler", (s) => s.level === "server" && s.component === "scheduler"],
   ["server: executor", (s) => s.level === "server" && s.component === "executor"],
   ["GPU kernels", (s) => s.level === "hardware" && s.component === "gpu" && s.name !== "sample"],
@@ -17,6 +20,8 @@ const LANES = [ // [label, test(span)]
 ];
 const LEVELS = {
   "0 architecture": (s) => MILESTONES.some((m) => m(s)),
+  "0b components": (s) => s.level !== "hardware" && !!boxOf(s) && !(s.level === "network" && s.name === "ACK")
+    && (s.level !== "server" || !!s.attrs.box),
   "1 network": (s) => s.level === "network",
   "2a client": (s) => s.level === "client",
   "2b server": (s) => s.level === "server",
@@ -26,7 +31,7 @@ const LEVELS = {
 const MILESTONES = [
   (s) => s.component === "sdk" && s.name === "send",
   (s) => s.level === "network" && s.name === "request body",
-  (s) => s.level === "server" && s.end_ns == null,
+  (s) => s.level === "server" && s.end_ns == null && !s.attrs.box,
   (s) => s.level === "network" && (s.name === "response headers" || s.attrs.first_token === 1 || s.attrs.done),
   (s) => s.component === "sdk" && (s.name === "response headers" || s.name === "protocol complete"),
   (s) => s.component === "sdk" && s.name === "event: token" && s.attrs.token === 1,
@@ -56,7 +61,8 @@ export class TraceView {
   }
 
   open(params, state) {
-    const [run, request] = params;
+    const [run, request, level] = params;
+    if (level === "0b") this.level = "0b components";
     if (run && run !== this.runId) { this.runId = run; this.run = null; this.kernel = null; this.opened = null; this.request = request ?? null; this.load(); }
     else if (request) { this.request = request; this.reset(); }
     this.dirty = true;
@@ -193,7 +199,8 @@ export class TraceView {
     const send = this.requestSpan()?.start_ns ?? s.start_ns;
     const own = s.level === "server" && s.attrs.seconds != null ? `engine steady clock ${s.attrs.seconds} s`
       : s.level === "network" ? `capture clock (UTC) converted with the client's anchor pair`
-        : s.level === "hardware" ? "Nsight/PyTorch profiler clock, joined to CLOCK_MONOTONIC" : `client CLOCK_MONOTONIC ${s.start_ns} ns`;
+        : s.level === "hardware" ? "Nsight/PyTorch profiler clock, joined to CLOCK_MONOTONIC"
+          : s.attrs.box ? `server CLOCK_MONOTONIC ${s.start_ns} ns (component stamp)` : `client CLOCK_MONOTONIC ${s.start_ns} ns`;
     const stack = (s.attrs.stack ?? []).map((f) => `<li><a href="#" class="frame" data-frame="${escape(f)}">${escape(f)}</a></li>`).join("");
     const text = s.attrs.text ? `<pre class="payload">${escape(s.attrs.text)}</pre>` : "";
     const attrs = Object.fromEntries(Object.entries(s.attrs).filter(([k]) => !["text", "stack"].includes(k)));
@@ -203,6 +210,8 @@ export class TraceView {
         · ${escape(own)}</div>
       ${s.attrs.what ? `<div>what: ${escape(s.attrs.what)} · set at <code>${escape(s.attrs.source)}</code></div>` : ""}
       ${s.attrs.data ? `<div>the request is now: ${escape(s.attrs.data)}</div>` : ""}
+      ${s.attrs.box ? `<div>component <b>${escape(BOX[s.attrs.box]?.label ?? s.attrs.box)}</b> · owner ${escape(s.attrs.owner)} · ${escape(s.attrs.proc)} process pid ${s.attrs.pid}
+        ${s.attrs.loop_iteration != null ? ` · executor loop ${s.attrs.loop_iteration}` : ""}</div>${inspect(s.attrs.box, s.attrs.stamp)}` : ""}
       ${s.attrs.op ? `<div>PyTorch op <code>${escape(s.attrs.op)}</code> shapes ${escape(JSON.stringify(s.attrs.shapes))} · launch ${escape(s.attrs.launch)}</div>` : ""}
       ${stack ? `<div class="label">Python stack (click for source)</div><ol class="stack">${stack}</ol>` : ""}
       ${text}${json(attrs)}
@@ -386,7 +395,7 @@ ${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))
         · step ${steps.length ? this.step + 1 : 0} of ${steps.length}
         · time <button class="zin">zoom in</button><button class="zout">out</button><button class="fit">fit request</button>
       </div>
-      ${this.map(current, previous)}
+      ${this.level === "0b components" ? this.compMap(current) : this.map(current, previous)}
       ${this.lanes(this.spans(), current)}
       <details class="iterpanel" ${this.run.spans.some((s) => s.component === "gpu" && s.attrs?.launch) ? "open" : ""}><summary>one iteration: CPU launches → GPU kernels (Nsight Systems)</summary>${this.iterationGraph()}</details>
       <div class="tracebody"><section class="detail">${this.detail(current)}</section>
@@ -398,6 +407,51 @@ ${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))
           <details><summary>sources (${this.run.sources.length})</summary>${json(this.run.sources)}</details>
         </section></div></div>`;
     this.bind(steps);
+    if (this.level === "0b components") this.animate(current, previous);
+  }
+
+  // Level 0b: the component map for this request, the current step lit, the data moving from the previous step.
+  compMap(current) {
+    const stats = {};
+    const steps = this.spans().filter(LEVELS["0b components"]);
+    if (!steps.length) return `<p class="dim">No component stamps in this run. TRACE=components records them, and so does every
+      profiled level; runs made before the stamps existed (2026-11-04) have none.</p>`;
+    for (const s of steps) {
+      const st = (stats[boxOf(s)] ??= { n: 0, ms: 0 });
+      st.n += 1; st.ms += s.end_ns != null ? (s.end_ns - s.start_ns) / 1e6 : 0;
+    }
+    const topo = this.run.topology ?? {};
+    const of = (svc) => (topo.containers ?? []).find((c) => c.service === svc);
+    const name = (c) => (c ? `${c.name} · ${c.image}` : "");
+    const pid = (proc) => steps.find((s) => s.attrs.proc === proc)?.attrs.pid;
+    const labels = { client: name(of("client")), server: name(of("server")),
+      http: pid("http") ? `pid ${pid("http")}` : "", worker: pid("worker") ? `pid ${pid("worker")}` : "" };
+    const now = current ? `<div class="nowis">the request is now: <b>${escape(dataForm(boxOf(current), current.attrs.stamp ?? current.attrs, current.name))}</b>
+      · at ${escape(BOX[boxOf(current)]?.label ?? "")}${this.kernelCount(current)}</div>` : "";
+    return `${mapSVG({ stats, labels })}${now}`;
+  }
+
+  kernelCount(s) { // a forward or sampler step in a profiled run: the GPU kernels of that iteration
+    if (!["forward", "sampler"].includes(s.attrs.box) || s.attrs.iteration == null) return "";
+    const n = this.run.spans.filter((k) => k.level === "hardware" && k.component === "gpu" && k.name !== "sample"
+      && k.attrs.iteration === s.attrs.iteration).length;
+    return n ? ` · ${n} GPU kernels in iteration ${s.attrs.iteration} (level 3 shows them)` : "";
+  }
+
+  animate(current, previous) {
+    const svg = this.root.querySelector(".compmap");
+    if (!svg) return;
+    const to = boxOf(current), from = boxOf(previous);
+    light(svg, to, from);
+    svg.querySelectorAll(".cbox").forEach((g) => (g.onclick = () => {
+      const steps = this.steps(), i = steps.findIndex((s, j) => j > this.step && boxOf(s) === g.dataset.box);
+      const k = i >= 0 ? i : steps.findIndex((s) => boxOf(s) === g.dataset.box);
+      if (k >= 0) this.go(k);
+    }));
+    if (current && this.animated !== current.id) {
+      this.animated = current.id;
+      packet(svg, from, to, dataForm(to, current.attrs.stamp ?? current.attrs, current.name), this.playing ? Math.min(300, 900 / this.speed) : 320);
+    }
   }
 
   bind(steps) {

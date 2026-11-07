@@ -42,7 +42,8 @@ runner-down:  ## a running job keeps running (own session); restart with make ru
 devtools-restart:  ## after a backend change (the code runs from the mounted repo)
 	REPO_HOST=$(CURDIR) docker compose -f deploy/devtools.yaml restart devtools
 
-# Steps 1-8: one run. TRACE=timeline|code|kernels makes a labeled, profiled run instead (never measured).
+# Steps 1-8: one run. TRACE=timeline|code|kernels makes a labeled, profiled run instead (never measured);
+# TRACE=components a labeled run with component stamps, live in the Components tab (deploy/compose.stamps.yaml).
 rep:
 	TRACE=$(TRACE) $(PY) reps/I02A-L1_streamed_latency/rep.py
 

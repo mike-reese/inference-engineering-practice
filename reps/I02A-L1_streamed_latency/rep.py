@@ -24,7 +24,7 @@ REP_DIR = Path(__file__).resolve().parent
 REPO = REP_DIR.parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 from compose_stack import (NCU_CACHE, NCU_CLOCK, NCU_SETS, TRACE_IMAGE, TRACE_LEVELS, Stack,  # noqa: E402
-                           has_profiler, prepare_run_dir, trace_settings)
+                           has_profiler, prepare_run_dir, trace_settings, uses_stamps)
 
 from inference_analysis.efficiency import efficiency  # noqa: E402
 from inference_analysis.latency import N_TTFT, latency_records  # noqa: E402
@@ -157,6 +157,7 @@ def run_stack(run_id: str, trace: str = "off", options: dict | None = None) -> d
     run_dir = prepare_run_dir(RESULTS_DIR, run_id, config)
     save_json(run_dir / "labels.json", {"trace": trace, "measured": trace == "off", "graphs": level.get("graphs", True),
                                         "profiler": has_profiler(trace), "iter_stats": bool(level.get("iter_stats")),
+                                        "stamps": uses_stamps(trace),
                                         "profile_range": settings["profile_range"],
                                         "options": settings["options"]})
     basis = execution_basis()
@@ -181,7 +182,7 @@ def run_stack(run_id: str, trace: str = "off", options: dict | None = None) -> d
             progress("closer request (ends the profiler range)")
             stack.run_step(step("closer", f"{run_id}-closer"), timeout_s=7200 if slow else 600)
             read_perf_metrics(base)
-        if level.get("iter_stats"):  # the devtools read /metrics in ~2 s batches (up to ~4 s): let the last one land
+        if level.get("iter_stats") or uses_stamps(trace):  # let the devtools' last /metrics batch or stamp read land
             progress("hold the stack for the Engine view's last iterations")
             time.sleep(LIVE_HOLD_S)
     finally:
@@ -326,7 +327,7 @@ def main() -> None:
         return k4_demo()
     if args.source:
         return source_lines()
-    if args.trace in ("code", "kernels"):
+    if args.trace in ("code", "kernels", "components"):
         run("docker", "image", "inspect", TRACE_IMAGE)  # fails clearly: run `make images` first
     prefix = "I02A" if args.trace == "off" else f"I02A-TRACE-{args.trace}"
     run_id = datetime.now(timezone.utc).strftime(f"{prefix}_%Y%m%dT%H%M%SZ_") + secrets.token_hex(3)
@@ -345,6 +346,7 @@ def main() -> None:
     if args.trace != "off":
         kind = ("profiled run" if has_profiler(args.trace)
                 else "unprofiled run with engine iteration stats" if TRACE_LEVELS[args.trace].get("iter_stats")
+                else "unprofiled run with component stamps" if TRACE_LEVELS[args.trace].get("stamps")
                 else "unprofiled comparison run (CUDA graphs off)")
         print(f"TRACE={args.trace}: {kind}, labeled; not a measured result.")
 

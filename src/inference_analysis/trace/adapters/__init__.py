@@ -1,6 +1,7 @@
 """One adapter per saved file. The order matters: the client adapter stores the clock joins the wire and trace
 adapters use; the engine adapter gives the iteration windows the GPU adapters assign kernels by."""
 from .client import client
+from .components import components
 from .docker import topology
 from .engine import engine
 from .gpu import gpu_samples
@@ -14,6 +15,7 @@ ADAPTERS = [
     ("topology.json", topology),
     ("client/*.json", client),
     ("engine_records.json", engine),
+    ("trace/server_stamps.jsonl", components),  # after engine: its iteration numbering
     ("frames.tsv", wire),
     ("gpu.csv", gpu_samples),
     ("trace/*.sqlite", nsys),

@@ -31,7 +31,8 @@ function card(c, s, held, history, byId) {
     ? `uses the network namespace of <b>${byId[c.shares_netns_with]?.service ?? c.shares_netns_with}</b>`
     : `↓ ${fmt.rate(s?.rx_rate)} ↑ ${fmt.rate(s?.tx_rate)} · ${Object.values(c.networks).join(", ")}`;
   const gpu = held.map((p) => `<div class="gpuheld">GPU ${fmt.gib(p.mib)} · ${p.program} pid ${p.pid}</div>`).join("");
-  return `<div class="card ${cls}" data-id="${c.id}">
+  return `<div class="card ${cls}" data-id="${c.id}" data-project="${c.project}" data-service="${c.service}"
+    title="open the components inside this container">
     <div class="title"><i class="dot"></i>${c.service}<span class="state">${label}</span></div>
     <div class="image">${c.image}</div>
     ${s ? `<div class="row">CPU ${fmt.pct(s.cpu_pct)} ${spark(history[`cpu:${c.id}`])}</div>
@@ -91,6 +92,9 @@ export class InfraView {
         <section class="events"><div class="label">events</div><ul>${events.join("")}</ul></section></div>
       <svg class="links"></svg></div>`;
     this.drawLinks(state);
+    this.root.querySelectorAll(".card[data-service]").forEach((card) => (card.onclick = () => {
+      location.hash = `components/${encodeURIComponent(card.dataset.project)}/${encodeURIComponent(card.dataset.service)}`;
+    }));
   }
 
   drawLinks(state) { // a line from each container that holds GPU memory to the GPU panel

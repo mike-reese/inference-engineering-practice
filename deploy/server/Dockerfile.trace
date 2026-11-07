@@ -11,3 +11,8 @@ RUN sed -i 's/with_modules=True)/with_modules=True, with_stack=True)/' "${PKG}/p
       -e 's/timeout if timeout is not None else 300/timeout if timeout is not None else int(os.environ.get("TLLM_HANG_TIMEOUT", "300"))/' \
       "${PKG}/hang_detector.py" \
  && grep -q 'TLLM_HANG_TIMEOUT' "${PKG}/hang_detector.py"
+
+# 3. Component stamps (deploy/server/ie_stamps): one JSON line per step a request takes through the HTTP process and
+#    the executor worker, on CLOCK_MONOTONIC. Inactive unless IE_SERVER_STAMPS is set or /trace/server_stamps.jsonl
+#    exists (deploy/compose.stamps.yaml sets it). The .pth file imports the module at every interpreter start.
+COPY ie_stamps/ie_stamps.py ie_stamps/ie_stamps.pth /usr/local/lib/python3.12/dist-packages/
