@@ -7,6 +7,7 @@ Clocks:
 Every value is milliseconds from the client's send unless it is an interval.
 """
 from .chat_records import chat_durations, content_event_gaps
+import numpy as np 
 
 NS_PER_MS = 1_000_000
 
@@ -162,3 +163,13 @@ def latency_records(record: dict, perf_entry: dict, stream: dict | None = None) 
                              f"a wrong clock conversion or a wrong join, not a measurement")
     out["segments"] = segments
     return out
+
+
+def latency_table(
+    ttft_ms: np.ndarray,
+    percentiles: np.ndarray,
+    *,
+    method: str,
+) -> np.ndarray:
+    """Return TTFT sample percentiles in milliseconds."""
+    return np.percentile(ttft_ms, percentiles, method=method, axis=0)

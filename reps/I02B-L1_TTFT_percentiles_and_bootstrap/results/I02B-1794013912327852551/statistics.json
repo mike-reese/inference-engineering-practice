@@ -1,0 +1,230 @@
+{
+  "evidence": "Calculated",
+  "input_kind": "chosen synthetic TTFT",
+  "unit": "ms",
+  "request_count": 20,
+  "input_rows": [
+    {
+      "row_id": "s01",
+      "ttft_ms": 40.0
+    },
+    {
+      "row_id": "s02",
+      "ttft_ms": 14.0
+    },
+    {
+      "row_id": "s03",
+      "ttft_ms": 180.0
+    },
+    {
+      "row_id": "s04",
+      "ttft_ms": 19.0
+    },
+    {
+      "row_id": "s05",
+      "ttft_ms": 12.0
+    },
+    {
+      "row_id": "s06",
+      "ttft_ms": 26.0
+    },
+    {
+      "row_id": "s07",
+      "ttft_ms": 55.0
+    },
+    {
+      "row_id": "s08",
+      "ttft_ms": 16.0
+    },
+    {
+      "row_id": "s09",
+      "ttft_ms": 21.0
+    },
+    {
+      "row_id": "s10",
+      "ttft_ms": 500.0
+    },
+    {
+      "row_id": "s11",
+      "ttft_ms": 18.0
+    },
+    {
+      "row_id": "s12",
+      "ttft_ms": 29.0
+    },
+    {
+      "row_id": "s13",
+      "ttft_ms": 13.0
+    },
+    {
+      "row_id": "s14",
+      "ttft_ms": 90.0
+    },
+    {
+      "row_id": "s15",
+      "ttft_ms": 22.0
+    },
+    {
+      "row_id": "s16",
+      "ttft_ms": 15.0
+    },
+    {
+      "row_id": "s17",
+      "ttft_ms": 33.0
+    },
+    {
+      "row_id": "s18",
+      "ttft_ms": 20.0
+    },
+    {
+      "row_id": "s19",
+      "ttft_ms": 17.0
+    },
+    {
+      "row_id": "s20",
+      "ttft_ms": 24.0
+    }
+  ],
+  "ordered_rows": [
+    {
+      "row_id": "s05",
+      "ttft_ms": 12.0
+    },
+    {
+      "row_id": "s13",
+      "ttft_ms": 13.0
+    },
+    {
+      "row_id": "s02",
+      "ttft_ms": 14.0
+    },
+    {
+      "row_id": "s16",
+      "ttft_ms": 15.0
+    },
+    {
+      "row_id": "s08",
+      "ttft_ms": 16.0
+    },
+    {
+      "row_id": "s19",
+      "ttft_ms": 17.0
+    },
+    {
+      "row_id": "s11",
+      "ttft_ms": 18.0
+    },
+    {
+      "row_id": "s04",
+      "ttft_ms": 19.0
+    },
+    {
+      "row_id": "s18",
+      "ttft_ms": 20.0
+    },
+    {
+      "row_id": "s09",
+      "ttft_ms": 21.0
+    },
+    {
+      "row_id": "s15",
+      "ttft_ms": 22.0
+    },
+    {
+      "row_id": "s20",
+      "ttft_ms": 24.0
+    },
+    {
+      "row_id": "s06",
+      "ttft_ms": 26.0
+    },
+    {
+      "row_id": "s12",
+      "ttft_ms": 29.0
+    },
+    {
+      "row_id": "s17",
+      "ttft_ms": 33.0
+    },
+    {
+      "row_id": "s01",
+      "ttft_ms": 40.0
+    },
+    {
+      "row_id": "s07",
+      "ttft_ms": 55.0
+    },
+    {
+      "row_id": "s14",
+      "ttft_ms": 90.0
+    },
+    {
+      "row_id": "s03",
+      "ttft_ms": 180.0
+    },
+    {
+      "row_id": "s10",
+      "ttft_ms": 500.0
+    }
+  ],
+  "percentiles": [
+    50,
+    90,
+    95,
+    99
+  ],
+  "by_method": {
+    "inverted_cdf": [
+      21.0,
+      90.0,
+      180.0,
+      500.0
+    ],
+    "linear": [
+      21.5,
+      99.00000000000013,
+      196.00000000000023,
+      439.1999999999996
+    ]
+  },
+  "bootstrap": {
+    "statistic_percentiles": [
+      50,
+      99
+    ],
+    "sample_percentile_method": "linear",
+    "interval_method": "percentile",
+    "confidence_level": 0.95,
+    "n_resamples": 10000,
+    "seed": 20261106,
+    "distribution_shape": [
+      2,
+      10000
+    ],
+    "first_5_resamples_ms": [
+      [
+        15.0,
+        27.5,
+        26.0,
+        17.5,
+        22.0
+      ],
+      [
+        52.14999999999998,
+        439.1999999999996,
+        162.8999999999999,
+        180.0,
+        80.49999999999994
+      ]
+    ],
+    "interval_low_ms": [
+      17.5,
+      52.14999999999998
+    ],
+    "interval_high_ms": [
+      31.0,
+      500.0
+    ]
+  },
+  "bootstrap_distribution_file": "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02B-L1_TTFT_percentiles_and_bootstrap/results/I02B-1794013912327852551/bootstrap_distribution.json"
+}

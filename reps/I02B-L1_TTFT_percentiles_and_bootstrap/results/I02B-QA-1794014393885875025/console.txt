@@ -1,0 +1,29 @@
+I02B-L1 | mode=verify | Calculated from 20 chosen synthetic TTFT values (ms)
+Input rows, complete: [{"row_id": "s01", "ttft_ms": 40.0}, {"row_id": "s02", "ttft_ms": 14.0}, {"row_id": "s03", "ttft_ms": 180.0}, {"row_id": "s04", "ttft_ms": 19.0}, {"row_id": "s05", "ttft_ms": 12.0}, {"row_id": "s06", "ttft_ms": 26.0}, {"row_id": "s07", "ttft_ms": 55.0}, {"row_id": "s08", "ttft_ms": 16.0}, {"row_id": "s09", "ttft_ms": 21.0}, {"row_id": "s10", "ttft_ms": 500.0}, {"row_id": "s11", "ttft_ms": 18.0}, {"row_id": "s12", "ttft_ms": 29.0}, {"row_id": "s13", "ttft_ms": 13.0}, {"row_id": "s14", "ttft_ms": 90.0}, {"row_id": "s15", "ttft_ms": 22.0}, {"row_id": "s16", "ttft_ms": 15.0}, {"row_id": "s17", "ttft_ms": 33.0}, {"row_id": "s18", "ttft_ms": 20.0}, {"row_id": "s19", "ttft_ms": 17.0}, {"row_id": "s20", "ttft_ms": 24.0}]
+Sorted rows, complete: [{"row_id": "s05", "ttft_ms": 12.0}, {"row_id": "s13", "ttft_ms": 13.0}, {"row_id": "s02", "ttft_ms": 14.0}, {"row_id": "s16", "ttft_ms": 15.0}, {"row_id": "s08", "ttft_ms": 16.0}, {"row_id": "s19", "ttft_ms": 17.0}, {"row_id": "s11", "ttft_ms": 18.0}, {"row_id": "s04", "ttft_ms": 19.0}, {"row_id": "s18", "ttft_ms": 20.0}, {"row_id": "s09", "ttft_ms": 21.0}, {"row_id": "s15", "ttft_ms": 22.0}, {"row_id": "s20", "ttft_ms": 24.0}, {"row_id": "s06", "ttft_ms": 26.0}, {"row_id": "s12", "ttft_ms": 29.0}, {"row_id": "s17", "ttft_ms": 33.0}, {"row_id": "s01", "ttft_ms": 40.0}, {"row_id": "s07", "ttft_ms": 55.0}, {"row_id": "s14", "ttft_ms": 90.0}, {"row_id": "s03", "ttft_ms": 180.0}, {"row_id": "s10", "ttft_ms": 500.0}]
+Percentiles (%): [50, 90, 95, 99]
+inverted_cdf (ms): [21.0, 90.0, 180.0, 500.0]
+linear (ms): [21.5, 99.00000000000013, 196.00000000000023, 439.1999999999996]
+P50: inverted_cdf rank 10 selects s09 = 21.0 ms; linear position 9.5: 21.0 + 0.5 * (22.0 - 21.0) = 21.50 ms
+P90: inverted_cdf rank 18 selects s14 = 90.0 ms; linear position 17.1: 90.0 + 0.1 * (180.0 - 90.0) = 99.00 ms
+P95: inverted_cdf rank 19 selects s03 = 180.0 ms; linear position 18.05: 180.0 + 0.05 * (500.0 - 180.0) = 196.000 ms
+P99: inverted_cdf rank 20 selects s10 = 500.0 ms; linear position 18.81: 180.0 + 0.81 * (500.0 - 180.0) = 439.200 ms
+pandas linear (ms; shares NumPy): [21.5, 99.00000000000013, 196.00000000000023, 439.1999999999996]
+Mean: (40.0 + 14.0 + 180.0 + 19.0 + 12.0 + 26.0 + 55.0 + 16.0 + 21.0 + 500.0 + 18.0 + 29.0 + 13.0 + 90.0 + 22.0 + 15.0 + 33.0 + 20.0 + 17.0 + 24.0) / 20 = 58.2 ms
+Mean - linear P50: 58.2 - 21.5 = 36.7 ms
+P99 method gap, linear - inverted_cdf: -60.80000000000041 ms
+Bootstrap distribution shape: (2, 10000); axes: statistic, resample
+First 5 of 10000 estimates per statistic (9995 per statistic omitted here; full data saved): [[15.0, 27.5, 26.0, 17.5, 22.0], [52.14999999999998, 439.1999999999996, 162.8999999999999, 180.0, 80.49999999999994]]
+95% interval lows (P50, P99; ms): [17.5, 52.14999999999998]
+95% interval highs (P50, P99; ms): [31.0, 500.0]
+P50 interval endpoint at distribution P2.5, position 249.975: 17.5 + 0.975 * (17.5 - 17.5) = 17.5000 ms
+P50 interval endpoint at distribution P97.5, position 9749.025: 31.0 + 0.025 * (31.0 - 31.0) = 31.0000 ms
+P99 interval endpoint at distribution P2.5, position 249.975: 52.14999999999998 + 0.975 * (52.14999999999998 - 52.14999999999998) = 52.14999999999998000 ms
+P99 interval endpoint at distribution P97.5, position 9749.025: 500.0 + 0.025 * (500.0 - 500.0) = 500.0000 ms
+Check 1: PASS | inverted_cdf agrees with explicit sorted ranks | max difference 0.0 ms <= 1e-10 ms
+Check 2: PASS | linear agrees with scalar positions and pandas | max difference 4.121147867408581e-13 ms <= 1e-10 ms
+Check 3: PASS | mean agrees with complete sum and differs from P50 | max difference 0.0 ms <= 1e-10 ms
+Check 4: PASS | SciPy interval agrees with its saved distribution | max difference 2.1316282072803006e-14 ms <= 1e-10 ms
+Checks: 4/4 passed
+Limits: synthetic input; IID assumed; bootstrap endpoint agreement does not establish coverage.
+Results: /home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02B-L1_TTFT_percentiles_and_bootstrap/results/I02B-QA-1794014393885875025

@@ -1,0 +1,39 @@
+{
+  "mode": "verify",
+  "run_actor": "tutor author verification",
+  "interpreter": "/home/mike/Work/Code/Personal/inference-engineering-practice/.venv/bin/python3",
+  "python": "3.12.14",
+  "numpy": "2.5.4",
+  "pandas": "3.0.6",
+  "scipy": "1.18.1",
+  "dtype": "float64",
+  "device": "CPU",
+  "working_directory": "/home/mike/Work/Code/Personal/inference-engineering-practice",
+  "argv": [
+    "/home/mike/Work/Code/Personal/inference-engineering-practice/.venv/bin/python3",
+    "reps/I02B-L1_TTFT_percentiles_and_bootstrap/rep.py"
+  ],
+  "source_sha256": "19ebe8c52bbd95b899c844239f54ed73f13da6f6e177d55db2f184bdd070b3a1",
+  "numpy_package_path": "/home/mike/Work/Code/Personal/inference-engineering-practice/.venv/lib/python3.12/site-packages/numpy/__init__.py",
+  "storage": {
+    "command": [
+      "findmnt",
+      "-T",
+      "/home/mike/Work/Code/Personal/inference-engineering-practice/.venv/lib/python3.12/site-packages/numpy/__init__.py",
+      "-n",
+      "-o",
+      "SOURCE,TARGET,FSTYPE"
+    ],
+    "returncode": 0,
+    "stdout": "/dev/mapper/root[/@home] /home btrfs",
+    "stderr": ""
+  },
+  "serving": {
+    "applicable": false,
+    "reason": "chosen synthetic data; no request was sent or timed",
+    "engine": null,
+    "model": null,
+    "GPU_measurement": null,
+    "ISL_OSL_concurrency": null
+  }
+}
