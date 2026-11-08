@@ -6,6 +6,9 @@ import { D, NAMES } from "./model.js";
 import * as api from "./api.js";
 import { Scene } from "./scene.js";
 import { opts } from "../layouts.js";
+import { Flyout } from "./flyout.js";
+import { panelOpen } from "./levels.js";
+import { router } from "/static/views/util.js";
 
 const DEFAULT_RUN = "I02A-TRACE-timeline_20261107T172848Z_f2ac52";   // the combined capture (stamps + nsys, ncu tied)
 const $ = (q) => document.querySelector(q);
@@ -15,7 +18,7 @@ const QP = new URLSearchParams(location.search);
 
 export function shell(title, extra = "") {
   document.body.innerHTML = `<header><b>${title}</b><span id="snaps"></span>${extra}<a class="btn" href="../index.html">all layouts</a></header>
-  <div id="main"><div id="stage"></div><aside id="sum"><div class="muted">loading from the store…</div></aside></div>
+  <div id="main"><div id="stage"></div><aside id="side"><div id="sum"><div class="muted">loading from the store…</div></div></aside></div>
   <footer><button id="back">◀</button><button id="play">▶ play</button><button id="next">▶|</button> speed <select id="speed">${[1, 5, 20, 100].map((v) => `<option ${v === 20 ? "selected" : ""}>${v}</option>`).join("")}</select> steps/s
   <canvas id="tl"></canvas><span id="tlabel" class="muted"></span></footer>`;
 }
@@ -29,6 +32,17 @@ export async function app(layout, view) {
   const u = readUrl();
   set({ t: u.t ?? (D.iters[1] || D.iters[0]).s + 200e3, sel: u.sel ?? null, container: u.container ?? "host/server" }, { fromUrl: true });
   const sc = new Scene($("#stage"), layout); window.SC = sc;
+  // the v1 panels: a container card opens its components in the next level; v1 tab links move the camera
+  sc.onPanelOpen = (project, service) => { const id = D.things.find((t) => t.kind === "container" && (t.name === service || t.id.endsWith("/" + service)))?.id;
+    if (id) set({ container: id }); setTimeout(() => sc.snap(1), 50); };
+  // v1 navigation (links, pickers, row clicks) inside the scene: places in the world move the camera; the other tabs
+  // open in the flyout. The v1 views call router (views/util.js); this page points it here.
+  const fly = new Flyout($("#side"), $("#sum")); window.FLY_OUT = fly;
+  const PLACES = { infra: 0, components: 1, trace: 2 };
+  router.go = (hash) => { const [n, ...ps] = hash.split("/").map(decodeURIComponent);
+    if (n in PLACES) { if (n !== "infra" && ps.length) panelOpen(n, ps); sc.snap(PLACES[n]); fly.open("summary", []); }
+    else if (!fly.open(n, ps)) console.warn("no place or tab for", hash); };
+  router.hash = () => fly.hash();
   let levels = [], key = "", busy = null, again = false;
 
   // ---------- rebuild the levels when the open chain changes (container, iteration or kernel at the cursor)
@@ -120,8 +134,8 @@ export async function app(layout, view) {
   const fo = $("#follow"); if (fo) fo.onchange = (e) => { opts.follow = e.target.checked; };
 
   // ---------- pointer: MapControls pans, dollies and orbits; a click without a drag picks (Raycaster)
-  const cv = sc.renderer.domElement; let down = null;
-  cv.addEventListener("pointerdown", (e) => (down = { x: e.clientX, y: e.clientY }));
+  const cv = $("#stage"); let down = null; const inPanel = (e) => e.composedPath().some((n) => n.classList?.contains("v1panel"));
+  cv.addEventListener("pointerdown", (e) => (down = inPanel(e) ? null : { x: e.clientX, y: e.clientY }));
   cv.addEventListener("pointerup", (e) => { if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 4) return; down = null;
     const h = sc.pick(e.clientX, e.clientY); if (!h) return; const b = h.b, patch = { sel: b.eid || b.id || null };
     if (h.L === 0 && b.peer && b.id) patch.container = b.id;

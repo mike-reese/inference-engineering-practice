@@ -98,47 +98,14 @@ const fmt = (ns) => ns >= 1e6 ? (ns / 1e6).toFixed(3) + " ms" : (ns / 1e3).toFix
 /** @returns {Promise<Level[]>} */
 export async function build(t) {
   const L = [], cont = state.container;
-  // L1 Infrastructure: host > containers > processes, and the host hardware things (Observed inventory)
-  { const hwKinds = new Set(["board", "cpu", "host memory", "chipset", "nvme", "gpu"]);
-    const nodes = [{ id: "host", label: D.byId.get("host")?.name || "host", kind: "host" }];
-    for (const t of D.things) {
-      if (["container", "network"].includes(t.kind) || (t.kind === "process" && containerOf(t.id))) nodes.push({ id: t.id, parent: t.parent_id, label: `${t.kind}: ${t.name}`, kind: t.kind });
-      else if (hwKinds.has(t.kind) && t.parent_id === "host") nodes.push({ id: t.id, parent: "host", label: `${t.kind}: ${t.name}`, kind: t.kind }); }
-    const E = await elk("infra", nodes), it = [];
-    for (const n of nodes) { const p = E.pos[n.id]; if (!p) continue; const [x, y, w, h] = p, card = n.kind === "container" || n.kind === "network";
-      it.push(item(x, y, x + w, y + h, card ? COL.card : hwKinds.has(n.kind) ? COL.hw : n.kind === "process" ? COL.proc : COL.frame, n.label,
-        { id: n.id, peer: card, header: !card && n.kind !== "process" && !hwKinds.has(n.kind), info: D.byId.get(n.id)?.evidence })); }
-    L.push({ name: NAMES[0], items: it, open: it.find((i) => i.id === cont) || null }); }
-  // L2 Components: the open container's processes > threads > component boxes (boxes named by the stamps, Observed)
-  { const nodes = [{ id: cont, label: D.byId.get(cont)?.name || cont, kind: "container" }];
-    const boxes = new Map();
-    for (const e of D.trace) if (e.a.box && containerOf(e.thing_id) === cont) boxes.set(e.thing_id + "#" + e.a.box, { th: e.thing_id, box: e.a.box, owner: e.a.owner });
-    for (const p of children(cont)) { nodes.push({ id: p.id, parent: cont, label: `process: ${p.name}`, kind: "process" });
-      for (const th of children(p.id)) { if (!D.trace.some((e) => e.thing_id === th.id)) continue;
-        nodes.push({ id: th.id, parent: p.id, label: `thread: ${th.name}`, kind: "thread" });
-        for (const b of boxes.values()) if (b.th === th.id) nodes.push({ id: b.th + "#" + b.box, parent: th.id, label: b.box, kind: "component" }); } }
-    const E = await elk("comp:" + cont, nodes), it = [];
-    for (const n of nodes) { const p = E.pos[n.id]; if (!p) continue; const [x, y, w, h] = p, leaf = n.kind === "component";
-      it.push(item(x, y, x + w, y + h, leaf ? COL.comp : n.kind === "thread" ? COL.thread : COL.proc, n.label + (leaf ? ` · ${boxes.get(n.id)?.owner || ""}` : ""),
-        { id: n.id, header: !leaf, comp: leaf, thing: leaf ? boxes.get(n.id).th : n.id, box: leaf ? boxes.get(n.id).box : null })); }
-    const at = (th) => it.find((i) => i.id === th);
-    const links = []; const seen = new Set();
-    for (const l of D.zmq) { const k = l.from_thing + ">" + l.to_thing; if (seen.has(k)) continue; seen.add(k); const a = at(l.from_thing), b = at(l.to_thing); if (a && b) links.push([a, b]); }
-    L.push({ name: NAMES[1], items: it, open: it.find((i) => i.box === "forward") || it.find((i) => i.comp) || it[1] || null, links }); }
-  // L3 Trace: lanes of the open container over the measured request, plus the engine iterations row
+  // L1 Infrastructure and L2 Components: the v1 views themselves (PanelLevel, levels.js), live; nothing dropped against v1.
+  // "open" is the panel area the next level hangs from (side layout link; flat and nested place the child under it).
+  const svc = (D.byId.get(cont)?.name || cont.split("/").pop());
+  L.push({ name: NAMES[0], panel: "infra", items: [], open: item(-220, -140, 220, 140, COL.card, "") });
+  L.push({ name: NAMES[1], panel: "components", project: null, service: svc, run: D.run, items: [], open: item(-220, -140, 220, 140, COL.comp, "") });
+  // L3 Trace: the v1 Trace view on this run (PanelLevel): summary, metrics as calculated, tokens, iteration graph, kernels.
   const it = iterAt(t);
-  { const lanes = lanesOf(cont), its = [], rows = lanes.length + (cont === "host/server" ? 1 : 0) || 1, rh = Math.min(50, 560 / rows);
-    const X = (x) => -480 + (x - D.t0) / (D.t1 - D.t0) * 960; let y = -280, op = null;
-    its.push(item(-500, -300, 500, 300, COL.frame, `Trace · ${D.byId.get(cont)?.name} · measured request · ${fmt(D.t1 - D.t0)}`, { header: true }));
-    for (const th of lanes) { its.push(item(-490, y, 490, y + rh - 4, COL.lane, th, { header: true, lane: true }));
-      for (const e of D.trace) if (e.thing_id === th && e.kind !== "engine iteration" && e.end >= D.t0 && e.start_ns <= D.t1)
-        its.push(item(X(Math.max(e.start_ns, D.t0)), y + rh * 0.3, X(Math.min(e.end, D.t1)), y + rh - 6, /ZMQ/.test(e.name) ? COL.zmq : e.kind === "client request" ? COL.req : COL.stamp, e.name,
-          { t0: e.start_ns, t1: e.end, eid: e.eid, info: e.what }));
-      y += rh; }
-    if (cont === "host/server") { its.push(item(-490, y, 490, y + rh - 4, COL.lane, "engine iterations (NVTX forward step + its stamps)", { header: true, lane: true }));
-      for (const r of D.iters) { const b = item(X(r.s), y + rh * 0.3, X(r.e), y + rh - 6, COL.iter, `it ${r.n}`, { t0: r.s, t1: r.e, eid: r.nvtx?.eid, peer: true,
-        info: `iteration ${r.n} · ${r.phase} · ${fmt(r.e - r.s)}` }); its.push(b); if (r === it) op = b; } }
-    L.push({ name: NAMES[2], items: its, open: op, win: [D.t0, D.t1], X }); }
+  L.push({ name: NAMES[2], panel: "trace", run: D.run, items: [], open: item(-220, -140, 220, 140, COL.iter, "") });
   // L4 Iteration: the server's stamp lanes in the open iteration, plus the KV blocks of the request (kv_cache stamps)
   const det = await iterDetail(it);
   { const its = [], X = (x) => -480 + (x - it.s) / (it.e - it.s) * 960, lanes = lanesOf("host/server"); let y = -270, op = null;

@@ -10,6 +10,8 @@ from aiohttp import web
 import runs
 import store_v2
 from bus import Bus
+from store import serve as store_v3
+from store import stream as store_v3_stream
 from collectors.components import ComponentsCollector
 from collectors.docker import DockerCollector
 from collectors.engine import EngineCollector
@@ -118,6 +120,8 @@ async def engine_iterations_raw(request: web.Request) -> web.Response:
 
 async def component_stamps(request: web.Request) -> web.Response:
     """Every component stamp held, per run (?run= for one): what the Components tab starts from."""
+    if request.query.get("saved"):  # v2 scene: any saved run, read from disk (?saved=<run id>)
+        return web.json_response(await asyncio.to_thread(request.app["components"].saved, request.query["saved"]))
     return web.json_response(request.app["components"].history(request.query.get("run")))
 
 
@@ -201,10 +205,11 @@ async def collectors(app: web.Application):
     bus = app["bus"]
     app["gpu"], app["logs"], app["engine"] = GpuCollector(bus), LogCollector(bus), EngineCollector(bus)
     app["components"] = ComponentsCollector(bus)
+    app["live"] = store_v3_stream.Live(bus, engine=app["engine"])   # command center v3: RunWatcher, host run, NVML
     app["http"] = aiohttp.ClientSession(auto_decompress=False)
     tasks = [asyncio.create_task(c.run()) for c in
              (DockerCollector(bus), app["gpu"], app["logs"], app["engine"], RecordsCollector(bus),
-              app["components"])]
+              app["components"], app["live"])]
     yield
     for task in tasks:
         task.cancel()
@@ -248,6 +253,8 @@ def make_app() -> web.Application:
     r.add_get("/api/runs/{run_id}/file", run_file)
     r.add_route("*", "/{service:grafana|prometheus|runner}{tail:(/.*)?}", proxy)
     store_v2.add_routes(r)  # command center v2 store (DuckDB over Parquet, ie-run/2); additive
+    store_v3.add_routes(r)  # command center v3 store (ie-run/3: CCVB blocks + detail); additive until cutover
+    store_v3_stream.add_routes(r)  # command center v3 live frames (WS /api/v3/stream)
     r.add_static("/static", FRONTEND)
     return app
 

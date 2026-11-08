@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# ccv: the command center verification CLI (ccv.mjs beside this file). See .claude/skills/verify-command-center/SKILL.md.
+exec node "$(dirname "$(readlink -f "$0")")/ccv.mjs" "$@"

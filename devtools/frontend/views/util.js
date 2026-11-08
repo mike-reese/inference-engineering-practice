@@ -1,4 +1,11 @@
 // Helpers shared by the views.
+
+// Navigation between views. v1 moves to a tab by setting the URL hash; a host page that embeds the views (the v2
+// scene) replaces go and hash with its own routing. Views call router.go / router.hash, never location.hash.
+export const router = {
+  go: (hash) => { location.hash = hash; },
+  hash: () => location.hash,
+};
 export const escape = (text) => String(text ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 export const ms = (v, digits = 2) => (v == null ? "–" : `${Number(v).toFixed(digits)}`);
 export const json = (v) => `<pre class="json">${escape(JSON.stringify(v, null, 1))}</pre>`;

@@ -1,0 +1,1752 @@
+{
+ "reps": [
+  {
+   "id": "I01-L2",
+   "title": "Chat service under load",
+   "folder": "reps/I01-L2_chat_service_under_load",
+   "registered": false,
+   "actions": [],
+   "sections": {
+    "Mechanism": "As input sequence length increases, we will see an interaction where the prefill stage of model serving grows but the decode stage of model serving largely doesn't grow. We'll see that end-to-end latency changes with prompt length specifically in this section of the pipeline. Given that we are still doing relatively small context sizes (maximum of 1024) we will not see a material increase in decode time. The effect is there, but the realized impact is not yet visible at these context sizes.",
+    "Task": "We are building a containerized production client/server inference infrastructure (hosted locally) focused on measuring production serving metrics including TTFT and content-event gaps (we will not be measuring server-side ITL here with llama.cpp -- and client-side chunk receipt is not single-token since it's text and we will not conflate the two measurements. We will measure the chunk receipt intervals but we will refer to it as content-event gaps).\n\nSpecifically, we would like to validate and observe what changes in TTFT and end-to-end latency as the ISL prompt length grows in three intervals from 64 to 256 to 1024 tokens at concurrency 1. We need to identify which component spends each millisecond and how the interaction of increasing input sequence length impacts those metrics.\n\nWe'll be building a seven-service deployment; containers for the client (using the OpenAI SDK to send messages), the server (using llama.cpp), prometheus (to store provided quantile / p50/90/95/99 / histogram bucket measurement counts), grafana (to display the measurements in a monitoring dashboard), NVIDIA DCGM (to measure GPU hardware metrics), and Node Exporter (to measure CPU hardware metrics), and a capture sidecar (tcpdump in the server's network namespace for network metrics).\n\nIn order to validate this, we'll get repeated measurements over the same prompts (3 replay blocks, each running all three ISLs in a rotated order) and validate a number of different prompt input sequence lengths and simulate server failure and recovery. The intention is to provide a very small scale, but realistic, monitoring and serving infrastructure on our local hardware.",
+    "Pass Check": "Fixture rows (P2a\u2013P2c, and the methods behind P3e, P4b\u2013P4d, P5c\u2013P5e) are tested in `tests/test_chat_records.py` against K5, K6/K7, K11, K15 and K16. Run rows are tested in `test_i01_l2.py` against the measured run's saved evidence.\n\nMeasured run `I01L2_20261031T000505Z_b7369e`, protocol commit `bce7031`. **45 of 47 run checks pass; P4c and P4d fail.** All fixture tests pass (57).\n\n| Row | Check | Must equal | Tol. | Measured | Pass |\n| --- | --- | --- | --- | --- | --- |\n| P1a | Source/build | K1 + own image | Exact | commit `a7a98e0f\u20263645`, Dockerfile sha256 and build args equal K1; running server image `sha256:b0aa24d3a8f2\u20261c51` equals the built image | Yes |\n| P1b | ISL | 64/256/1024 | Exact | HF input 64/256/1024; `prompt_tokens` = ISL in all 231 records with usage | Yes |\n| P1c | Greedy output IDs | HF output, K2 | Exact | HF output = K2 at each ISL; server IDs equal HF in 24/24 diagnostic records | Yes |\n| P1d | Output count | 32 | Exact | 32 HF and server IDs per ISL; `completion_tokens` = 32 in all 231 complete records | Yes |\n| P2a | Fixture TTFT, ms | 65.012786 | 1e-6 | 65.012786 (K5 fixture) | Yes |\n| P2b | Fixture e2e, ms | 274.035202 | 1e-6 | 274.035202 (K5 fixture) | Yes |\n| P2c | Gap sum, ms | 207.8986 | 1e-6 | 207.8986 over 31 gaps (K5 fixture) | Yes |\n| P2d | Events/usage/status | Raw response | Exact | 210 complete records with saved events: status 200, role-only first event, first content at `first_content_ns`, one finish, final usage and timings, ordered clocks | Yes |\n| P2e | Normal exact ITL/EOF | Unavailable | Exact | unavailable with reasons in all 233 records; none of the 186 normal-path records carries `logprobs` | Yes |\n| P2f | Failure completeness | K12 boundaries | Exact | mid-stream kill: HTTP 200, incomplete, `APIConnectionError`, no usage, TTFT 40.101 ms, attempt 439.328 ms, e2e null. Server down: no status or headers, `APIConnectionError` after 2.114 ms | Yes |\n| P3a | Requests/errors/usage | Raw totals | Exact | per phase and outcome at 3 checkpoints (102, 207, 212 exported records) | Yes |\n| P3b | Bucket/count | Reconstruction | Exact | TTFT and e2e buckets and counts per phase at 3 checkpoints | Yes |\n| P3c | Histogram sum, s | Raw sum | 1e-12 | TTFT and e2e sums per phase at 3 checkpoints | Yes |\n| P3d | Engine token counters | Usage totals | Exact | `after_replay` 45,696 prompt / 3,264 predicted; `final` 192 / 96. `before_failure` 0 / 0 (see note) | Yes |\n| P3e | Engine seconds | Truncated sum | 1e-9 | `after_replay` 5.486 / 22.920 s; `final` 0.080 / 0.651 s; `before_failure` 0 / 0 | Yes |\n| P3f | Host identity | K13 + live host | Exact | `omarchy-desktop`, 16 CPUs, 67,340,988,416 bytes, GPU `GPU-2204ae42\u2026c3b546`, driver 580.178.04; same in Node and DCGM series | Yes |\n| P3g | Targets/rule/recovery | K12/K14 | Exact | 4 targets up; rule inactive \u2192 pending \u2192 firing \u2192 inactive; health 503 \u00d75 then 200; 3/3 recovery requests complete | Yes |\n| P4a | Count/peak per replay | 8 / 1 | Exact | 9 replays \u00d7 8 complete; 3 warm-ups each; no request overlaps another | Yes |\n| P4b | Locust summary | Matched bucket/rank | Exact | 60/60 steps rebuild exactly | Yes |\n| P4c | Half-P50 difference, ms | At most 15 | Condition | max \\|difference\\| 22.179 (ISL 256, block 2, step 20); next 14.170 (ISL 256, block 1) | **No** |\n| P4d | Repeat-P50 range, ms | At most 15 | Condition | ISL 64: 9.355; 256: 12.271; 1024: **15.145** | **No** |\n| P4e | Log/capture P50 difference | Within \u00b115 ms | Condition | \u221211.974, +0.801, +1.197 | Yes |\n| P4f | Observer P50 difference | Within \u00b115 ms | Condition | \u221214.983, \u22122.328, \u22127.804 | Yes |\n| P5a | Requests joined | Client count | Exact | 186/186 server-start-0 records joined; 165 decomposed (the 21 observer-off records save no events) | Yes |\n| P5b | Log prompt tokens | Usage | Exact | 165/165 | Yes |\n| P5c | Offset interval, ms | Nonempty, width | \u2264 0.25 | width 0.055884 (half-width 0.027942) | Yes |\n| P5d | Smallest segment, ms | \u2265 0 | Exact | 0.027942 | Yes |\n| P5e | Segment sum \u2212 TTFT, e2e, ms | 0 | 1e-9 | max \\|difference\\| 1.1e-13 | Yes |\n| P5f | Launch\u2192send \u2212 prompt_ms | 0 to 0.1 ms | Condition | 0.009 to 0.086 over 72 measured requests | Yes |\n| P5g | Send\u2192release \u2212 predicted_ms | \u22120.1 to 0 ms | Condition | \u22120.082 to \u22120.006 over 72 measured requests | Yes |\n\n- **P3d/P3e at `before_failure`:** that snapshot is of server start 7, the server freshly restarted after the logging control, before it served any request. Its 0 = 0 agreement is true but tests nothing. The other two checkpoints carry the comparison.\n- **P4c/P4d failures** are reported, not retuned (spec P4). Results below.",
+    "Results": "**Run:** `I01L2_20261031T000505Z_b7369e`, 2026-10-31 00:05:05\u201300:08:13 UTC, protocol commit `bce7031`. 233 requests: 231 complete, 2 failed on purpose (failure test). Cleanup left no project containers.\n\n### Verdict: TTFT increase measured; e2e stability guard failed\n\nTTFT P50 rises by 91.0 ms from ISL 64 to 1024, with nearly the same value in all three blocks, and engine prompt time rises with it. The e2e stability guard failed (P4c, P4d). Under the frozen rule the failures are reported, not retuned. The guard measures e2e, and the variation it caught is in decode time, which TTFT does not include (next section).\n\n| Contrast | Per-block differences, ms | Mean, ms | 95% bootstrap (N = 3 blocks) |\n| --- | --- | --- | --- |\n| TTFT P50, ISL 1024 \u2212 64 | 94.905, 88.966, 89.033 | 90.968 | [88.966, 94.905] |\n| Engine `prompt_ms` P50, ISL 1024 \u2212 64 | 91.021, 87.606, 87.688 | 88.771 | \u2014 |\n\nBoth rise in the same direction. Had the guard passed, this would have met the \"supported\" rule.\n\n### Why the guard failed\n\nThe guard is on e2e, and the e2e spread comes from decode, not prefill:\n\n| ISL, block | TTFT P50 | e2e P50 | Half-P50 diff | Engine decode P50 |\n| --- | --- | --- | --- | --- |\n| 64, 0 | 24.331 | 240.481 | \u22124.726 | 216.081 |\n| 64, 1 | 24.045 | 231.126 | +2.508 | 206.837 |\n| 64, 2 | 24.114 | 234.507 | +11.984 | 209.083 |\n| 256, 0 | 35.014 | 250.362 | +7.146 | 214.286 |\n| 256, 1 | 35.485 | 257.009 | \u221214.170 | 219.558 |\n| 256, 2 | 34.795 | 244.738 | **\u221222.179** | 209.694 |\n| 1024, 0 | 119.236 | **342.113** | +2.606 | 220.404 |\n| 1024, 1 | 113.011 | 326.968 | +3.312 | 213.048 |\n| 1024, 2 | 113.147 | 330.930 | \u22129.259 | 215.562 |\n\nAll values in ms. In step 20 (ISL 256, block 2), per-request decode times were 211, 236, 219, 225, 207, 209, 207, 207 ms, and e2e followed them. Across blocks, TTFT P50 moved at most 0.29 ms (ISL 64), 0.69 ms (256) and 6.23 ms (1024); e2e moved 9.4, 12.3 and 15.1 ms. Per-request decode times cluster at 205\u2013212 ms, with others spread from 213 to 258 ms. In the pre-freeze rehearsal, DCGM showed the SM clock mostly at 1974 MHz with drops to 1733 and 1569 MHz. The GPU clocks were not locked (Configuration). The 1 s DCGM samples can't attribute individual requests to a clock state, so this explanation is likely but unproven.\n\n### Pooled measured requests (24 per ISL)\n\n| ISL | TTFT P50 / P95 / P99 | e2e P50 / P95 / P99 | Locust P50 / P95 / P99 | Engine prompt / decode P50 |\n| --- | --- | --- | --- | --- |\n| 64 | 24.154 / 29.052 / 30.065 | 236.362 / 248.783 / 261.736 | 240 / 250 / 270 | 20.338 / 210.724 |\n| 256 | 34.882 / 40.998 / 41.661 | 250.362 / 275.328 / 275.523 | 250 / 280 / 280 | 30.782 / 214.287 |\n| 1024 | 114.466 / 129.400 / 134.551 | 334.288 / 368.856 / 372.966 | 330 / 370 / 370 | 108.943 / 217.927 |\n\nAll values in ms. Raw values use NumPy linear quantiles; Locust's use its 2-significant-digit buckets. All ISLs are within the lab budgets (TTFT P95 150 ms, e2e P95 400 ms).\n\n**Held-back ISL 256:** the line through ISL 64 and 1024 TTFT P50s predicts 42.357 ms; observed 35.098; miss \u22127.259 ms. TTFT is not linear in ISL between these points.\n\n### Where each millisecond goes (medians, ms, measured requests)\n\n| Segment | Clock | ISL 64 | ISL 256 | ISL 1024 |\n| --- | --- | --- | --- | --- |\n| client before connect | client | 0.839 | 0.847 | 0.880 |\n| network to server | client \u2192 pcap | 0.499 | 0.506 | 0.524 |\n| server receive | pcap \u2192 log | 0.041 | 0.047 | 0.047 |\n| template + tokenize | log | 1.859 | 2.059 | 3.058 |\n| queue | log | 0.126 | 0.141 | 0.161 |\n| launch \u2192 first result (prefill) | log | 20.352 | 30.794 | 108.966 |\n| server send | log \u2192 pcap | 0.061 | 0.081 | 0.082 |\n| network to client | pcap \u2192 client | 0.271 | 0.337 | 0.327 |\n| client parse | client | 0.114 | 0.116 | 0.114 |\n| decode (first send \u2192 release) | log | 210.711 | 214.272 | 217.911 |\n| send rest + network/client rest | log \u2192 pcap \u2192 client | 0.687 | 0.706 | 0.718 |\n\nCross-clock segments carry the log-offset bound of \u00b10.028 ms. Prefill grows by 88.6 ms from ISL 64 to 1024 and accounts for nearly all the TTFT change. Template/tokenize grows by 1.2 ms. Decode grows by 7.2 ms, well inside its own band spread. Network and client segments stay below 1 ms each.\n\n### Controls (ISL 256, on \u2212 off or diagnostic \u2212 normal, P50 ms)\n\n| Control | e2e, pairs 1/2/3 | TTFT, pairs 1/2/3 |\n| --- | --- | --- |\n| Diagnostic (`logprobs`) | +279.731 / +288.055 / +292.500 | +10.425 / +8.437 / +11.182 |\n| Observers | \u221214.983 / \u22122.328 / \u22127.804 | \u22123.195 / \u22120.335 / \u22122.610 |\n| Debug log + capture | \u221211.974 / +0.801 / +1.197 | \u22123.028 / \u22120.332 / +0.353 |\n\n`logprobs` more than doubles e2e, so diagnostic records stay out of the normal results (K8). The observer and logging differences have mixed signs and sit within the decode-band spread. They show no cost, but they are not proof that instrumentation is free.\n\n### Histogram estimates versus raw (normal phase, all ISLs, N = 72)\n\n| Quantile | TTFT raw / estimate / diff | e2e raw / estimate / diff |\n| --- | --- | --- |\n| P50 | 34.882 / 40.323 / +5.440 | 251.877 / 253.846 / +1.969 |\n| P95 | 121.969 / 142.500 / +20.531 | 349.205 / 385.000 / +35.795 |\n| P99 | 131.896 / 148.500 / +16.604 | 372.456 / 397.000 / +24.544 |\n\nAll values in ms. Prometheus `histogram_quantile` interpolates linearly inside a bucket, so tail estimates land far from the raw values when a bucket is wide (0.1\u20130.15 s for the TTFT tail, 0.3\u20130.4 s for the e2e tail). The bucket counts themselves are exact (P3b).\n\n### Failure and recovery\n\nThe server was killed 0.3 s into a 512-token generation. The client saw HTTP 200, first content at 40.1 ms, then `APIConnectionError` at 439.3 ms: a stream can start successfully and still fail. With the server down, the next request failed to connect after 2.1 ms. The `InferenceServerDown` rule went pending 1.0 s and firing 3.0 s after the kill. After the recreate, health returned 503 five times (model loading) and 200 at 4.8 s. All 3 recovery requests completed, and the rule returned to inactive at 6.1 s.\n\n### Limits\n\n- The e2e stability guard failed, so the TTFT contrast does not carry the formal \"supported\" label. The contrast itself is consistent across blocks (above).\n- GPU clocks were not locked. Decode bands are visible in the engine timings, but individual requests can't be tied to a clock state.\n- The spec's Task step 6 figures (distributions/CDFs, request timelines, per-ISL segment timelines) are not drawn yet.\n- The failure request's pcap is incomplete (Inspection point 4).",
+    "Why It Matters": ""
+   },
+   "moments": null
+  },
+  {
+   "id": "I01A-L1",
+   "title": "Chat Request Inspection Points",
+   "folder": "reps/I01A-L1_chat_request_inspection",
+   "registered": false,
+   "actions": [],
+   "sections": {
+    "Mechanism": "We are studying what a chat request turns into before a model generates anything.",
+    "Task": "We will inspect a chat request at 4 points, using the transformers library and validating with separate checks for each point from an independent source.\n\n1. Message request -> Template. Inspected in transformers, validated by llama.cpp's serving engine.\n2. Template -> Tokens. Inspected in transformers, validated by llama.cpp's tokenizer.\n3. Config. Inspected in transformers' config.json, validated via the safetensors header bytes.\n4. KV Cache. Inspected from a prefill forward pass from the model in transformers, validated via handcoded KV Cache arithmetic.",
+    "Pass Check": "**Status: passing.** `HF_HUB_OFFLINE=1 uv run pytest` on 2026-10-27: 12 passed, none skipped (16 s).\n\n- `reps/I01A-L1_chat_request_inspection/test_i01a_l1.py`: the four pass checks below, against a live llama.cpp server.\n- `tests/test_kv_cache.py`: 3 tests (K12, K13, and an explicit `head_dim`).\n- `tests/test_llama_cpp_server.py`: the server script's tests.\n\nThe checks, from the spec:\n\n| # | Check | Rows |\n| --- | --- | --- |\n| 1 | Template: one rendered string, two implementations | K1\u2013K4 |\n| 2 | Token IDs: one string, two tokenizers | K5\u2013K7 |\n| 3 | Config against the stored tensors | K8\u2013K10 |\n| 4 | The KV cache after prefill, including the no-`dtype` hazard | K11\u2013K13 |",
+    "Why It Matters": "This shows us that A) we can accurately predict the KV cache size just from the published config.json of the model (which is what will allow us to estimate and plan inference infrastructure) and B) that the transformers library matches our served llama.cpp engine configuration for this model, in the template and the token IDs.\n\n### Beyond this rep: decode speed\nThe two engines agree on the values, but not on speed. The course repo's `notebooks/Practice_Exploration/I01A-L1.ipynb` (cells 62, 69 and 71, 2026-10-26) profiled one decode step in each engine. Both ran on the GTX 1080 Ti; this rep runs transformers on the CPU. These numbers are not in `results/`.\n\nThis is not a controlled comparison. Each table has its own conditions:\n\n| Engine | Cached tokens | Cache dtype |\n| --- | --- | --- |\n| transformers | about 2,054 | float32 |\n| llama.cpp | 8,192 + 5 | float16 |\n\n- **The matmuls are nearly identical.** In decode, both engines process one query row. The matmuls take 5.48 ms against 5.43 ms, at 74% against 75% of peak bandwidth.\n- **The gap is attention and launch overhead.**\n  - transformers ran `fmha_cutlassF_f32_aligned_64x64`, a kernel whose tile holds 64 query rows. In decode it held 1, and it launched 14 blocks on 28 SMs: 9.88 ms at 5 GB/s.\n  - llama.cpp switches to `flash_attn_vec_ext_f32`, its one-query decode kernel, with 112 blocks: 1.34 ms at 75 GB/s.\n  - The idle gaps between kernel launches were 2.81 ms against 0.23 ms.\n- **Arithmetic intensity is the same.** The same bytes and FLOPs give the same intensity. The difference is the bandwidth the attention kernel achieved.\n\ntransformers, one decode step (cell 62):\n\n```\npart                                   kernels     bytes      time       rate  of 484 GB/s\nmatmuls (read every weight)                166  1.976 GB   5.48 ms   360 GB/s          74%\nattention (read the KV cache)               24  0.051 GB   9.88 ms     5 GB/s           1%\ntorch.cat (the cache copy, + rotary)        93  0.101 GB   0.41 ms   248 GB/s          51%\neverything else (norms, adds)              616         -   1.46 ms          -            -\ngaps between launches (GPU idle)                       -   2.81 ms\nwhole step                                 899            20.05 ms   floor at 484 GB/s: 4.19 ms\n```\n\nOne launch of each kind (cell 62): attention ran 14 blocks over the 28 SMs, 0.5 per SM.\n\nllama.cpp, one decode step (step 5, cell 71; kernel sources in cell 69):\n\n```\npart                                   kernels     bytes      time       rate  of 484 GB/s\nmatmuls (read every weight)                169  1.976 GB   5.43 ms   364 GB/s          75%\nattention (read the KV cache)               48  0.101 GB   1.34 ms    75 GB/s          16%\nKV write (new token's row only)             48   12.3 KB   0.16 ms     0 GB/s           0%\nmask cast (f32 -> f16, once a step)          1         -   0.05 ms          -            -\neverything else (norms, adds)              243         -   0.53 ms          -            -\ngaps between launches (GPU idle)                       -   0.23 ms\nwhole step (GPU timeline)                  509             7.74 ms   floor at 484 GB/s: 4.29 ms\n```\n\nOne launch of each kind (cell 71): `flash_attn_vec_ext_f32` ran 112 blocks, 4 per SM. Its source is `ggml/src/ggml-cuda/fattn-vec-f32.cuh:14`."
+   },
+   "moments": null
+  },
+  {
+   "id": "I01B-L1",
+   "title": "Sampler Inspection",
+   "folder": "reps/I01B-L1_sampler_inspection",
+   "registered": false,
+   "actions": [],
+   "sections": {
+    "Mechanism": "We're validating the sampler behavior, which is the mechanism that sits between the model's forward call and the next token. The sampler takes the raw logit vector and runs an ordered list of rules. Each rule is set by a request field or by the checkpoint's defaults when the field is not set. We'll be examining repetition penalties, temperature, top-k and top-p. Specifically, we are going to be investigating three things: 1) which rules run, 2) their parameters, and 3) the order. All of these 3 items can change the probability distribution of softmax. Engines do not agree on them: transformers applies temperature before top-k and top-p, and llama.cpp applies it last. So the same request, on the same model with the same token IDs, can sample from different token sets on two engines, with no error. That cross-engine difference is what we're validating.",
+    "Task": "Run one generate call (Qwen2.5-0.5B-Instruct, float32, CPU, max_new_tokens=1), seeded with a fixed value of 2, and inspect its sampler at 3 points. 1) Read the checkpoint's generation_config.json and the processer list generate builds (which rules run, parameters, order). 2) APply the processors one at a time to the raw logits and confirm the results equal the processed scores, then recompute the surviving set and its probabilities by hand from the raw logits (once in the library order and once with the temperature applied last). Send the same 36 token IDs and fields to the llama.cpp server and read its own surviving set (`post_sampling_probs`): it must match the temperature-last recomputation and differ from generate's set. 3) Read the drawn token and check that it is in the surviving token set and confirm that a rerun draws it again on the same seed. Finally, we'll rerun without the repetition penalty to show that the default silently changes the distribution and draw.",
+    "Pass Check": "**Status: passing.** `HF_HUB_OFFLINE=1 uv run pytest` on 2026-10-27: 17 passed, none skipped (18 s).\n\n- `reps/I01B-L1_sampler_inspection/test_i01b_l1.py`: the five pass checks below; check 5 runs against a live llama.cpp server.\n- `reps/I01A-L1_chat_request_inspection/test_i01a_l1.py`, `tests/test_kv_cache.py`, `tests/test_llama_cpp_server.py`: earlier tests, still passing.\n\nAll tests must pass:\n\n### 1. The processor list and its order\n\nBuild the config on a copy of `model.generation_config` with the request's fields, call `_get_logits_processor`, and apply each processor in turn to `logits[0]` from a seeded `generate` call.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| classes, in order | Temperature, TopK, TopP | exact | equal | K3 |\n| parameters | 0.7, 20, 0.8 | exact | equal | K3 |\n| finite entries after each | 151936, 20, 2 | exact | equal | K5 |\n| list applied to `logits[0]` | `scores[0]` | exact | `torch.equal` | K5 |\n\n- **Classes row:** `TemperatureLogitsWarper`, `TopKLogitsWarper`, `TopPLogitsWarper`, and nothing else.\n- **Last row:** ties the list read at point 1 to the vector `generate` returned. A list that differed in any rule, parameter or position would give different bits.\n- **Why exact:** the list is a deterministic function of the config. The same processors on the same tensor on the same CPU give the same bits.\n\n### 2. The surviving set, recomputed from the raw logits\n\nRecompute from `logits[0]` with `torch.topk`, `torch.softmax` and `torch.cumsum` in the list's order (point 2's second source). Then recompute with temperature moved last.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| surviving IDs | finite IDs of `scores[0]` | exact | {785, 4498} | K7, K8 |\n| surviving probabilities | `softmax(scores[0])` | 1e-6 | 0.0 | K7, K8 |\n| IDs, temperature last | not `scores[0]`'s | exact | 4 vs 2 | K9 |\n\n- **Second row:** compare each recomputed probability with `softmax(scores[0])` at the same ID.\n- **Third row:** the order evidence. The same three rules, with the same parameters and the same input, keep four tokens when temperature comes last, as in llama.cpp's default chain.\n- **Why 1e-6:** float32 resolves about 1.2e-7 near 1. `softmax(scores[0])` normalizes all 151,936 entries, all but two of them \u2212inf, while the recomputation normalizes the two kept values of a 20-entry list. A different summation order may differ in the last bits; here it measured 0.0. Repeated runs are bit-identical, so 1e-6 is above the run-to-run spread of 0. Set membership is exact: the cut sits 0.058 above and 0.088 below `top_p` (K6), far beyond any float32 difference.\n\n### 3. The drawn token\n\nRead `sequences[0, -1]`. Seed with 2 again and rerun the same call.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| drawn token | in the surviving IDs | exact | 4498 in set | K10 |\n| rerun's drawn token | first run's | exact | equal | K10 |\n| rerun's `logits[0]` | first run's | exact | `torch.equal` | K10 |\n| rerun's `scores[0]` | first run's | exact | `torch.equal` | K10 |\n\n- **Why exact:** the same seed restores the same random state, and this CPU's float32 forward call repeats bit for bit, so the probabilities and the draw repeat.\n- **What it does not show:** that the draw followed `softmax(scores[0])`. The rerun shares all of `generate`'s code. Membership rules out a token the rules removed, nothing more. The `torch.multinomial` option shows the distribution itself.\n\n### 4. The hazard: the checkpoint's repetition penalty\n\nSeed with 2 and run the same call with `repetition_penalty` left out. Build its processor list the same way, without the field.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| file's `repetition_penalty` | 1.1 | exact | 1.1 | K1 |\n| first processor | RepetitionPenalty, 1.1 | exact | equal | K12 |\n| default call's `logits[0]` | check 1's `logits[0]` | exact | `torch.equal` | K12 |\n| default call's surviving IDs | not the recomputed IDs | exact | 4 vs 2 | K12 |\n\n- **First row:** read from the raw file with `json.load`, not from `transformers`.\n- **Third row:** the raw logits do not change. The penalty acts after the forward call, inside the processor list, so `logits` cannot show it. Only the list and `scores` do.\n- **Fourth row, what the wrong method returns:** the recomputation without the penalty keeps `The` 0.82978559 and `When` 0.17021443. `generate` kept four tokens with `When` 0.49682972 first and `The` 0.17476992 third, and seed 2 drew `During`, which the recomputation excludes.\n- **Why:** this is the hazard of this reading. The checkpoint's file sets a field the request never mentioned. It lowers every prompt token's logit, and the reply's natural first word, `The`, is a prompt token. Nothing errors, and the reply still reads well. Greedy decoding is affected too (K15).\n\n### 5. The engine's order: llama.cpp on the same request\n\nStart the server through the fixture. Read `/props`. Send the engine request (Configuration) and read `completion_probabilities[0][\"top_probs\"]`. Compare with your recomputation with temperature moved last, and with `generate`'s `scores[0]` from a seeded call.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| `/props` `samplers`, last | `temperature` | exact | equal | K19 |\n| engine IDs | temperature-last IDs | exact | 4 IDs equal | K20 |\n| engine probabilities | temperature-last's | 0.02 | 9.11e-4 | K20 |\n| engine IDs | not `scores[0]`'s | exact | 4 vs 2 | K20 |\n\n- **First row:** the engine's own statement of its order, read from the running server, not from its source.\n- **Second and third rows:** your hand model of llama.cpp's order matches llama.cpp. Compare probabilities at the same ID.\n- **Fourth row:** the cross-engine result. Same model, same 36 token IDs, same three fields, logits within 7.5e-3 in log-probability: `transformers` keeps two tokens, llama.cpp keeps four.\n- **Why 0.02:** the two engines' logits differ, systematically, not at random. The largest top-20 log-probability difference is 7.52e-3 (K21). Temperature divides it by 0.7, and a probability p moves by at most about 2 \u00b7 p \u00b7 \u0394. With p = 0.746, that is 2 \u00d7 0.746 \u00d7 7.52e-3 / 0.7 = 0.016; 0.02 sits above that bound. Measured: 9.11e-4. Three identical engine requests were bit-identical, so the run-to-run spread is 0.\n- **Why the sets are exact:** the tightest cut is rank 3's untempered cumulative, 0.7893 on the engine and 0.7895 in `transformers`, 0.0107 below 0.8 (K21). The top-4 log-probability differences, at most 4.9e-3, move it by far less than that.\n- **On the new card (2026-10-28):** the image needs the rebuild `I01-L2` does. With a rebuilt image, re-measure K20 and K21; the tolerance formula above still applies to the new logit difference.",
+    "Results": "Every value agreed with its second source, in the `rep.py` run (`results/output.txt`) and in the five pass checks. The two rows expected to differ (the engine's set against `generate`'s, and the hazard) did differ. The two engines sample from different sets for the same request. The cause is the order of the rules: the logits differ by at most 7.52e-3 in log-probability, far too little to move the top-p cut.\n\n| Point | transformers reports | Second source | Result |\n| --- | --- | --- | --- |\n| 1 rules | Checkpoint defaults 0.7 / 20 / 0.8, penalty 1.1; list Temperature \u2192 TopK \u2192 TopP | raw `generation_config.json`; the list replayed on `logits[0]` | all fields equal; replayed list equals `scores[0]` bit for bit |\n| 2 surviving set | 151,936 \u2192 20 \u2192 2 finite; `The` 0.82978559, `When` 0.17021443 | hand recomputation from `logits[0]` | same 2 IDs; probability difference 0.0 |\n| 2 engine | temperature-last recomputation: 4 tokens (`The`, `When`, `Decode`, `During`) | llama.cpp `/completion` `post_sampling_probs`; `/props` `samplers` | same 4 IDs, largest difference 9.11e-4; temperature is last in the engine's chain; 4 against `generate`'s 2 |\n| 2 engine logits | `log_softmax(logits[0])`, top 20 | llama.cpp `top_logprobs`, `temperature` 0 | same 20 IDs; largest difference 7.52e-3 |\n| 3 draw | 4498 `When`, rank 2, 0.17021443 | membership; seed-2 rerun | in the set; rerun draws 4498 with equal `logits` and `scores` |\n| hazard | penalty 1.1 runs first; 4 survivors led by `When` 0.49682972; draws `During` | recomputation without the penalty | raw logits unchanged; surviving set and draw differ; `During` is outside the recomputed set |",
+    "Why It Matters": "Different serving engines can have arithmetic differences in their sampler libraries that affect the final token distribution. As seen in this example, our llama.cpp server orders the temperature adjustment at the end, after top_k and top_p have been calculated, which results in a different distribution of tokens compared to the transformers library, which does temperature adjustment at the start of the order. Understanding the nuances, and being able to quantitatively measure their impact, of these changes (as well as the interaction of the repetition_penalty when set to None -- i.e. resulting in the default selection, which is actually active) allows us to better diagnose model performance that deviates from our expectations."
+   },
+   "moments": null
+  },
+  {
+   "id": "I01C-L1",
+   "title": "Streamed completion",
+   "folder": "reps/I01C-L1_streamed_completion",
+   "registered": false,
+   "actions": [],
+   "sections": {
+    "Mechanism": "At load, the llama.cpp server reserves the KV cache for every token position in its context (`--ctx-size 4096`). The cache's size depends on the context size and the cache's dtype (f16), not on the weights' dtype.\n\nFor each request, the engine prefills the prompt in one forward call. It then decodes one token per forward call and streams each token as its own event, so each chunk holds one token. The final event carries the engine's counts, its stop reason and its timings.\n\nThe engine also exports counters at `/metrics`: prompt tokens, generated tokens and the engine's seconds. `/metrics` holds no TTFT or ITL. The client measures TTFT (time to first token) on its own clock. So three records exist: the engine's final event, the client's clock and `/metrics`. Two of them come from the engine.\n\nInter-token latency (ITL) is the time between consecutive tokens, in ms per token. Perceived TPS is tokens per second for one user. For a single request it is roughly 1000 / ITL, but it is a different quantity in different units. This rep records each chunk's arrival time. ITL and its percentiles are computed in I02.\n\nThe client's interval minus the engine's interval is everything outside the engine: HTTP handling, the network and any queue. This rep cannot separate those parts from one another.",
+    "Task": "We'll reuse the server script (`scripts/llama_cpp_server.py`) and the image from I01A, with llama.cpp b6500 and one slot. New here:\n\n- the flags `--temp 0 --seed 0 --metrics`, with no `--jinja`;\n- a streaming client: `httpx` with keep-alive off;\n- the prompt sent as the rendered string, so the engine tokenizes it and the prompt count is its own reading.\n\nWe'll send three requests:\n\n- **A** ends on eos. It sends `cache_prompt: false`.\n- **B** ends at the token limit (`n_predict` 12). It sends `cache_prompt: false`.\n- **Hazard** is A again with `cache_prompt` at its default (true), so the engine reuses the 18-token prefix A shares with B.\n\nWe'll inspect four points. Point 1 is read once, at load. Points 2\u20134 are read per request.\n\n1. **KV buffer (at load).** The engine's reported KV buffer size. Second source: `kv_cache_shape` at 2 bytes per element.\n2. **Chunks.** Each streamed chunk and its arrival time on the client's clock. Second source: our chunk count against the final event's `tokens_predicted`.\n3. **Final event.** The engine's counts and stop reason. Second sources: the `transformers` tokenizer's prompt count, the `eos_token` ID and `n_predict`.\n4. **Timings.** The engine's timings in the final event. Second sources: the client's clock (independent) and the `/metrics` deltas (not independent; they come from the engine).",
+    "Pass Check": "**Status: passing.** `HF_HUB_OFFLINE=1 uv run pytest` on 2026-10-28: 24 passed, none skipped (23 s).\n\n- `reps/I01C-L1_streamed_completion/test_i01c_l1.py`: the four pass checks below, against a live llama.cpp server. One module-scoped fixture sends A, B and the hazard request in that order.\n- `tests/test_completion.py`: `completion_record` on typed events, no server (3 tests).\n- `reps/I01A-L1_chat_request_inspection/test_i01a_l1.py`, `reps/I01B-L1_sampler_inspection/test_i01b_l1.py`, `tests/test_kv_cache.py`, `tests/test_llama_cpp_server.py`: earlier tests, still passing.\n\nThe \"Measured\" column holds the values found when each check was fixed (spec, 13 server starts). The `rep.py` run falls inside every one of them (see Results).\n\nAll tests must pass:\n\n### 1. KV buffer at load: the engine's log against the config\n\nRead the `llama_kv_cache: size = ...` line from `docker logs <name>` after the server is ready. Call `kv_cache_shape(config, 4096, dtype_bytes=2)` on the raw `config.json`.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| KV size (MiB) | `total_bytes` / 2^20 | 0.005 MiB | 0.00 | K1, K2 |\n| K size (MiB) | `total_bytes` / 2 / 2^20 | 0.005 MiB | 0.00 | K1, K2 |\n| cells | `--ctx-size`, 4096 | exact | 4096 | K1 |\n| layers | `num_hidden_layers`, 24 | exact | 24 | K1, K2 |\n| K and V dtype | f16, 2 bytes | exact | f16, f16 | K1 |\n\n- **K size row:** V has the same size; one of the two is enough.\n- **Why 0.005 MiB:** the log rounds to two decimals; half a unit in the last place is the most rounding can move it.\n- **Why `dtype_bytes=2`:** the weights are F32, but the KV cache type is an engine setting, f16 by default. The cost model must use the cache's dtype. With the default `dtype_bytes=4` it predicts 96.00 MiB, 2\u00d7 the reservation.\n\n### 2. The stream and the final event: counted twice\n\nBuild A's and B's records with `completion_record`. Count the prompts with the `transformers` tokenizer; convert `/props`' `eos_token` with `convert_tokens_to_ids`.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| A, B chunks | `predicted_n`, `tokens_predicted` | exact | 16, 12 | K6\u2013K8 |\n| A `stop_type`, last ID | `eos`, `eos_token`'s ID | exact | eos, 151645 | K4, K6 |\n| B `stop_type`, chunks | `limit`, `n_predict` 12 | exact | limit, 12 | K7, K8 |\n| `tokens_evaluated` | tokenizer count | exact | 35, 34 | K5, K8 |\n| `tokens_cached` | count + chunks \u2212 1 | exact | 50, 45 | K8 |\n| `stopping_word`, `truncated` | `\"\"`, false | exact | `\"\"`, false | K8 |\n\n- **Chunks:** events with `stop` false. All `data:` events give 17 and 13 (one too many: the final event); chunks with text give 15 for A (one too few: the end-of-sequence chunk's content is `\"\"`).\n- **`tokens_cached` row:** the last sampled token is returned but never fed back, so it has no cell. The cache holds 35 + 15 positions after A, not 35 + 16.\n- **Why exact:** these are integers and strings, and at temperature 0 the reply is the same every run.\n\n### 3. Engine timings against the client clock and `/metrics`\n\nFor A and B: the record's TTFT and end-to-end time, its `timings`, and the deltas of `/metrics` read just before and just after the request, parsed with `text_string_to_metric_families`.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| TTFT \u2212 `prompt_ms` | 0 < r \u2264 10 ms | bound | 2.2 to 6.4 ms | K10 |\n| end-to-end \u2212 both | 0 < r \u2264 10 ms | bound | 2.2 to 5.4 ms | K10 |\n| \u0394 `prompt_tokens_total` | `prompt_n` | exact | 0 | K11 |\n| \u0394 `tokens_predicted_total` | `predicted_n` | exact | 0 | K11 |\n| \u0394 `prompt_seconds_total` \u00d7 1000 | `prompt_ms` | 1 ms | 0 to 0.99 ms | K11 |\n| \u0394 `tokens_predicted_seconds_total` \u00d7 1000 | `predicted_ms` | 1 ms | 0 to 0.99 ms | K11 |\n\n- **\"Both\":** `prompt_ms` + `predicted_ms`.\n- **Why greater than 0:** the engine's intervals sit inside the client's. The client sends before the engine starts the prompt and receives the first chunk after the engine sampled the first token; likewise for the final event. A remainder below 0 means the client clock started late (inside `with client.stream(...)`) or an engine phase was counted twice.\n- **Why at most 10 ms:** the largest of 126 remainders (63 requests, both images, load average up to 10.5) was 7.3 ms, so 10 ms is above the measured spread. It is below the smallest `prompt_ms` measured, 11.0 ms, so a comparison that leaves out an engine phase (end-to-end against `predicted_ms` alone) fails. On a busier machine the remainder grows: if this row fails above 10 ms, check the load average before the code.\n- **On another GPU, fix the bound again:** it must lie above the largest measured remainder and below the smallest measured `prompt_ms` of A and B. A faster GPU shortens `prompt_ms` but not the HTTP remainder, so both are re-measured before the rep runs there; if no such value exists, the upper bound no longer catches a left-out phase and the row is redesigned.\n- **Why the send as the anchor:** first chunk to final event, minus `predicted_ms`, ranged from \u22121.9 to +0.8 ms (K10). Two delivery delays subtract, and the sign is not fixed.\n- **Why exact for the token counters:** they add the same integers the final event reports.\n- **Why 1 ms for the seconds counters:** they add whole milliseconds, rounded down, so a delta \u00d7 1000 is `floor(ms)`, up to 0.999 ms below `timings`.\n- **Not independent:** the counters and `timings` come from the same engine values. Their agreement shows the export is right, not the time. The client clock is the independent source.\n\n### 4. The hazard: a cached prefix counted as prefill\n\nAfter B, send request A again with `cache_prompt` left out (default true). Build its record and read the `/metrics` delta around it.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| `cache_n` | shared prefix of A and B | exact | 18 | K5, K12 |\n| `prompt_n` | tokenizer count \u2212 `cache_n` | exact | 17 | K12 |\n| `tokens_evaluated` | tokenizer count | exact | 35 | K12 |\n| \u0394 `prompt_tokens_total` | `prompt_n` | exact | 17 | K12 |\n| reply IDs | request A's first reply | exact | equal | K6, K12 |\n\n- **Shared prefix:** the number of leading IDs equal in A's and B's tokenized prompts. The slot still held B's tokens, and the engine reused the longest prefix the new prompt shares with them.\n- **The wrong method:** reading `prompt_n` as the prompt's length, or as the prefill work for the whole prompt. It returns 17 of 35 tokens; `prompt_per_second` then describes 17 tokens of work. `tokens_cached` stays 50 and says nothing about reuse.\n- **`/metrics` row:** the counter repeats the engine's 17. Only the tokenizer count exposes the difference, which is why it is the second source for prompt length.\n- **Reply row:** greedy decoding gave the same 16 IDs with and without the reused prefix (21 of 21 starts). The README warns this is not guaranteed: logits computed in a different batch shape need not be bit-for-bit equal.\n- **Why exact:** integers and an ID sequence.\n- **Why it matters:** prefix caching (I11) is how production engines skip a shared system prompt. A dashboard or a bill that reads the processed count as the prompt length undercounts every request that hits the cache.",
+    "Results": "Every value agreed with its second source, in the `rep.py` run (`results/output.txt`) and in the four pass checks. The engine's intervals sat inside the client's by 2.28\u20132.35 ms in all six comparisons. The `/metrics` counters matched `timings` exactly for tokens and to the whole millisecond (rounded down) for time. The hazard request read as the wrong method expects: `prompt_n` 17 against a 35-token prompt, and `/metrics` repeated the 17.\n\n| Point | Engine reports | Second source | Result |\n| --- | --- | --- | --- |\n| 1 load | KV 48.00 MiB (K and V 24.00 each, f16), 4096 cells, 24 layers, 1/1 seqs | `kv_cache_shape(config, 4096, dtype_bytes=2)`; `--ctx-size`; `config.json`; `/props` | difference 0.0000 MiB; at 4 bytes the model would say 96.00 MiB (2\u00d7) |\n| 2 chunks | A 16, B 12, hazard 16 chunks; one ID each; A's last is 151645 with `''` | final event's `tokens_predicted`, `predicted_n` | equal; `data:` events are one more (the final event); chunks with text are one fewer for A (15) |\n| 3 final | A `eos`, B `limit`; `tokens_evaluated` 35, 34; `tokens_cached` 50, 45 | `eos_token` ID 151645; `n_predict` 12; tokenizer count; count + chunks \u2212 1 | all equal |\n| 4 timings, client clock | `prompt_ms` 23.069, 12.770, 11.238; `predicted_ms` 98.991, 72.967, 100.217 | TTFT and end-to-end on `perf_counter_ns` | remainders +2.28 to +2.35 ms, all positive and \u2264 10 ms |\n| 4 timings, `/metrics` | `prompt_n` 35, 34, 17; `predicted_n` 16, 12, 16 | per-request counter deltas (not independent) | token deltas equal; seconds deltas \u00d7 1000 = `floor(ms)`, up to 0.991 ms below |\n| hazard | `cache_n` 18, `prompt_n` 17, `tokens_evaluated` 35 | shared prefix 18; tokenizer count 35 | `prompt_n` covers 17 of 35 tokens (18 of 35, 51%, came from the cache); reply IDs equal A's |\n\nOther readings from the run:\n\n- **First request after load is slower.** A's `prompt_ms` was 23.069 ms for 35 tokens; B's was 12.770 ms for 34. The second request did the same work in about half the time.\n- **Prefill time barely moves with prompt length at this size.** The hazard processed 17 tokens in 11.238 ms; B processed 34 in 12.770 ms. So the engine's `prompt_per_second` reads 1,513 tokens/s for the hazard and 2,662 for B. Neither describes the 35-token prompt the client sent.\n- **The per-token ratio divides by one step too many.** `predicted_per_token_ms` divides `predicted_ms` by `predicted_n`: 6.19, 6.08, 6.26 ms. The decode steps number `predicted_n` \u2212 1: 6.60, 6.63, 6.68 ms per step. The client's chunk spacing agrees with the second: A's chunks 1 to 16 span 98.91 ms over 15 gaps, 6.59 ms each.\n- **`/metrics` totals are not per request.** After B the totals read 69 prompt tokens and 28 generated, the sum of A and B. Only the deltas around one request match its `timings`.",
+    "Why It Matters": "The client clock measures what the user waits for. The engine's `prompt_ms` and `predicted_ms` measure intervals inside llama-server. Comparing them shows engine time and a combined HTTP, queue and network remainder. These records cannot isolate network speed or separate queue time from network time.\n\nThe first request after load also includes warm-up costs. The separate exploration notebook traces its GPU activity and compares repeated requests and a request after idle. The three requests in this rep alone do not isolate the cause of A's higher prefill time.\n\nPrefix reuse changes how much prefill work the engine performs. In the hazard request, 18 of 35 prompt tokens came from the cache, so `prompt_per_second` describes only the 17 tokens computed. Crediting that time with all 35 tokens overstates computed-token throughput. On this pinned llama.cpp server, leaving out `cache_prompt` enables reuse by default; it does not clear the cache."
+   },
+   "moments": null
+  },
+  {
+   "id": "I02A-L1",
+   "title": "Streamed latency",
+   "folder": "reps/I02A-L1_streamed_latency",
+   "registered": true,
+   "actions": [
+    {
+     "id": "off",
+     "group": "run",
+     "label": "Measured run",
+     "description": "One warm-up and one measured streamed request. Client, wire and engine times; no profiler.",
+     "measured": true,
+     "minutes": 2,
+     "options": []
+    },
+    {
+     "id": "timeline",
+     "group": "run",
+     "label": "Timeline (Nsight Systems)",
+     "description": "Every kernel, copy and executor iteration on the run clock, CUDA graphs on. About 20-40% slower.",
+     "measured": false,
+     "minutes": 4,
+     "options": [
+      {
+       "id": "profile_range",
+       "label": "Profile range",
+       "arg": "--profile-range",
+       "pattern": "^\\d{1,3}-\\d{1,3}$",
+       "default": "1-129",
+       "description": "Executor iterations to record, first-last (/perf_metrics numbering): warm-up 1-64, measured request 66-129."
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "group": "run",
+     "label": "Code (PyTorch profiler)",
+     "description": "Each kernel with the op, tensor shapes and Python stack that launched it. CUDA graphs off; about 50x slower per token.",
+     "measured": false,
+     "minutes": 6,
+     "options": [
+      {
+       "id": "profile_range",
+       "label": "Profile range",
+       "arg": "--profile-range",
+       "pattern": "^\\d{1,3}-\\d{1,3}$",
+       "default": "66-129",
+       "description": "Executor iterations to record, first-last: the measured request is 66 (prefill) to 129."
+      }
+     ]
+    },
+    {
+     "id": "kernels",
+     "group": "run",
+     "label": "Kernels (Nsight Compute)",
+     "description": "Every kernel of the chosen iterations, each replayed many times for its counters. CUDA graphs on. Not on the run clock.",
+     "measured": false,
+     "minutes": 15,
+     "options": [
+      {
+       "id": "profile_range",
+       "label": "Profile range",
+       "arg": "--profile-range",
+       "pattern": "^\\d{1,3}-\\d{1,3}$",
+       "default": "67-67",
+       "description": "Executor iterations to profile, at most 3: 66 is the prefill, 67-129 the decode steps. About 13 minutes per iteration with the full set."
+      },
+      {
+       "id": "ncu_set",
+       "label": "Section set",
+       "arg": "--ncu-set",
+       "choices": [
+        "full",
+        "detailed",
+        "basic",
+        "memory"
+       ],
+       "default": "full",
+       "description": "full: every section and rule (41 passes per kernel). memory: speed of light, memory workload, source counters (12 passes). basic and detailed: ncu's own sets."
+      },
+      {
+       "id": "ncu_cache",
+       "label": "Cache control",
+       "arg": "--ncu-cache",
+       "choices": [
+        "all",
+        "none"
+       ],
+       "default": "all",
+       "description": "all: flush the caches before every pass, so each pass starts cold and repeats. none: keep them warm, closer to the real run, less repeatable."
+      },
+      {
+       "id": "ncu_clock",
+       "label": "Clock control",
+       "arg": "--ncu-clock",
+       "choices": [
+        "base",
+        "none"
+       ],
+       "default": "base",
+       "description": "base: lock the GPU to its base clock (2.39 GHz in our report), so results repeat. none: the GPU's own clocks (2.74 GHz in the measured run)."
+      }
+     ]
+    },
+    {
+     "id": "nographs",
+     "group": "run",
+     "label": "No graphs (no profiler)",
+     "description": "Same request with CUDA graphs off and no profiler: against a measured run it shows what graphs save.",
+     "measured": false,
+     "minutes": 3,
+     "options": []
+    },
+    {
+     "id": "live",
+     "group": "run",
+     "label": "Live (engine iteration stats)",
+     "description": "The measured run's setup plus the engine's iteration stats (batch, KV blocks, queue, iteration time), streamed to the Engine view. No profiler; labeled not measured.",
+     "measured": false,
+     "minutes": 2,
+     "options": []
+    },
+    {
+     "id": "components",
+     "group": "run",
+     "label": "Components (live component stamps)",
+     "description": "The measured run's setup plus a stamp at every component a request passes: client SDK and transport, the server's HTTP handler, template, tokenizer, ZMQ, scheduler, KV blocks, forward, sampler, detokenizer. Streamed to the Components tab. No profiler; labeled not measured.",
+     "measured": false,
+     "minutes": 2,
+     "options": []
+    },
+    {
+     "id": "check",
+     "group": "check",
+     "label": "Pass check (5 checks)",
+     "description": "make check: the five pass checks on a fresh stack (project ie-i02a-l1-test).",
+     "measured": null,
+     "minutes": 3,
+     "options": []
+    },
+    {
+     "id": "k4",
+     "group": "check",
+     "label": "K4: break check 1 on purpose",
+     "description": "Default skip_special_tokens against false: the token-count check fails, then passes.",
+     "measured": null,
+     "minutes": 3,
+     "options": []
+    },
+    {
+     "id": "source",
+     "group": "check",
+     "label": "Where each engine time is stamped",
+     "description": "Reads the installed TensorRT-LLM source for the six /perf_metrics stamps (K18).",
+     "measured": null,
+     "minutes": 1,
+     "options": []
+    }
+   ],
+   "sections": {
+    "Mechanism": "The serving engine (TensorRT-LLM) sends response headers before the engine has a token, then streams one server-sent event per generated token. The engine provides measurements for the requests arrival, first token, and last token on its own clock separately from the times the client records on its own clock. The engine also does not measure anything related to the network.",
+    "Task": "We have a new GPU compared to I01-L2.\n\nWe will swap to using TensorRT-LLM as our serving engine, running in a container (the NGC image plus the NVML patch, built from `deploy/server/Dockerfile`), and cut over the I01-L2 Compose stack: server, client and the tcpdump capture sidecar. The stack driver moves to `scripts/compose_stack.py`. We'll send one warm-up request, drain `/perf_metrics`, and then send a measured streamed request. We count the prompt's tokens offline with the tokenizer and then read `/perf_metrics` twice, and decode the capture with `tshark` and `pcap_streams`. A new function (`latency_records`) turns the client record, the engine record and the captured stream into TTFT, ITL, end-to-end latency and the segments between them, each named by its clock. Outputs are the raw records, both `/perf_metrics` reads, the pcap, the offline count and the latency records.",
+    "Pass Check": "All tests must pass. Five checks (owner ruling 2026-10-31). Measured values: 60 requests, 3 stack starts, 2026-10-31.\n\n### 1. Token counts: usage against the offline tokenizer and the token records\n\nCount the prompt offline with `apply_chat_template`. From the measured record, count the token events and the\n`logprobs.content` records, and read the final `usage`.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| `prompt_tokens` | offline count | exact | 34 = 34 | K1, K3 |\n| records per token event | 1 | exact | 1 | K3 |\n| `completion_tokens` | sum of records | exact | 64 = 64 | K3 |\n| token events | `completion_tokens` | exact | 64 = 64 | K2, K3 |\n| `cached_tokens` | 0 | exact | 0 | K3 |\n\n- **Why exact:** integers, at temperature 0 with a fixed output length.\n- **The second row is the evidence rule:** one record per event is what makes each event time a token time.\n- **Wrong methods:** counting all events gives 66. Default `skip_special_tokens` on a prompt whose answer ends early\n  gives 56 records for 64 tokens (K4), and this table fails.\n\n### 2. Client intervals against the engine's\n\nBuild both sides with `latency_records` from the measured record and its `/perf_metrics` entry.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| mean ITL, client \u2212 engine | 0 | 0.1 ms | \u22120.052 to \u22120.003 | K6, K7, K8 |\n| TTFT remainder | 0 < r \u2264 10 ms | bound | 3.22 to 5.97 | K8 |\n| client TTFT \u2212 HTTP-layer TTFT | 0 < r \u2264 10 ms | bound | 2.17 to 2.94 | K8 |\n| end-to-end remainder | 0 < r \u2264 10 ms | bound | 2.97 to 3.94 | K8 |\n\n- **Mean ITL row, matching boundaries:** both sides span the same first and last token; delivery delay at the two ends\n  nearly cancels. 0.1 ms is about twice the largest measured difference. Using end-to-end / 64 is +0.24 to +0.32 off and\n  fails. Dividing by 64 instead of 63 is only about 0.05 off, which this row does not reliably catch; the\n  `latency_records` test catches it.\n- **Containment rows:** the engine's intervals start later than the client's and its last stamp comes before the last\n  delivery, so each remainder must be positive. Check 5 splits the remainder into measured segments.\n- **Why 10 ms:** above the largest measured remainder (5.97) and below the smallest engine TTFT (15.77), so a client\n  \"TTFT\" that leaves out prefill, such as the headers time (\u221217.26 to \u221213.07), fails the lower bound.\n\n### 3. The hazard: which client time is the first token\n\nFrom the measured record, compare the headers time, the first body read and the first token event, and read what the\nfirst body read holds.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| headers vs first body read | before | exact | 2.69 vs 19.52 (P50) | K5 |\n| first body read holds a token | no | exact | role only | K2, K5 |\n| first token event vs first body read | after | exact | +0.38 to +0.63 | K5 |\n| headers time \u2212 engine TTFT | < 0 | exact | \u221217.26 to \u221213.07 | K8 |\n\n- **Why it is the hazard:** TensorRT-LLM sends its headers before the engine has a token, so the headers time is about\n  3 ms while TTFT is about 20 ms. The first body read is closer, but it holds only the role event; it passes the\n  containment bound of check 2 (+2.81 to +5.56, K8), so only reading its content shows it is not the first token.\n- **The last row is the negative control:** the headers time used as TTFT is shorter than the engine's own TTFT, which is\n  impossible for the real first token.\n\n### 4. The join: one isolated request, one engine record\n\nDrain `/perf_metrics` after the warm-up. After the measured request, read it twice.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| entries, first read | 1 | exact | 1 | K9 |\n| entries, second read | 0 | exact | 0 | K9 |\n| `last_iter \u2212 first_iter + 1` | `completion_tokens` | exact | 64 = 64 | K7 |\n| `request_id` type | `int` | exact | `int` | K7, K10 |\n\n- **Why this is the join:** no emitted ID links the stream to the engine record (K10), so correlation rests on isolation:\n  one request in flight, a drain before it, exactly one record after it. The iteration row ties the record to a 64-token\n  request; with `--max_batch_size 1` the engine generates one token per iteration.\n- **Wrong method:** reading twice, or letting another reader in, returns `[]`; code that takes element 0 then crashes or,\n  with other traffic, joins the wrong request.\n\n### 5. The wire: the capture against the client and the engine\n\nDecode the pcap with `pcap_streams`, take the stream whose `X-Request-ID` is the measured request's, and build the `wire`\nand `segments` parts with `latency_records`.\n\n| Quantity | Must equal | Tol. | Measured | Row |\n| --- | --- | --- | --- | --- |\n| chat requests in the stream | 1 | exact | 1 | K14 |\n| token events on the wire | `completion_tokens` | exact | 64 = 64 | K14 |\n| mean ITL, wire \u2212 client | 0 | 0.05 ms | +0.002 to +0.007 | K15 |\n| smallest segment | > 0 | bound | \u2265 0.094 ms | K15, K16 |\n| headers on wire \u2212 `first_token_time` | < 0 | exact | \u221219.73 to \u221215.24 | K15 |\n\n- **First row, the join by ID:** the request ID is in the captured bytes, so this join does not rest on isolation.\n- **Second row:** a third reader (`tshark` on the raw bytes) agrees with the SDK and `usage`. It is not independent of the\n  engine's output; it is independent of the SDK's parsing.\n- **Mean ITL row:** wire and client span the same two token events; 0.05 ms is seven times the largest measured\n  difference and below the 0.052 ms that dividing by 64 instead of 63 would add to one side only.\n- **Smallest-segment row, the clock join:** the segments chain three clocks (client, capture, engine). A wrong unit, a\n  missed `anchor_pair` conversion or a wrong stream makes some segment negative or absurd. Every segment was positive in\n  60 of 60; the smallest was 0.094 ms.\n- **Last row, the hazard on a third clock:** the headers leave the server's interface about 16 ms before the engine has\n  its first token. Check 3 showed it on the client's clock; this shows it at the server, where the network is excluded.",
+    "Results": "**Run:** `I02A_20261103T164324Z_348959`, 2026-11-03. **Pass check:** `make check` 5 of 5 passed on a fresh stack\n(project `ie-i02a-l1-test`); `make test-unit` 33 passed.\n\n| Quantity | Client | Wire | Engine |\n| --- | --- | --- | --- |\n| TTFT, ms | 35.564 | 34.910 | 29.478 |\n| Mean ITL, ms | 4.531 | 4.533 | 4.547 |\n| End-to-end, ms | 321.604 | 321.134 | 315.947 |\n\n- **Prefill dominates TTFT:** 27.309 of 35.564 ms (77%). Queue 2.169; request's last byte \u2192 `arrival_time` (receive,\n  body, template, tokenization) 1.196; the two network legs 2.348 and 0.655; engine-to-handler 1.303.\n- **Slower than the spec's measurements (2026-10-31):** TTFT 35.6 vs about 20 ms, ITL 4.5 vs about 3.4 ms, and the TTFT\n  remainder 6.09 ms is just above the measured range (3.22 to 5.97). The SM clock was 2742 MHz during the request, so a\n  low clock does not explain it. Cause not found; `devtools/overhead.json` measures whether the devtools add to it.\n- **Decode efficiency:** decode MBU 0.485 (218 GB/s of 448 GB/s Published), from 0.989 GB per step (weights + KV) and\n  the engine ITL. Nsight Compute measured 1.013 GB DRAM read for one decode step (`TRACE=kernels`), 2.5% above the\n  estimate. Prefill MFU is Unavailable (peak tensor FLOPS not yet sourced; I03); achieved 1.23 TFLOP/s.\n- **K4 (`make k4`):** default `skip_special_tokens` gives 58 records for 64 tokens, and check 1 fails; `false` gives\n  64 = 64. The spec measured 56; the count depends on where the answer ends.\n- **Profiled runs (labeled, not measured):** `TRACE=timeline` (Nsight Systems, CUDA graphs on, 29,891 kernels mapped\n  to their iteration and request), `TRACE=code` (PyTorch profiler with Python stacks, iterations 66\u2013129, 211 kernels\n  per decode step), `TRACE=kernels` (Nsight Compute, iteration 67, 242 kernels, 12 replay passes each).\n- **Iteration numbering:** `/perf_metrics` counts iterations from 1; the executor's NVTX labels and\n  `TLLM_PROFILE_START_STOP` count from 0. Checked by time: `first_iter` 66 starts in NVTX label 65.\n- **`server_arrival_time` is stamped at the headers, not the full request** (owner ruling 2026-11-03). It is set in an\n  ASGI middleware (`serve/responses_utils.py:1930`) once uvicorn has parsed the headers; the body is read later. In run\n  `I02A_20261103T173059Z_b3fec0` the warm-up's body frame came 0.43 ms after its headers frame, and the old segment\n  \"wire \u2192 `server_arrival_time`\" was \u22120.187 ms. As in I01-L2, a request arrives when all of it is in: the segments now\n  run from the request's last byte straight to `arrival_time` (7 TTFT segments), and `server_arrival_time` is a labeled\n  point. This run's `latency.json` was recomputed from its raw records under the revised split.",
+    "Why It Matters": "- **TTFT is a client time that must hold a token.** TensorRT-LLM sends headers about 25 ms before it has a token, and\n  the first body read holds only the role event. A load test that times headers or the first read reports a TTFT\n  shorter than prefill.\n- **Every latency has an owner.** The 7 segments split client TTFT across three clocks. Prefill is 27.3 of 35.6 ms;\n  the network and the HTTP layer are under 2 ms each. Tuning targets come from the segment that grows, not the total.\n- **`/perf_metrics` drains on read.** Correlation rests on isolation (one request, a drain before, one record after).\n  Any other reader, such as a dashboard, breaks the join.\n- **The wire is the referee.** The capture agrees with the SDK to 0.002 ms on mean ITL, so client-side parsing is not\n  where latency hides."
+   },
+   "moments": {
+    "request": "measured",
+    "moments": [
+     {
+      "id": "headers-early",
+      "title": "Headers leave before any token exists",
+      "lesson": "TTFT is a client time that must hold a token.",
+      "at": "wire.headers_ms",
+      "event": "ASGI sends the response headers",
+      "note": "TensorRT-LLM answers 200 OK before prefill has started. A load test that times the headers reports a TTFT shorter than prefill.",
+      "evidence": [
+       {
+        "label": "headers on the wire",
+        "path": "wire.headers_ms"
+       },
+       {
+        "label": "headers at the client",
+        "path": "client.headers_ms"
+       },
+       {
+        "label": "engine first token",
+        "path": "engine.ttft_ms"
+       }
+      ]
+     },
+     {
+      "id": "first-read-role",
+      "title": "The first body read holds only the role event",
+      "lesson": "TTFT is a client time that must hold a token.",
+      "at": "client.first_body_read_ms",
+      "event": "HTTP transport: body read",
+      "note": "The first bytes the SDK reads are the role event, not a token. Only the first token event counts as TTFT.",
+      "evidence": [
+       {
+        "label": "first body read",
+        "path": "client.first_body_read_ms"
+       },
+       {
+        "label": "first token event",
+        "path": "client.ttft_ms"
+       }
+      ]
+     },
+     {
+      "id": "prefill",
+      "title": "Prefill owns most of TTFT",
+      "lesson": "Every latency has an owner.",
+      "at": "engine.queue_ms",
+      "event": "model forward (prefill)",
+      "note": "The 7 TTFT segments split client TTFT across three clocks; prefill is the one that matters here.",
+      "evidence": [
+       {
+        "label": "queue",
+        "path": "engine.queue_ms"
+       },
+       {
+        "label": "prefill (first_scheduled_time -> first_token_time)",
+        "path": "segments[first_scheduled_time].ms"
+       },
+       {
+        "label": "client TTFT",
+        "path": "client.ttft_ms"
+       }
+      ]
+     },
+     {
+      "id": "first-token",
+      "title": "One first token, three clocks",
+      "lesson": "Every latency has an owner.",
+      "at": "client.ttft_ms",
+      "event": "SDK yields the token",
+      "note": "The engine has the token first, the wire sees it next, the client last. The gaps are the owners of the remainder.",
+      "evidence": [
+       {
+        "label": "engine",
+        "path": "engine.ttft_ms"
+       },
+       {
+        "label": "wire",
+        "path": "wire.ttft_ms"
+       },
+       {
+        "label": "client",
+        "path": "client.ttft_ms"
+       }
+      ]
+     },
+     {
+      "id": "decode",
+      "title": "Steady decode: the wire agrees with the client",
+      "lesson": "The wire is the referee.",
+      "at": "client.ttft_ms",
+      "event": "model forward (decode)",
+      "note": "Mean ITL on the wire matches the client to a few microseconds, so client-side parsing is not where latency hides.",
+      "evidence": [
+       {
+        "label": "client mean ITL",
+        "path": "client.mean_itl_ms"
+       },
+       {
+        "label": "wire mean ITL",
+        "path": "wire.mean_itl_ms"
+       },
+       {
+        "label": "engine mean ITL",
+        "path": "engine.mean_itl_ms"
+       }
+      ]
+     },
+     {
+      "id": "done",
+      "title": "[DONE] closes the stream",
+      "lesson": "Every latency has an owner.",
+      "at": "client.e2e_ms",
+      "event": "send_one: protocol complete",
+      "note": "End-to-end on each clock. The engine stops stamping at the last token; delivery adds the rest.",
+      "evidence": [
+       {
+        "label": "engine",
+        "path": "engine.e2e_ms"
+       },
+       {
+        "label": "wire [DONE]",
+        "path": "wire.done_ms"
+       },
+       {
+        "label": "client",
+        "path": "client.e2e_ms"
+       }
+      ]
+     }
+    ],
+    "setup_lessons": [
+     {
+      "lesson": "`/perf_metrics` drains on read.",
+      "note": "Correlation rests on isolation: one request, a drain before, one record after. The pass check reads it twice; the second read is empty."
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02B-L1",
+   "title": "I02B-L1_TTFT_percentiles_and_bootstrap",
+   "folder": "reps/I02B-L1_TTFT_percentiles_and_bootstrap",
+   "registered": false,
+   "actions": [],
+   "sections": {
+    "Mechanism": "Compare sample-percentile conventions and percentile-bootstrap intervals\non 20 chosen synthetic TTFT values. All statistics are **Calculated**; no server ran.",
+    "Task": "Preserve the input rows, calculate P50/P90/P95/P99 with two methods, compare\nthe mean with P50, and reconstruct SciPy's P50/P99 interval endpoints from its distribution.\n\n**Configuration.** Python 3.12.14, NumPy 2.5.4, pandas 3.0.6, SciPy 1.18.1; CPU, float64.\nOne fixed 20-row sample. Bootstrap: linear P50/P99, 10,000 resamples, 95% confidence,\npercentile interval method, axis 0, vectorized, batch 1,000, fresh RNG seed 20261106.\nThe independent unit is a whole synthetic row; IID is assumed, not established.\n\n| Inspection | Library result (ms) | Reference and meaning |\n| --- | --- | --- |\n| P50/P90/P95/P99, inverted_cdf | 21 / 90 / 180 / 500 | Sorted one-based ranks 10 / 18 / 19 / 20 |\n| P50/P90/P95/P99, linear | 21.5 / 99 / 196 / 439.2 | Scalar positions 9.5 / 17.1 / 18.05 / 18.81 |\n| Mean versus linear P50 | 58.2 versus 21.5 | Complete sum 1164 / 20; difference 36.7 |\n| P50 95% bootstrap interval | [17.5, 31] | Distribution percentiles 2.5 and 97.5 |\n| P99 95% bootstrap interval | [52.15, 500] | Same endpoint extraction on P99 estimates |\n\nValues above are rounded for display. Raw precision, every scalar substitution and\nall 20,000 bootstrap estimates are saved. pandas agrees with NumPy but uses NumPy\ninternally; scalar rank/interpolation arithmetic is the independent reference.\n\n| Check | Reference | Max difference (ms) | Result |\n| --- | --- | --- | --- |\n| 1: selected observations | Explicit ranks and fixed values | 0 | PASS |\n| 2: interpolation | Scalar values, pandas, method gap | 4.121e-13 | PASS |\n| 3: mean | Complete sum/count and fixed values | 0 | PASS |\n| 4: interval endpoints | Saved distribution and scalar endpoint positions | 2.132e-14 | PASS |\n\n**Pass rule.** Absolute difference at most 1e-10 ms, with zero relative tolerance.\nThis allowance covers floating-point arithmetic, not request variation or uncertainty.\nThe method substitution changes P99 by about \u221260.8 ms and fails the intended method's reference.\n\n**Meaning and limits.** The few large values pull this sample's mean above its P50.\nThe P99 interval is much wider than P50's interval because the sample has sparse tail evidence.\nMore resamples add no new requests or unseen slow values. Matching interval endpoints checks\nextraction, not nominal coverage; these synthetic results justify no serving-capacity decision.\nThe practical use is declaring the method, sample size and uncertainty in real benchmark claims.\n\n**Toolkit.** `latency_table(ttft_ms, percentiles, *, method)` delegates to NumPy and\nreturns an array in the requested percentile order; reuse is not a requirement of this rep.\n\n**Reproduce** from the practice repository:\n\n```bash\nuv run --no-sync python reps/I02B-L1_TTFT_percentiles_and_bootstrap/rep.py\n```\n\nEvery execution creates a fresh results directory. `IE_STUDY_MODE=verify` selects a\nseparate `I02B-QA-...` identifier. No Makefile, control CLI, plots or devtools are required\nfor this synthetic rep under Mike's session decisions. No commit or push was made by the tutor.\n\nVerified artifacts: [statistics](results/I02B-QA-1794014393885875025/statistics.json),\n[basis](results/I02B-QA-1794014393885875025/basis.json),\n[complete distribution](results/I02B-QA-1794014393885875025/bootstrap_distribution.json),\n[console walkthrough](results/I02B-QA-1794014393885875025/console.txt)."
+   },
+   "moments": null
+  }
+ ],
+ "runs": [
+  {
+   "id": "I02A-TRACE-code_20261103T170709Z_0ac2db",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "code",
+    "measured": false,
+    "graphs": false,
+    "profile_range": "66-129"
+   },
+   "started": "20261103T170709Z",
+   "result": {
+    "request_id": "I02A-TRACE-code_20261103T170709Z_0ac2db-measured",
+    "client": {
+     "headers_ms": 5.327196,
+     "first_body_read_ms": 123.137251,
+     "ttft_ms": 123.607006,
+     "e2e_ms": 12681.820015,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 199.3293124920635,
+     "perceived_tps": 5.01682360460565
+    },
+    "engine": {
+     "queue_ms": 2.621999999973923,
+     "ttft_ms": 115.98000000230968,
+     "decode_span_ms": 12557.99899995327,
+     "e2e_ms": 12673.97899995558,
+     "http_ttft_ms": 119.36499999137595,
+     "mean_itl_ms": 199.3333174595757
+    },
+    "wire": {
+     "headers_ms": 4.907141,
+     "ttft_ms": 123.089886,
+     "done_ms": 12680.835708,
+     "token_events": 64,
+     "mean_itl_ms": 199.32749412698413
+    },
+    "remainder": {
+     "ttft_ms": 7.627005997690318,
+     "e2e_ms": 7.8410150444196915,
+     "mean_itl_ms": -0.004004967512202029
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.581328
+     },
+     {
+      "name": "wire \u2192 server_arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.6830639587135314
+     },
+     {
+      "name": "server_arrival_time \u2192 arrival_time",
+      "clocks": "engine",
+      "ms": 0.6530000567436218
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.621999979019165
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 113.35799998044968
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 2.73199999332428
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.46049403174973236
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.5171199999999914
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 2.939316071804569
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.9843069999988074
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-components_20261104T141339Z_012ef7",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "components",
+    "measured": false,
+    "graphs": true,
+    "profiler": false,
+    "iter_stats": false,
+    "stamps": true,
+    "profile_range": null,
+    "options": {}
+   },
+   "started": "20261104T141339Z",
+   "result": {
+    "request_id": "I02A-TRACE-components_20261104T141339Z_012ef7-measured",
+    "client": {
+     "headers_ms": 6.208071,
+     "first_body_read_ms": 34.212987,
+     "ttft_ms": 35.1042,
+     "e2e_ms": 331.844886,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 4.696644412698412,
+     "perceived_tps": 212.91797124267697
+    },
+    "engine": {
+     "queue_ms": 2.096999960485846,
+     "ttft_ms": 27.85399998538196,
+     "decode_span_ms": 295.3529999940656,
+     "e2e_ms": 323.2069999794476,
+     "http_ttft_ms": 30.002999992575496,
+     "mean_itl_ms": 4.6881428570486605,
+     "headers_parsed_ms": 3.7519760131835938
+    },
+    "wire": {
+     "headers_ms": 5.772122,
+     "ttft_ms": 34.141848,
+     "done_ms": 331.185558,
+     "token_events": 64,
+     "mean_itl_ms": 4.703089412698413
+    },
+    "remainder": {
+     "ttft_ms": 7.250200014618038,
+     "e2e_ms": 8.6378860205524,
+     "mean_itl_ms": 0.008501555649751857
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 3.504475
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 1.1615010475158694
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.096999943256378
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 25.757000029087067
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.23499995470047
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.38687202544021915
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.9623519999999957
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 3.3125819949226525
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.6593279999999595
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-components_20261104T142238Z_0b249c",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "components",
+    "measured": false,
+    "graphs": true,
+    "profiler": false,
+    "iter_stats": false,
+    "stamps": true,
+    "profile_range": null,
+    "options": {}
+   },
+   "started": "20261104T142238Z",
+   "result": {
+    "request_id": "I02A-TRACE-components_20261104T142238Z_0b249c-measured",
+    "client": {
+     "headers_ms": 6.585804,
+     "first_body_read_ms": 35.761211,
+     "ttft_ms": 36.625642,
+     "e2e_ms": 336.99896,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 4.754478444444445,
+     "perceived_tps": 210.32801214368507
+    },
+    "engine": {
+     "queue_ms": 2.18400004087016,
+     "ttft_ms": 29.141000006347895,
+     "decode_span_ms": 299.5620000292547,
+     "e2e_ms": 328.7030000356026,
+     "http_ttft_ms": 31.503000005614012,
+     "mean_itl_ms": 4.754952381416741,
+     "headers_parsed_ms": 3.8146780133247375
+    },
+    "wire": {
+     "headers_ms": 6.158338,
+     "ttft_ms": 35.684383,
+     "done_ms": 336.342173,
+     "token_events": 64,
+     "mean_itl_ms": 4.75974246031746
+    },
+    "remainder": {
+     "ttft_ms": 7.4846419936521045,
+     "e2e_ms": 8.295959964397412,
+     "mean_itl_ms": -0.0004739369722965847
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 3.254984
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 1.3976939532432557
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.184000074863434
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 26.956999957561493
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.5239999890327454
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.3667050252990691
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.9412590000000023
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 2.986494978092196
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.6567870000000084
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-kernels_20261103T171059Z_8a4ac0",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "kernels",
+    "measured": false,
+    "graphs": false,
+    "profile_range": "67-67"
+   },
+   "started": "20261103T171059Z",
+   "result": {
+    "request_id": "I02A-TRACE-kernels_20261103T171059Z_8a4ac0-measured",
+    "client": {
+     "headers_ms": 3.099219,
+     "first_body_read_ms": 510056.299028,
+     "ttft_ms": 510057.019697,
+     "e2e_ms": 513195.602084,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 49.8116506984127,
+     "perceived_tps": 20.075624597437123
+    },
+    "engine": {
+     "queue_ms": 1.1050000321120024,
+     "ttft_ms": 510047.3420000053,
+     "decode_span_ms": 3144.436000031419,
+     "e2e_ms": 513191.7780000367,
+     "http_ttft_ms": 510053.76400001114,
+     "mean_itl_ms": 49.91168254018125
+    },
+    "wire": {
+     "headers_ms": 2.900267,
+     "ttft_ms": 510056.369072,
+     "done_ms": 513195.210714,
+     "token_events": 64,
+     "mean_itl_ms": 49.81818885714286
+    },
+    "remainder": {
+     "ttft_ms": 9.677696994680446,
+     "e2e_ms": 3.824083963292651,
+     "mean_itl_ms": -0.10003184176855484
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 1.719969
+     },
+     {
+      "name": "wire \u2192 server_arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.21042499385452262
+     },
+     {
+      "name": "server_arrival_time \u2192 arrival_time",
+      "clocks": "engine",
+      "ms": 0.387999951839447
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 1.105000078678131
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 510046.23699992895
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 6.034000039100647
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.6746780075482093
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.6506250000093132
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 1.1143199975485913
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.39137000002665445
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-kernels_20261103T181509Z_52744d",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "kernels",
+    "measured": false,
+    "graphs": true,
+    "profiler": true,
+    "profile_range": "67-67"
+   },
+   "started": "20261103T181509Z",
+   "result": {
+    "request_id": "I02A-TRACE-kernels_20261103T181509Z_52744d-measured",
+    "client": {
+     "headers_ms": 4.98367,
+     "first_body_read_ms": 729135.169123,
+     "ttft_ms": 729135.944776,
+     "e2e_ms": 730742.084315,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 25.485787507936507,
+     "perceived_tps": 39.237555429220734
+    },
+    "engine": {
+     "queue_ms": 2.275999984703958,
+     "ttft_ms": 729113.8059999794,
+     "decode_span_ms": 1622.092000034172,
+     "e2e_ms": 730735.8980000135,
+     "http_ttft_ms": 729128.2650000066,
+     "mean_itl_ms": 25.74749206403448,
+     "headers_parsed_ms": 2.9048869609832764
+    },
+    "wire": {
+     "headers_ms": 4.714936,
+     "ttft_ms": 729134.837477,
+     "done_ms": 730741.615638,
+     "token_events": 64,
+     "mean_itl_ms": 25.497407793650794
+    },
+    "remainder": {
+     "ttft_ms": 22.138776020612568,
+     "e2e_ms": 6.186314986436628,
+     "mean_itl_ms": -0.26170455609797116
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 3.070072
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.6648150038986205
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.275999963283539
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 729111.530000031
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 13.628999948501587
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 3.6675900532864034
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 1.1072990000247955
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 1.9827509941533208
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.4686770000262186
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-live_20261103T184723Z_36b7fb",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "live",
+    "measured": false,
+    "graphs": true,
+    "profiler": false,
+    "iter_stats": true,
+    "profile_range": null,
+    "options": {}
+   },
+   "started": "20261103T184723Z",
+   "result": {
+    "request_id": "I02A-TRACE-live_20261103T184723Z_36b7fb-measured",
+    "client": {
+     "headers_ms": 4.635722,
+     "first_body_read_ms": 33.196862,
+     "ttft_ms": 33.628529,
+     "e2e_ms": 294.351427,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 4.130344857142857,
+     "perceived_tps": 242.11053425009754
+    },
+    "engine": {
+     "queue_ms": 1.9169999868609011,
+     "ttft_ms": 28.432999970391393,
+     "decode_span_ms": 260.15800004824996,
+     "e2e_ms": 288.59100001864135,
+     "http_ttft_ms": 29.91199999814853,
+     "mean_itl_ms": 4.129492064257936,
+     "headers_parsed_ms": 2.804269015789032
+    },
+    "wire": {
+     "headers_ms": 4.229388,
+     "ttft_ms": 33.107167,
+     "done_ms": 293.441368,
+     "token_events": 64,
+     "mean_itl_ms": 4.131063365079365
+    },
+    "remainder": {
+     "ttft_ms": 5.195529029608608,
+     "e2e_ms": 5.760426981358648,
+     "mean_itl_ms": 0.0008527928849213495
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.534601
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.9236680000534059
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 1.9169999957084656
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 26.515999972820282
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 0.8250000476837158
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.39089798373412776
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.5213620000000034
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 1.3920989794426077
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.9100589999999897
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-live_20261103T185133Z_55cd9f",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "live",
+    "measured": false,
+    "graphs": true,
+    "profiler": false,
+    "iter_stats": true,
+    "profile_range": null,
+    "options": {}
+   },
+   "started": "20261103T185133Z",
+   "result": {
+    "request_id": "I02A-TRACE-live_20261103T185133Z_55cd9f-measured",
+    "client": {
+     "headers_ms": 5.773273,
+     "first_body_read_ms": 32.340851,
+     "ttft_ms": 33.157972,
+     "e2e_ms": 288.323943,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 4.04228473015873,
+     "perceived_tps": 247.38484959735445
+    },
+    "engine": {
+     "queue_ms": 2.0749999675899744,
+     "ttft_ms": 25.963999971281737,
+     "decode_span_ms": 256.00500003201887,
+     "e2e_ms": 281.9690000033006,
+     "http_ttft_ms": 28.129999991506338,
+     "mean_itl_ms": 4.063571429079665,
+     "headers_parsed_ms": 3.7109479904174805
+    },
+    "wire": {
+     "headers_ms": 5.34388,
+     "ttft_ms": 32.825827,
+     "done_ms": 287.468613,
+     "token_events": 64,
+     "mean_itl_ms": 4.040685888888889
+    },
+    "remainder": {
+     "ttft_ms": 7.193972028718264,
+     "e2e_ms": 6.3549429966993785,
+     "mean_itl_ms": -0.021286698920934377
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 3.124193
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 1.231755030948639
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.074999988079071
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 23.88899999856949
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.5209999680519104
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.9848790143508879
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.33214500000000413
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 1.143664987171178
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.8553299999999808
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-live_20261103T185532Z_1c1629",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "live",
+    "measured": false,
+    "graphs": true,
+    "profiler": false,
+    "iter_stats": true,
+    "profile_range": null,
+    "options": {}
+   },
+   "started": "20261103T185532Z",
+   "result": {
+    "request_id": "I02A-TRACE-live_20261103T185532Z_1c1629-measured",
+    "client": {
+     "headers_ms": 4.443563,
+     "first_body_read_ms": 33.564515,
+     "ttft_ms": 34.233874,
+     "e2e_ms": 289.815753,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 4.050008238095238,
+     "perceived_tps": 246.91307800161678
+    },
+    "engine": {
+     "queue_ms": 2.2589999716728926,
+     "ttft_ms": 28.568999958224595,
+     "decode_span_ms": 256.3920000102371,
+     "e2e_ms": 284.9609999684617,
+     "http_ttft_ms": 30.65000002970919,
+     "mean_itl_ms": 4.069714285876779,
+     "headers_parsed_ms": 2.4079399704933167
+    },
+    "wire": {
+     "headers_ms": 4.036922,
+     "ttft_ms": 33.519741,
+     "done_ms": 289.054102,
+     "token_events": 64,
+     "mean_itl_ms": 4.054189746031746
+    },
+    "remainder": {
+     "ttft_ms": 5.6648740417754055,
+     "e2e_ms": 4.85475303153828,
+     "mean_itl_ms": -0.019706047781541614
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.20227
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.8376699995803834
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.2589999437332153
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 26.310000002384186
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.449000060558319
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.4618009937438998
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.7141329999999968
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 1.0531620347518924
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.7616509999999721
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-nographs_20261103T183031Z_2ffe88",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "nographs",
+    "measured": false,
+    "graphs": false,
+    "profiler": false,
+    "profile_range": null
+   },
+   "started": "20261103T183031Z",
+   "result": {
+    "request_id": "I02A-TRACE-nographs_20261103T183031Z_2ffe88-measured",
+    "client": {
+     "headers_ms": 4.353267,
+     "first_body_read_ms": 47.688334,
+     "ttft_ms": 48.149216,
+     "e2e_ms": 1256.418916,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 19.17036634920635,
+     "perceived_tps": 52.16384401758706
+    },
+    "engine": {
+     "queue_ms": 2.34400003682822,
+     "ttft_ms": 43.13200002070516,
+     "decode_span_ms": 1207.4109999812208,
+     "e2e_ms": 1250.543000001926,
+     "http_ttft_ms": 44.80499995406717,
+     "mean_itl_ms": 19.165253967955884,
+     "headers_parsed_ms": 2.451248049736023
+    },
+    "wire": {
+     "headers_ms": 3.962301,
+     "ttft_ms": 47.587346,
+     "done_ms": 1255.975818,
+     "token_events": 64,
+     "mean_itl_ms": 19.172874825396825
+    },
+    "remainder": {
+     "ttft_ms": 5.017215979294839,
+     "e2e_ms": 5.875915998074106,
+     "mean_itl_ms": 0.0051123812504663135
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.298936
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.7353119944229127
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.3440000414848328
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 40.787999987602234
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.0899999737739563
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.33109800271606105
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.5618700000000061
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 2.3985699631384705
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.44309800000019095
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-timeline_20261103T164724Z_f91205",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "timeline",
+    "measured": false,
+    "graphs": true,
+    "profile_range": "1-129"
+   },
+   "started": "20261103T164724Z",
+   "result": {
+    "request_id": "I02A-TRACE-timeline_20261103T164724Z_f91205-measured",
+    "client": {
+     "headers_ms": 5.705821,
+     "first_body_read_ms": 39.233477,
+     "ttft_ms": 39.877406,
+     "e2e_ms": 379.809112,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 5.3871659365079365,
+     "perceived_tps": 185.62635934845903
+    },
+    "engine": {
+     "queue_ms": 2.123999991454184,
+     "ttft_ms": 33.36399997351691,
+     "decode_span_ms": 340.4650000156835,
+     "e2e_ms": 373.8289999892004,
+     "http_ttft_ms": 35.16299999319017,
+     "mean_itl_ms": 5.404206349455293
+    },
+    "wire": {
+     "headers_ms": 5.261838,
+     "ttft_ms": 39.149346,
+     "done_ms": 378.971619,
+     "token_events": 64,
+     "mean_itl_ms": 5.391835380952381
+    },
+    "remainder": {
+     "ttft_ms": 6.513406026483089,
+     "e2e_ms": 5.980112010799644,
+     "mean_itl_ms": -0.01704041294735692
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 3.297427
+     },
+     {
+      "name": "wire \u2192 server_arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.3368599997024537
+     },
+     {
+      "name": "server_arrival_time \u2192 arrival_time",
+      "clocks": "engine",
+      "ms": 0.6229999661445618
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.1240000128746033
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 31.240000009536743
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.1760000586509705
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.35205895309066904
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.7280599999999993
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.8853320379676575
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.8374930000000518
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A-TRACE-timeline_20261103T185837Z_e08b8b",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "timeline",
+    "measured": false,
+    "graphs": true,
+    "profiler": true,
+    "iter_stats": false,
+    "profile_range": "1-129",
+    "options": {
+     "profile_range": "1-129"
+    }
+   },
+   "started": "20261103T185837Z",
+   "result": {
+    "request_id": "I02A-TRACE-timeline_20261103T185837Z_e08b8b-measured",
+    "client": {
+     "headers_ms": 5.064477,
+     "first_body_read_ms": 44.280796,
+     "ttft_ms": 46.514518,
+     "e2e_ms": 9778.72384,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 154.47132876190477,
+     "perceived_tps": 6.473693260846843
+    },
+    "engine": {
+     "queue_ms": 2.2480000043287873,
+     "ttft_ms": 37.477999983821064,
+     "decode_span_ms": 9734.456000034697,
+     "e2e_ms": 9771.934000018518,
+     "http_ttft_ms": 40.22600001189858,
+     "mean_itl_ms": 154.51517460372534,
+     "headers_parsed_ms": 2.465837001800537
+    },
+    "wire": {
+     "headers_ms": 4.517824,
+     "ttft_ms": 45.953901,
+     "done_ms": 9777.853149,
+     "token_events": 64,
+     "mean_itl_ms": 154.4718777142857
+    },
+    "remainder": {
+     "ttft_ms": 9.036518016178938,
+     "e2e_ms": 6.789839981482146,
+     "mean_itl_ms": -0.04384584182056983
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.220157
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.9436800156288148
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.2480000257492065
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 35.22999995946884
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 2.050000011920929
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 3.26206398723221
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.5606170000000006
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 2.7553119691128813
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.8706910000000789
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A_20261102T203728Z_d7d75f",
+   "rep": "I02A-L1",
+   "labels": {},
+   "started": "20261102T203728Z",
+   "result": null
+  },
+  {
+   "id": "I02A_20261103T164324Z_348959",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "off",
+    "measured": true,
+    "graphs": true,
+    "profile_range": null
+   },
+   "started": "20261103T164324Z",
+   "result": {
+    "request_id": "I02A_20261103T164324Z_348959-measured",
+    "client": {
+     "headers_ms": 4.858349,
+     "first_body_read_ms": 34.957352,
+     "ttft_ms": 35.564488,
+     "e2e_ms": 321.603585,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 4.531243063492064,
+     "perceived_tps": 220.6899930080856
+    },
+    "engine": {
+     "queue_ms": 2.1689999848604202,
+     "ttft_ms": 29.47799995308742,
+     "decode_span_ms": 286.46900004241616,
+     "e2e_ms": 315.9469999955036,
+     "http_ttft_ms": 31.36999998241663,
+     "mean_itl_ms": 4.547126984800256,
+     "headers_parsed_ms": 2.9552279710769653
+    },
+    "wire": {
+     "headers_ms": 4.463034,
+     "ttft_ms": 34.909646,
+     "done_ms": 321.134477,
+     "token_events": 64,
+     "mean_itl_ms": 4.533139666666667
+    },
+    "remainder": {
+     "ttft_ms": 6.086488046912578,
+     "e2e_ms": 5.656585004496435,
+     "mean_itl_ms": -0.01588392130819205
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.347853
+     },
+     {
+      "name": "wire \u2192 arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 1.1963750173301695
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 2.168999969959259
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 27.308999955654144
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.303000032901764
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.5844180241546653
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.654841999999995
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 1.6432490155715982
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.46910800000000563
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A_20261103T172804Z_a3ca9a",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "off",
+    "measured": true,
+    "graphs": true,
+    "profile_range": null
+   },
+   "started": "20261103T172804Z",
+   "result": {
+    "request_id": "I02A_20261103T172804Z_a3ca9a-measured",
+    "client": {
+     "headers_ms": 3.974157,
+     "first_body_read_ms": 29.609426,
+     "ttft_ms": 30.237706,
+     "e2e_ms": 270.780792,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 3.8091436984126985,
+     "perceived_tps": 262.52619464492983
+    },
+    "engine": {
+     "queue_ms": 1.5530000091530383,
+     "ttft_ms": 24.838000012096018,
+     "decode_span_ms": 240.8210000139661,
+     "e2e_ms": 265.65900002606213,
+     "http_ttft_ms": 26.682999974582344,
+     "mean_itl_ms": 3.8225555557772397
+    },
+    "wire": {
+     "headers_ms": 3.666017,
+     "ttft_ms": 29.446246,
+     "done_ms": 270.326567,
+     "token_events": 64,
+     "mean_itl_ms": 3.812497206349206
+    },
+    "remainder": {
+     "ttft_ms": 5.399705987903982,
+     "e2e_ms": 5.1217919739378885,
+     "mean_itl_ms": -0.013411857364541202
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.22834
+     },
+     {
+      "name": "wire \u2192 server_arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.1685679852104185
+     },
+     {
+      "name": "server_arrival_time \u2192 arrival_time",
+      "clocks": "engine",
+      "ms": 0.49299997091293335
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 1.553000032901764
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 23.2849999666214
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.3519999980926514
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.36633804626083233
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.7914600000000007
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 1.7776590047760124
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.4542250000000081
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A_20261103T172929Z_0e5d39",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "off",
+    "measured": true,
+    "graphs": true,
+    "profile_range": null
+   },
+   "started": "20261103T172929Z",
+   "result": {
+    "request_id": "I02A_20261103T172929Z_0e5d39-measured",
+    "client": {
+     "headers_ms": 4.665898,
+     "first_body_read_ms": 30.351969,
+     "ttft_ms": 30.963867,
+     "e2e_ms": 277.966224,
+     "token_events": 64,
+     "token_records": 64,
+     "mean_itl_ms": 3.9126048095238093,
+     "perceived_tps": 255.58420762706848
+    },
+    "engine": {
+     "queue_ms": 1.3490000274032354,
+     "ttft_ms": 25.398000027053058,
+     "decode_span_ms": 246.61699996795505,
+     "e2e_ms": 272.0149999950081,
+     "http_ttft_ms": 26.971999963279814,
+     "mean_itl_ms": 3.9145555550469058
+    },
+    "wire": {
+     "headers_ms": 4.243893,
+     "ttft_ms": 30.262376,
+     "done_ms": 277.56666,
+     "token_events": 64,
+     "mean_itl_ms": 3.916233714285714
+    },
+    "remainder": {
+     "ttft_ms": 5.565866972946942,
+     "e2e_ms": 5.9512240049919,
+     "mean_itl_ms": -0.0019507455230964865
+    },
+    "segments": [
+     {
+      "name": "send \u2192 request's last byte on the wire",
+      "clocks": "client \u2192 pcap",
+      "ms": 2.575163
+     },
+     {
+      "name": "wire \u2192 server_arrival_time",
+      "clocks": "pcap \u2192 engine",
+      "ms": 0.38946903430175794
+     },
+     {
+      "name": "server_arrival_time \u2192 arrival_time",
+      "clocks": "engine",
+      "ms": 0.5449999570846558
+     },
+     {
+      "name": "arrival_time \u2192 first_scheduled_time",
+      "clocks": "engine",
+      "ms": 1.3490000367164612
+     },
+     {
+      "name": "first_scheduled_time \u2192 first_token_time",
+      "clocks": "engine",
+      "ms": 24.048999965190887
+     },
+     {
+      "name": "first_token_time \u2192 server_first_token_time",
+      "clocks": "engine",
+      "ms": 1.0289999842643738
+     },
+     {
+      "name": "server_first_token_time \u2192 first token on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 0.32574402244186373
+     },
+     {
+      "name": "wire \u2192 client first token event",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.7014910000000008
+     },
+     {
+      "name": "last_token_time \u2192 [DONE] on the wire",
+      "clocks": "engine \u2192 pcap",
+      "ms": 2.042028022918714
+     },
+     {
+      "name": "[DONE] on the wire \u2192 protocol completion",
+      "clocks": "pcap \u2192 client",
+      "ms": 0.39956399999999803
+     }
+    ]
+   }
+  },
+  {
+   "id": "I02A_20261103T173059Z_b3fec0",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "off",
+    "measured": true,
+    "graphs": true,
+    "profile_range": null
+   },
+   "started": "20261103T173059Z",
+   "result": null
+  },
+  {
+   "id": "K4_20261103T172626Z_3c139c",
+   "rep": "I02A-L1",
+   "labels": {
+    "trace": "off",
+    "measured": false,
+    "demo": "K4"
+   },
+   "started": "20261103T172626Z",
+   "result": null
+  },
+  {
+   "id": "I02B-QA-1794014393885875025",
+   "rep": "I02B-L1",
+   "labels": {},
+   "started": null,
+   "result": null
+  }
+ ]
+}

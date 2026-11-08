@@ -131,6 +131,7 @@ class EngineCollector:
         self.iterations = {}  # container id -> deque of iteration(), for engines with iteration stats
         self.readers = {}  # container id -> the task reading its /metrics
         self.raw = {}  # container id -> {container, run_id, reads (deque of raw_read lines), dropped, reading, gone_ns}
+        self.raw_listeners = []  # fn(run_id, line) per read, on the loop thread: the v3 live writer (store/stream.py)
 
     async def engines(self) -> list[dict]:
         state = self.bus.state.get(("containers", None))
@@ -154,7 +155,10 @@ class EngineCollector:
             return  # still starting
         sample = {"ns": time.time_ns(), "metrics": metrics}
         self.history.setdefault(c["id"], collections.deque(maxlen=KEEP)).append(sample)
-        self.bus.publish("engine_metrics", {"container": c["name"], "project": c["project"], **sample}, key=c["id"])
+        folder = run_dir(c)
+        self.bus.publish("engine_metrics", {"container": c["name"], "project": c["project"],
+                                            "run_id": os.path.basename(folder) if folder else None, **sample},
+                         key=c["id"])
         if c["id"] not in self.info and c.get("health") == "healthy":
             await self.describe(session, c, address)
 
@@ -188,6 +192,8 @@ class EngineCollector:
         if len(buffer["reads"]) == buffer["reads"].maxlen:
             buffer["dropped"] += 1
         buffer["reads"].append(line)
+        for fn in self.raw_listeners:
+            fn(buffer["run_id"], line)
 
     def raw_reads(self, run_id: str | None = None, container: str | None = None) -> dict | None:
         """The raw reads of the engine for a run folder name (or a container name); the newest such engine."""

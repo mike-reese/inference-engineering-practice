@@ -1,0 +1,9 @@
+[Unit]
+Description=Run maintain-verify-skill daily at 00:00
+
+[Timer]
+OnCalendar=*-*-* 00:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

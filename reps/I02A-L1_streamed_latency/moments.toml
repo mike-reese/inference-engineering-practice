@@ -1,0 +1,93 @@
+# Key moments: where in a run each lesson of this rep can be seen. The command center's Rep world lists them in
+# order; "show me" moves the replay to the moment. Values are read from the run's latency.json for the measured
+# request ("request" = the request ID suffix), so they stay correct for every run of this rep.
+# Fields:
+#   lesson   = the "Why It Matters" bullet the moment proves (its bold lead, verbatim)
+#   at       = the moment's time, a latency.json path for the measured request (ms from send, client clock)
+#   evidence = latency.json paths shown beside the moment, with a label each. A segment is picked by the start of its
+#              name, segments[first_scheduled_time].ms, never by index: older runs have one more segment
+#   event    = what happens there, in the vocabulary of the execution spine (phase or kernel name)
+
+request = "measured"
+
+[[moments]]
+id = "headers-early"
+title = "Headers leave before any token exists"
+lesson = "TTFT is a client time that must hold a token."
+at = "wire.headers_ms"
+event = "ASGI sends the response headers"
+note = "TensorRT-LLM answers 200 OK before prefill has started. A load test that times the headers reports a TTFT shorter than prefill."
+evidence = [
+  { label = "headers on the wire", path = "wire.headers_ms" },
+  { label = "headers at the client", path = "client.headers_ms" },
+  { label = "engine first token", path = "engine.ttft_ms" },
+]
+
+[[moments]]
+id = "first-read-role"
+title = "The first body read holds only the role event"
+lesson = "TTFT is a client time that must hold a token."
+at = "client.first_body_read_ms"
+event = "HTTP transport: body read"
+note = "The first bytes the SDK reads are the role event, not a token. Only the first token event counts as TTFT."
+evidence = [
+  { label = "first body read", path = "client.first_body_read_ms" },
+  { label = "first token event", path = "client.ttft_ms" },
+]
+
+[[moments]]
+id = "prefill"
+title = "Prefill owns most of TTFT"
+lesson = "Every latency has an owner."
+at = "engine.queue_ms"
+event = "model forward (prefill)"
+note = "The 7 TTFT segments split client TTFT across three clocks; prefill is the one that matters here."
+evidence = [
+  { label = "queue", path = "engine.queue_ms" },
+  { label = "prefill (first_scheduled_time -> first_token_time)", path = "segments[first_scheduled_time].ms" },
+  { label = "client TTFT", path = "client.ttft_ms" },
+]
+
+[[moments]]
+id = "first-token"
+title = "One first token, three clocks"
+lesson = "Every latency has an owner."
+at = "client.ttft_ms"
+event = "SDK yields the token"
+note = "The engine has the token first, the wire sees it next, the client last. The gaps are the owners of the remainder."
+evidence = [
+  { label = "engine", path = "engine.ttft_ms" },
+  { label = "wire", path = "wire.ttft_ms" },
+  { label = "client", path = "client.ttft_ms" },
+]
+
+[[moments]]
+id = "decode"
+title = "Steady decode: the wire agrees with the client"
+lesson = "The wire is the referee."
+at = "client.ttft_ms"
+event = "model forward (decode)"
+note = "Mean ITL on the wire matches the client to a few microseconds, so client-side parsing is not where latency hides."
+evidence = [
+  { label = "client mean ITL", path = "client.mean_itl_ms" },
+  { label = "wire mean ITL", path = "wire.mean_itl_ms" },
+  { label = "engine mean ITL", path = "engine.mean_itl_ms" },
+]
+
+[[moments]]
+id = "done"
+title = "[DONE] closes the stream"
+lesson = "Every latency has an owner."
+at = "client.e2e_ms"
+event = "send_one: protocol complete"
+note = "End-to-end on each clock. The engine stops stamping at the last token; delivery adds the rest."
+evidence = [
+  { label = "engine", path = "engine.e2e_ms" },
+  { label = "wire [DONE]", path = "wire.done_ms" },
+  { label = "client", path = "client.e2e_ms" },
+]
+
+# A lesson with no moment in the replay: it is about how the run was set up.
+[[setup_lessons]]
+lesson = "`/perf_metrics` drains on read."
+note = "Correlation rests on isolation: one request, a drain before, one record after. The pass check reads it twice; the second read is empty."

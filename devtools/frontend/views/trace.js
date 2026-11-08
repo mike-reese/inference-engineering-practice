@@ -4,7 +4,7 @@
 // One step control drives every level; the lanes show the same time window; metrics light their input spans.
 // Request "*" (all clients) puts every measured client on one time scale, one lane each. Unpaired native records and
 // Prometheus scrapes (request_id none, no client join) sit in their own neutral lane, in either mode.
-import { escape, getJSON, json, ms, openInTool } from "./util.js";
+import { escape, getJSON, json, ms, openInTool, router } from "./util.js";
 import { BOX, boxOf, dataForm, inspect, light, mapSVG, packet } from "./components_map.js";
 
 const W = 1200;
@@ -517,8 +517,8 @@ ${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))
 
   bind(steps) {
     const $ = (q) => this.root.querySelector(q);
-    $(".run").onchange = (e) => { location.hash = `trace/${encodeURIComponent(e.target.value)}`; };
-    $(".request").onchange = (e) => { location.hash = `trace/${encodeURIComponent(this.runId)}/${encodeURIComponent(e.target.value)}`; };
+    $(".run").onchange = (e) => { router.go(`trace/${encodeURIComponent(e.target.value)}`); };
+    $(".request").onchange = (e) => { router.go(`trace/${encodeURIComponent(this.runId)}/${encodeURIComponent(e.target.value)}`); };
     $(".level").onchange = (e) => { this.level = e.target.value; this.go(0); };
     if ($(".iteration")) $(".iteration").onchange = (e) => { this.iteration = e.target.value; this.go(0); };
     $(".speed").onchange = (e) => { this.speed = +e.target.value; if (this.playing) { this.play(); this.play(); } };

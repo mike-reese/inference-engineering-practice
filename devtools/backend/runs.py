@@ -52,7 +52,11 @@ def safe_path(run: Path, relative: str) -> Path:
 
 def raw(run_id: str, file: str, pointer: str) -> dict:
     """The source of one span: a JSON pointer into a JSON file, one TSV row by frame number, one CSV line."""
-    run = find_run(run_id)
+    return raw_in(find_run(run_id), file, pointer)
+
+
+def raw_in(run: Path, file: str, pointer: str) -> dict:
+    """raw() for a run folder given by path (ie-run/3 manifests name it; some run folders have no config.yaml)."""
     path = safe_path(run, file)
     if path.suffix == ".json":
         value = json.loads(path.read_text())
@@ -66,6 +70,19 @@ def raw(run_id: str, file: str, pointer: str) -> dict:
                 payload = bytes.fromhex(row.pop("tcp.payload") or "")
                 return {"file": file, "pointer": pointer, "value": {**row, "payload_text":
                                                                      payload.decode(errors="replace")}}
+    if path.suffix == ".pcap" and pointer.startswith("frame.number="):  # the v3 store reads frames from the pcap
+        from store.adapters.wire import PcapReader, tcp
+        number = int(pointer.split("=", 1)[1])
+        for k, utc_ns, frame in PcapReader(path).read():
+            if k == number:
+                p = tcp(frame)
+                value = {"frame.number": k, "utc_ns": utc_ns, "frame_len": len(frame)}
+                if p is not None:
+                    value |= {"src_port": p["src"][1], "dst_port": p["dst"][1],
+                              "flags": [f for f in ("syn", "fin", "rst", "ack") if p[f]],
+                              "payload_bytes": len(p["payload"]), "payload_text": p["payload"].decode(errors="replace")}
+                return {"file": file, "pointer": pointer, "value": value}
+        return {"file": file, "pointer": pointer, "value": None, "note": f"no frame {number} in the pcap"}
     if path.suffix in (".csv", ".log", ".txt") and pointer.startswith("line "):
         n = int(pointer.split()[1])
         lines = path.read_text().splitlines()
