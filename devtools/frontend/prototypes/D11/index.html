@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D11 command center</title>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }</script>
+<style>
+  /* v1 tokens (devtools/frontend/style.css), copied, not imported. Mixed styles are allowed. */
+  :root { --bg:#0f1115; --panel:#171a21; --line:#2a2f3a; --text:#d7dae0; --dim:#8a90a0;
+    --up:#3fb950; --starting:#d29922; --down:#f85149; --accent:#58a6ff;
+    --exec:#7cc4ff; --hw:#f5a623; --arch:#b58cff; --dock-h:380px; --dock-w:440px; --arch-w:440px; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; margin:0; }
+  body { background:var(--bg); color:var(--text); font:13px/1.4 ui-monospace, monospace; display:grid; overflow:hidden; }
+  body.dock-bottom { grid-template: "chrome chrome" auto "world arch" 1fr "dock dock" var(--dock-h) / 1fr var(--arch-w); }
+  body.dock-right { grid-template: "chrome chrome chrome" auto "world arch dock" 1fr / 1fr var(--arch-w) var(--dock-w); }
+  body.dock-closed.dock-right { grid-template-columns: 1fr var(--arch-w) 34px; }
+  body.dock-closed.dock-bottom { grid-template-rows: auto 1fr 34px; }
+  #chrome { grid-area:chrome; border-bottom:1px solid var(--line); }
+  #world { grid-area:world; position:relative; min-width:0; min-height:0; overflow:hidden; }
+  #arch { grid-area:arch; border-left:1px solid var(--line); min-height:0; overflow:auto; }
+  #dock { grid-area:dock; border-top:1px solid var(--line); min-height:0; overflow:hidden; background:var(--panel); }
+  body.dock-right #dock { border-top:0; border-left:1px solid var(--line); }
+</style></head>
+<body class="dock-bottom">
+  <div id="chrome"></div><div id="world"></div><div id="arch"></div><div id="dock"></div>
+<script type="module">
+  import { state, subscribe } from "./model.js";
+  import { mountChrome } from "./chrome.js";
+  import { mountArch } from "./arch.js";
+  import { mountDock } from "./dock.js";
+  mountChrome(document.getElementById("chrome"));
+  mountArch(document.getElementById("arch"));
+  mountDock(document.getElementById("dock"));
+  let shown = null, dispose = null;
+  subscribe(async (s) => {
+    document.body.className = `dock-${s.dock.pos}${s.dock.open ? "" : " dock-closed"}`;
+    if (s.world === shown) return;
+    shown = s.world; dispose?.(); const el = document.getElementById("world"); el.replaceChildren();
+    const { mount } = await import(`./worlds/${s.world}.js`);
+    if (shown === s.world) dispose = mount(el);
+  });
+  window.__d11 = state; // for ccv checks
+</script>
+</body></html>

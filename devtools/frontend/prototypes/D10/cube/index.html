@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D. Orbit cube</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+  :root { --bg:#070a10; --panel:#0e1420ee; --line:#263041; --fg:#d7e0ec; --dim:#8394aa;
+    --E:#7cc4ff; --H:#ffb454; --A:#c39bff; --cur:#5ef2d6; }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:15px/1.35 system-ui,sans-serif;overflow:hidden}
+  #stage{position:fixed;inset:0}
+  #labels{position:fixed;inset:0;pointer-events:none}
+  .panel{position:fixed;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;z-index:20}
+  #focus{top:46px;left:14px;width:330px}
+  #focus .big{font-size:26px;font-weight:700;letter-spacing:.02em}
+  #focus .sub{color:var(--dim);font-size:14px;margin-top:2px}
+  #ladders{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .lad h4{margin:0 0 4px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:flex;gap:8px;align-items:center}
+  .lad h4 kbd{font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--fg)}
+  .rungs{display:flex;gap:3px}
+  .rung{flex:1;font-size:12px;padding:4px 2px;text-align:center;border-radius:4px;background:#ffffff08;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rung.on{color:#06101c;font-weight:700}
+  .rung.land{outline:1px dashed currentColor}
+  #orbit{margin-top:10px;display:flex;gap:10px;align-items:center;color:var(--dim);font-size:13px}
+  #now{top:46px;right:14px;width:400px;max-height:calc(100% - 190px);overflow:auto}
+  #now h3{margin:10px 0 4px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  #now h3:first-child{margin-top:0}
+  #now .row{display:flex;gap:8px;font-size:14px;padding:1px 0}
+  #now .row .k{color:var(--dim);width:92px;flex:none}
+  #now .row.on{font-weight:700}
+  #now .row .v{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #sm{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;margin:6px 0}
+  #sm i{height:10px;border-radius:2px;background:#ffffff12}
+  #sm i.on{background:var(--H);box-shadow:0 0 6px var(--H)}
+  .meter{height:8px;background:#ffffff10;border-radius:4px;overflow:hidden;flex:1;align-self:center}
+  .meter b{display:block;height:100%;background:var(--H)}
+  #stops{left:14px;right:14px;bottom:14px;height:86px;padding:10px 14px}
+  #stopname{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #stopname span{color:var(--dim);font-weight:400}
+  #track{position:relative;height:34px;margin-top:8px;border-top:1px solid var(--line)}
+  #track .tick{position:absolute;top:0;width:2px;height:16px;margin-left:-1px;background:#9fb3cc88}
+  #track .tick.sel{background:#fff;height:22px}
+  #track .win{position:absolute;top:0;height:30px;border:1px solid #ffffff55;border-top:none;background:#ffffff08}
+  #track .cur{position:absolute;top:-6px;width:2px;height:40px;margin-left:-1px;background:var(--cur);box-shadow:0 0 8px var(--cur)}
+  #track .ax{position:absolute;bottom:-2px;font-size:12px;color:var(--dim)}
+  #keys{position:fixed;left:360px;bottom:112px;color:var(--dim);font-size:13px;z-index:20}
+  .lbl{font-size:15px;color:#eef3fa;background:#0b1120cc;border:1px solid #ffffff22;padding:2px 7px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lbl.hl{border-color:var(--cur);color:#fff;font-weight:600}
+  .row-lbl{font-size:14px;color:#c9d3e0;background:#070a10bb;padding:1px 6px;border-radius:4px;white-space:nowrap}
+  .face-lbl{font-size:20px;font-weight:800;letter-spacing:.15em;opacity:.85}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="labels"></div>
+<div class="panel" id="focus">
+  <div class="big" id="fdim"></div>
+  <div class="sub" id="fsub"></div>
+  <div id="ladders"></div>
+  <div id="orbit"><svg width="92" height="92" viewBox="-46 -46 92 92" id="orbitsvg"></svg><div id="orbittxt"></div></div>
+</div>
+<div class="panel" id="now"></div>
+<div id="keys">← → stop · Shift coarser stop · ↑ ↓ fly out / in (depth) · E H A orbit to a face · 1-6 tier · Space play</div>
+<div class="panel" id="stops"><div id="stopname"></div><div id="track"></div></div>
+<script type="module" src="./cube.js"></script>
+</body>
+</html>

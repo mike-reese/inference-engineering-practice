@@ -1,5 +1,9 @@
 # Run launcher
 
+> **Legacy (v2 prototype).** This recipe drives the D5v2 page, which goes at the v3 cutover. Open it with
+> `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` wherever the steps say `$CCV open side`
+> (that now opens the v3 page, `/static/cc/index.html`).
+
 The Run tab lists the registered reps (`reps/*/rep.toml`) and each action with its options. `Start` queues an action
 on the host runner. The right side follows a job's steps and output, with links to its run.
 

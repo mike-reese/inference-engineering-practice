@@ -1,5 +1,9 @@
 # Level navigation
 
+> **Legacy (v2 prototype).** This recipe drives the D5v2 page, which goes at the v3 cutover. Open it with
+> `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` wherever the steps say `$CCV open side`
+> (that now opens the v3 page, `/static/cc/index.html`).
+
 The scene lays out seven zoom levels side by side: Infrastructure, Components, Trace, Iteration, Model ops, Kernel and
 Hardware. A user frames a level with its header button, zooms with the mouse wheel, and pans with a drag.
 

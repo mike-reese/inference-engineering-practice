@@ -1,0 +1,50 @@
+{
+ "source": "nsys",
+ "title": "Nsight Systems export (SQLite): CUPTI activity, NVTX, OS runtime, GPU metrics",
+ "order": 20,
+ "evidence": "Observed: Nsight Systems on the run clock (CLOCK_MONOTONIC)",
+ "event_kinds": [
+  {"match": {"source": "kernel", "track_prefix": "gpu"}, "kind": "kernel", "term": "CUDA kernel",
+   "eid": "kernel/{iter}/{short}#{n}", "what": "The GPU does the kernel {name} on {lane}.",
+   "fields": ["grid", "block", "registers", "shared_memory", "graph", "graph_node", "demangled"]},
+  {"match": {"source": "memcpy", "track_prefix": "gpu"}, "kind": "memcpy", "term": "memory copy",
+   "eid": "memcpy/{iter}/{short}#{n}", "what": "The GPU copies {bytes} bytes ({name}) on {lane}.", "fields": ["bytes"]},
+  {"match": {"source": "memset", "track_prefix": "gpu"}, "kind": "memset", "term": "memory set",
+   "eid": "memset/{iter}#{n}", "what": "The GPU sets {bytes} bytes of device memory to one value on {lane}.", "fields": ["bytes", "value"]},
+  {"match": {"source": "cuda_runtime", "track_prefix": "proc/"}, "kind": "cuda runtime call", "term": "CUDA runtime API call",
+   "eid": "cuda-runtime/{lane}/{iter}/{short}#{n}", "what": "The thread {lane} calls the CUDA runtime function {name}.", "fields": ["ret"]},
+  {"match": {"source": "cuda_sync"}, "kind": "cuda synchronization", "term": "CUDA synchronization",
+   "eid": "cuda-sync/{lane}/{short}#{n}", "what": "The CPU waits until the GPU completes the work before a sync point ({name}).", "fields": ["sync_corr"]},
+  {"match": {"source": "cuda_event"}, "kind": "cuda event record", "term": "CUDA event",
+   "eid": "cuda-event/{lane}#{n}", "what": "The GPU records a CUDA event on {lane}.", "fields": ["event_id", "event_corr"]},
+  {"match": {"source": "cuda_graph"}, "kind": "cuda graph node", "term": "CUDA graph node",
+   "eid": "cuda-graph/{lane}/{short}#{n}", "what": "The CUDA runtime makes or changes a graph node ({name}).", "fields": ["graph_node"]},
+  {"match": {"source": "nvtx", "name_regex": "_forward_step"}, "kind": "engine iteration", "term": "executor iteration (NVTX range)",
+   "eid": "iteration/{iter}", "what": "The executor does one engine iteration: {name}.", "fields": ["domain"]},
+  {"match": {"source": "nvtx"}, "kind": "nvtx range", "term": "NVTX range",
+   "eid": "nvtx/{lane}/{iter}/{short}#{n}", "what": "The code marks the range {name} on {lane}.", "fields": ["event_type", "domain"]},
+  {"match": {"source": "osrt"}, "kind": "os runtime call", "term": "OS runtime (libc/syscall) call",
+   "eid": "os-call/{lane}/{short}#{n}", "what": "The thread {lane} calls the OS function {name}.", "fields": ["ret", "nesting"]},
+  {"match": {"source": "profiler_overhead"}, "kind": "profiler overhead", "term": "profiler overhead",
+   "eid": "profiler-overhead/{lane}#{n}", "what": "The profiler adds work to {lane}: {name}.", "fields": ["overhead_type"]},
+  {"match": {"source": "nsys_diagnostic"}, "kind": "profiler message", "term": "Nsight Systems diagnostic",
+   "eid": "profiler-message#{n}", "what": "Nsight Systems writes this message: {name}.", "fields": []}
+ ],
+ "samples": [
+  {"match": {"track": "gpu0/metrics"}, "thing": "gpu0", "unit_from_name": "\\[(.*)\\]$",
+   "decode": {"GPC Clock Frequency [MHz]": "uint32 Hz to MHz", "SYS Clock Frequency [MHz]": "uint32 Hz to MHz"},
+   "_decode_doc": "GPU_METRICS values are integers; the two clock frequencies are Hz stored as signed 32-bit and wrap negative above 2.147 GHz: read as unsigned Hz, divided by 1e6",
+   "evidence": "Observed: Nsight Systems GPU metrics (--gpu-metrics-devices=all), sampled by the GPU"}
+ ],
+ "links": [
+  {"kind": "cuda launch", "term": "CUDA launch (correlation id)", "what": "A CUDA runtime call puts GPU work on a stream."}
+ ],
+ "measures": [
+  {"measure": "kernel time", "formula": "sum over kernels of (min(end, t1) - max(start, t0))", "unit": "ns",
+   "additivity": "additive over time, stream and request share", "evidence": "Calculated from Observed kernel spans"},
+  {"measure": "GPU busy time", "formula": "length of the union of kernel, memcpy and memset intervals clipped to [t0, t1]",
+   "unit": "ns", "additivity": "semi-additive (disjoint time only)", "evidence": "Calculated from Observed spans"},
+  {"measure": "launch latency", "formula": "kernel start - start of the CUDA runtime call linked by correlation id",
+   "unit": "ns", "additivity": "non-additive (report a distribution)", "evidence": "Calculated from Observed links"}
+ ]
+}

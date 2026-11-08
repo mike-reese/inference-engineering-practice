@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Execution Spine Lenses</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+  :root { --bg:#070a10; --fg:#dbe4f0; --dim:#7d8ba0; --ex:#7cc4ff; --hw:#ffb547; --ar:#c39bff; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:14px system-ui, sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; }
+  #labels { position:fixed; inset:0; pointer-events:none; }
+  #hud { position:fixed; top:34px; left:0; right:0; display:flex; gap:24px; padding:10px 16px; background:linear-gradient(#0b0f16f0,#0b0f1600); z-index:20; pointer-events:none; }
+  #focus { min-width:330px; }
+  #focus .t { font-size:24px; font-weight:700; letter-spacing:.2px; }
+  #focus .d { color:var(--dim); font-size:14px; margin-top:4px; max-width:420px; }
+  #ladders { display:grid; grid-template-columns:auto repeat(6,auto); gap:4px 6px; align-items:center; font-size:13px; }
+  #ladders .dn { font-weight:700; text-transform:uppercase; font-size:12px; letter-spacing:.6px; padding-right:6px; }
+  #ladders .c { padding:2px 8px; border-radius:5px; color:#6c7a8e; border:1px solid #1d2635; white-space:nowrap; }
+  #ladders .c.al { color:#cfd8e6; border-color:#3a475c; }
+  #ladders .c.on { color:#061018; font-weight:700; }
+  #nowbox { margin-left:auto; display:grid; grid-template-columns:auto 1fr; gap:4px 10px; font-size:14px; max-width:46%; }
+  #nowbox .k { font-weight:700; font-size:12px; letter-spacing:.6px; text-transform:uppercase; padding-top:2px; }
+  #nowbox .v { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #strip { position:fixed; left:0; right:0; bottom:0; height:78px; background:#0b0f16ee; border-top:1px solid #263041; z-index:20; }
+  #strip .lab { position:absolute; left:16px; right:16px; top:6px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #strip canvas { position:absolute; left:16px; right:16px; bottom:8px; height:40px; width:calc(100% - 32px); cursor:pointer; }
+  .lb { font-size:13px; color:#e8eef7; white-space:nowrap; text-shadow:0 0 4px #000, 0 0 2px #000; }
+  .lb.big { font-size:16px; font-weight:700; }
+  .lb.title { font-size:17px; font-weight:700; letter-spacing:.3px; }
+  .lb.sub { font-size:13px; color:#9fb0c6; }
+  .lb.row { background:#070a10d0; padding:2px 6px; border-radius:4px; font-size:13px; color:#8193ab; text-transform:uppercase; letter-spacing:.6px; }
+  .lb.row.on { color:#fff; font-weight:700; font-size:15px; }
+  .lb.unit { font-size:12.5px; color:#0a0f18; text-shadow:none; font-weight:600; }
+  .lb.unit.on { font-size:14px; font-weight:700; }
+  .lb.dimt { color:#b4c0d2; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="labels"></div>
+<div id="hud">
+  <div id="focus"><div class="t"></div><div class="d"></div></div>
+  <div id="ladders"></div>
+  <div id="nowbox"></div>
+</div>
+<div id="strip"><div class="lab"></div><canvas></canvas></div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

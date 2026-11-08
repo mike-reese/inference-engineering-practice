@@ -4,6 +4,8 @@ WORKDIR /app
 RUN pip install --no-cache-dir aiohttp==3.14.5 numpy==2.5.4 scipy==1.18.1
 # duckdb: the command center v2 store API (backend/store_v2.py), same version as the store's importer
 RUN pip install --no-cache-dir duckdb==2.0.0
+# nvidia-ml-py: the NVML collector for live GPU samples (command center v3 step 5); matches the 615 driver branch
+RUN pip install --no-cache-dir nvidia-ml-py==13.615.71
 COPY backend /app/backend
 COPY frontend /app/frontend
 ENV DEVTOOLS_HOST=127.0.0.1 DEVTOOLS_PORT=7700

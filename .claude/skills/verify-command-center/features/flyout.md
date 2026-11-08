@@ -1,5 +1,9 @@
 # Flyout tabs
 
+> **Legacy (v2 prototype).** This recipe drives the D5v2 page, which goes at the v3 cutover. Open it with
+> `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` wherever the steps say `$CCV open side`
+> (that now opens the v3 page, `/static/cc/index.html`).
+
 The right-hand flyout holds the v1 tabs that are not places in the scene: Summary, Run, Runs, Requests, Engine,
 Metrics, Lifecycle, Logs, Tools and Compare. A tab replaces the flyout's content and the scene stays as it is. The
 flyout docks right or bottom and can be made larger.

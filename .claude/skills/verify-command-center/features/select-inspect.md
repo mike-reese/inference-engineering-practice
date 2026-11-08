@@ -1,5 +1,9 @@
 # Select and inspect
 
+> **Legacy (v2 prototype).** This recipe drives the D5v2 page, which goes at the v3 cutover. Open it with
+> `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` wherever the steps say `$CCV open side`
+> (that now opens the v3 page, `/static/cc/index.html`).
+
 Clicking an item drawn in the scene selects it. An outline marks it, the cursor moves to its time, the URL keeps it
 (`sel=`), and the Summary tab's `Selected` box shows its name, stable id, description and evidence. Browser Back and
 Forward step through selections.

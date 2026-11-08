@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D10 layouts</title>
+<style>
+  :root { --bg:#0b0f16; --fg:#c9d3e0; --mute:#8fa3bd; --card:#131a26; --line:#263041; --accent:#7cc4ff; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui; padding:32px 16px; }
+  main { max-width:880px; margin:0 auto; }
+  h1 { font-size:22px; margin:0 0 4px; } p { color:var(--mute); margin:0 0 20px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:24px; }
+  a.card { display:block; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; color:var(--fg); text-decoration:none; }
+  a.card:hover { border-color:var(--accent); } a.card b { display:block; color:#fff; margin-bottom:4px; }
+  table { border-collapse:collapse; width:100%; } td { padding:4px 8px; border-bottom:1px solid var(--line); } td:first-child { color:#fff; white-space:nowrap; }
+</style></head>
+<body><main>
+  <h1>Three dimensions, four layouts</h1>
+  <p>Same scratch data and the same keys in every layout. Only the layout differs. Switch with [ and ] or the strip at the top of each page.</p>
+  <div class="grid">
+    <a class="card" href="stacked/index.html"><b>A. Stacked world</b>The board is the floor, architecture stands on it, execution is a pulse moving through both.</a>
+    <a class="card" href="stages/index.html"><b>B. Three stages</b>One column per dimension on one cursor, tied by highlights and lines.</a>
+    <a class="card" href="spine/index.html"><b>C. Execution spine + lenses</b>The execution timeline is always there; hardware and architecture open as lenses.</a>
+    <a class="card" href="cube/index.html"><b>D. Orbit cube</b>Each face is a dimension, depth is the tier, the cursor slices all three faces.</a>
+  </div>
+  <table>
+    <tr><td>← →</td><td>previous / next stop of the focused tier</td></tr>
+    <tr><td>Shift ← →</td><td>stop one tier coarser</td></tr>
+    <tr><td>↑ ↓</td><td>fly one tier coarser / finer</td></tr>
+    <tr><td>E H A</td><td>cross to execution / hardware / architecture (lands on the aligned tier)</td></tr>
+    <tr><td>1-6</td><td>fly to tier n of the focused dimension</td></tr>
+    <tr><td>Space</td><td>play stops</td></tr>
+    <tr><td>[ ]</td><td>previous / next layout</td></tr>
+  </table>
+</main></body></html>

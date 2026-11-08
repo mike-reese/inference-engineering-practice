@@ -3,7 +3,7 @@ IECTL := $(PY) scripts/iectl.py
 TRACE ?= off
 
 .PHONY: doctor images devtools devtools-up-quiet devtools-down devtools-restart runner runner-down rep profile k4 source test-unit check \
-	snapshot tabs overhead status lifecycle
+	snapshot tabs overhead status lifecycle store-check
 
 doctor:
 	$(IECTL) doctor
@@ -76,3 +76,9 @@ status:
 
 lifecycle:
 	$(IECTL) lifecycle
+
+# Command center v3 store (ie-run/3 under CC_STORE): every ie-run/2 run converted, CCVB round trip, tier invariant,
+# unique eids, schema.py == frontend/cc/store/columns.js. DuckDB and numpy only (the bulk data venv on the data drive).
+CC_PY ?= /mnt/ie-data/venvs/cc-v2-proto/bin/python
+store-check:
+	cd devtools/backend && PYTHONDONTWRITEBYTECODE=1 $(CC_PY) -m store.check

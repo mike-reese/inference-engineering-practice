@@ -9,7 +9,7 @@ import path from "node:path";
 import os from "node:os";
 
 const APP = process.env.CCV_APP || "http://127.0.0.1:7710";
-const SIDE = `${APP}/static/prototypes/D5v2/side/index.html`;
+const SIDE = `${APP}/static/cc/index.html`;   // command center v3 (side-by-side); D5v2 stays reachable by its URL
 const STATE = process.env.CCV_STATE || path.join(os.homedir(), ".local/state/inference-engineering/ccv");
 const SESSIONS = path.join(STATE, "sessions");
 const EVIDENCE_ROOT = process.env.CCV_EVIDENCE || "/mnt/ie-data/cc-v2-verify/evidence";
@@ -35,7 +35,7 @@ Session
                                       on a free ${SEAT.output} workspace (${SEAT.workspaces[0]}-${SEAT.workspaces.at(-1)}); wait until READY
   sessions                            the running sessions: workspace, tile, port
   doctor                              read-only health: browser ours and up, tile and frames, page on ${APP}, server, store, READY
-  open [URL|side]                     navigate like the address bar; waits for READY on scene pages
+  open [URL|side]                     navigate like the address bar (side = /static/cc/index.html); waits for READY on scene pages
   back | forward                      the browser's Back / Forward buttons (history entries, hash changes included)
   close                               stop this session's browser and console watcher, free its tile; evidence stays
 
@@ -47,7 +47,7 @@ Act (real input events; a target outside the viewport is scrolled into view firs
   drag    --from x,y --to x,y [...]                          the same between two points (last resort)
   key     KEY [--mods ctrl,shift,alt]  e.g. ArrowRight, Enter, Escape, " ", a
   type    TEXT                         into the focused element
-  select  TARGET --option TEXT         keyboard selection on a focused <select>
+  select  TARGET --option VALUE|TEXT   the option with that exact value, else that exact text: click opens the popup, arrows, Enter; the result is checked
   TARGET is one of: --at x,y | --css SEL | --text T [--exact] | --role R --name N ; plus [--nth i]
   Every act accepts --after NAME: screenshot the resulting state as NAME.png
 
@@ -168,7 +168,12 @@ const FINDER = String.raw`(spec) => {
   const e = vis[spec.nth || 0];
   if (!e) return { found: hits.length, visible: vis.length, error: hits.length ? "matched but not visible" : "no match" };
   const outside = (b) => b.bottom <= 0 || b.right <= 0 || b.top >= innerHeight || b.left >= innerWidth;
-  if (spec.scroll && outside(e.getBoundingClientRect())) e.scrollIntoView({ block: "center", inline: "center" });   // a user scrolls to it first
+  // inside the viewport but scrolled out of a scrolling panel (the inspector body): its center lies outside a scrolling ancestor
+  const clipped = (b) => { const cx = (b.left + b.right) / 2, cy = (b.top + b.bottom) / 2;
+    for (let p = e.parentElement; p; p = p.parentElement) { const s = getComputedStyle(p); if (!/auto|scroll/.test(s.overflowX + s.overflowY)) continue;
+      const q = p.getBoundingClientRect(); if (cx < q.left || cx > q.right || cy < q.top || cy > q.bottom) return true; }
+    return false; };
+  if (spec.scroll && (outside(e.getBoundingClientRect()) || clipped(e.getBoundingClientRect()))) e.scrollIntoView({ block: "center", inline: "center" });   // a user scrolls to it first
   const r = e.getBoundingClientRect(), [fx, fy] = spec.frac || [0.5, 0.5], inView = !outside(r);
   if (spec.scroll && !inView) return { found: hits.length, visible: vis.length, error: "outside the viewport, and scrolling did not bring it in" };
   const x = r.left + r.width * fx, y = r.top + r.height * fy;
@@ -177,6 +182,16 @@ const FINDER = String.raw`(spec) => {
   const label = (n) => n ? n.tagName.toLowerCase() + (n.id ? "#" + n.id : "") + (n.className && typeof n.className === "string" ? "." + n.className.trim().split(/\s+/).join(".") : "") : null;
   return { x, y, rect: { left: r.left, top: r.top, width: r.width, height: r.height }, tag: label(e), role: role(e), name: name(e).slice(0, 120),
            matches: vis.length, in_viewport: inView, covered: inView && covered ? label(top) : null };
+}`;
+
+/** The <select> at (x, y) and the option `want` names: {from, to, value} as option indexes, or {error}. */
+const SELECT_PLAN = String.raw`({ x, y, want }) => {
+  let e = document.elementFromPoint(x, y); while (e && e.shadowRoot) { const i = e.shadowRoot.elementFromPoint(x, y); if (!i || i === e) break; e = i; }
+  const s = e?.closest("select"); if (!s) return { error: "the target is not a <select>" };
+  const opts = [...s.options], byValue = opts.flatMap((o, i) => (o.value === want ? [i] : [])), byText = opts.flatMap((o, i) => (o.text.trim() === want ? [i] : []));
+  const hits = byValue.length ? byValue : byText;
+  if (hits.length !== 1) return { error: (hits.length ? "more than one option is " : "no option is ") + JSON.stringify(want) + " (by value, then by text); options: " + opts.map((o) => o.value + " = " + o.text.trim()).join(" | ") };
+  return { from: s.selectedIndex, to: hits[0], value: opts[hits[0]].value };
 }`;
 
 function spec(opt) {
@@ -231,10 +246,12 @@ async function screenshot(c, name, css) {
 }
 const STATE_PROBE = String.raw`(() => {
   const $ = (q) => document.querySelector(q);
-  const sc = window.SC, cam = sc?.camera?.position, tg = sc?.controls?.target;
-  const names = (window.LEVELS || []).map((l) => l.name);
-  const focus = typeof window.DEEPEST === "function" ? window.DEEPEST() : null;
+  const cc = window.CC, f = cc?.control?.frame;   // v3 page (static/cc): read-only probes; the D5v2 page sets SC, LEVELS, DEEPEST
+  const sc = cc?.scene ?? window.SC, cam = sc?.camera?.position, tg = sc?.controls?.target;
+  const names = (cc?.scene?.levels ?? window.LEVELS ?? []).map((l) => l.name);
+  const focus = f ? f.focus : typeof window.DEEPEST === "function" ? window.DEEPEST() : null;
   return { url: location.href, title: document.title, ready: !!window.READY, t_first_ms: window.T_FIRST ?? null,
+    cursor: f ? { t: f.cursor.t, id: f.cursor.id } : undefined, window_ns: f?.win, grain: f?.grainName, sel: f?.sel,
     timeline: $("#tlabel")?.textContent ?? null, playing: $("#play")?.textContent?.includes("pause") ?? null,
     focus_level: focus == null ? null : { index: focus, name: names[focus] ?? null }, levels: names,
     camera: cam ? { position: [cam.x, cam.y, cam.z].map((v) => +v.toPrecision(6)), target: [tg.x, tg.y, tg.z].map((v) => +v.toPrecision(6)) } : null,
@@ -260,7 +277,7 @@ async function waitReady(c, timeout = 60000) {
   const end = Date.now() + timeout;
   while (Date.now() < end) {
     // a scene page (prototypes/D5v2) is ready when it sets window.READY; any other page when it has loaded
-    const v = await c.eval("({ url: location.href, scene: location.pathname.includes('/D5v2/'), ready: !!window.READY, state: document.readyState })").catch(() => null);
+    const v = await c.eval("({ url: location.href, scene: /\\/(D5v2|cc)\\//.test(location.pathname), ready: !!window.READY, state: document.readyState })").catch(() => null);
     if (v && v.url.startsWith("http") && v.state === "complete" && (!v.scene || v.ready)) return v;
     await sleep(250);
   }
@@ -455,14 +472,25 @@ async function run(cmd, pos, opt) {
         await mouse(c, "mouseReleased", x1, y1, { button: b, buttons: 0, clickCount: 1 }); out = { drag: { from: [x0, y0], to: [x1, y1], button: b } }; break; }
       case "key": { await key(c, pos[0], (opt.mods || "").split(",").filter(Boolean)); out = { key: pos[0], mods: opt.mods || "" }; break; }
       case "type": { await c.send("Input.insertText", { text: pos.join(" ") }); out = { typed: pos.join(" ") }; break; }
-      case "select": { const r = await locate(c, opt); await click(c, r.x, r.y); await key(c, "Escape");   // focus it as a user does; close the native popup
-        const want = opt.option; const idx = await c.eval(`(() => { const roots = []; (function w(r) { roots.push(r); for (const e of r.querySelectorAll("*")) if (e.shadowRoot) w(e.shadowRoot); })(document);
-          const s = roots.flatMap((r) => [...r.querySelectorAll("select")]).find((e) => e.matches(":focus") || e.getRootNode().activeElement === e);
-          if (!s) return null; const o = [...s.options].findIndex((o) => o.text.trim() === ${JSON.stringify(want)} || o.value === ${JSON.stringify(want)}); return o < 0 ? { missing: [...s.options].map((o) => o.text) } : { from: s.selectedIndex, to: o }; })()`);
-        if (!idx) throw new Error("the select did not take focus from the click");
-        if (idx.missing) throw new Error(`no option "${want}"; options: ${idx.missing.join(" | ")}`);
-        for (let i = 0; i < Math.abs(idx.to - idx.from); i++) await key(c, idx.to > idx.from ? "ArrowDown" : "ArrowUp");
-        out = { selected: want, target: r }; break; }
+      // A closed <select> commits (fires change) on every arrow key, so stepping to an option through the closed control
+      // lands on the first one passed when change navigates (the run picker reloads). Instead: plan from the DOM (option by
+      // exact value, else by exact trimmed text; more than one match is an error), open the popup with a click as a user
+      // does, move inside it, commit once with Enter, then read back what the select holds.
+      case "select": { const r = await locate(c, opt), want = opt.option;
+        const plan = await c.eval(`(${SELECT_PLAN})(${JSON.stringify({ x: r.x, y: r.y, want })})`);
+        if (plan.error) throw new Error(plan.error);
+        if (plan.to !== plan.from) {
+          await click(c, r.x, r.y); await sleep(150);
+          for (let i = 0; i < Math.abs(plan.to - plan.from); i++) await key(c, plan.to > plan.from ? "ArrowDown" : "ArrowUp");
+          await key(c, "Enter"); await sleep(300);
+          await waitReady(c);   // a change handler may reload the page (the run picker does)
+        }
+        const now = await c.eval(`(() => { const r = (${FINDER})(${JSON.stringify({ ...spec(opt), scroll: false })}); if (r.error) return { error: r.error };
+          let e = document.elementFromPoint(r.x, r.y); while (e && e.shadowRoot) { const i = e.shadowRoot.elementFromPoint(r.x, r.y); if (!i || i === e) break; e = i; }
+          e = e?.closest("select"); return e ? { value: e.value, text: e.selectedOptions[0]?.text.trim() } : { error: "no <select> at the target after the change" }; })()`);
+        if (now.error) throw new Error(`select: ${now.error}`);
+        if (now.value !== plan.value) throw new Error(`select: wanted ${JSON.stringify(plan.value)}, the select holds ${JSON.stringify(now.value)} (moved ${plan.to - plan.from} options in the popup)`);
+        out = { selected: now, moved: plan.to - plan.from, target: r }; break; }
       case "shot": out = { screenshot: await screenshot(c, pos[0] || `shot-${Date.now()}`, opt.css) }; break;
       case "aria": { const file = path.join(session(), `${(pos[0] || "aria").replace(/[^\w.-]/g, "_")}.aria.txt`); fs.writeFileSync(file, await axText(c)); out = { aria: file }; break; }
       case "state": out = await c.eval(STATE_PROBE); break;
