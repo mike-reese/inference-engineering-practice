@@ -70,10 +70,13 @@ def raw(run_id: str, file: str, pointer: str) -> dict:
         n = int(pointer.split()[1])
         lines = path.read_text().splitlines()
         return {"file": file, "pointer": pointer, "value": lines[n - 1] if n <= len(lines) else None}
-    if path.suffix == ".jsonl" and pointer.startswith("line "):  # component stamps: one JSON document per line
-        n = int(pointer.split()[1])
+    if path.suffix == ".jsonl" and pointer.startswith("line "):  # one JSON document per line; "line N /a/0" goes in
+        _, n, *inner = pointer.split(maxsplit=2)
         lines = path.read_text().splitlines()
-        return {"file": file, "pointer": pointer, "value": json.loads(lines[n - 1]) if n <= len(lines) else None}
+        value = json.loads(lines[int(n) - 1]) if int(n) <= len(lines) else None
+        for part in [p for p in (inner[0] if inner else "").split("/") if p and value is not None]:
+            value = value[int(part)] if isinstance(value, list) else value[part]
+        return {"file": file, "pointer": pointer, "value": value}
     return {"file": file, "pointer": pointer, "value": None, "note": "open the file in Tools"}
 
 

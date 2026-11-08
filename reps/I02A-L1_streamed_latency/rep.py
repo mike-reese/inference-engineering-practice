@@ -13,7 +13,6 @@ import os
 import secrets
 import subprocess
 import sys
-import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -25,6 +24,7 @@ REPO = REP_DIR.parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 from compose_stack import (NCU_CACHE, NCU_CLOCK, NCU_SETS, TRACE_IMAGE, TRACE_LEVELS, Stack,  # noqa: E402
                            has_profiler, prepare_run_dir, trace_settings, uses_stamps)
+from gpu_sampler import GpuSampler  # noqa: E402
 
 from inference_analysis.efficiency import efficiency  # noqa: E402
 from inference_analysis.latency import N_TTFT, latency_records  # noqa: E402
@@ -51,7 +51,6 @@ MESSAGES = [
 K4_MESSAGES = [{"role": "user", "content": "What is 2 plus 2? Answer briefly."}]
 MAX_TOKENS = 64
 LIVE_HOLD_S = 6  # live level: seconds the stack stays up after the last request (the collector's read cycle is <= ~4 s)
-GPU_QUERY = "utilization.gpu,utilization.memory,memory.used,power.draw,clocks.sm,temperature.gpu,pcie.link.gen.current"
 SOURCE_STAMPS = {  # K18: the file each engine time is set in, and the text that sets it
     "server_arrival_time": ("serve/responses_utils.py", "server_arrival_time"),
     "arrival_time": ("llmapi/llm.py", "arrival_time = steady_clock_now"),
@@ -124,27 +123,6 @@ def read_perf_metrics(base: str, poll_s: float = 0.0) -> list:
         if entries or time.monotonic() >= deadline:
             return entries
         time.sleep(0.05)
-
-
-class GpuSampler:
-    """nvidia-smi every 100 ms, each line stamped on read with CLOCK_MONOTONIC (the run's clock) -> gpu.csv."""
-
-    def __init__(self, path: Path):
-        self.path = path
-        self.process = subprocess.Popen(["nvidia-smi", f"--query-gpu={GPU_QUERY}", "--format=csv,noheader,nounits",
-                                         "-lms", "100"], stdout=subprocess.PIPE, text=True, bufsize=1)
-        self.thread = threading.Thread(target=self.read, daemon=True)
-        self.thread.start()
-
-    def read(self) -> None:
-        with self.path.open("w") as out:
-            for line in self.process.stdout:
-                out.write(f"{time.monotonic_ns()},{','.join(v.strip() for v in line.split(','))}\n")
-                out.flush()
-
-    def stop(self) -> None:
-        self.process.terminate()
-        self.thread.join(timeout=5)
 
 
 def run_stack(run_id: str, trace: str = "off", options: dict | None = None) -> dict:

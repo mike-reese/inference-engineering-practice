@@ -12,7 +12,7 @@ import os
 import signal
 import sys 
 import time 
-
+import gevent
 from chat_client import ClientMetrics, ObservedTransport, save_record, send_one, make_client, stamp
 
 RECORDS_DIR = Path(os.environ["RECORDS_DIR"])
@@ -35,7 +35,8 @@ def run_step(client, transport: ObservedTransport, metrics: ClientMetrics, recor
                 record = send_one(client, transport, item["request_id"], item["messages"], item["max_tokens"],
                                   diagnostic=step.get("diagnostic", False), detail=step.get("detail", True),
                                   timeout_s=step.get("timeout_s"),
-                                  skip_special_tokens=step.get("skip_special_tokens", False))
+                                  skip_special_tokens=step.get("skip_special_tokens", False),
+                                  chat_template_kwargs=step.get("chat_template_kwargs"))
             record["phase"] = phase
             record["isl"] = step["isl"]
             record["block"] = step.get("block")
@@ -62,6 +63,46 @@ def run_step(client, transport: ObservedTransport, metrics: ClientMetrics, recor
     runner.quit()
     return env.stats
 
+
+def run_pair(client, transport: ObservedTransport, metrics: ClientMetrics, records_dir: Path, step: dict) -> dict:
+    """A, then B on A's first nonempty content, while A is still streaming. Saves both records; raises on a failed
+    overlap (no content from A in time, or A done before B's send), after saving what happened."""
+    item_a, item_b = step["requests"]
+    phase = step["phase"]
+    released = Event()
+
+    def send(item: dict, role: str, on_first_content=None) -> dict:
+        with metrics.in_flight.labels(phase).track_inprogress():
+            record = send_one(client, transport, item["request_id"], item["messages"], item["max_tokens"],
+                              timeout_s=step.get("timeout_s"),
+                              skip_special_tokens=step.get("skip_special_tokens", False),
+                              on_first_content=on_first_content,
+                              chat_template_kwargs=step.get("chat_template_kwargs"))
+        record["phase"] = phase
+        record["isl"] = step["isl"]
+        record["pair"] = step.get("pair")
+        record["role"] = role
+        save_record(record, records_dir)
+        metrics.observe(record, phase)
+        return record
+
+    task_a = gevent.spawn(send, item_a, "A", lambda now_ns: released.set())
+    gevent.wait([released, task_a], count=1, timeout=step["release_timeout_s"])
+    if not released.is_set():
+        record_a = task_a.get(timeout=step["release_timeout_s"])
+        raise RuntimeError(f"A ({item_a['request_id']}) gave no content within {step['release_timeout_s']} s "
+                           f"(error: {record_a['error']}); B not sent")
+
+    record_b = send(item_b, "B")
+    record_a = task_a.get()
+    if not (record_a["complete"] and record_b["complete"]):
+        raise RuntimeError(f"pair incomplete: A status {record_a['status']} error {record_a['error']}; "
+                           f"B status {record_b['status']} error {record_b['error']}; both records saved")
+    if record_a["protocol_complete_ns"] is None or record_b["send_ns"] >= record_a["protocol_complete_ns"]:
+        raise RuntimeError("no overlap: A completed before B's send; both records saved")
+    return {"pair": step.get("pair"), "a": item_a["request_id"], "b": item_b["request_id"],
+            "a_release_ns": record_a["release_ns"], "b_send_ns": record_b["send_ns"],
+            "a_protocol_complete_ns": record_a["protocol_complete_ns"]}
 
 def locust_summary(stats) -> list[dict]:
     rows = []
@@ -99,8 +140,11 @@ def main():
         step = json.loads(command.read_text())
         print(f"step {index}: {step['phase']} isl={step['isl']} n={len(step['requests'])}", flush=True)
         try:
-            stats = run_step(client, transport, metrics, RECORDS_DIR, step)
-            result = {"step": index, "ok": True, "locust": locust_summary(stats)}
+            if step.get("kind") == "pair":
+                result = {"step": index, "ok": True, "pair": run_pair(client, transport, metrics, RECORDS_DIR, step)}
+            else:
+                stats = run_step(client, transport, metrics, RECORDS_DIR, step)
+                result = {"step": index, "ok": True, "locust": locust_summary(stats)}
         except Exception as exc:
             result = {"step": index, "ok": False, "error": f"{type(exc).__name__}: {exc}"}
         write_atomic(RECORDS_DIR / f"step_{index:04d}.done.json", result)

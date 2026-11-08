@@ -1,0 +1,190 @@
+{
+ "source": "run_json",
+ "title": "ie-run/1 run.json: client spans, wire frames, engine timestamps and component stamps",
+ "order": 30,
+ "evidence": "Observed: written by the rep's collectors on CLOCK_MONOTONIC",
+ "event_kinds": [
+  {
+   "match": {
+    "source": "run.json",
+    "process_prefix": "client",
+    "thread": "locust"
+   },
+   "kind": "client request",
+   "term": "HTTP request (client view)",
+   "eid": "client/request/{request}",
+   "what": "The client sends one chat completion request and reads the full stream ({request}).",
+   "fields": [
+    "phase",
+    "status",
+    "finish_reason"
+   ]
+  },
+  {
+   "match": {
+    "source": "run.json",
+    "process_prefix": "client",
+    "thread": "sdk"
+   },
+   "kind": "client event",
+   "term": "client SDK event",
+   "eid": "client/sdk/{request}/{short}#{n}",
+   "what": "The client SDK records: {name}.",
+   "fields": []
+  },
+  {
+   "match": {
+    "source": "run.json",
+    "process_prefix": "client",
+    "thread": "transport"
+   },
+   "kind": "client transport",
+   "term": "HTTP transport (httpcore)",
+   "eid": "client/transport/{request}/{short}#{n}",
+   "what": "The client transport does this step: {name}.",
+   "fields": [
+    "bytes"
+   ]
+  },
+  {
+   "match": {
+    "source": "run.json",
+    "process_prefix": "network"
+   },
+   "kind": "network frame",
+   "term": "network frame (pcap)",
+   "eid": "wire/{request}/{short}#{n}",
+   "what": "A frame goes across the container network: {name}.",
+   "fields": [
+    "direction",
+    "bytes",
+    "frame_len"
+   ]
+  },
+  {
+   "match": {
+    "source": "run.json",
+    "process_prefix": "server (no pid recorded)"
+   },
+   "kind": "engine timestamp",
+   "term": "engine request timestamp (/perf_metrics)",
+   "eid": "engine/{request}/{short}#{n}",
+   "what": "The engine records the time: {name}.",
+   "fields": [
+    "what",
+    "data",
+    "seconds"
+   ]
+  },
+  {
+   "match": {
+    "source": "run.json",
+    "box": "*"
+   },
+   "kind": "component stamp",
+   "term": "component stamp (server instrumentation)",
+   "eid": "stamp/{box}/{request}/{iter}/{short}#{n}",
+   "what": "The component {box} records: {name}.",
+   "fields": [
+    "box",
+    "proc",
+    "owner",
+    "cid",
+    "loop_iteration",
+    "iteration"
+   ]
+  }
+ ],
+ "lanes": [
+  {
+   "process_prefix": "client",
+   "container": "client",
+   "container_name": "client-1 (Locust client)"
+  },
+  {
+   "process_prefix": "network",
+   "container": "network",
+   "container_name": "bridge network"
+  },
+  {
+   "process_prefix": "server",
+   "container": "server",
+   "container_name": "server-1 (trtllm-serve)"
+  },
+  {
+   "process_prefix": "pytorch profiler",
+   "container": "server",
+   "container_name": "server-1 (trtllm-serve)"
+  }
+ ],
+ "samples": [
+  {
+   "match": {
+    "track": "gpu0/nvidia-smi"
+   },
+   "thing": "gpu0",
+   "units": {
+    "utilization.gpu": "%",
+    "utilization.memory": "%",
+    "memory.used": "MiB",
+    "power.draw": "W",
+    "temperature.gpu": "°C",
+    "clocks.sm": "MHz",
+    "pcie.link.gen.current": "generation"
+   },
+   "evidence": "Observed: nvidia-smi query every 100 ms (gpu.csv)"
+  }
+ ],
+ "links": [
+  {
+   "kind": "zmq",
+   "term": "ZeroMQ message",
+   "what": "A process sends a pickled message to the other process."
+  },
+  {
+   "kind": "network",
+   "term": "HTTP response on the wire",
+   "what": "The response goes from the server to the wire and to the client."
+  },
+  {
+   "kind": "serves",
+   "term": "iteration serves request",
+   "what": "One engine iteration does work for this request; weight = its share."
+  }
+ ],
+ "shares": {
+  "stamp_name": "batch scheduled",
+  "context_tokens": "num_ctx_tokens of the context request, else prompt_len",
+  "generation_tokens": 1,
+  "evidence": "Calculated from Observed scheduler stamps"
+ },
+ "measures": [
+  {
+   "measure": "iteration share",
+   "formula": "share(r, i) = tokens of request r in iteration i / tokens of all requests in iteration i; prefill tokens = the context chunk length, decode tokens = 1 per request",
+   "unit": "fraction (0-1)",
+   "additivity": "sums to 1 over the requests of one iteration",
+   "evidence": "Calculated from Observed scheduler stamps ('batch scheduled')"
+  },
+  {
+   "measure": "kernel time per request",
+   "formula": "sum over iterations i of (kernel time in i) x share(r, i)",
+   "unit": "ns",
+   "additivity": "additive over requests",
+   "evidence": "Calculated"
+  },
+  {
+   "measure": "time to first token (client)",
+   "formula": "first content event - send (client clock)",
+   "unit": "ns",
+   "additivity": "non-additive",
+   "evidence": "Calculated from Observed client stamps"
+  }
+ ],
+ "iteration_from": {
+  "field": "loop_iteration",
+  "offset": 1,
+  "rule": "iteration (/perf_metrics numbering) = the executor loop counter stamped in the component stamp + 1; the same offset as NVTX '_forward_step N' -> iteration N + 1",
+  "evidence": "Observed loop counter; offset checked against rows that carry both"
+ }
+}

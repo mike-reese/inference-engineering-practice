@@ -3,9 +3,9 @@ adapters use; the engine adapter gives the iteration windows the GPU adapters as
 from .client import client
 from .components import components
 from .docker import topology
-from .engine import engine
+from .engine import engine, iterations, unpaired
 from .gpu import gpu_samples
-from .metrics import efficiency, latency
+from .metrics import aggregate, efficiency, latency
 from .ncu import ncu
 from .nsys import nsys
 from .torch_trace import torch_trace
@@ -15,6 +15,8 @@ ADAPTERS = [
     ("topology.json", topology),
     ("client/*.json", client),
     ("engine_records.json", engine),
+    ("native_records.json", unpaired),  # no client join (I02C): request_id None, per-client fields unavailable
+    ("engine_iterations_raw.jsonl", iterations),  # the collector's raw /metrics reads, in reader order
     ("trace/server_stamps.jsonl", components),  # after engine: its iteration numbering
     ("frames.tsv", wire),
     ("gpu.csv", gpu_samples),
@@ -23,4 +25,5 @@ ADAPTERS = [
     ("trace/kernels.csv", ncu),
     ("latency.json", latency),
     ("efficiency.json", efficiency),
+    ("native_records.json", aggregate),  # totals over the unpaired set, with the Prometheus scrapes beside it
 ]

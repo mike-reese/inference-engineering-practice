@@ -1,0 +1,20 @@
+:root { --bg:#f7f7f5; --panel:#fff; --ink:#1d1f23; --muted:#5d636e; --line:#d9dbe0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#15171b; --panel:#1d2026; --ink:#e6e8ec; --muted:#9aa1ad; --line:#3b404c; } }
+:root[data-theme="dark"] { --bg:#15171b; --panel:#1d2026; --ink:#e6e8ec; --muted:#9aa1ad; --line:#3b404c; }
+* { box-sizing:border-box; } html, body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:13px/1.4 system-ui, sans-serif; }
+body { display:flex; flex-direction:column; height:100vh; }
+header, footer { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:5px 10px; border-bottom:1px solid var(--line); }
+footer { border-top:1px solid var(--line); border-bottom:0; } header b { font-size:14px; margin-right:6px; }
+button, select, a.btn { font:inherit; font-size:12px; border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:6px; padding:2px 8px; cursor:pointer; text-decoration:none; }
+#snaps { display:flex; gap:4px; flex-wrap:wrap; }
+#main { flex:1; display:flex; min-height:0; } #stage { position:relative; flex:1; background:#15171b; overflow:hidden; touch-action:none; }
+#stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+#sum { width:340px; overflow:auto; padding:8px 10px; border-left:1px solid var(--line); font-size:12px; } #sum table { border-collapse:collapse; width:100%; margin-top:6px; }
+#sum td { border-bottom:1px solid var(--line); padding:2px 4px; vertical-align:top; } #sum div { margin:3px 0; } .sh { font-weight:600; margin-top:8px !important; }
+.tag { font-size:10px; padding:0 5px; border-radius:8px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; } .muted { color:var(--muted); }
+#tl { flex:1; min-width:200px; height:28px; border:1px solid var(--line); border-radius:4px; cursor:ew-resize; }
+@media (max-width:760px) { #main { flex-direction:column; } #sum { width:auto; height:35vh; border-left:0; border-top:1px solid var(--line); } }
+.labels { position:absolute; pointer-events:none; overflow:hidden; }
+.lab { color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:system-ui, sans-serif; line-height:1.1; pointer-events:none; }
+.lab.hd { color:#d8dee9; }
+#sum details { margin:2px 0 0 0; } #sum code { font-size:11px; word-break:break-all; }

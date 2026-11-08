@@ -1,0 +1,322 @@
+server-1  | 2026-11-07T18:03:05.320092056Z 
+server-1  | 2026-11-07T18:03:05.320192362Z =============
+server-1  | 2026-11-07T18:03:05.320198701Z == PyTorch ==
+server-1  | 2026-11-07T18:03:05.320229229Z =============
+server-1  | 2026-11-07T18:03:05.321869437Z 
+server-1  | 2026-11-07T18:03:05.321883094Z NVIDIA Release 25.12 (build 245654590)
+server-1  | 2026-11-07T18:03:05.321884755Z PyTorch Version 2.10.0a0+b4e4ee8
+server-1  | 2026-11-07T18:03:05.322584044Z Container image Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+server-1  | 2026-11-07T18:03:05.323360018Z Copyright (c) 2014-2024 Facebook Inc.
+server-1  | 2026-11-07T18:03:05.323370605Z Copyright (c) 2011-2014 Idiap Research Institute (Ronan Collobert)
+server-1  | 2026-11-07T18:03:05.323373527Z Copyright (c) 2012-2014 Deepmind Technologies    (Koray Kavukcuoglu)
+server-1  | 2026-11-07T18:03:05.323374800Z Copyright (c) 2011-2012 NEC Laboratories America (Koray Kavukcuoglu)
+server-1  | 2026-11-07T18:03:05.323375832Z Copyright (c) 2011-2013 NYU                      (Clement Farabet)
+server-1  | 2026-11-07T18:03:05.323376772Z Copyright (c) 2006-2010 NEC Laboratories America (Ronan Collobert, Leon Bottou, Iain Melvin, Jason Weston)
+server-1  | 2026-11-07T18:03:05.323377698Z Copyright (c) 2006      Idiap Research Institute (Samy Bengio)
+server-1  | 2026-11-07T18:03:05.323378589Z Copyright (c) 2001-2004 Idiap Research Institute (Ronan Collobert, Samy Bengio, Johnny Mariethoz)
+server-1  | 2026-11-07T18:03:05.323379501Z Copyright (c) 2015      Google Inc.
+server-1  | 2026-11-07T18:03:05.323380475Z Copyright (c) 2015      Yangqing Jia
+server-1  | 2026-11-07T18:03:05.323381321Z Copyright (c) 2013-2016 The Caffe contributors
+server-1  | 2026-11-07T18:03:05.323382231Z All rights reserved.
+server-1  | 2026-11-07T18:03:05.323943842Z 
+server-1  | 2026-11-07T18:03:05.323953395Z Various files include modifications (c) NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+server-1  | 2026-11-07T18:03:05.323955202Z 
+server-1  | 2026-11-07T18:03:05.323956071Z GOVERNING TERMS: The software and materials are governed by the NVIDIA Software License Agreement
+server-1  | 2026-11-07T18:03:05.323957065Z (found at https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-software-license-agreement/)
+server-1  | 2026-11-07T18:03:05.323958011Z and the Product-Specific Terms for NVIDIA AI Products
+server-1  | 2026-11-07T18:03:05.323958901Z (found at https://www.nvidia.com/en-us/agreements/enterprise-software/product-specific-terms-for-ai-products/).
+server-1  | 2026-11-07T18:03:05.575143685Z 
+server-1  | 2026-11-07T18:03:05.575167661Z NOTE: The SHMEM allocation limit is set to the default of 64MB.  This may be
+server-1  | 2026-11-07T18:03:05.575170033Z    insufficient for PyTorch.  NVIDIA recommends the use of the following flags:
+server-1  | 2026-11-07T18:03:05.575171345Z    docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 ...
+server-1  | 2026-11-07T18:03:05.575172517Z 
+server-1  | 2026-11-07T18:03:09.939594808Z /usr/local/lib/python3.12/dist-packages/torch/library.py:356: UserWarning: Warning only once for all operators,  other operators may also be overridden.
+server-1  | 2026-11-07T18:03:09.939617552Z   Overriding a previously registered kernel for the same operator and the same dispatch key
+server-1  | 2026-11-07T18:03:09.939619684Z   operator: flash_attn::_flash_attn_backward(Tensor dout, Tensor q, Tensor k, Tensor v, Tensor out, Tensor softmax_lse, Tensor(a6!)? dq, Tensor(a7!)? dk, Tensor(a8!)? dv, float dropout_p, float softmax_scale, bool causal, SymInt window_size_left, SymInt window_size_right, float softcap, Tensor? alibi_slopes, bool deterministic, Tensor? rng_state=None) -> Tensor
+server-1  | 2026-11-07T18:03:09.939621958Z     registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922
+server-1  | 2026-11-07T18:03:09.939622975Z   dispatch key: ADInplaceOrView
+server-1  | 2026-11-07T18:03:09.939623878Z   previous kernel: no debug info
+server-1  | 2026-11-07T18:03:09.939624771Z        new kernel: registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922 (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/core/dispatch/OperatorEntry.cpp:208.)
+server-1  | 2026-11-07T18:03:09.939625834Z   self.m.impl(
+server-1  | 2026-11-07T18:03:13.572005250Z /usr/local/lib/python3.12/dist-packages/modelopt/torch/__init__.py:36: UserWarning: transformers version 4.57.3 is incompatible with nvidia-modelopt and may cause issues. Please install recommended version with `pip install nvidia-modelopt[hf]` if working with HF models.
+server-1  | 2026-11-07T18:03:13.572022149Z   _warnings.warn(
+server-1  | 2026-11-07T18:03:31.009683750Z [TensorRT-LLM] TensorRT LLM version: 1.2.1
+server-1  | 2026-11-07T18:03:31.488150174Z /usr/local/lib/python3.12/dist-packages/tensorrt_llm/serve/openai_protocol.py:104: UserWarning: Field name "schema" in "ResponseFormat" shadows an attribute in parent "OpenAIBaseModel"
+server-1  | 2026-11-07T18:03:31.488170446Z   class ResponseFormat(OpenAIBaseModel):
+server-1  | 2026-11-07T18:03:31.643535646Z [11/07/2026-18:03:31] [TRT-LLM] [W] Overriding kv_cache_config 
+server-1  | 2026-11-07T18:03:31.643549950Z [11/07/2026-18:03:31] [TRT-LLM] [I] Overriding max_num_tokens from build_config to 1024
+server-1  | 2026-11-07T18:03:31.643901992Z [11/07/2026-18:03:31] [TRT-LLM] [I] Using LLM with PyTorch backend
+server-1  | 2026-11-07T18:03:31.644224012Z [11/07/2026-18:03:31] [TRT-LLM] [I] neither checkpoint_format nor checkpoint_loader were provided, checkpoint_format will be set to HF.
+server-1  | 2026-11-07T18:03:31.644765799Z [11/07/2026-18:03:31] [TRT-LLM] [I] Found /model/hf_quant_config.json, pre-quantized checkpoint is used.
+server-1  | 2026-11-07T18:03:31.644849486Z [11/07/2026-18:03:31] [TRT-LLM] [I] Setting quant_algo=FP8 form HF quant config.
+server-1  | 2026-11-07T18:03:31.644884684Z [11/07/2026-18:03:31] [TRT-LLM] [I] Setting kv_cache_quant_algo=FP8 form HF quant config.
+server-1  | 2026-11-07T18:03:31.644901615Z [11/07/2026-18:03:31] [TRT-LLM] [I] Setting exclude_modules=['lm_head'] from HF quant config.
+server-1  | 2026-11-07T18:03:31.872301107Z The argument `trust_remote_code` is to be used with Auto classes. It has no effect here and is ignored.
+server-1  | 2026-11-07T18:03:31.872388293Z You are using a model of type qwen3 to instantiate a model of type . This is not supported for all configurations of models and can yield errors.
+server-1  | 2026-11-07T18:03:31.875469538Z `torch_dtype` is deprecated! Use `dtype` instead!
+server-1  | 2026-11-07T18:03:31.875702612Z [11/07/2026-18:03:31] [TRT-LLM] [W] Orchestrator is creating IPC executor
+server-1  | 2026-11-07T18:03:31.875745994Z [33;20mrank 0 using MpiPoolSession to spawn MPI processes
+server-1  | 2026-11-07T18:03:31.876403722Z [11/07/2026-18:03:31] [TRT-LLM] [I] Generating a new HMAC key for server proxy_request_queue
+server-1  | 2026-11-07T18:03:31.876768244Z [11/07/2026-18:03:31] [TRT-LLM] [I] Generating a new HMAC key for server worker_init_status_queue
+server-1  | 2026-11-07T18:03:31.877044335Z [11/07/2026-18:03:31] [TRT-LLM] [I] Generating a new HMAC key for server proxy_result_queue
+server-1  | 2026-11-07T18:03:34.911688102Z [0m/usr/local/lib/python3.12/dist-packages/torch/library.py:356: UserWarning: Warning only once for all operators,  other operators may also be overridden.
+server-1  | 2026-11-07T18:03:34.911703412Z   Overriding a previously registered kernel for the same operator and the same dispatch key
+server-1  | 2026-11-07T18:03:34.911705257Z   operator: flash_attn::_flash_attn_backward(Tensor dout, Tensor q, Tensor k, Tensor v, Tensor out, Tensor softmax_lse, Tensor(a6!)? dq, Tensor(a7!)? dk, Tensor(a8!)? dv, float dropout_p, float softmax_scale, bool causal, SymInt window_size_left, SymInt window_size_right, float softcap, Tensor? alibi_slopes, bool deterministic, Tensor? rng_state=None) -> Tensor
+server-1  | 2026-11-07T18:03:34.911707031Z     registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922
+server-1  | 2026-11-07T18:03:34.911708002Z   dispatch key: ADInplaceOrView
+server-1  | 2026-11-07T18:03:34.911708971Z   previous kernel: no debug info
+server-1  | 2026-11-07T18:03:34.911709874Z        new kernel: registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922 (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/core/dispatch/OperatorEntry.cpp:208.)
+server-1  | 2026-11-07T18:03:34.911710926Z   self.m.impl(
+server-1  | 2026-11-07T18:03:38.310060962Z Multiple distributions found for package optimum. Picked distribution: optimum
+server-1  | 2026-11-07T18:03:38.311466716Z Multiple distributions found for package modelopt. Picked distribution: nvidia-modelopt
+server-1  | 2026-11-07T18:03:38.546778089Z /usr/local/lib/python3.12/dist-packages/modelopt/torch/__init__.py:36: UserWarning: transformers version 4.57.3 is incompatible with nvidia-modelopt and may cause issues. Please install recommended version with `pip install nvidia-modelopt[hf]` if working with HF models.
+server-1  | 2026-11-07T18:03:38.546799782Z   _warnings.warn(
+server-1  | 2026-11-07T18:03:42.311880901Z [TensorRT-LLM] TensorRT LLM version: 1.2.1
+server-1  | 2026-11-07T18:03:42.745136719Z /usr/local/lib/python3.12/dist-packages/tensorrt_llm/serve/openai_protocol.py:104: UserWarning: Field name "schema" in "ResponseFormat" shadows an attribute in parent "OpenAIBaseModel"
+server-1  | 2026-11-07T18:03:42.745160195Z   class ResponseFormat(OpenAIBaseModel):
+server-1  | 2026-11-07T18:03:42.887687120Z [11/07/2026-18:03:42] [TRT-LLM] [W] cloudpickle is not installed. TransformersTokenizer will not be serializable across nodes in multi-node setups. Install cloudpickle to fix this: pip install cloudpickle
+server-1  | 2026-11-07T18:03:43.171759890Z [TensorRT-LLM][INFO] Refreshed the MPI local session
+server-1  | 2026-11-07T18:03:43.254296313Z [11/07/2026-18:03:43] [TRT-LLM] [W] Worker process 301 is affined to run on the following CPUs: [2, 10] (subset of all logical CPUs). This may harm performance if set incorrectly.
+server-1  | 2026-11-07T18:03:43.254318928Z [11/07/2026-18:03:43] [TRT-LLM] [W] Worker process 301 has constrained CPU affinity but `TLLM_NUMA_AWARE_WORKER_AFFINITY` is not set. Removing CPU affinity constraints.
+server-1  | 2026-11-07T18:03:43.287315344Z [11/07/2026-18:03:43] [TRT-LLM] [I] ATTENTION RUNTIME FEATURES:  AttentionRuntimeFeatures(chunked_prefill=False, cache_reuse=False, has_speculative_draft_tokens=False, chunk_size=1024, chunked_prefill_buffer_batch_size=4)
+server-1  | 2026-11-07T18:03:43.288527041Z `torch_dtype` is deprecated! Use `dtype` instead!
+server-1  | 2026-11-07T18:03:43.289700732Z [11/07/2026-18:03:43] [TRT-LLM] [I] Validating KV Cache config against kv_cache_dtype="auto"
+server-1  | 2026-11-07T18:03:43.289707046Z [11/07/2026-18:03:43] [TRT-LLM] [I] KV cache quantization set to "auto". Using checkpoint KV quantization.
+server-1  | 2026-11-07T18:03:43.778861215Z [11/07/2026-18:03:43] [TRT-LLM] [I] Use 8.79 GB for model weights.
+server-1  | 2026-11-07T18:03:43.779122729Z [11/07/2026-18:03:43] [TRT-LLM] [I] Prefetching 8.79GB checkpoint files.
+server-1  | 2026-11-07T18:03:43.779486379Z [11/07/2026-18:03:43] [TRT-LLM] [I] Prefetching /model/model-00001-of-00002.safetensors to memory...
+server-1  | 2026-11-07T18:03:43.779496469Z [11/07/2026-18:03:43] [TRT-LLM] [I] Prefetching /model/model-00002-of-00002.safetensors to memory...
+server-1  | 2026-11-07T18:03:53.212094110Z [11/07/2026-18:03:53] [TRT-LLM] [I] Finished prefetching /model/model-00002-of-00002.safetensors.
+server-1  | 2026-11-07T18:03:53.748528560Z [11/07/2026-18:03:53] [TRT-LLM] [I] Finished prefetching /model/model-00001-of-00002.safetensors.
+server-1  | 2026-11-07T18:03:53.755697704Z [11/07/2026-18:03:53] [TRT-LLM] [I] Start to load safetensor file /model/model-00002-of-00002.safetensors
+server-1  | 2026-11-07T18:03:53.764720689Z [11/07/2026-18:03:53] [TRT-LLM] [I] Start to load safetensor file /model/model-00001-of-00002.safetensors
+server-1  | 2026-11-07T18:03:53.857531128Z 
+Loading safetensors weights in parallel:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading safetensors weights in parallel: 100%|██████████| 2/2 [00:00<00:00, 19.60it/s]
+Loading safetensors weights in parallel: 100%|██████████| 2/2 [00:00<00:00, 19.53it/s]
+server-1  | 2026-11-07T18:03:57.289009454Z 
+Loading weights concurrently:   0%|          | 0/836 [00:00<?, ?it/s]
+Loading weights concurrently:   6%|▌         | 47/836 [00:00<00:07, 104.90it/s]
+Loading weights concurrently:  11%|█         | 93/836 [00:00<00:04, 181.56it/s]
+Loading weights concurrently:  14%|█▍        | 120/836 [00:00<00:04, 152.37it/s]
+Loading weights concurrently:  21%|██        | 173/836 [00:00<00:03, 217.46it/s]
+Loading weights concurrently:  24%|██▍       | 201/836 [00:01<00:03, 201.31it/s]
+Loading weights concurrently:  33%|███▎      | 275/836 [00:01<00:01, 315.05it/s]
+Loading weights concurrently:  38%|███▊      | 316/836 [00:01<00:01, 285.70it/s]
+Loading weights concurrently:  43%|████▎     | 357/836 [00:01<00:01, 309.56it/s]
+Loading weights concurrently:  47%|████▋     | 394/836 [00:01<00:01, 303.63it/s]
+Loading weights concurrently:  55%|█████▌    | 463/836 [00:01<00:00, 395.51it/s]
+Loading weights concurrently:  61%|██████    | 508/836 [00:01<00:00, 381.85it/s]
+Loading weights concurrently:  66%|██████▋   | 555/836 [00:01<00:00, 393.81it/s]
+Loading weights concurrently:  71%|███████▏  | 597/836 [00:02<00:00, 368.63it/s]
+Loading weights concurrently:  76%|███████▌  | 636/836 [00:02<00:00, 359.49it/s]
+Loading weights concurrently:  85%|████████▌ | 711/836 [00:02<00:00, 456.74it/s]
+Loading weights concurrently:  93%|█████████▎| 774/836 [00:02<00:00, 499.96it/s]
+Loading weights concurrently:  99%|█████████▉| 826/836 [00:03<00:00, 146.77it/s]
+Loading weights concurrently: 100%|██████████| 836/836 [00:03<00:00, 244.20it/s]
+server-1  | 2026-11-07T18:03:57.293440130Z Model init total -- 14.00s
+server-1  | 2026-11-07T18:03:57.386090182Z [11/07/2026-18:03:57] [TRT-LLM] [I] Using Sampler: TorchSampler
+server-1  | 2026-11-07T18:03:57.386296552Z [11/07/2026-18:03:57] [TRT-LLM] [I] [create_py_executor] Created execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0x38d435b0>
+server-1  | 2026-11-07T18:03:57.401264679Z [11/07/2026-18:03:57] [TRT-LLM] [I] [kv cache manager] Primary/secondary blocks for window sizes set to {2049: (14, 0)} for estimation dry run
+server-1  | 2026-11-07T18:03:57.401419578Z [11/07/2026-18:03:57] [TRT-LLM] [W] Attention window size 2049 exceeds upper bound 448 for available blocks. Reducing to 448.
+server-1  | 2026-11-07T18:03:57.401434888Z [11/07/2026-18:03:57] [TRT-LLM] [W] Adjusted max_attention_window_vec to [448]
+server-1  | 2026-11-07T18:03:57.401440328Z [11/07/2026-18:03:57] [TRT-LLM] [W] Adjusted window size 2049 to 448 in blocks_per_window
+server-1  | 2026-11-07T18:03:57.401442086Z [11/07/2026-18:03:57] [TRT-LLM] [W] Adjusted max_seq_len to 448
+server-1  | 2026-11-07T18:03:57.401529263Z [11/07/2026-18:03:57] [TRT-LLM] [I] [KVCacheManager] execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0x38d435b0>
+server-1  | 2026-11-07T18:03:57.419335286Z [TensorRT-LLM][INFO] Max KV cache blocks per sequence: 65 [window size=448], tokens per block=32, primary blocks=14, secondary blocks=0, max sequence length=2049
+server-1  | 2026-11-07T18:03:57.419804987Z [TensorRT-LLM][INFO] Number of tokens per block: 32.
+server-1  | 2026-11-07T18:03:57.420090234Z [TensorRT-LLM][INFO] [MemUsageChange] Allocated 0.03 GiB for max tokens in paged KV cache (448).
+server-1  | 2026-11-07T18:03:57.421825248Z [11/07/2026-18:03:57] [TRT-LLM] [I] max_seq_len=448, max_num_requests=1, max_num_tokens=1024, max_batch_size=1
+server-1  | 2026-11-07T18:03:57.422994371Z [11/07/2026-18:03:57] [TRT-LLM] [I] cache_transceiver is disabled
+server-1  | 2026-11-07T18:03:57.423255881Z [11/07/2026-18:03:57] [TRT-LLM] [I] [PyExecutor] execution_stream initialized: <torch.cuda.Stream device=cuda:0 cuda_stream=0x38d435b0>. 
+server-1  | 2026-11-07T18:03:57.425457166Z [11/07/2026-18:03:57] [TRT-LLM] [I] Running autotuner warmup...
+server-1  | 2026-11-07T18:03:57.425884076Z [11/07/2026-18:03:57] [TRT-LLM] [I] [Autotuner] Autotuning process starts ...
+server-1  | 2026-11-07T18:03:59.798760560Z [11/07/2026-18:03:59] [TRT-LLM] [I] PDL enabled
+server-1  | 2026-11-07T18:04:15.645307848Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 36312064 bytes
+server-1  | 2026-11-07T18:04:18.055236736Z [11/07/2026-18:04:18] [TRT-LLM] [I] [Autotuner] Autotuning process ends
+server-1  | 2026-11-07T18:04:18.055668811Z [11/07/2026-18:04:18] [TRT-LLM] [E] Failed to initialize executor on rank 0: CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling `cublasCreate(handle)`
+server-1  | 2026-11-07T18:04:18.061954678Z [11/07/2026-18:04:18] [TRT-LLM] [E] Traceback (most recent call last):
+server-1  | 2026-11-07T18:04:18.061977043Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/worker.py", line 281, in worker_main
+server-1  | 2026-11-07T18:04:18.061978970Z     worker: GenerationExecutorWorker = worker_cls(
+server-1  | 2026-11-07T18:04:18.061979984Z                                        ^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.061980865Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/worker.py", line 62, in __init__
+server-1  | 2026-11-07T18:04:18.061981836Z     self.setup_engine()
+server-1  | 2026-11-07T18:04:18.061982683Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/base_worker.py", line 257, in setup_engine
+server-1  | 2026-11-07T18:04:18.061983687Z     self.engine = _create_py_executor(
+server-1  | 2026-11-07T18:04:18.061984560Z                   ^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.061985421Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/base_worker.py", line 228, in _create_py_executor
+server-1  | 2026-11-07T18:04:18.061986458Z     _executor = create_executor(**args)
+server-1  | 2026-11-07T18:04:18.061987342Z                 ^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.061988232Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor_creator.py", line 658, in create_py_executor
+server-1  | 2026-11-07T18:04:18.061989222Z     py_executor = create_py_executor_instance(
+server-1  | 2026-11-07T18:04:18.061990079Z                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.061990954Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/_util.py", line 871, in create_py_executor_instance
+server-1  | 2026-11-07T18:04:18.061991954Z     return PyExecutor(
+server-1  | 2026-11-07T18:04:18.061992784Z            ^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.061993662Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", line 280, in __init__
+server-1  | 2026-11-07T18:04:18.061994663Z     self.model_engine.warmup(self.resource_manager)
+server-1  | 2026-11-07T18:04:18.061995585Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 560, in wrapper
+server-1  | 2026-11-07T18:04:18.061996559Z     return method(self, *args, **kwargs)
+server-1  | 2026-11-07T18:04:18.061997445Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.061998283Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 598, in warmup
+server-1  | 2026-11-07T18:04:18.061999222Z     self._run_autotuner_warmup(resource_manager)
+server-1  | 2026-11-07T18:04:18.062000165Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 681, in _run_autotuner_warmup
+server-1  | 2026-11-07T18:04:18.062002109Z     self.forward(batch,
+server-1  | 2026-11-07T18:04:18.062003042Z   File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+server-1  | 2026-11-07T18:04:18.062003997Z     return func(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.062005388Z            ^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062008849Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/utils.py", line 109, in wrapper
+server-1  | 2026-11-07T18:04:18.062010702Z     return func(self, *args, **kwargs)
+server-1  | 2026-11-07T18:04:18.062012142Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062013591Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 3317, in forward
+server-1  | 2026-11-07T18:04:18.062078944Z     outputs = self._forward_step(inputs, gather_ids,
+server-1  | 2026-11-07T18:04:18.062151912Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062179747Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 3382, in _forward_step
+server-1  | 2026-11-07T18:04:18.062193806Z     outputs = self.model_forward(
+server-1  | 2026-11-07T18:04:18.062208423Z               ^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062240914Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 3369, in model_forward
+server-1  | 2026-11-07T18:04:18.062257592Z     return self.model.forward(**kwargs)
+server-1  | 2026-11-07T18:04:18.062272560Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062299962Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/models/modeling_speculative.py", line 1002, in forward
+server-1  | 2026-11-07T18:04:18.062317569Z     logits = self.logits_processor.forward(
+server-1  | 2026-11-07T18:04:18.062336742Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062352684Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/logits_processor.py", line 30, in forward
+server-1  | 2026-11-07T18:04:18.062367051Z     logits = lm_head(hidden_states)
+server-1  | 2026-11-07T18:04:18.062382567Z              ^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062397426Z   File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+server-1  | 2026-11-07T18:04:18.062411491Z     return self._call_impl(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.062428824Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062441631Z   File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+server-1  | 2026-11-07T18:04:18.062456908Z     return forward_call(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.062482258Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062496889Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/embedding.py", line 108, in forward
+server-1  | 2026-11-07T18:04:18.062522032Z     output = super().forward(input, all_reduce_params=all_reduce_params)
+server-1  | 2026-11-07T18:04:18.062543807Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062563016Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/linear.py", line 2332, in forward
+server-1  | 2026-11-07T18:04:18.062576664Z     output = self.apply_linear(input, self.bias, lora_params, layer_idx)
+server-1  | 2026-11-07T18:04:18.062592731Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062602387Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/linear.py", line 2271, in apply_linear
+server-1  | 2026-11-07T18:04:18.062620504Z     output = self.quant_method.apply(self, input, bias)
+server-1  | 2026-11-07T18:04:18.062629767Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062657180Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/linear.py", line 399, in apply
+server-1  | 2026-11-07T18:04:18.062667092Z     output = F.linear(input, module.weight, bias)
+server-1  | 2026-11-07T18:04:18.062677282Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.062710907Z RuntimeError: CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling `cublasCreate(handle)`
+server-1  | 2026-11-07T18:04:18.062733548Z 
+server-1  | 2026-11-07T18:04:18.079549181Z [11/07/2026-18:04:18] [TRT-LLM] [I] get signal from executor worker
+server-1  | 2026-11-07T18:04:18.079698728Z [11/07/2026-18:04:18] [TRT-LLM] [E] Executor worker initialization error: Traceback (most recent call last):
+server-1  | 2026-11-07T18:04:18.079705831Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/worker.py", line 281, in worker_main
+server-1  | 2026-11-07T18:04:18.079708300Z     worker: GenerationExecutorWorker = worker_cls(
+server-1  | 2026-11-07T18:04:18.079709938Z                                        ^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.079711498Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/worker.py", line 62, in __init__
+server-1  | 2026-11-07T18:04:18.079713324Z     self.setup_engine()
+server-1  | 2026-11-07T18:04:18.079714876Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/base_worker.py", line 257, in setup_engine
+server-1  | 2026-11-07T18:04:18.079716569Z     self.engine = _create_py_executor(
+server-1  | 2026-11-07T18:04:18.079718041Z                   ^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.079719353Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/base_worker.py", line 228, in _create_py_executor
+server-1  | 2026-11-07T18:04:18.079720943Z     _executor = create_executor(**args)
+server-1  | 2026-11-07T18:04:18.079722463Z                 ^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.079749355Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor_creator.py", line 658, in create_py_executor
+server-1  | 2026-11-07T18:04:18.079760257Z     py_executor = create_py_executor_instance(
+server-1  | 2026-11-07T18:04:18.079766929Z                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.079773297Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/_util.py", line 871, in create_py_executor_instance
+server-1  | 2026-11-07T18:04:18.079783539Z     return PyExecutor(
+server-1  | 2026-11-07T18:04:18.079834559Z            ^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.079857906Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", line 280, in __init__
+server-1  | 2026-11-07T18:04:18.079890275Z     self.model_engine.warmup(self.resource_manager)
+server-1  | 2026-11-07T18:04:18.079906864Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 560, in wrapper
+server-1  | 2026-11-07T18:04:18.079916650Z     return method(self, *args, **kwargs)
+server-1  | 2026-11-07T18:04:18.079956320Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.079976910Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 598, in warmup
+server-1  | 2026-11-07T18:04:18.080002407Z     self._run_autotuner_warmup(resource_manager)
+server-1  | 2026-11-07T18:04:18.080021150Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 681, in _run_autotuner_warmup
+server-1  | 2026-11-07T18:04:18.080034840Z     self.forward(batch,
+server-1  | 2026-11-07T18:04:18.080052443Z   File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+server-1  | 2026-11-07T18:04:18.080079007Z     return func(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.080097695Z            ^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080114822Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/utils.py", line 109, in wrapper
+server-1  | 2026-11-07T18:04:18.080123174Z     return func(self, *args, **kwargs)
+server-1  | 2026-11-07T18:04:18.080149883Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080174686Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 3317, in forward
+server-1  | 2026-11-07T18:04:18.080189515Z     outputs = self._forward_step(inputs, gather_ids,
+server-1  | 2026-11-07T18:04:18.080204941Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080238698Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 3382, in _forward_step
+server-1  | 2026-11-07T18:04:18.080267528Z     outputs = self.model_forward(
+server-1  | 2026-11-07T18:04:18.080295093Z               ^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080321469Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", line 3369, in model_forward
+server-1  | 2026-11-07T18:04:18.080335822Z     return self.model.forward(**kwargs)
+server-1  | 2026-11-07T18:04:18.080363322Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080387624Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/models/modeling_speculative.py", line 1002, in forward
+server-1  | 2026-11-07T18:04:18.080413116Z     logits = self.logits_processor.forward(
+server-1  | 2026-11-07T18:04:18.080447585Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080463873Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/logits_processor.py", line 30, in forward
+server-1  | 2026-11-07T18:04:18.080474595Z     logits = lm_head(hidden_states)
+server-1  | 2026-11-07T18:04:18.080494916Z              ^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080508476Z   File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+server-1  | 2026-11-07T18:04:18.080539619Z     return self._call_impl(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.080565793Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080591524Z   File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+server-1  | 2026-11-07T18:04:18.080614689Z     return forward_call(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.080630937Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080640595Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/embedding.py", line 108, in forward
+server-1  | 2026-11-07T18:04:18.080667971Z     output = super().forward(input, all_reduce_params=all_reduce_params)
+server-1  | 2026-11-07T18:04:18.080690378Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080703587Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/linear.py", line 2332, in forward
+server-1  | 2026-11-07T18:04:18.080727179Z     output = self.apply_linear(input, self.bias, lora_params, layer_idx)
+server-1  | 2026-11-07T18:04:18.080762920Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080791882Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/linear.py", line 2271, in apply_linear
+server-1  | 2026-11-07T18:04:18.080811447Z     output = self.quant_method.apply(self, input, bias)
+server-1  | 2026-11-07T18:04:18.080825800Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080841653Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/modules/linear.py", line 399, in apply
+server-1  | 2026-11-07T18:04:18.080856601Z     output = F.linear(input, module.weight, bias)
+server-1  | 2026-11-07T18:04:18.080872168Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.080884794Z RuntimeError: CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling `cublasCreate(handle)`
+server-1  | 2026-11-07T18:04:18.080907052Z 
+server-1  | 2026-11-07T18:04:18.089094509Z RuntimeError: CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling `cublasCreate(handle)`
+server-1  | 2026-11-07T18:04:18.089110958Z 
+server-1  | 2026-11-07T18:04:18.089112466Z The above exception was the direct cause of the following exception:
+server-1  | 2026-11-07T18:04:18.089113500Z 
+server-1  | 2026-11-07T18:04:18.089114449Z Traceback (most recent call last):
+server-1  | 2026-11-07T18:04:18.089115335Z   File "/usr/local/bin/trtllm-serve", line 7, in <module>
+server-1  | 2026-11-07T18:04:18.089594208Z     sys.exit(main())
+server-1  | 2026-11-07T18:04:18.089643606Z              ^^^^^^
+server-1  | 2026-11-07T18:04:18.089649944Z   File "/usr/local/lib/python3.12/dist-packages/click/core.py", line 1485, in __call__
+server-1  | 2026-11-07T18:04:18.090103605Z     return self.main(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.090150418Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.090160706Z   File "/usr/local/lib/python3.12/dist-packages/click/core.py", line 1406, in main
+server-1  | 2026-11-07T18:04:18.090346719Z     rv = self.invoke(ctx)
+server-1  | 2026-11-07T18:04:18.090475447Z          ^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.090480295Z   File "/usr/local/lib/python3.12/dist-packages/click/core.py", line 1873, in invoke
+server-1  | 2026-11-07T18:04:18.090675970Z     return _process_result(sub_ctx.command.invoke(sub_ctx))
+server-1  | 2026-11-07T18:04:18.090854326Z                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.090860971Z   File "/usr/local/lib/python3.12/dist-packages/click/core.py", line 1269, in invoke
+server-1  | 2026-11-07T18:04:18.091002496Z     return ctx.invoke(self.callback, **ctx.params)
+server-1  | 2026-11-07T18:04:18.091078425Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.091084987Z   File "/usr/local/lib/python3.12/dist-packages/click/core.py", line 824, in invoke
+server-1  | 2026-11-07T18:04:18.091216176Z     return callback(*args, **kwargs)
+server-1  | 2026-11-07T18:04:18.091226669Z            ^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.091228457Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/commands/serve.py", line 568, in serve
+server-1  | 2026-11-07T18:04:18.091468923Z     launch_server(host, port, llm_args, tool_parser, chat_template,
+server-1  | 2026-11-07T18:04:18.091473352Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/commands/serve.py", line 201, in launch_server
+server-1  | 2026-11-07T18:04:18.091515952Z     llm = PyTorchLLM(**llm_args)
+server-1  | 2026-11-07T18:04:18.091664105Z           ^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.091667878Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/llmapi/llm.py", line 1202, in __init__
+server-1  | 2026-11-07T18:04:18.092024213Z     super().__init__(model, tokenizer, tokenizer_mode, skip_tokenizer_init,
+server-1  | 2026-11-07T18:04:18.092029023Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/llmapi/llm.py", line 1088, in __init__
+server-1  | 2026-11-07T18:04:18.092179991Z     super().__init__(model,
+server-1  | 2026-11-07T18:04:18.092192871Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/llmapi/llm.py", line 236, in __init__
+server-1  | 2026-11-07T18:04:18.092229959Z     self._build_model()
+server-1  | 2026-11-07T18:04:18.092264481Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/llmapi/llm.py", line 1149, in _build_model
+server-1  | 2026-11-07T18:04:18.092443280Z     self._executor = self._executor_cls.create(
+server-1  | 2026-11-07T18:04:18.092450596Z                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.092471733Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/executor.py", line 546, in create
+server-1  | 2026-11-07T18:04:18.092716728Z     return GenerationExecutor._create_ipc_executor(
+server-1  | 2026-11-07T18:04:18.092722404Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.092738448Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/executor.py", line 417, in _create_ipc_executor
+server-1  | 2026-11-07T18:04:18.092835396Z     return GenerationExecutorProxy(
+server-1  | 2026-11-07T18:04:18.092839552Z            ^^^^^^^^^^^^^^^^^^^^^^^^
+server-1  | 2026-11-07T18:04:18.092850231Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/proxy.py", line 111, in __init__
+server-1  | 2026-11-07T18:04:18.092972975Z     self._start_executor_workers(worker_kwargs)
+server-1  | 2026-11-07T18:04:18.093115200Z   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/executor/proxy.py", line 268, in _start_executor_workers
+server-1  | 2026-11-07T18:04:18.093197934Z     raise RuntimeError(
+server-1  | 2026-11-07T18:04:18.093206481Z RuntimeError: Executor worker returned error

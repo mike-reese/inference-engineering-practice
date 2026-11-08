@@ -15,6 +15,7 @@ services:
       DEVTOOLS_PORT: "7700"
       REPO: "/repo"
       PYTHONDONTWRITEBYTECODE: "1"
+      STORE_V2: "/store_v2"
       REPO_HOST: "${REPO_HOST:-}"   # the repo's host path (make devtools sets it): maps mounts to /repo
     # Run the code from the mounted repo, so a change needs a restart (make devtools-restart), not a rebuild.
     command: ["python", "-u", "/repo/devtools/backend/app.py"]
@@ -22,6 +23,8 @@ services:
       # Read-only mount, but the Docker API is still root-equivalent: local machine only; read endpoints only.
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "..:/repo:ro"   # run folders and the trace adapters (src/inference_analysis/trace)
+      # command center v2 store (ie-run/2 on Parquet), on the data drive; read-only
+      - "/mnt/ie-data/cc-v2-proto/store_v2:/store_v2:ro"
     mem_limit: 1g
   prometheus:
     image: "prom/prometheus:v3.13.5@sha256:aafa9d694e6a883c02db516d9f6e5b84e14195f49a2a6456a4cca815edda72b9"

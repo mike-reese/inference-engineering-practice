@@ -1,0 +1,23 @@
+{
+  "I02A-TRACE-timeline_20261107T172848Z_f2ac52-warmup": {
+    "request_id": 2,
+    "perf_metrics": {
+      "first_iter": 1,
+      "last_iter": 64,
+      "timing_metrics": {
+        "server_arrival_time": 84183.387293,
+        "arrival_time": 84183.39727,
+        "first_scheduled_time": 84183.412638,
+        "first_token_time": 84184.643774,
+        "server_first_token_time": 84184.647442,
+        "last_token_time": 84184.871337
+      },
+      "kv_cache_metrics": {
+        "num_total_allocated_blocks": 2,
+        "num_new_allocated_blocks": 2,
+        "num_reused_blocks": 0,
+        "num_missed_blocks": 0
+      }
+    }
+  }
+}
