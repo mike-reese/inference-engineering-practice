@@ -16,6 +16,9 @@ python3 design/dimensions/map_surfaces.py --write          # section 9; exits 1 
 uv run --no-project --with duckdb python design/dimensions/stop_counts.py --write   # section 10; exits 1 on a jump
 ```
 
+P1 changes both scripts (section 7.4): the jump check gives way to the stop check, and the sources move to D13 and
+`cc/`. Sections 9 and 10 are regenerated then.
+
 ## 1. Goal and role
 
 An intuitive, working interface for a conceptual understanding of the inference stack (owner, 2026-11-08): what
@@ -86,7 +89,8 @@ Selection, cursor and tiers carry over when the world changes.
   playback; it never filters events. One animation frame moves the cursor and redraws every view. Time pace by
   default (the bounds play in 8 s at x1); events pace on request.
 - **Zoom.** Each spine pane (architecture, hardware, execution bands) zooms and pans on its own: wheel to zoom
-  (0.5x to 16x), drag to pan, double-click to reset. Each pane keeps its zoom across reloads.
+  (0.5x to 16x), drag to pan, double-click to reset. Each pane keeps its zoom across reloads. Zoom does not snap to
+  tier bounds; flying to a tier already sets that tier's window (choice 2).
 - **History.** Back / forward in the bottom bar walk selections. Each step restores the selection, cursor and tab.
 - **State in the URL.** Session, world, tiers, cursor, selection and dock live in the hash, written at most every
   150 ms, so a reload or a link keeps the view. A live session reloads as a replay.
@@ -105,7 +109,8 @@ Selection, cursor and tiers carry over when the world changes.
 | D | dock bottom / right |
 | Space | play every event in the bounds, looping |
 | T | pace: events / time |
-| Alt ← → | back / forward through selections (conflict, open choice 4) |
+| Alt ← → | previous / next row of the focused tier (walk every row, section 3.4) |
+| [ ] | back / forward through selections (choice 4) |
 
 One `keydown` listener owns the keymap, and the keymap table renders the help.
 
@@ -156,7 +161,7 @@ today). Counts per iteration come from section 10.
 | iteration | one scheduler step: which requests run, prefill or decode | scheduler stamps (derived span) | 3.4 ms median | measured |
 | phase | executor phases (`_fetch_new_requests`, `_schedule`, `_sample_async`, `_handle_responses`), request hops | NVTX top-level ranges, component stamps | 13 to 26 per iteration | measured |
 | layer | one decoder layer | `layer` column (RMSNorm rule in `trace/adapters/nsys.py`) | 25 per iteration (24 layers + final norm) | inferred |
-| module | attention, MLP, linear, norm, with their ops | module `forward()` frames (code run) | 269 per iteration | measured in the code run only; missing elsewhere |
+| module | attention, MLP, linear, norm, with their ops | module `forward()` frames (code run) | 269 per iteration | measured in the code run only; graphs-on runs say "missing" until M2 |
 | kernel | one kernel, copy or memset, with the CPU call that launched it | nsys or PyTorch profiler | 2.3 µs median kernel | measured |
 
 - Everything finer than a module is **detail**: built-ins, nn plumbing, nested aten ops, CUDA queries, syncs, OS
@@ -164,21 +169,24 @@ today). Counts per iteration come from section 10.
 - A launch call and its kernel are one stop, seen from the CPU and the GPU. The code run's 18,309 launch calls match
   its 18,309 device rows by correlation id (measured).
 - Module is the gap. Graphs-on runs replay a captured graph, so they have no module frames. A module there must be
-  inferred by matching the kernel sequence learned from the code run (rule not yet written).
+  inferred by matching the kernel sequence learned from the code run (rule written in M2). The match is not 1:1: the
+  code run has 286 kernels per iteration, graphs-on runs 207 (measured).
 
 ### 3.2 Hardware
 
 | tier | what you see | source | resolution | status |
 | --- | --- | --- | --- | --- |
-| system | utilization of every GPU and host: GPU %, VRAM, CPU %, RAM | `nvidia-smi` query; NVML GPM (live); Docker stats per container (live) | 100 ms; 100 ms; about 1 s | GPU measured; CPU and RAM live only, not stored |
+| system | utilization of every GPU and host: GPU %, VRAM, CPU %, RAM | `nvidia-smi` query; NVML; Docker stats per container; host `/proc/stat`, `/proc/meminfo` (P2) | 100 ms; 50 to 500 ms; about 1 s; 100 ms | GPU and per-container CPU and memory measured (Docker stats stored since run 1d82c9); host CPU % and RAM used added in P2 |
 | node | the board: CPU, RAM, chipset, PCIe and DMI links, GPU, NVMe, NIC | inventory probe (`registry/inventory.json`) | static | measured |
-| device | bytes moving between devices: PCIe copies, network frames, NVMe reads | memcpy rows with bytes; nsys PCIe RX/TX %; tcpdump | per copy; 100 µs; per frame | PCIe and network measured; NVMe and RAM bandwidth missing |
-| unit | parts inside a device: SMs active, tensor, warps in flight, DRAM read/write, copy engines; CPU cores, L3 | nsys GPU metrics | 100 µs | GPU measured; CPU cores and L3 missing |
-| kernel traffic | one kernel's DRAM and L2 bytes, occupancy, throughput, grid over 36 SMs | ncu | per kernel, profiled iterations only | measured for 235 kernels of iteration 67; tie to the run inferred |
+| device | bytes moving between devices: PCIe copies, network frames, NVMe reads, RAM traffic | memcpy rows with bytes; nsys PCIe RX/TX %; tcpdump; `/proc/diskstats` (P2); `perf` `uncore_imc` (P2) | per copy; 100 µs; per frame; 100 ms; 100 ms | PCIe and network measured; NVMe and RAM bandwidth added in P2 |
+| unit | parts inside a device: SMs active, tensor, warps in flight, DRAM read/write, copy engines; CPU cores, L3 | nsys GPU metrics; `/proc/stat` per core (P2); `perf` `uncore_cbox_*` (P2) | 100 µs; 100 ms; 100 ms | GPU measured; CPU cores and L3 added in P2 |
+| kernel traffic | one kernel's DRAM and L2 bytes, occupancy, throughput, grid over 36 SMs | ncu | per kernel, profiled iterations only | measured for the 266 profiled kernels of iteration 67 in run f2ac52; run R1 (section 7.3) replaces it; tie to the run inferred |
 | SM internals | warps, shared memory, registers, source lines | ncu sections | per kernel | link only (open in Nsight Compute) |
 
 - CPU-side counters are required (owner, 2026-11-08): CPU cores, L3 and RAM bandwidth, stored, not live only. The
-  i9-9900K exposes uncore counters to `perf` (not yet tried). NVMe I/O is needed by I33. Work item M8.
+  kernel exposes `uncore_imc` and `uncore_cbox_0..7` (measured 2026-11-08). `perf` is not installed and
+  `perf_event_paranoid` is 2, so the capture container gets `perf` and `CAP_PERFMON`; the host sysctl stays. NVMe
+  I/O comes from `/proc/diskstats`. Work item P2.
 - Board (probed 2026-11-08): MSI MPG Z390M GAMING EDGE AC; i9-9900K, 8 cores / 16 threads, L3 16 MiB; 62 GiB RAM;
   RTX 5060 Ti, 16 GiB, 36 SMs; PCIe max gen 3, gen 2 x8 at idle (the link trains down at idle); WD_BLACK SN7100.
 - One metric sample (100 µs) covers dozens of 2.3 µs kernels. Hardware state follows an iteration (about 34 samples)
@@ -227,8 +235,9 @@ tier's natural window around the cursor.
 **Stepping.** A step moves to the next stop of the focused position. Execution stops are its units. Hardware stops
 are the events that move data at that tier: transfers at device, kernels at unit, profiled kernels at kernel
 traffic; system and node step on the aligned execution tier. Architecture stops are hand-offs: the request moving to
-another container, process or box. Samples are state, never stops. No stop budget: only real units are stops, and
-the jump check (section 10) guards against a detail kind landing on a stop tier.
+another container, process or box. Samples are state, never stops. No stop budget: only real units are stops. The
+stop check (P1) guards against a detail kind landing on a stop tier: kernel stops must equal the device rows in the
+run's nsys report, and a mutation self-test proves the check fails when a detail kind is mapped to a stop tier.
 
 **Walking every row (owner).** Below the stop tiers, two modes: every row of the focused tier in time order across
 every process, or only the rows of the selected process or object (about 64 detail rows per `linear` call).
@@ -236,32 +245,37 @@ every process, or only the rows of the selected process or object (about 64 deta
 **Process identity and branches (owner).** Every row maps to its process (a row's lane is a thread or stream under
 its process in the things tree, measured). A process or thread that creates another shows the branch at the step
 where it happens. Thread creation is recorded (42 `pthread_create` calls in the timeline run, measured). Process
-creation (the MPI-spawned worker) is missing: it happens before the profiler's capture range. Candidate sources are
-the nsys process table and the container log.
+creation (the MPI-spawned worker) is missing: it happens before the profiler's capture range. P2 adds it: the
+capture container polls the server container's `/proc` every 100 ms and writes a `process start` row per new pid
+(pid, ppid, command, start time from `/proc/<pid>/stat`, 10 ms clock-tick resolution).
 
 ## 4. Fit test: future reps
 
-A rep fits when it only adds registry entries.
+A rep fits when it only adds registry entries. This is a design check, not acceptance: I03 and later reps do not exist
+yet (owner, 2026-11-08). Each change below is built with its rep, not in the migration of section 7.
 
 | rep | adds | verdict |
 | --- | --- | --- |
 | I06, three engines and a hand-written kernel | containers `vllm`, `sglang`; process `double_kernel`; a component map per engine | structure change: `components.json` holds one map; it needs one per engine, keyed by the run's engine |
 | I27, Kubernetes | kind `k8s event` (architecture / container stop); things cluster, control plane component, k8s node, pod | fits; apply-to-ready becomes the stops of architecture / container |
 | I30, TP 8 on 8 GPUs | kind `nccl collective` (execution module, hardware device NVLink, architecture runtime); 8 GPUs, NVLink, 8 ranks | fits as entries; kernel stops grow about 8x, so stepping needs a rule: one GPU, or all ranks in time order |
-| I33, Mooncake KV with NVMe spill | kind `kv transfer` naming source and destination things; container `mooncake_master`; component transfer engine | fits if the row names its things; needs NVMe and RAM bandwidth (M8) |
+| I33, Mooncake KV with NVMe spill | kind `kv transfer` naming source and destination things; container `mooncake_master`; component transfer engine | fits if the row names its things; needs NVMe and RAM bandwidth (P2) |
 
 ## 5. Walkthroughs (acceptance tests for the production build)
 
-- **I02A, which client time is the first token?** Execution / phase: step the request's hops (headers sent by ASGI,
-  role event, first token event). Cross to architecture / component: the ASGI box lights while the worker's forward
-  box is still busy. Cross to hardware / device: the GPU is running prefill when the headers leave. One cursor, three
-  answers. The Rep world's moments 1 to 4 jump to these points.
-- **I03, is decode memory-bound?** Execution / iteration: a decode iteration. Hardware / unit: DRAM read % against
-  SMs active over its 34 samples. Kernel traffic for iteration 67: DRAM bytes per kernel against FLOPs (the roofline
-  point). Stated limit: per kernel only where ncu profiled.
-- **I06, why do decode's projections leave SMs idle?** Execution / module: a `linear` forward (code run). Finer to
-  its GEMM kernel. Hardware / kernel traffic: grid size against 36 SMs, waves, achieved occupancy. Architecture /
-  software layer: TRT-LLM linear (toolkit) through `cudaLaunchKernel` (runtime) to the cuBLAS kernel (device code).
+Only reps that exist are acceptance tests: I02A and I02C today (owner, 2026-11-08). Each walkthrough is a script
+(`devtools/verify/walkthroughs.sh`, built in M1) that drives the page in `ccv` and checks every value against a
+source outside the interface: the run's `latency.json`, its nsys report (`.sqlite`) or its client records.
+
+- **I02A, which client time is the first token?** On run R1. Execution / phase: step the request's hops (headers
+  sent by ASGI, role event, first token event). Cross to architecture / component: the ASGI box lights while the
+  worker's forward box is still busy. Cross to hardware / device: the GPU is running prefill when the headers leave.
+  One cursor, three answers. The Rep world's moments 1 to 4 jump to these points. Checks: each hop's time equals
+  `latency.json` (`wire.headers_ms` and the TTFT segments); the GPU state at the headers time equals the R1 nsys
+  report (a prefill kernel running).
+- **I02C, two requests in flight on one slot.** On an imported I02C run. Execution / request shows two request
+  stops, A and B. Checks: each stop's send and first-content times equal `send_ns` and `first_content_ns` of that
+  client in the run's `readout.json`, moved onto the run clock.
 
 ## 6. Data layer (built: ie-run/3 and `/api/v3`)
 
@@ -274,7 +288,7 @@ adds what the interface needs on top.
   engine stats, docker events. Samples are a separate table of clocked values, never stepped.
 - Total order is `(start, id)`. `id` is dense `0..N-1`; in a final generation it follows `(start_ns, source order)`.
 - Times are Float64 ns from the run's `t0_ns`. `seek` rounds the cursor once, so a fractional ns never exists.
-- Hot columns (the browser holds these, 54 B per row):
+- Hot columns (the browser holds these, 57 B per row; `flow` added in P3):
 
 | column | type | meaning |
 | --- | --- | --- |
@@ -289,12 +303,14 @@ adds what the interface needs on top.
 | `iter` | `<i4` | engine iteration, `-1` = none; a device op takes its launching call's iteration |
 | `parent` | `<i4` | parent row id, `-1` = none |
 | `cause` | `<i4` | cross-lane origin: CUDA launch call for a device op, ZMQ send for a receive; `-1` = none |
-| `name` | `<u4` | string index (`manifest.names`) |
+| `name` | `<u4` | string index (`manifest.names`) of the short name (choice 7) |
 | `bytes` | `<f8` | bytes moved, NaN if none |
+| `layer` | `<i2` | decoder layer of a kernel (RMSNorm rule of `trace/adapters/nsys.py` `layer_of`), `-1` = none |
+| `flow` | `\|u1` | logical flow: 0 request in, 1 prefill, 2 decode loop, 3 stream out, `0xFF` = none |
 
 - Cold columns stay in Parquet; the server answers them by id: `eid` (the stable URL key), `what`, `args`,
   `evidence`, `term`, `source`, `corr`, `quirk`, `parent_rule`, `raw_file`, `raw_ptr`, `code_origin`, `code_where`,
-  `layer` (inferred by the RMSNorm rule of `trace/adapters/nsys.py` `layer_of`).
+  `full_name` (the full demangled name when `name` is shortened).
 - `backend/store/schema.py` is the one column list; `frontend/cc/store/columns.js` mirrors it; `make store-check`
   fails when they differ.
 
@@ -303,7 +319,7 @@ adds what the interface needs on top.
 The store ranks rows on a 7-tier ladder in `devtools/registry/kinds.json`: request, iteration, stage, op, call,
 device, os. Its rungs mix the three dimensions. Tier 4 (call) holds 1,120,878 of 1,140,076 rows in the code run
 (measured), so stepping on it walks about 17,500 rows per iteration. The interface steps on the per-dimension tiers
-of section 3 instead. The storage tier stays as a column until nothing reads it (M10). Kind-by-kind placement is in
+of section 3 instead. The storage tier stays as a column until nothing reads it (M4). Kind-by-kind placement is in
 `design/dimensions/proposal.json` and section 9.
 
 - `derive_tier`: the kind's tier; one finer when nested in the same kind (NVTX only). `tier(child) >= tier(parent)`
@@ -311,6 +327,9 @@ of section 3 instead. The storage tier stays as a column until nothing reads it 
 - The derived iteration (scheduler stamp to the next) has kind `iteration`. The executor's NVTX forward step covers
   only 0.92 ms of a 3.48 ms period (measured), so it is imported as an `nvtx range`. A run with no scheduler stamps
   has no derived iteration rows.
+- A derived iteration ends where its last row ends (device work, NVTX range or stamp carrying its `iter`, whichever
+  ends last), not at the next scheduler stamp. The idle gap between requests belongs to no iteration (choice 5;
+  before P3, iteration 129 of the timeline run spanned 12.55 s across that gap).
 
 ### 6.3 Storage: ie-run/3, one folder per run
 
@@ -397,85 +416,112 @@ hides blocks, CCVB, the socket, dictionaries, indexes, the id map and generation
 
 ### 6.6 Accepted tradeoffs
 
-- Browser memory (10.9 MB for the timeline run, 64 MB budget) for no network on any step, scrub or zoom.
+- Browser memory (10.9 MB for the timeline run, 120 MB for the code run; budget 160 MB per open run, choice 9) for
+  no network on any step, scrub or zoom. Compare holds two runs.
 - Two encodings of the hot columns (Parquet canonical, CCVB derived) for zero-parse loads and DuckDB for agents.
 - A reload (target 250 ms) when a new generation lands, for one id rule per generation.
 
 ## 7. Migration plan: prototype to production
 
-Target: `/static/cc/index.html` is the command center of section 2, drawn from the v3 store. The prototype's files
-move into `devtools/frontend/cc/`; the 3D side-by-side levels go. The verify skill stays where it is
-(`.claude/skills/verify-command-center`, page `/static/cc/index.html`); its recipes change as each step lands.
-`prototypes/D13/regress.sh` becomes the acceptance test, pointed at `/static/cc/index.html`.
+Target: `/static/cc/index.html` is the command center of section 2, drawn only from recorded runs in the v3 store.
+No scratch value ships (owner, 2026-11-08): every number, unit, box and moment on the page comes from a run, the
+registry or a rep file. Three prerequisite steps put the checks (P1), trackers and runs (P2) and data (P3) in place.
+M1 then moves the whole interface at once, Load, Launch and Compare included. M2 to M4 follow on the production
+page. Each step starts only when the previous step's check passes. No open choice blocks a step (section 8).
+
+The prototype's files move into `devtools/frontend/cc/`; the 3D side-by-side levels go in M1. The verify skill stays
+where it is (`.claude/skills/verify-command-center`); M1 rewrites its recipes for the new page.
 
 ### 7.1 What moves where
 
 | prototype (`prototypes/D13/`) | production (`frontend/cc/`) | change |
 | --- | --- | --- |
-| `model.js` (state, frame loop, history, session, keys, hash) | `control/control.js`, `control/keys.js`, `control/url.js` | `Control` gains the D13 state (world, focus, tiers, paired, metric, bounds, playEvent, dock, nav, session, head, follow); one keymap (2.4); the hash of 2.3 replaces `#side?run=&t=…` |
-| `data.js` (scratch units, boxes, samples, metrics) | `store/run.js` plus a per-dimension view of it | every scratch list becomes a `RunStore` query (7.2) |
-| `session.js`, `tools/build_session.py` | `session.js` plus a backend route | the build script becomes `GET /api/v3/reps` (7.2) |
-| `shell.js`, `chrome.js` | `chrome/` | as built |
-| `stage.js`, `worlds/rep.js`, `worlds/stacked.js`, `worlds/spine.js`, `worlds/architecture.js` | `worlds/` | stand-in phase regexes for "show me" become `moments.toml` `event` lookups |
-| `arch.js` | `arch.js` | box state from `activeBy("comp", t)` and things |
-| `hwside.js` | `sidebar/sidebar.js` | rows from the manifest metric catalog (`sidebar: true`) |
+| `model.js` (state, frame loop, history, session, keys, hash) | `control/control.js`, `control/keys.js`, `control/url.js` | `Control` gains the D13 state (world, focus, tiers, paired, metric, bounds, playEvent, dock, nav, session, head, follow); one keymap (2.4); the hash of 2.3 replaces `#side?run=&t=…`; state exposed read-only as `window.__cc` for `ccv` |
+| `data.js` (scratch units, boxes, samples, metrics) | `store/run.js`, registry reads | not copied: every scratch value becomes a store query or a registry read (7.2) |
+| `session.js`, `tools/build_session.py`, `session-data.json` | `session.js` plus `GET /api/v3/reps` (P3) | the snapshot is not copied |
+| `shell.js`, `chrome.js` | `chrome/` | Launch posts `/runner/jobs`; Compare opens two stores |
+| `stage.js`, `worlds/rep.js`, `worlds/stacked.js`, `worlds/spine.js`, `worlds/architecture.js` | `worlds/` | "show me" looks up the moment's `event` in the run; stand-in regexes are not copied |
+| `arch.js` | `arch.js` | box state from `activeBy("comp", t)` and things; the request panel from the cold `args` of client and stamp rows |
+| `hwside.js` | `sidebar/sidebar.js` | rows from the manifest metric catalog (`sidebar: true`), each with its source and measured period |
 | `bar.js` | `control/bar.js`, `inspector/` | tab list already matches `inspector/tabs.js`; keep `nsight.js` links |
 | `zoom.js` | `zoom.js` | as built |
-| (none) | `levels/*`, `scene/*` (3D side-by-side levels) | deleted once the worlds draw from the store; the Stacked world may keep `scene/` helpers it uses |
+| `regress.sh` | `devtools/verify/regress.sh` (P1) | page from `CC_URL`; expectations from the store and rep files |
+| (none) | `levels/*`, `scene/*` (3D side-by-side levels) | deleted in M1; the Stacked world keeps the `scene/` helpers it uses, moved under `worlds/stacked/` |
 
-### 7.2 What the interface needs that the store does not give yet
+### 7.2 Where each scratch value comes from
 
-| need | today | work |
+Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P3" mark the step that adds it.
+
+| D13 scratch value | production source | status |
 | --- | --- | --- |
-| stops per (dimension, tier) | `step` walks the 7-tier storage ladder | M2: placement per dimension in `kinds.json`; `step` by the focused position |
-| layer for every kernel | cold column; the browser repeats the rule | open choice 6 |
-| module in graphs-on runs | missing | M3: sequence-match rule from the code run |
-| flow of each unit (in, prefill, decode, out) | not stored | M4: derive from iteration kind (prefill or decode) and the request's client and server stream rows; store as a hot column or aux |
-| architecture hand-offs | counted ad hoc by `stop_counts.py` | M2 |
-| rep catalog, runs with labels and result summary, moments | `build_session.py` reads the repo | M5: `GET /api/v3/reps` and a result summary per run |
-| launch | runner `POST /runner/jobs` exists | M6: Launch calls it; the live run arrives through `RunWatcher` and the stream |
-| live head and mask | `head_ns` and stream frames exist | M6 |
-| compare | one `RunStore` per page | M7: two stores, A / B switch |
-| CPU cores, L3, RAM bandwidth, NVMe | missing | M8 (owner: required) |
-| more than one request | the v2 scene required one `measured` request; check v3 | M2 check with I02C (two overlapping requests) |
+| execution units (request, iteration, phase, layer, module, kernel) | store rows, placed per dimension by `kinds.json` (P3) | rows measured; placement P3 |
+| kernel grid, block, registers, shared memory | cold `args` of each kernel row (nsys) | measured |
+| kernel DRAM and L2 bytes, occupancy, throughput | `profiles.parquet` (ncu), profiled iteration only; other kernels say "not profiled" | measured (f2ac52; R1) |
+| transfers (hardware / device stops) | memcpy and memset rows with bytes | measured |
+| flow of each unit | hot `flow` column (P3 rule) | P3 |
+| architecture things, 26 component boxes | manifest `things`; `registry/components.json` | measured |
+| hardware things | `inventory.json` through the manifest | measured |
+| SMs active, DRAM read/write, PCIe, warps, copy engines | nsys GPU metrics (replay, 100 µs); NVML GPM (live, 100 ms) | measured |
+| GPU utilization, VRAM, SM clock, power, temperature | `nvidia-smi` `gpu.csv`; NVML 50 ms and 500 ms groups | measured (run 1d82c9) |
+| per-container CPU, memory, network | Docker stats sample groups | measured (stored since run 1d82c9) |
+| host CPU % (total and per core), RAM used | `/proc/stat`, `/proc/meminfo` at 100 ms (P2) | P2 |
+| L3 and RAM bandwidth | `perf stat -I 100` on `uncore_cbox_*` and `uncore_imc` (P2) | P2 |
+| NVMe I/O | `/proc/diskstats` for the SN7100 at 100 ms (P2) | P2 |
+| process starts (the MPI-spawned worker) | `/proc` poll of the server container, kind `process start` (P2) | P2 |
+| request payload per step | cold `args` of client request and stamp rows | measured |
+| calculated metrics and their inputs | `aux.json` | measured |
+| rep catalog, runs, result summaries | `GET /api/v3/reps` (P3) | P3 |
+| key moments | `moments.toml` per rep; `event` resolved against the run's names (P3 lint) | I02A file exists |
+| live head and mask | `head_ns` and stream frames | measured |
 
-### 7.3 Steps (each ends in a check)
+### 7.3 Runs to record (owner approved, 2026-11-08)
+
+- **R1, the reference run.** I02A `timeline` action with every P2 tracker on, then its `kernels` (ncu) run on the
+  same prompt, tied by the rule of `registry/ncu.json` (iteration 67). R1 replaces f2ac52 as the run with ncu
+  counters and 1d82c9 as the newest timeline run. `regress.sh` and the I02A walkthrough run on R1. Its run ids go in
+  the decision log when recorded.
+- **I02C.** No new recording first. P2 fixes the importer and imports `I02C_20261107T181031Z_5626f7` and
+  `I02C_20261107T181629Z_c37c3e`. `I02C_20261107T180301Z_e0e4f0` has no clock anchor and stays unimported, with
+  its reason in the import log. If either run still stops after the fix, record one I02C run (approved).
+- **M1's Launch check** records one I02A `off` run through the runner (approved).
+- The code run `I02A-TRACE-code_20261103T170709Z_0ac2db` stays the module source; no re-recording.
+
+### 7.4 Steps (each ends in a check that can fail)
 
 | step | change | check |
 | --- | --- | --- |
-| M1 shell on the store | `cc/` gets the D13 chrome, stage, worlds, bar and sidebar; Rep world reads results from the run folder; worlds still on scratch data | `regress.sh` passes on `/static/cc/index.html`; 0 console errors |
-| M2 dimensions in the data | `kinds.json` gains each kind's place per dimension and the hand-off rule; `RunStore.step` steps by (dimension, tier) | `stop_counts.py` jump check passes; `ccv` steps a code-run iteration with no crawl; I02C shows both requests |
-| M3 module inference | module rule for graphs-on runs | timeline run has module stops; counts match the code run's per-iteration pattern |
-| M4 flows | flow per unit | flow colours on real runs; stream out overlaps the next decode pass |
-| M5 real worlds | every world draws from `RunStore`; "show me" uses `moments.toml` `event`; scratch `data.js` deleted | walkthroughs of section 5 done in the interface |
-| M6 launch and live | Launch posts `/runner/jobs`; live via `RunWatcher` and the stream; mask and follow | a launched I02A run is followed live and becomes a replay at its end with no command |
-| M7 compare | two runs, A / B in replay worlds | Rep world deltas equal `latency.json` differences |
-| M8 CPU-side counters | `perf` uncore (L3, RAM bandwidth), per-core CPU, Docker stats stored, NVMe I/O | values in the sidebar with source and period; stored in replay |
-| M9 rep files | `moments.toml` and `rep.toml` for every rep | the Rep world lists moments for every rep with results |
-| M10 retire | delete `levels/`, `scene/` remnants, `store_v2.py` and `/api/v2`, `prototypes/D1`, `D2`, `D5v2`, `D13`, the v2 collectors once unused, the storage `tier` column once nothing reads it; the v1 page stays until the owner retires it | no surface in section 9 points at a removed item; `make store-check` passes |
+| P1 checks that can fail | Merge `v2-scene` into `main` (choice 11); the container mounts one checkout. `regress.sh` moves to `devtools/verify/`, reads its page from `CC_URL` (default `/static/cc/index.html`), stops on its first check when `window.__cc` is missing, asserts a non-null value before every before / after comparison, and reads expected values from the store and files (run list from `/api/v3/runs`, TTFT from that run's `latency.json`, moment count from `moments.toml`, box count from `components.json`), never literals. History moves to `[` `]`; Alt ← → walks rows (choice 4). The runner gains `dry_run` on `POST /runner/jobs` (validates the action and options, returns the job, starts nothing); `regress.sh` launches with it. `stop_counts.py` reads placement from `registry/kinds.json` (the file `RunStore` reads), drops the jump check, and asserts per run: kernel stops equal the kernel, memcpy and memset rows of the run's nsys `.sqlite` (39,768 for f2ac52, measured); detail is never negative; every row has one tier per dimension. `stop_counts.py --self-test` maps `cuda runtime call` to phase and must exit 1. `map_surfaces.py` reads D13 and `cc/` instead of D5v2 and `cc/levels/`, and fails when a new place names a world or tier missing from the ladders. D13 sets `window.__cc` too. | Against the current `/static/cc/index.html`, `regress.sh` exits 1 at its first check (today 12 of 50 pass on a page without the state handle). `stop_counts.py --self-test` exits 1. `stop_counts.py` and `map_surfaces.py` exit 0 on every stored run. `make store-check` passes. |
+| P2 trackers, importer, runs | The capture container records host CPU % (total and per core) and RAM used from `/proc` at 100 ms; L3 and RAM bandwidth with `perf stat -I 100` on `uncore_cbox_*` and `uncore_imc` (`perf` installed in the image, `CAP_PERFMON`); NVMe I/O from `/proc/diskstats`; process starts from a `/proc` poll of the server container (new kind `process start`). Each source has one adapter for live and final (6.5), and each metric names its source and measured period in the catalog. The importer turns the run.json Prometheus scrape spans into samples of group `prometheus` (today an I02C import stops on `prometheus/baseline/line 103`). Record R1; import R1 and the two I02C runs (7.3). | R1's manifest has every new metric group, with `period_ns_measured` near 100 ms. Under a 10 s memory load, the tracker's RAM bandwidth is within 5% of a standalone `perf stat -a -e uncore_imc/data_reads/,uncore_imc/data_writes/` over the same 10 s, and host CPU % is within 2 points of `mpstat 1`. R1 has a `process start` row for the executor worker. R1's ncu profiles cover every kernel of iteration 67 with matching names. Both I02C runs import. `make store-check` passes. |
+| P3 data shape | `kinds.json` gains each kind's place per dimension and the hand-off rule (from `design/dimensions/proposal.json`, then deleted); `RunStore.step` steps by (dimension, tier); the every-row walk has its two modes (3.4). Kernel short names (choice 7). Derived iterations end at their last row (choice 5). Lane `gpu0/stream 4294967295` is labelled "no stream" (choice 8). Hot column `flow`: prefill or decode from the iteration's kind, request in and stream out from the request's client and server stream rows. `GET /api/v3/reps`: reps, `rep.toml` actions, README sections, moments, and the store's runs with labels and a `latency.json` summary, or "results not computed". A moments lint resolves every `at` and `evidence` path and every `event` in each run of the rep. `schema.py`, `columns.js` and the CCVB writer gain `flow` and cold `full_name`. | `stop_counts.py` exits 0 and its self-test exits 1. In `ccv`, `RunStore.step` counts per tier equal `stop_counts.py` for R1 and the code run. No device row is named bare `kernel` (12,096 of 39,768 today). No derived iteration in R1 contains a 100 ms span with no row of its own. Each R1 stream-out unit overlaps the next decode iteration, and its time range matches the client's token arrival times and `frames.tsv`. An I02C run steps through two request stops. The moments lint passes for I02A. `make store-check` passes. |
+| M1 production cutover | `cc/` gets the D13 chrome, stage, four worlds, bar, sidebar and shell, drawn only from `RunStore`, the registry and `/api/v3/reps`. Load replays any stored run; Launch posts `/runner/jobs` and follows the live run through `RunWatcher` and the stream, with mask and follow; Compare opens two stores with the A / B switch (choice 3). "Show me" uses the moment's `event`. `levels/` and `scene/` are deleted; `data.js` and `session-data.json` are not copied. The verify recipes are rewritten for the new page, one per world plus Load, Launch, Compare and the inspector. `walkthroughs.sh` (section 5) is written. | `regress.sh` passes on `/static/cc/index.html` with R1, with 0 console errors. `walkthroughs.sh` passes. `cc/` contains no `scratch`, `stand-in` or `simulated` text and no import from `prototypes/`. One real Launch of I02A `off`: followed live, the shown head equals the stream's `head_ns`, and at its end it becomes a replay with no command; `make store-check` passes on it (live eids in final). Compare: B − A in the Rep world equals TTFT recomputed from each run's client rows in the store, not read from `latency.json`. The sidebar's DRAM % at an R1 cursor equals the nsys GPU metrics of that 100 µs window in R1's `.sqlite`. The code run opens within 160 MB (`ccv perf`). |
+| M2 module inference | Graphs-on runs get module rows by matching kernel sequences against the code run's modules. Until then their module tier says "missing" (3.1). | For R1, every inferred module's kernel names equal the code run's for that module; each module span contains its kernels; unmatched kernels per iteration are counted and shown (286 against 207 kernels per iteration, measured, so 1:1 cannot hold); per-name kernel totals equal `nsys stats -r cuda_gpu_kern_sum` for R1. |
+| M3 rep files | `moments.toml` and `rep.toml` for every rep with recorded runs: I01A, I01B, I01C, I01-L2, I02A, I02B, I02C. | The moments lint passes for every rep. The Rep world lists moments for each, and `regress.sh` passes. |
+| M4 retire | Delete `store_v2.py` and `/api/v2`, `prototypes/D1`, `D2`, `D5v2`, `D13`, the v2 collectors, the legacy D5v2 recipes, and the storage `tier` column once nothing reads it. The v1 page stays until the owner retires it. Deleting `/mnt/ie-data/cc-v2-proto` (29 GB, the v2 store) is data deletion: the owner confirms it at M4 (choice 1). | `map_surfaces.py` exits 0 reading only `cc/` and v1. A grep of `devtools/` and the skill finds no removed path. `regress.sh` passes with 0 failed requests in the console log. `make store-check` passes. |
 
-M10 also covers `/mnt/ie-data/cc-v2-proto` (29 GB, the v2 store). Deleting it is data deletion and waits for the
-owner. `map_surfaces.py` reads `prototypes/D5v2/base/model.js`, so it changes before D5v2 goes.
+## 8. Resolved choices (owner, 2026-11-08, on the agent's recommendation)
 
-## 8. Open choices (owner)
-
-1. **v2 alongside during the migration.** The v2 store and D5v2 stay until M10; the verify skill opens D5v2 only for
-   legacy recipes.
-2. **Snap-to-tier zoom.** Each dimension keeps its own tier (settled). Open: semantic zoom that snaps to tier bounds.
-3. **Compare as a split.** Initial layout: A / B switch. Open: a split into two full worlds once per-run events exist.
-4. **Key for walking every row.** Alt ← → is given to walking every row (owner) and, in the prototype, to
-   back / forward. Proposed: history on `[` and `]`.
-5. **A derived iteration across an idle gap.** In the timeline run iteration 129 runs 12.55 s, across the gap between
-   requests. End it at the request end, or at its last device work? (`derive.py`)
-6. **`layer` hot or cold.** Make it a hot column (`<i2`, +2 B per row), or keep the browser copy of the rule?
-7. **Kernel short names.** 12,096 of 39,768 device rows are named `kernel` (templated GEMMs). Carry a short name that
-   tells GEMMs apart, full name cold?
-8. **Stream id -1.** Lane `gpu0/stream 4294967295` (2,392 rows). Name it "no stream", or keep the raw id?
-9. **Browser memory for the code run.** 120 MB against a 64 MB budget. Integer GPU attributes, fine blocks on
-   demand, a run-size budget, or accept it?
-10. **Kernel duration unit.** The v2 scene showed "replay 2.176 ns" for a kernel; likely a unit bug (not verified on
-    v3, which scales ncu units on import).
-11. **Merge into main.** Later (owner, 2026-11-08). `main` has one commit touching 10 of the same files.
+1. **v2 alongside during the migration.** The v2 store and D5v2 stay read-only until M4. The verify skill opens D5v2
+   only for legacy recipes. M4 removes the code; the owner confirms deleting the 29 GB v2 store at M4.
+2. **Snap-to-tier zoom.** No snap. Flying to a tier already sets that tier's natural window (3.4); wheel zoom stays
+   free from 0.5x to 16x.
+3. **Compare as a split.** No split. The A / B switch is final; the Rep world shows A, B, B − A and %.
+4. **Key for walking every row.** Alt ← → walks every row (owner). Back / forward moves to `[` and `]`.
+5. **A derived iteration across an idle gap.** An iteration ends where its last row ends (6.2), so the gap between
+   requests belongs to no iteration. `derive.py`, P3.
+6. **`layer` hot or cold.** Already hot (measured 2026-11-08): `schema.py` and `columns.js` carry `layer <i2`, and
+   the browser holds no copy of the rule. Closed; the earlier 7.2 row was stale.
+7. **Kernel short names.** Yes. The hot `name` is a short name: the demangled function's base name, and when that
+   base is generic (`kernel`, `Kernel`, `Kernel2`, `device_kernel`), the leaf identifier of its first template
+   argument appended. The full demangled name moves to cold `full_name`. P3.
+8. **Stream id -1.** The lane is labelled "no stream"; the inspector shows the raw id 4294967295. P3.
+9. **Browser memory for the code run.** Accept it: the budget is 160 MB per open run (6.6), so the code run (120 MB)
+   loads whole and stepping keeps needing no network. Fine blocks on demand would put the network back on the step
+   path. The host has 62 GiB of RAM.
+10. **Kernel duration unit.** No bug in v3 (measured 2026-11-08): ncu durations are stored in ns (`unit_rule`
+    "report value in us times 1000 = ns"); the shortest profiled kernel in f2ac52 is 1,536 ns, and its profiled
+    kernel rows have a median of 2,320 ns. Closed.
+11. **Merge into main.** Before P1, replacing "later". The dev server reads rep files from the main checkout
+    (`/repo`), which has no `moments.toml`, and the runner records from `main`, so P2's trackers must be on `main`.
 
 ## 9. Map of every current surface
 
@@ -848,3 +894,8 @@ Reading the counts:
 | 2026-11-08 | The verify skill stays in place; production is built to it | owner |
 | 2026-11-08 | CPU-side counters are required | owner |
 | 2026-11-08 | Merge into main later | owner |
+| 2026-11-08 | Production carries no scratch value; M1 moves the whole interface, Load, Launch and Compare included; trackers added and runs re-recorded as needed (R1, section 7.3) | owner |
+| 2026-11-08 | I03 and later reps are not acceptance criteria; they do not exist yet. Section 5 holds I02A and I02C only | owner |
+| 2026-11-08 | Open choices 1 to 11 resolved as in section 8; merge into main moves before P1, replacing "later" | owner (agent recommendation) |
+| 2026-11-08 | Plan re-sequenced after review: P1 checks, P2 trackers and runs, P3 data, M1 cutover, M2 modules, M3 rep files, M4 retire | owner |
+| 2026-11-08 | M4 may delete the v2 store (29 GB). D13 stays until production and D13 are both verified with the verify-command-center skill as identical in layout and function; then D13 is deleted | owner |
