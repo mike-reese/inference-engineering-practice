@@ -229,7 +229,12 @@ check "launch: live mode" "$(ev '__cc.session.mode')" "live"
 h1=$(ev '__cc.head'); sleep 0.5
 check "launch: head moves" "$(real "$h1" && ev "__cc.head > $h1 && $h1 > 0")" "True"
 check "launch: follow keeps cursor at head" "$(ev 'Math.abs(__cc.t-__cc.head) <= __cc.head*0.2')" "True"
-check "launch: spine masks the future" "$(ev "+document.querySelector('#stage .sp2 svg rect[fill=\"#0b0f16\"]').getAttribute('width') > 0")" "True"
+# The mask is 0 while the view glides (220 ms) to new bounds and the head is still right of it: poll for up to 1 s.
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  mask=$(ev "+document.querySelector('#stage .sp2 svg rect[fill=\"#0b0f16\"]').getAttribute('width') > 0")
+  [ "$mask" = True ] && break; sleep 0.1
+done
+check "launch: spine masks the future" "$mask" "True"
 $C shot regress-live >/dev/null
 $C click --css ".ch-nav [data-sh=follow]" >/dev/null; sleep 0.3
 check "launch: follow off" "$(ev '__cc.follow')" "False"
