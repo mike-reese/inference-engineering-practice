@@ -1,161 +1,255 @@
-"""Stop counts per tier of each dimension, for every run in the ie-run/3 store (COMMAND_CENTER.md, section 10).
+"""Stop counts per tier of each dimension, and the stop check, for every run in the ie-run/3 store (COMMAND_CENTER.md,
+sections 3.4 and 10).
 
-A stop is a place the cursor lands when stepping at that tier. The tier rules live in proposal.json; this script only
-applies them. Run: uv run --no-project --with duckdb python design/dimensions/stop_counts.py [--write]
---write replaces the block between the gen:stops markers in COMMAND_CENTER.md. Exits 1 when the jump check
-flags a tier.
+Placement comes from devtools/registry/kinds.json: each kind's place per dimension, a ladder tier, "detail", "-", or a
+rule that picks per row. A kernel stop (a kernel, memcpy or memset row) also claims its cause, the call that launched
+it, as its CPU side: the same stop, not a second one.
+
+The stop check, per run; exits 1 on any failure:
+  - kernel stops equal the kernel, memcpy and memset rows of the run's own device trace, the files the importer reads:
+    trace/*.sqlite (Nsight Systems CUPTI tables) and trace/torch_trace.json (PyTorch profiler); 0 with neither;
+  - every row has one tier per dimension: its kind has a valid place in each, and no row is claimed by two execution
+    tiers (its kind's place and the CPU side of a kernel stop);
+  - detail, the rows no stop tier claims, is never negative.
+--self-test maps "cuda runtime call" to phase. The launch calls are then claimed twice, so it must exit 1.
+
+Run: uv run --no-project --with duckdb python design/dimensions/stop_counts.py [--write | --self-test]
+--write replaces the block between the gen:stops markers in COMMAND_CENTER.md.
 """
 import argparse
 import json
 import re
+import sqlite3
 import sys
 from pathlib import Path
 
 import duckdb
+import numpy as np
 
 HERE = Path(__file__).parent
-DOC = HERE.parent.parent / "COMMAND_CENTER.md"
+REPO = HERE.parent.parent
+DOC = REPO / "COMMAND_CENTER.md"
+KINDS = REPO / "devtools/registry/kinds.json"
 STORE = Path("/mnt/ie-data/cc/store/runs")
 NONE16 = 65535
+RULES = ("top-level", "launch", "module forward", "profiled")
+NSYS_DEVICE = ("CUPTI_ACTIVITY_KIND_KERNEL", "CUPTI_ACTIVITY_KIND_MEMCPY", "CUPTI_ACTIVITY_KIND_MEMSET")
+TORCH_DEVICE = {"kernel", "gpu_memcpy", "gpu_memset"}
+DETAIL, UNPLACED = -1, -2
 
 
-def run_counts(con, run_dir: Path, P: dict) -> dict:
+def tier_of(value: str) -> str:
+    """'kernel (CPU side)' -> 'kernel': the bracket says what the row lands on, not which tier."""
+    return value.split(" (")[0]
+
+
+def check_places(reg: dict) -> list[str]:
+    ladders, bad = reg["ladders"], []
+    for k in reg["kinds"]:
+        place = k.get("place") or {}
+        if set(place) != set(ladders):
+            bad.append(f"kind {k['kind']!r}: place names {sorted(place)}, not each of {list(ladders)}")
+            continue
+        for dim, v in place.items():
+            if isinstance(v, dict) and (v.get("if") not in RULES or set(v) - {"if", "then", "else", "match"}):
+                bad.append(f"kind {k['kind']!r}: {dim} rule {v} is not one of {RULES} with then and else")
+                continue
+            for out in ([v] if isinstance(v, str) else [v.get("then"), v.get("else")]):
+                if not isinstance(out, str) or tier_of(out) not in [*ladders[dim], "detail", "-"]:
+                    bad.append(f"kind {k['kind']!r}: {dim} place {out!r} is not a tier of {dim}, detail or -")
+    return bad
+
+
+def device_trace(run_dir: Path | None) -> tuple[str, int | None]:
+    if run_dir is None:
+        return "none (no run folder)", 0
+    if not run_dir.is_dir():
+        return f"{run_dir} is missing", None
+    found, n = [], 0
+    for db in sorted(run_dir.glob("trace/*.sqlite")):
+        con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+        have = {r[0] for r in con.execute("select name from sqlite_master where type = 'table'")}
+        n += sum(con.execute(f"select count(*) from {t}").fetchone()[0] for t in NSYS_DEVICE if t in have)
+        found.append(db.name)
+    torch = run_dir / "trace" / "torch_trace.json"
+    if torch.is_file():
+        n += sum(e.get("ph") == "X" and e.get("cat") in TORCH_DEVICE for e in json.loads(torch.read_bytes())["traceEvents"])
+        found.append(torch.name)
+    return ", ".join(found) or "none", n
+
+
+def run_counts(con, run_dir: Path, reg: dict, place: dict) -> dict:
     m = json.loads((run_dir / "manifest.json").read_text())
     g = run_dir / f"g{m['generation']}"
-    kinds = [k["name"] for k in m["kinds"]]
-    names = m["names"]
-    things = m["things"]
-    con.sql(f"create or replace table e as select * from read_parquet('{g}/events-*.parquet', union_by_name=true)")
-    rows = con.sql("select id, start, kind, tier, name, iter, layer, comp, lane, req from e order by start, id").fetchall()
-    by_kind = {}
-    for r in rows:
-        by_kind.setdefault(kinds[r[2]], []).append(r)
+    kinds, names, things = [k["name"] for k in m["kinds"]], m["names"], m["things"]
+    h = con.sql(f"select id, start, kind, tier, name, iter, layer, comp, req, cause from read_parquet("
+                f"'{g}/events-*.parquet', union_by_name=true) order by start, id").fetchnumpy()
+    h = {k: np.ma.filled(v, -1) if np.ma.isMaskedArray(v) else np.asarray(v) for k, v in h.items()}
+    n, K = len(h["id"]), h["kind"]
+    ladders, base = reg["ladders"], {k["kind"]: k["tier"] for k in reg["kinds"]}
+    bad = [f"kind {kinds[c]!r} ({int((K == c).sum()):,} rows) has no place in kinds.json"
+           for c in np.unique(K) if kinds[c] not in place]
 
-    ex = P["execution_rules"]
-    module_re = re.compile(ex["module_name_regex"])
-    launch_re = re.compile(ex["launch_name_regex"])
-    c = {}
-    c["request"] = sum(len(by_kind.get(k, [])) for k in ex["request"])
-    c["iteration"] = sum(len(by_kind.get(k, [])) for k in ex["iteration"])
-    c["phase"] = sum(len(by_kind.get(k, [])) for k in ex["phase"]) + sum(
-        1 for r in by_kind.get("nvtx range", []) if r[3] == ex["phase_nvtx_tier"])
-    device = [r for k in ex["kernel"] for r in by_kind.get(k, [])]
-    device.sort(key=lambda r: (r[1], r[0]))
-    prev, layers = None, 0
-    for r in device:
-        if r[6] < 0:
-            continue
-        key = (r[5], r[6])
-        if key != prev:
-            layers += 1
-        prev = key
-    c["layer"] = layers
-    c["module"] = sum(1 for r in by_kind.get("python call", []) if module_re.search(names[r[4]]))
-    c["kernel"] = len(device)
-    stops = sum(c.values()) - c["layer"]
-    c["detail"] = len(rows) - stops
+    def plain(dim, tier):
+        return [c for c, k in enumerate(kinds) if isinstance(place.get(k, {}).get(dim), str)
+                and tier_of(place[k][dim]) == tier]
+    device = np.isin(K, plain("execution", "kernel"))
+    causes = h["cause"][device]
+    launch_ids = np.unique(causes[causes >= 0])
+    profiled_ids = np.array([], np.int64)
+    if (g / "profiles.parquet").exists():
+        profiled_ids = con.sql(f"select distinct event_id from '{g / 'profiles.parquet'}' where event_id >= 0"
+                               ).fetchnumpy()["event_id"]
 
-    iters = c["iteration"] or len({r[5] for r in rows if r[5] is not None and r[5] >= 0})
-    launches = sum(1 for k in ("cuda runtime call", "cuda driver call") for r in by_kind.get(k, [])
-                   if launch_re.search(names[r[4]]))
+    def when(rule, kind, sel):
+        if rule["if"] == "top-level":
+            return h["tier"][sel] == base[kind]
+        if rule["if"] == "launch":
+            return np.isin(h["id"][sel], launch_ids)
+        if rule["if"] == "profiled":
+            return np.isin(h["id"][sel], profiled_ids)
+        rx, codes = re.compile(rule["match"]), h["name"][sel]
+        hit = {int(c): bool(rx.search(names[c])) for c in np.unique(codes)}
+        return np.array([hit[int(c)] for c in codes], bool)
+
+    def tiers(dim):
+        """Each row's tier index in the dimension's ladder, DETAIL for detail or -, UNPLACED for an unknown kind."""
+        out, code = np.full(n, UNPLACED, np.int8), lambda v: ladders[dim].index(tier_of(v)) \
+            if tier_of(v) in ladders[dim] else DETAIL
+        for c in np.unique(K):
+            kind, sel = kinds[c], np.flatnonzero(K == c)
+            v = place.get(kind, {}).get(dim)
+            if v is None:
+                continue
+            out[sel] = code(v) if isinstance(v, str) else np.where(when(v, kind, sel), code(v["then"]), code(v["else"]))
+        return out
+
+    ex, hw = tiers("execution"), tiers("hardware")
+    for dim, t in (("execution", ex), ("hardware", hw), ("architecture", tiers("architecture"))):
+        if (t == UNPLACED).any():
+            bad.append(f"{dim}: {int((t == UNPLACED).sum()):,} rows have no tier")
+    KERNEL = ladders["execution"].index("kernel")
+    side = np.isin(h["id"], launch_ids)
+    twice = side & (ex != KERNEL)
+    if twice.any():
+        first = int(np.flatnonzero(twice)[0])
+        bad.append(f"{int(twice.sum()):,} rows on two execution tiers, the CPU side of a kernel stop and their kind's "
+                   f"{ladders['execution'][ex[first]] if ex[first] >= 0 else 'detail'} (first row {int(h['id'][first])}, "
+                   f"{kinds[K[first]]} {names[h['name'][first]]})")
+    c = {t: int(((ex == i) & ~side).sum()) for i, t in enumerate(ladders["execution"])}
+    claimed = int((ex >= 0).sum() + twice.sum())
+    c["detail"] = n - claimed
+    if c["detail"] < 0:
+        bad.append(f"detail is {c['detail']:,}: stop tiers claim more rows than the run has")
+    source, want = device_trace(REPO / m["source"]["run_dir"] if m["source"].get("run_dir") else None)
+    if want is None:
+        bad.append(f"device trace: {source}")
+    elif c["kernel"] != want:
+        bad.append(f"kernel stops {c['kernel']:,} differ from the {want:,} kernel, memcpy and memset rows of {source}")
+
+    order = np.flatnonzero(device & (h["layer"] >= 0))
+    keys = list(zip(h["iter"][order].tolist(), h["layer"][order].tolist()))
+    c["layer"] = sum(1 for i, k in enumerate(keys) if i == 0 or k != keys[i - 1])
+    iters = c["iteration"] or len(np.unique(h["iter"][h["iter"] >= 0]))
 
     def path(i, depth):
-        parts = things[i]["key"].split("/")
-        return "/".join(parts[:depth])
-    hand = {"container": 0, "process": 0, "component": 0}
-    last = {}
-    for r in rows:
-        if r[7] is None or r[7] == NONE16 or r[9] is None or r[9] < 0:
+        return "/".join(things[i]["key"].split("/")[:depth])
+    hand, last = {"container": 0, "process": 0, "component": 0}, {}
+    for comp, req in zip(h["comp"].tolist(), h["req"].tolist()):
+        if comp < 0 or comp == NONE16 or req < 0:
             continue
         for tier, depth in (("container", 3), ("process", 4), ("component", 99)):
-            p = path(r[7], depth)
-            if last.get((r[9], tier)) is not None and p != last[(r[9], tier)]:
+            p = path(comp, depth)
+            if last.get((req, tier)) is not None and p != last[(req, tier)]:
                 hand[tier] += 1
-            last[(r[9], tier)] = p
+            last[(req, tier)] = p
 
     samples = {}
     for f in sorted(g.glob("samples-*.parquet")):
-        n, med = con.sql(f"select count(*), median(d) from (select ts_ns - lag(ts_ns) over (order by ts_ns) d from '{f}')").fetchall()[0]
-        samples[f.stem.removeprefix("samples-")] = (n, med)
-    profiled = 0
-    if (g / "profiles.parquet").exists():
-        profiled = con.sql(f"select count(distinct event_id) from '{g / 'profiles.parquet'}'").fetchall()[0][0]
-    return {"rows": len(rows), "iters": iters, "exec": c, "launches": launches, "hand": hand,
-            "transfers": sum(len(by_kind.get(k, [])) for k in ("memcpy", "memset")), "samples": samples,
-            "profiled": profiled}
+        k, med = con.sql(f"select count(*), median(d) from (select ts_ns - lag(ts_ns) over (order by ts_ns) d "
+                         f"from '{f}')").fetchall()[0]
+        samples[f.stem.removeprefix("samples-")] = (k, med)
+    return {"rows": n, "iters": iters, "exec": c, "launches": len(launch_ids), "hand": hand, "samples": samples,
+            "hw": {t: int((device & (hw == i)).sum()) for i, t in enumerate(ladders["hardware"])},
+            "source": source, "want": want, "twice": int(twice.sum()), "bad": bad}
 
 
-STOP_TIERS = ["request", "iteration", "phase", "layer", "module", "kernel"]
-JUMP = 3
-
-
-def level_and_time(run: str) -> tuple[str, str]:
-    m = re.search(r"-TRACE-(\w+?)_(\d{8}T\d{6}Z)_", run) or re.search(r"()_(\d{8}T\d{6}Z)_", run)
-    return (m[1] or "measured", m[2]) if m else ("unknown", run)
-
-
-def jumps(results: dict) -> list[str]:
-    """A tier whose stops per iteration exceed JUMP times the largest earlier run of the same trace level: a row kind
-    that should be detail has probably been mapped to a stop tier (the Tier 4 mistake)."""
-    seen, flags = {}, []
-    for run in sorted(results, key=lambda r: level_and_time(r)[1]):
-        R, level = results[run], level_and_time(run)[0]
-        if not R["iters"]:
-            continue
-        for t in STOP_TIERS:
-            per = R["exec"][t] / R["iters"]
-            prior = seen.get((level, t), 0)
-            if prior and per > JUMP * prior:
-                flags.append(f"{run}: {t} {per:,.0f} stops per iteration, over {JUMP} x {prior:,.0f} (earlier {level} runs)")
-            seen[(level, t)] = max(prior, per)
-    return flags
-
-
-def table(results: dict, flags: list[str]) -> str:
-    tiers = STOP_TIERS + ["detail"]
-    out = ["Execution stops (own tier). Per iteration in brackets. `detail` rows are never stops.", "",
+def table(reg: dict, results: dict, skipped: list[str]) -> str:
+    tiers = reg["ladders"]["execution"] + ["detail"]
+    out = ["Execution stops (own tier), per iteration in brackets. `layer` groups kernel rows by decoder layer. A kernel "
+           "stop's launch call is its CPU side (launches, below): the same stop, not detail. `detail` is the rows no "
+           "stop tier claims; they are never stops.", "",
            "| run | rows | iterations | " + " | ".join(tiers) + " |", "| --- " * (3 + len(tiers)) + "|"]
     for run, R in results.items():
         cells = []
         for t in tiers:
-            n = R["exec"][t]
-            per = n / R["iters"] if R["iters"] else None
-            cells.append(f"{n:,}" + (f" ({per:,.0f})" if per is not None else ""))
+            k = R["exec"][t]
+            cells.append(f"{k:,}" + (f" ({k / R['iters']:,.0f})" if R["iters"] else ""))
         out.append(f"| {run} | {R['rows']:,} | {R['iters']} | " + " | ".join(cells) + " |")
-    out += ["", f"Jump check (a stop tier above {JUMP} times its largest earlier run of the same trace level): " +
-            ("no jumps." if not flags else f"{len(flags)} flagged."), ""] + [f"- {f}" for f in flags]
-    out += ["", "Hardware and architecture stops.", "",
-            "| run | transfers | launches | container hand-offs | process hand-offs | component hand-offs | ncu-profiled |",
-            "| --- | --- | --- | --- | --- | --- | --- |"]
+    out += ["", "Stop check: kernel stops equal the kernel, memcpy and memset rows of the run's device trace; no row is "
+            "on two execution tiers; detail is not negative.", "",
+            "| run | device trace | trace rows | kernel stops | rows on two tiers | result |",
+            "| --- | --- | --- | --- | --- | --- |"]
+    for run, R in results.items():
+        want = "n/a" if R["want"] is None else f"{R['want']:,}"
+        out.append(f"| {run} | {R['source']} | {want} | {R['exec']['kernel']:,} | {R['twice']:,} | "
+                   f"{'FAIL: ' + '; '.join(R['bad']) if R['bad'] else 'ok'} |")
+    if skipped:
+        out += ["", "Not counted: " + "; ".join(skipped) + "."]
+    hw = [t for t in reg["ladders"]["hardware"] if any(R["hw"][t] for R in results.values())]
+    out += ["", "Hardware and architecture stops. Hardware: kernel stops at their hardware tier (kinds.json). "
+            "Architecture: hand-offs of a request to another container, process or component.", "",
+            "| run | " + " | ".join(f"hardware {t}" for t in hw) + " | launches | container hand-offs | "
+            "process hand-offs | component hand-offs |", "| --- " * (5 + len(hw)) + "|"]
     for run, R in results.items():
         h = R["hand"]
-        out.append(f"| {run} | {R['transfers']:,} | {R['launches']:,} | {h['container']:,} | {h['process']:,} | "
-                   f"{h['component']:,} | {R['profiled']:,} |")
+        out.append(f"| {run} | " + " | ".join(f"{R['hw'][t]:,}" for t in hw) + f" | {R['launches']:,} | "
+                   f"{h['container']:,} | {h['process']:,} | {h['component']:,} |")
     out += ["", "Hardware samples (state, not stops): count and median period.", "",
             "| run | sample group | samples | median period |", "| --- | --- | --- | --- |"]
     for run, R in results.items():
-        for grp, (n, med) in R["samples"].items():
-            out.append(f"| {run} | {grp} | {n:,} | {med / 1e3:,.0f} µs |" if med else f"| {run} | {grp} | {n:,} | n/a |")
+        for grp, (k, med) in R["samples"].items():
+            out.append(f"| {run} | {grp} | {k:,} | {med / 1e3:,.0f} µs |" if med else f"| {run} | {grp} | {k:,} | n/a |")
     return "\n".join(out)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--write", action="store_true")
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument("--write", action="store_true")
+    mode.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
-    P = json.loads((HERE / "proposal.json").read_text())
+    reg = json.loads(KINDS.read_text())
+    place = {k["kind"]: dict(k["place"]) for k in reg["kinds"] if k.get("place")}
+    if a.self_test:
+        place["cuda runtime call"]["execution"] = "phase"
+        print("self-test: cuda runtime call placed at execution / phase; the stop check must fail\n", file=sys.stderr)
+    problems = check_places(reg)
     con = duckdb.connect()
-    results = {d.name: run_counts(con, d, P) for d in sorted(STORE.iterdir())
-               if (d / "manifest.json").exists() and json.loads((d / "manifest.json").read_text())["generation"] > 0}
-    flags = jumps(results)
-    md = table(results, flags)
+    results, skipped = {}, []
+    for d in sorted(STORE.iterdir()):
+        if not (d / "manifest.json").exists():
+            continue
+        m = json.loads((d / "manifest.json").read_text())
+        if not list((d / f"g{m['generation']}").glob("events-*.parquet")):
+            skipped.append(f"{d.name} ({m['source'].get('live') or m['status']}, no events)")
+            continue
+        if m["status"] == "live":
+            skipped.append(f"{d.name} (live; counted after its final import)")
+            continue
+        results[d.name] = run_counts(con, d, reg, place)
+    md = table(reg, results, skipped)
     print(md)
-    if a.write:
+    failed = problems + [f"{run}: {b}" for run, R in results.items() for b in R["bad"]]
+    print(f"\nstop check: {len(results)} runs, {len(failed)} failures", file=sys.stderr)
+    for f in failed:
+        print("FAIL " + f, file=sys.stderr)
+    if a.write and not failed:
         text = DOC.read_text()
-        new = re.sub(r"(<!-- gen:stops -->\n).*?(<!-- /gen:stops -->)", lambda m: m[1] + md + "\n" + m[2], text, flags=re.S)
+        new = re.sub(r"(<!-- gen:stops -->\n).*?(<!-- /gen:stops -->)", lambda x: x[1] + md + "\n" + x[2], text, flags=re.S)
         assert new != text or md in text, "gen:stops markers not found in the doc"
         DOC.write_text(new)
-    sys.exit(1 if flags else 0)
+    sys.exit(1 if failed else 0)
 
 
 if __name__ == "__main__":

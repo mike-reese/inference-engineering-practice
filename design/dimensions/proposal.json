@@ -1,19 +1,5 @@
 {
-  "_doc": "The three-dimension proposal as data (COMMAND_CENTER.md). Ladders: each dimension's tiers, coarse to fine. execution_rules: how a stored row becomes an execution stop (stop_counts.py). kinds: every registry kind placed in each dimension. surfaces: every current level, tier, view, panel and control, with its new home or 'dropped' or 'owner' (an open choice). map_surfaces.py fails when a current surface has no entry here. Proposal only: nothing reads this at runtime.",
-  "ladders": {
-    "execution": ["request", "iteration", "phase", "layer", "module", "kernel"],
-    "hardware": ["system", "node", "device", "unit", "kernel traffic", "SM internals"],
-    "architecture": ["fleet", "node", "container", "process", "component", "software layer"]
-  },
-  "execution_rules": {
-    "request": ["client request"],
-    "iteration": ["iteration"],
-    "phase": ["component stamp", "client event", "client transport", "network frame"],
-    "phase_nvtx_tier": 2,
-    "module_name_regex": "^tensorrt_llm/_torch/(modules|attention_backend|distributed)/[^()]+\\(\\d+\\): forward$",
-    "launch_name_regex": "^(cudaLaunchKernel|cudaLaunchKernelExC|cuLaunchKernel|cuLaunchKernelEx|cudaMemcpyAsync|cudaMemsetAsync|cudaGraphLaunch)",
-    "kernel": ["kernel", "memcpy", "memset"]
-  },
+  "_doc": "The three-dimension proposal as data (COMMAND_CENTER.md). Ladders and execution placement moved to devtools/registry/kinds.json (P1). kinds: every registry kind placed in each dimension. surfaces: every current level, tier, view, panel and control, with its new home or 'dropped' or 'owner' (an open choice). map_surfaces.py fails when a current surface has no entry here. Proposal only: nothing reads this at runtime.",
   "kinds": {
     "client request":       {"execution": "request",           "hardware": "-",                  "architecture": "component (client boxes)"},
     "container event":      {"execution": "detail",            "hardware": "-",                  "architecture": "container (lifecycle stop)"},
