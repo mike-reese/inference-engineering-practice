@@ -39,6 +39,10 @@ const STOPS = {
   ],
 };
 for (const d of DIMS) for (const s of STOPS[d]) s.sort((a, b) => a.t - b.t);
+/** Rows per (dimension, tier) for the every-row walk (section 3.4): the stops without the stop rule, so the
+ *  architecture box tiers list every phase instead of only the hand-offs. */
+const boxRows = (tier) => units(2).map((p) => ({ t: p.t0, ref: p.id, label: byId.get(archAncestor(p.comp, tier))?.name }));
+const ROWS = { ...STOPS, architecture: STOPS.architecture.map((s, i) => (i >= 2 && i <= 4 ? boxRows(i) : s)) };
 
 export const state = {
   world: "rep", focus: "execution", tiers: { execution: 2, hardware: 2, architecture: 4 }, paired: false,   // independent by default (owner, 2026-11-08)
@@ -99,6 +103,13 @@ export function step(dir, coarser = false) {
   const S = stops(state.focus, tier);
   const s = dir > 0 ? S.find((x) => x.t > state.t + 1e-6 && x.t <= state.head) : [...S].reverse().find((x) => x.t < state.t - 1e-6);
   if (s) { state.t = s.t; state.sel = s.ref; emit(); }
+}
+/** Alt ← →: the previous / next row of the focused tier, every row in time order across every process. */
+export function walkRow(dir) {
+  const R = ROWS[state.focus][tierOf()];
+  const i = R.findIndex((x) => x.ref === state.sel && x.t === state.t);
+  const r = i >= 0 ? R[i + dir] : dir > 0 ? R.find((x) => x.t > state.t + 1e-6) : R.findLast((x) => x.t < state.t - 1e-6);
+  if (r && r.t <= state.head) { state.t = r.t; state.sel = r.ref; emit(); }
 }
 export function seek(t) { state.t = Math.max(0, Math.min(state.head, t)); if (state.head < END) state.follow = false; rebound(); emit(); }
 
@@ -239,14 +250,16 @@ export const data = { LADDERS, ALIGN, EXEC, ARCH, HW, TRANSFERS, SAMPLES, END, b
 export const KEYS = [
   ["← →", "previous / next stop of the focused tier"], ["Shift ← →", "stop one tier coarser"],
   ["↑ ↓", "fly one tier coarser / finer"], ["E H A", "focus execution / hardware / architecture"],
-  ["1-6", "tier n of the focused dimension"], ["P", "paired / independent tiers"], ["W", "switch world view"],
+  ["1-6", "tier n of the focused dimension"], ["P", "paired / independent tiers"], ["W", "next world"],
   ["D", "dock bottom / right"], ["Space", "play every event in the bounds, looping"], ["T", "pace: events / time"],
-  ["Alt ← →", "back / forward through selections"],
+  ["Alt ← →", "previous / next row of the focused tier (walk every row, section 3.4)"],
+  ["[ ]", "back / forward through selections (choice 4)"],
 ];
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input, textarea, select")) return;
   const k = e.key;
-  if (e.altKey && (k === "ArrowLeft" || k === "ArrowRight")) (k === "ArrowLeft" ? goBack : goForward)();
+  if (e.altKey && (k === "ArrowLeft" || k === "ArrowRight")) walkRow(k === "ArrowLeft" ? -1 : +1);
+  else if (k === "[") goBack(); else if (k === "]") goForward();
   else if (k === "ArrowRight") step(+1, e.shiftKey); else if (k === "ArrowLeft") step(-1, e.shiftKey);
   else if (k === "ArrowUp") fly(-1); else if (k === "ArrowDown") fly(+1);
   else if ("ehaEHA".includes(k) && k.length === 1) focus({ e: "execution", h: "hardware", a: "architecture" }[k.toLowerCase()]);

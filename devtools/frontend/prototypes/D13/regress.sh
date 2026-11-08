@@ -56,7 +56,7 @@ check "history: back restores the tab" "$(ev '__d13.dock.tab')" "selected"
 $C click --css ".b-hist[aria-label=Back]" >/dev/null; sleep 0.3
 check "history: back again reaches the first click's page" "$(ev '__d13.sel')" "$sel"
 $C click --css ".b-hist[aria-label=Forward]" >/dev/null; sleep 0.2
-ev "(()=>{dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',altKey:true,bubbles:true}));return 1})()" >/dev/null; sleep 0.3
+$C key "]" >/dev/null; sleep 0.3
 check "history: forward twice returns" "$(ev '__d13.sel')" "$picked"
 check "history: forward disabled at the end" "$(ev "document.querySelector('.b-hist[aria-label=Forward]').disabled")" "True"
 $C key 5 >/dev/null; sleep 0.2

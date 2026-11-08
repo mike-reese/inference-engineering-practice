@@ -35,6 +35,6 @@
   mountHardwareSide(document.getElementById("hw"));
   mountStage(document.getElementById("stage"));
   subscribe((s) => { document.body.className = `dock-${s.dock.pos}${s.dock.open ? "" : " dock-closed"}`; });
-  window.__d12 = window.__d13 = state; // for ccv checks
+  window.__d12 = window.__d13 = window.__cc = state; // for ccv checks (__cc: devtools/verify/regress.sh)
 </script>
 </body></html>

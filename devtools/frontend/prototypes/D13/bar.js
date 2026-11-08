@@ -332,7 +332,7 @@ const tabOf = (s) => TABS.find((t) => t.key === (OLD_TAB[s.dock.tab] ?? s.dock.t
 export function mountBar(el) {
   const css = document.createElement("style"); css.textContent = CSS; document.head.append(css);
   el.innerHTML = `<div class="b-grip" title="drag to resize"></div>
-    <div class="b-tabs" role="tablist"><button data-act="hist-back" class="b-hist" aria-label="Back" title="back to the previous selection and tab (Alt ←)">←</button><button data-act="hist-fwd" class="b-hist" aria-label="Forward" title="forward again (Alt →)">→</button>${TABS.map((t) => `<button role="tab" data-act="tab" data-tab="${t.key}">${t.label}</button>`).join("")}
+    <div class="b-tabs" role="tablist"><button data-act="hist-back" class="b-hist" aria-label="Back" title="back to the previous selection and tab ([)">←</button><button data-act="hist-fwd" class="b-hist" aria-label="Forward" title="forward again (])">→</button>${TABS.map((t) => `<button role="tab" data-act="tab" data-tab="${t.key}">${t.label}</button>`).join("")}
       <span class="sp"></span><button data-act="pos" class="b-pos"></button><button data-act="big" title="enlarge or shrink the bar" aria-label="enlarge or shrink the bar">⤢</button></div>
     <div class="b-body" role="tabpanel"></div>
     <div class="b-transport">
