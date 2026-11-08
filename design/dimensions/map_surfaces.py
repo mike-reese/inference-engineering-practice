@@ -1,14 +1,17 @@
 """Old-to-new map of every current surface (COMMAND_CENTER.md, section 9).
 
-Finds the current tiers and kinds (registry/kinds.json), v3 levels (cc/levels/index.js), v2 levels (D5v2 model.js),
-v1 views (frontend/index.html), panels (cc/sidebar, cc/inspector, cc/control/bar.js) and controls (cc/control/keys.js)
-from the source, and looks each one up in proposal.json. Exits 1 when a surface has no entry or an entry matches no
-surface. Run: python3 design/dimensions/map_surfaces.py [--write]
+Finds the storage tiers, kinds and each kind's place (registry/kinds.json), the D13 worlds (prototypes/D13/model.js),
+the v1 views (frontend/index.html), the cc panels (cc/sidebar, cc/inspector, cc/control/bar.js) and controls
+(cc/control/keys.js) from the source, and looks each one up in proposal.json. Exits 1 when a surface has no entry, an
+entry matches no surface, or a new place names a tier missing from the ladders ("execution / phase") or a world D13
+does not draw ("Rep world"). Run: python3 design/dimensions/map_surfaces.py [--write]
 """
 import json
 import re
 import sys
 from pathlib import Path
+
+from places import check_places, load, text
 
 HERE = Path(__file__).parent
 REPO = HERE.parent.parent
@@ -16,13 +19,15 @@ FE = REPO / "devtools/frontend"
 DOC = REPO / "COMMAND_CENTER.md"
 
 
-def current() -> list[tuple[str, str]]:
-    reg = json.loads((REPO / "devtools/registry/kinds.json").read_text())
+def worlds() -> list[str]:
+    body = re.search(r"export const WORLDS = (\[.*?\]\]);", (FE / "prototypes/D13/model.js").read_text())[1]
+    return [name for _, name in json.loads(body)]
+
+
+def current(reg: dict) -> list[tuple[str, str]]:
     s = [("tier", t) for t in reg["tiers"]]
     s += [("kind", k["kind"]) for k in reg["kinds"]]
-    s += [("v3 level", n) for n in re.findall(r'name: "([^"]+)"', (FE / "cc/levels/index.js").read_text())]
-    names = re.search(r"NAMES = \[([^\]]+)\]", (FE / "prototypes/D5v2/base/model.js").read_text())[1]
-    s += [("v2 level", n) for n in re.findall(r'"([^"]+)"', names)]
+    s += [("D13 world", w) for w in worlds()]
     s += [("v1 view", v) for v in dict.fromkeys(re.findall(r'data-view="([a-z_]+)"', (FE / "index.html").read_text()))]
     s += [("panel", p) for p, f in (("sidebar", "cc/sidebar/sidebar.js"), ("inspector", "cc/inspector/inspector.js"),
                                     ("bar", "cc/control/bar.js")) if (FE / f).exists()]
@@ -33,41 +38,62 @@ def current() -> list[tuple[str, str]]:
     return s
 
 
+def unknown_names(place: str, ladders: dict, world_names: list[str]) -> list[str]:
+    """Each 'dimension / tier[ and tier]' must start with ladder tiers; each '<Name> world' must be a D13 world."""
+    bad = []
+    for dim, rest in re.findall(r"\b(execution|hardware|architecture) / ([^;,]+)", place):
+        tiers = sorted(ladders[dim], key=len, reverse=True)
+        while True:
+            hit = next((t for t in tiers if rest == t or rest.startswith(t + " ")), None)
+            if hit is None:
+                bad.append(f"{dim} / {rest}: no {dim} tier {ladders[dim]}")
+                break
+            rest = rest[len(hit):]
+            if not rest.startswith(" and "):
+                break
+            rest = rest[len(" and "):]
+    for name in re.findall(r"\b([A-Z][a-z]+) world\b", place):
+        if name not in world_names and f"{name} world" not in world_names:
+            bad.append(f"{name} world: D13 draws {world_names}")
+    return bad
+
+
 def main():
-    P = json.loads((HERE / "proposal.json").read_text())
-    surf, kinds = P["surfaces"], P["kinds"]
-    found = current()
-    rows, missing = [], []
+    reg = load()
+    surf = json.loads((HERE / "proposal.json").read_text())["surfaces"]
+    place = {k["kind"]: k["place"] for k in reg["kinds"] if k.get("place")}
+    world_names = worlds()
+    found = current(reg)
+    rows, missing, wrong = [], [], [f"kinds.json: {b}" for b in check_places(reg)]
     for typ, name in found:
         if typ == "kind":
-            k = kinds.get(name)
-            if not k:
-                missing.append(f"kind:{name}")
-                continue
-            rows.append((typ, name, f"execution: {k['execution']}; hardware: {k['hardware']}; "
-                                     f"architecture: {k['architecture']}"))
+            p = place.get(name)
+            new = p and "; ".join(f"{dim}: {text(p[dim])}" for dim in reg["ladders"])
         else:
-            e = surf.get(f"{typ}:{name}")
-            if not e:
-                missing.append(f"{typ}:{name}")
-                continue
-            rows.append((typ, name, e["new"]))
+            new = surf.get(f"{typ}:{name}", {}).get("new")
+        if not new:
+            missing.append(f"{typ}:{name}")
+            continue
+        rows.append((typ, name, new))
+        wrong += [f"{typ}:{name}: {b}" for b in unknown_names(new, reg["ladders"], world_names)]
     keys = {f"{t}:{n}" for t, n in found}
-    stale = [k for k in surf if k not in keys] + [f"kind:{k}" for k in kinds if f"kind:{k}" not in keys]
+    stale = [k for k in surf if k not in keys]
     md = "\n".join(["| type | current | new place |", "| --- | --- | --- |"] +
                    [f"| {t} | {n} | {p} |" for t, n, p in rows])
     print(md)
-    print(f"\n{len(rows)} surfaces mapped, {len(missing)} missing, {len(stale)} stale", file=sys.stderr)
-    for m in missing:
-        print(f"missing: {m}", file=sys.stderr)
-    for s in stale:
-        print(f"stale: {s}", file=sys.stderr)
-    if "--write" in sys.argv:
-        text = DOC.read_text()
-        new = re.sub(r"(<!-- gen:surfaces -->\n).*?(<!-- /gen:surfaces -->)", lambda m: m[1] + md + "\n" + m[2], text, flags=re.S)
-        assert new != text or md in text, "gen:surfaces markers not found in the doc"
+    print(f"\n{len(rows)} surfaces mapped, {len(missing)} missing, {len(stale)} stale, {len(wrong)} naming a tier or "
+          f"world that does not exist", file=sys.stderr)
+    for kind, items in (("missing", missing), ("stale", stale), ("unknown", wrong)):
+        for x in items:
+            print(f"{kind}: {x}", file=sys.stderr)
+    failed = missing or stale or wrong
+    if "--write" in sys.argv and not failed:
+        doc = DOC.read_text()
+        new = re.sub(r"(<!-- gen:surfaces -->\n).*?(<!-- /gen:surfaces -->)", lambda m: m[1] + md + "\n" + m[2], doc,
+                     flags=re.S)
+        assert new != doc or md in doc, "gen:surfaces markers not found in the doc"
         DOC.write_text(new)
-    sys.exit(1 if missing or stale else 0)
+    sys.exit(1 if failed else 0)
 
 
 if __name__ == "__main__":

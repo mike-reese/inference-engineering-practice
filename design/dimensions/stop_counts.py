@@ -26,38 +26,16 @@ from pathlib import Path
 import duckdb
 import numpy as np
 
+from places import check_places, load, tier_of
+
 HERE = Path(__file__).parent
 REPO = HERE.parent.parent
 DOC = REPO / "COMMAND_CENTER.md"
-KINDS = REPO / "devtools/registry/kinds.json"
 STORE = Path("/mnt/ie-data/cc/store/runs")
 NONE16 = 65535
-RULES = ("top-level", "launch", "module forward", "profiled")
 NSYS_DEVICE = ("CUPTI_ACTIVITY_KIND_KERNEL", "CUPTI_ACTIVITY_KIND_MEMCPY", "CUPTI_ACTIVITY_KIND_MEMSET")
 TORCH_DEVICE = {"kernel", "gpu_memcpy", "gpu_memset"}
 DETAIL, UNPLACED = -1, -2
-
-
-def tier_of(value: str) -> str:
-    """'kernel (CPU side)' -> 'kernel': the bracket says what the row lands on, not which tier."""
-    return value.split(" (")[0]
-
-
-def check_places(reg: dict) -> list[str]:
-    ladders, bad = reg["ladders"], []
-    for k in reg["kinds"]:
-        place = k.get("place") or {}
-        if set(place) != set(ladders):
-            bad.append(f"kind {k['kind']!r}: place names {sorted(place)}, not each of {list(ladders)}")
-            continue
-        for dim, v in place.items():
-            if isinstance(v, dict) and (v.get("if") not in RULES or set(v) - {"if", "then", "else", "match"}):
-                bad.append(f"kind {k['kind']!r}: {dim} rule {v} is not one of {RULES} with then and else")
-                continue
-            for out in ([v] if isinstance(v, str) else [v.get("then"), v.get("else")]):
-                if not isinstance(out, str) or tier_of(out) not in [*ladders[dim], "detail", "-"]:
-                    bad.append(f"kind {k['kind']!r}: {dim} place {out!r} is not a tier of {dim}, detail or -")
-    return bad
 
 
 def device_trace(run_dir: Path | None) -> tuple[str, int | None]:
@@ -219,7 +197,7 @@ def main():
     mode.add_argument("--write", action="store_true")
     mode.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
-    reg = json.loads(KINDS.read_text())
+    reg = load()
     place = {k["kind"]: dict(k["place"]) for k in reg["kinds"] if k.get("place")}
     if a.self_test:
         place["cuda runtime call"]["execution"] = "phase"
