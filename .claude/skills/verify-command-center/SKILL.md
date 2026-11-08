@@ -5,7 +5,7 @@ description: Verify the inference-engineering command center v2 (the three.js si
 
 # Verify the command center as a user
 
-The command center v2 is a web page: a three.js scene (WebGL canvas plus CSS3D panels and CSS2D labels), a header of level buttons, a right-hand flyout of tabs, and a timeline footer. It must be verified in a **real, headed Chromium with the real GPU**: headless rendering (SwiftShader) gets WebGL, CSS3D, wheel zoom and frame timing wrong. `ccv` launches our own Chromium on Mike's desktop and drives it with real input events over the Chrome DevTools Protocol. Mike can watch the window while you work.
+The command center v2 is a web page: a three.js scene (WebGL canvas plus CSS3D panels and CSS2D labels), a header of level buttons, a right-hand flyout of tabs, and a timeline footer. It must be verified in a **real, headed Chromium with the real GPU**: headless rendering (SwiftShader) gets WebGL, CSS3D, wheel zoom and frame timing wrong. `ccv` launches our own Chromium on a hidden Hyprland monitor and drives it with real input events over the Chrome DevTools Protocol. Mike keeps working on his own screens; nothing you do may move his focus or cursor. See **Hidden monitor**.
 
 Layout rule (owner, 2026-11-08): verify **only the side-by-side page** (`/static/prototypes/D5v2/side/index.html`). Never open the flat, nested or split pages.
 
@@ -18,13 +18,38 @@ CCV=~/Work/Code/Personal/inference-engineering-practice-v2scene/devtools/verify/
 ## Launch
 
 1. The app server: `docker start ie-devtools-v2scene` (port 7710; devtools and `src` from the `v2-scene` worktree, run folders from the main checkout, v2 store read-only). For the Run tab, the host runner: `make runner` in `~/Work/Code/Personal/inference-engineering-practice`. A backend change needs `docker restart ie-devtools-v2scene`; a frontend change needs only a reload (`$CCV open side`).
-2. The browser: `$CCV launch --session <feature-or-task>`. Ready when the output has `"ready": {"scene": true, "ready": true}`: the page set `window.READY` after loading the run from the store and drawing the levels. The window is tiled by Hyprland, so the viewport is whatever the window gets; `$CCV state` reports it.
+2. The browser: `export CCV_SESSION=<feature-or-task>`, then `$CCV launch` (half tile, the default and the minimum) or `$CCV launch --size full`. Ready when the output has `"ready": {"scene": true, "ready": true}`: the page set `window.READY` after loading the run from the store and drawing the levels. The output also names the `workspace`, `tile` and `viewport`.
 
-One browser per machine (port 9333, profile in `~/.local/state/inference-engineering/ccv/profile`). `launch` refuses when one is already running or when port 9333 answers but is not ours. Reuse the running one (`doctor` first) rather than starting another. Never attach to Mike's own browser.
+## Sessions
+
+Several agents verify at once. Each session is its own Chromium with its own profile, CDP port (9340-9399) and evidence folder, in its own tile on `CCV-1`.
+
+| `--size` | Window | Viewport | Per workspace |
+| --- | --- | --- | --- |
+| `half` (default, minimum) | 1259x1388 | 1259x1301 | 2 (left, right) |
+| `full` | 2534x1388 | 2534x1301 | 1 |
+
+- Workspaces 21-30 hold up to 20 half or 10 full sessions. `launch` packs halves next to halves and refuses when no tile of the asked size is free.
+- Every command acts on one session: set `CCV_SESSION` once per shell, or pass `--session NAME`. With exactly one session running, the name may be left out. Use a name unique to your task, so you never drive another agent's browser.
+- `$CCV sessions` lists the running sessions with their workspace, tile and port. Never close or drive a session you did not launch.
+- Recipe numbers that depend on width (window lengths after a wheel zoom, tick counts, drag targets) hold for one tile size. A recipe states the size its numbers assume; launch that size to reproduce them.
+- Never attach to Mike's own browser.
+
+## Hidden monitor
+
+Owner rule (2026-11-08): never switch Mike's focus, not even for a moment.
+
+- The browsers run on `CCV-1`, a 2560x1440 Hyprland headless output at 20000,20000 that no screen shows, with Mike's tile geometry. Hyprland creates it at start from `~/.config/hypr/ccv-agent.lua` and pins workspaces 21-30 to it. It uses the real GPU (WebGL renders on the RTX 5060 Ti).
+- Only one workspace of `CCV-1` is shown. The `render_unfocused` window rule keeps sending frame callbacks to agent windows on the others at 60 Hz, so every session draws and its screenshots return. Mike's screens run at 144 Hz, so compare frame timings only between runs on `CCV-1`.
+- Every CDP call times out after 30 s with an error naming the method, so a stuck browser fails a command instead of blocking it. Run `$CCV doctor` when that happens.
+- `launch` gives each Chromium the app id `ccv-agent-<session>` and a floating tile on its workspace, placed with `silent`. It refuses when `CCV-1` is missing, not 2560x1440 or not off-screen, and closes the browser when the window lands outside its tile or the viewport is below 1259x1301. `doctor` checks the tile, the frame rate and the viewport.
+- Chromium asks for window activation on every synthetic click. The `ccv-agent-*` window rule (`suppress_event`, `no_focus`) drops that request. Keys, scrolling and screenshots work without focus (`Emulation.setFocusEmulationEnabled`).
+- Never create, remove or reconfigure an output, and never run `hyprctl reload`, `hyprctl dispatch` or focus and workspace commands: each one can move Mike's focus. If `CCV-1` is missing, stop and tell Mike; the fix (`hyprctl output create headless CCV-1`) is his to run.
+- Mike sees the page through your evidence: `--after` screenshots, `$CCV shot`, `$CCV state`.
 
 ## Doctor
 
-`$CCV doctor` is read-only. It passes only when the browser is ours and alive, CDP answers, the app server and v2 store answer, the runner answers, the page is the app, and the scene is READY. Run it first, and again whenever anything looks wrong.
+`$CCV doctor` is read-only. It passes only when the session's browser is ours and alive, CDP answers, the window is in its tile on `CCV-1`, frames are drawn, the viewport is at least 1259x1301, the app server and v2 store answer, the runner answers, the page is the app, and the scene is READY. Run it first, and again whenever anything looks wrong.
 
 ## Drive
 
@@ -64,7 +89,7 @@ Proof standard:
 
 ## Cleanup
 
-`$CCV close` stops only the Chromium and watcher that `launch` recorded (process groups from `browser.json`), then removes `browser.json`. Evidence stays in `/mnt/ie-data/cc-v2-verify/evidence/<session>/`. Never kill Chromium by name: Mike's own browser is also Chromium. Leave `ie-devtools-v2scene` and the runner running unless Mike says otherwise; they are his.
+`$CCV close` stops only this session's Chromium and watcher (process groups from its record), frees its tile and deletes its profile. Close every session you launched when you finish. Evidence stays in `/mnt/ie-data/cc-v2-verify/evidence/<session>/`. Never kill Chromium by name: Mike's own browser is also Chromium. Leave `ie-devtools-v2scene` and the runner running unless Mike says otherwise; they are his.
 
 Do not click `Start` in the Run tab (it runs a GPU job on the shared machine and writes a run folder) unless the task or Mike asks for a run. See `features/run-launcher.md`.
 
@@ -76,7 +101,7 @@ Do not click `Start` in the Run tab (it runs a GPU job on the shared machine and
 | `devtools/verify/ccv.mjs` | run through `ccv` | launch, CDP input, observation, evidence logging |
 | console watcher | started by `$CCV launch` (`ccv.mjs _watch`); stopped by `$CCV close` | records console messages, page errors and navigations to `console.jsonl` |
 
-`launch` writes `~/.local/state/inference-engineering/ccv/browser.json` (`pid`, `watcher`, `port`, `session`); `close` reads it. Environment overrides: `CCV_PORT` (9333), `CCV_APP` (`http://127.0.0.1:7710`), `CCV_EVIDENCE`, `CCV_STATE`, `CCV_CHROMIUM` (`/usr/bin/chromium`), `CCV_SESSION`.
+`launch` writes one record per session in `~/.local/state/inference-engineering/ccv/sessions/<session>.json` (`pid`, `watcher`, `port`, `profile`, `workspace`, `tile`); a lock in the same folder serializes concurrent launches. Environment: `CCV_SESSION`, `CCV_APP` (`http://127.0.0.1:7710`), `CCV_EVIDENCE`, `CCV_STATE`, `CCV_CHROMIUM` (`/usr/bin/chromium`).
 
 ## Feature map
 

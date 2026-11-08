@@ -3,28 +3,41 @@
 // Real GPU WebGL, real input events (Input.dispatchMouseEvent / dispatchKeyEvent), shadow DOM and CSS3D panels included.
 // No dependencies: Node's built-in fetch and WebSocket. Every command prints one JSON object and logs itself to the
 // session's actions.jsonl. Run `ccv help` for the commands.
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 
-const PORT = Number(process.env.CCV_PORT || 9333);
 const APP = process.env.CCV_APP || "http://127.0.0.1:7710";
 const SIDE = `${APP}/static/prototypes/D5v2/side/index.html`;
 const STATE = process.env.CCV_STATE || path.join(os.homedir(), ".local/state/inference-engineering/ccv");
+const SESSIONS = path.join(STATE, "sessions");
 const EVIDENCE_ROOT = process.env.CCV_EVIDENCE || "/mnt/ie-data/cc-v2-verify/evidence";
 const BROWSER = process.env.CCV_CHROMIUM || "/usr/bin/chromium";
-const INFO = path.join(STATE, "browser.json");
-const VIEW = { width: 1800, height: 1000 };
+// Agent browsers live on CCV-1, a Hyprland headless output nobody sees, sized like Mike's 2560x1440 screens. Each
+// session reserves a floating tile on one of its workspaces. Chromium asks for window activation on every synthetic
+// click; the rule in SEAT.config drops that request, so Mike keeps his focus.
+const SEAT = { output: "CCV-1", workspaces: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30], app_prefix: "ccv-agent-", config: "~/.config/hypr/ccv-agent.lua", ports: [9340, 9399] };
+// Mike's tiled window geometry on a 2560x1440 monitor (gaps included). Half is the minimum size (owner, 2026-11-08).
+const TILES = {
+  half: [{ side: "left", size: [1259, 1388], at: [13, 39] }, { side: "right", size: [1259, 1388], at: [1288, 39] }],
+  full: [{ side: "both", size: [2534, 1388], at: [13, 39] }],
+};
+const MIN_VIEW = { width: 1259, height: 1301 };   // measured viewport of a half tile
 
-const HELP = `ccv: verify the command center as a user, in a real browser (CDP, port ${PORT})
+const HELP = `ccv: verify the command center as a user, in a real browser on the hidden monitor ${SEAT.output}
+
+Every command acts on one session: --session NAME or CCV_SESSION (optional when exactly one session runs).
 
 Session
-  launch [--url U] [--session NAME]   start our own headed Chromium (own profile) on the side view; wait until READY
-  doctor                              read-only health: browser ours and up, page on ${APP}, server, store, READY
+  launch [--session NAME] [--size half|full] [--url U]
+                                      start our own headed Chromium (own profile and port) in a half (default) or full tile
+                                      on a free ${SEAT.output} workspace (${SEAT.workspaces[0]}-${SEAT.workspaces.at(-1)}); wait until READY
+  sessions                            the running sessions: workspace, tile, port
+  doctor                              read-only health: browser ours and up, tile and frames, page on ${APP}, server, store, READY
   open [URL|side]                     navigate like the address bar; waits for READY on scene pages
   back | forward                      the browser's Back / Forward buttons (history entries, hash changes included)
-  close                               stop the browser and console watcher we started; evidence stays
+  close                               stop this session's browser and console watcher, free its tile; evidence stays
 
 Act (real input events; a target outside the viewport is scrolled into view first; it must then be visible and not covered)
   click   TARGET [--frac fx,fy] [--button left|right|middle] [--count 2]
@@ -48,7 +61,7 @@ Observe
   console [--tail N]                  console messages and page errors since launch
   eval JS                             READ-ONLY probe; never use it to change app state
 
-Environment: CCV_PORT CCV_APP CCV_EVIDENCE CCV_STATE CCV_CHROMIUM CCV_SESSION
+Environment: CCV_SESSION CCV_APP CCV_EVIDENCE CCV_STATE CCV_CHROMIUM
 `;
 
 // ---------------------------------------------------------------- args
@@ -63,14 +76,39 @@ function parse(argv) {
 }
 const pair = (s) => s.split(",").map(Number);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const readInfo = () => { try { return JSON.parse(fs.readFileSync(INFO, "utf8")); } catch { return null; } };
 const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
 
-function session(info = readInfo()) {
-  const name = process.env.CCV_SESSION || info?.session || "adhoc";
-  const dir = path.join(EVIDENCE_ROOT, name);
+// ---------------------------------------------------------------- sessions
+// One record per session in STATE/sessions: { session, pid, watcher, port, profile, app_id, workspace, size, side, headless }.
+const slug = (name) => name.replace(/[^\w.-]/g, "_");
+const recPath = (name) => path.join(SESSIONS, `${slug(name)}.json`);
+const readRec = (name) => { try { return JSON.parse(fs.readFileSync(recPath(name), "utf8")); } catch { return null; } };
+const writeRec = (rec) => { fs.mkdirSync(SESSIONS, { recursive: true }); fs.writeFileSync(recPath(rec.session), JSON.stringify(rec)); };
+function records() {
+  fs.mkdirSync(SESSIONS, { recursive: true });
+  return fs.readdirSync(SESSIONS).filter((f) => f.endsWith(".json")).map((f) => readRec(f.slice(0, -5))).filter(Boolean);
+}
+const liveRecs = () => records().filter((r) => alive(r.pid));
+
+let NAME = null;   // the session this command acts on (resolveName)
+function resolveName(cmd, opt) {
+  const name = opt.session || process.env.CCV_SESSION;
+  if (name) return name;
+  if (cmd === "launch") return new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+  if (["help", "sessions"].includes(cmd) || !cmd) return null;
+  const live = liveRecs();
+  if (live.length === 1) return live[0].session;
+  throw new Error(live.length ? `${live.length} sessions are running (${live.map((r) => r.session).join(", ")}): pass --session NAME or set CCV_SESSION` : "no session is running: ccv launch --session NAME");
+}
+function session() {
+  const dir = path.join(EVIDENCE_ROOT, NAME || "adhoc");
   fs.mkdirSync(dir, { recursive: true });
   return dir;
+}
+function liveRec() {
+  const rec = readRec(NAME);
+  if (!rec || !alive(rec.pid)) throw new Error(`session ${NAME} is not running: ccv launch --session ${NAME}`);
+  return rec;
 }
 function logAction(entry) {
   fs.appendFileSync(path.join(session(), "actions.jsonl"), JSON.stringify({ at: new Date().toISOString(), ...entry }) + "\n");
@@ -78,7 +116,7 @@ function logAction(entry) {
 
 // ---------------------------------------------------------------- CDP
 class CDP {
-  static async attach(port = PORT) {
+  static async attach(port = liveRec().port) {
     const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
     const page = list.find((t) => t.type === "page" && !t.url.startsWith("devtools://"));
     if (!page) throw new Error("no page target: run `ccv launch` (or `ccv open side`)");
@@ -96,7 +134,13 @@ class CDP {
       else if (d.method) this.handlers.forEach((h) => h(d));
     };
   }
-  send(method, params = {}) { const id = ++this.id; this.ws.send(JSON.stringify({ id, method, params })); return new Promise((ok, bad) => this.wait.set(id, [ok, bad])); }
+  send(method, params = {}, timeout = 30000) {
+    const id = ++this.id; this.ws.send(JSON.stringify({ id, method, params }));
+    return new Promise((ok, bad) => {
+      const timer = setTimeout(() => { this.wait.delete(id); bad(new Error(`CDP ${method} did not answer in ${timeout / 1000} s (ccv doctor)`)); }, timeout);
+      this.wait.set(id, [(v) => { clearTimeout(timer); ok(v); }, (e) => { clearTimeout(timer); bad(e); }]);
+    });
+  }
   on(fn) { this.handlers.push(fn); }
   close() { this.ws.close(); }
   async eval(expr, awaitPromise = true) {
@@ -222,28 +266,95 @@ async function waitReady(c, timeout = 60000) {
   }
   throw new Error(`page not READY after ${timeout} ms (run ccv console for page errors)`);
 }
-async function versionInfo() { try { return await (await fetch(`http://127.0.0.1:${PORT}/json/version`)).json(); } catch { return null; } }
+const hypr = (...args) => execFileSync("hyprctl", args, { encoding: "utf8" });
+const seatMonitor = () => JSON.parse(hypr("-j", "monitors")).find((m) => m.name === SEAT.output);
+const sessionWindow = (rec) => JSON.parse(hypr("-j", "clients")).find((w) => w.class === rec.app_id);
+const ruleName = (rec) => `ccv-seat-${rec.app_id}`;
+const onTile = (w, m, rec) => !!w && !!m && w.monitor === m.id && w.workspace.id === rec.workspace && w.size.join("x") === rec.tile.size.join("x");
+function checkSeat() {
+  if (!process.env.HYPRLAND_INSTANCE_SIGNATURE) throw new Error("not in a Hyprland session: the hidden monitor needs Hyprland");
+  const m = seatMonitor();
+  // Creating an output moves Mike's focus, so only Hyprland start (SEAT.config) creates it.
+  if (!m) throw new Error(`no ${SEAT.output} output. It is created at Hyprland start by ${SEAT.config}; ccv never creates it because that moves Mike's focus. Tell Mike`);
+  if (m.x < 10000 || m.width !== 2560) throw new Error(`${SEAT.output} is ${m.width}x${m.height} at ${m.x},${m.y}, not 2560x1440 off-screen: ${SEAT.config} is not loaded. Tell Mike; reloading Hyprland is his call`);
+  return m;
+}
+async function versionInfo(port) { try { return await (await fetch(`http://127.0.0.1:${port}/json/version`)).json(); } catch { return null; } }
+
+// Launches can run at the same time (one per agent); the lock serializes choosing a port and a tile.
+async function withLock(fn) {
+  const lock = path.join(STATE, "lock");
+  fs.mkdirSync(STATE, { recursive: true });
+  for (let i = 0; ; i++) {
+    try { fs.mkdirSync(lock); break; }
+    catch { if (Date.now() - fs.statSync(lock, { throwIfNoEntry: false })?.mtimeMs > 30000) fs.rmSync(lock, { recursive: true, force: true });
+      if (i > 300) throw new Error(`${lock} is held for over 30 s`); await sleep(100); }
+  }
+  try { return await fn(); } finally { fs.rmSync(lock, { recursive: true, force: true }); }
+}
+async function allocate(name, size, headless) {
+  for (const r of records()) if (!alive(r.pid)) release(r);
+  const live = liveRecs();
+  let port = null;
+  for (let p = SEAT.ports[0]; p <= SEAT.ports[1] && port === null; p++) if (!live.some((r) => r.port === p) && !(await versionInfo(p))) port = p;
+  if (port === null) throw new Error(`no free CDP port in ${SEAT.ports.join("-")}`);
+  let workspace = null, tile = null;
+  if (!headless) {
+    const taken = (ws) => live.filter((r) => r.workspace === ws).map((r) => r.tile.side);
+    // Pack halves next to halves first, so whole workspaces stay free for full tiles.
+    const order = [...SEAT.workspaces].sort((a, b) => taken(b).length - taken(a).length);
+    for (const ws of order) {
+      const used = taken(ws);
+      const free = TILES[size].find((t) => !used.includes("both") && !used.includes(t.side) && (t.side !== "both" || !used.length));
+      if (free) { workspace = ws; tile = free; break; }
+    }
+    if (!tile) throw new Error(`no free ${size} tile on ${SEAT.output} workspaces ${SEAT.workspaces[0]}-${SEAT.workspaces.at(-1)} (${live.length} sessions running: ccv sessions)`);
+  }
+  const app_id = `${SEAT.app_prefix}${slug(name)}`;
+  // pid is the launcher until Chromium starts, so a concurrent allocate sees the tile as taken.
+  const rec = { session: name, pid: process.pid, port, app_id, profile: path.join(STATE, "profiles", slug(name)), workspace, size, tile, headless, started: new Date().toISOString() };
+  writeRec(rec);
+  return rec;
+}
+function release(rec) {
+  if (rec.workspace) try { hypr("eval", `hl.window_rule({ name = "${ruleName(rec)}", enabled = false })`); } catch {}
+  fs.rmSync(rec.profile, { recursive: true, force: true });
+  fs.rmSync(recPath(rec.session), { force: true });
+}
 
 async function launch(opt) {
-  const info = readInfo();
-  if (info && alive(info.pid)) throw new Error(`our browser is already running (pid ${info.pid}, session ${info.session}); use it, or ccv close first`);
-  if (await versionInfo()) throw new Error(`port ${PORT} already answers CDP but not from a browser we started; refusing to drive it (set CCV_PORT)`);
-  const name = opt.session || process.env.CCV_SESSION || new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  fs.mkdirSync(STATE, { recursive: true });
-  const profile = path.join(STATE, "profile");
-  const args = [`--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, "--no-first-run", "--no-default-browser-check", "--disable-extensions",
-    `--window-size=${VIEW.width},${VIEW.height}`, "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding",
-    "--disable-background-timer-throttling", "--new-window", opt.url || SIDE];
+  const old = readRec(NAME);
+  if (old && alive(old.pid)) throw new Error(`session ${NAME} is already running (pid ${old.pid}, workspace ${old.workspace}); use it, or ccv close --session ${NAME}`);
+  const size = opt.size || "half";
+  if (!TILES[size]) throw new Error(`--size is half or full, not ${size}`);
+  const monitor = opt.headless ? null : checkSeat();
+  const rec = await withLock(() => allocate(NAME, size, !!opt.headless));
+  const args = [`--remote-debugging-port=${rec.port}`, `--user-data-dir=${rec.profile}`, "--no-first-run", "--no-default-browser-check", "--disable-extensions",
+    "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding", "--disable-background-timer-throttling", "--new-window", opt.url || SIDE];
   if (opt.headless) args.unshift("--headless=new");
+  else {
+    args.unshift(`--class=${rec.app_id}`);
+    // "silent" on a workspace never moves focus; a rule naming the monitor would focus it.
+    hypr("eval", `hl.window_rule({ name = "${ruleName(rec)}", match = { class = "^${rec.app_id}$" }, workspace = "${rec.workspace} silent", float = true, size = "${rec.tile.size.join(" ")}", move = "${rec.tile.at.join(" ")}" })`);
+  }
   const child = spawn(BROWSER, args, { detached: true, stdio: "ignore" }); child.unref();
-  fs.writeFileSync(INFO, JSON.stringify({ pid: child.pid, port: PORT, session: name, headless: !!opt.headless, started: new Date().toISOString() }));
-  for (let i = 0; i < 80 && !(await versionInfo()); i++) await sleep(250);
-  if (!(await versionInfo())) throw new Error("Chromium did not open its debugging port in 20 s");
-  const watcher = spawn(process.execPath, [new URL(import.meta.url).pathname, "_watch"], { detached: true, stdio: "ignore", env: { ...process.env, CCV_SESSION: name } });
+  writeRec({ ...rec, pid: child.pid });
+  const fail = async (msg) => { await close(); throw new Error(msg); };
+  for (let i = 0; i < 80 && !(await versionInfo(rec.port)); i++) await sleep(250);
+  if (!(await versionInfo(rec.port))) await fail(`Chromium did not open its debugging port ${rec.port} in 20 s`);
+  if (monitor) {
+    for (let i = 0; i < 25 && !onTile(sessionWindow(rec), monitor, rec); i++) await sleep(200);
+    const w = sessionWindow(rec);
+    if (!onTile(w, monitor, rec)) await fail(`the browser window is not in its ${rec.tile.size.join("x")} tile on workspace ${rec.workspace} (${w ? `monitor ${w.monitor}, workspace ${w.workspace.name}, ${w.size.join("x")}` : "no window"}): check ${SEAT.config}`);
+  }
+  const watcher = spawn(process.execPath, [new URL(import.meta.url).pathname, "_watch"], { detached: true, stdio: "ignore", env: { ...process.env, CCV_SESSION: NAME } });
   watcher.unref();
-  fs.writeFileSync(INFO, JSON.stringify({ ...readInfo(), watcher: watcher.pid }));
-  const c = await CDP.attach(); const ready = await waitReady(c); c.close();
-  return { launched: true, pid: child.pid, headless: !!opt.headless, session: name, evidence: session(), ready };
+  writeRec({ ...readRec(NAME), watcher: watcher.pid });
+  let ready, viewport;
+  try { const c = await CDP.attach(); ready = await waitReady(c); viewport = await c.eval("[innerWidth, innerHeight]"); c.close(); }
+  catch (e) { await fail(e.message); }
+  if (!opt.headless && (viewport[0] < MIN_VIEW.width || viewport[1] < MIN_VIEW.height)) await fail(`viewport ${viewport.join("x")} is below the ${MIN_VIEW.width}x${MIN_VIEW.height} minimum`);
+  return { launched: true, session: NAME, workspace: rec.workspace, tile: rec.tile.side, size, viewport, port: rec.port, evidence: session(), ready };
 }
 
 // Console watcher: one long-lived CDP connection that records console messages and page errors to console.jsonl.
@@ -265,37 +376,55 @@ async function watch() {
         });
       });
     } catch { /* browser gone or between pages */ }
-    const info = readInfo(); if (!info || !alive(info.pid)) return;
+    const rec = readRec(NAME); if (!rec || !alive(rec.pid)) return;
     await sleep(500);
   }
 }
 
 async function close() {
-  const info = readInfo();
-  if (!info) return { closed: false, note: "no browser recorded as ours" };
-  for (const pid of [info.watcher, info.pid]) if (pid && alive(pid)) { try { process.kill(-pid, "SIGTERM"); } catch { try { process.kill(pid, "SIGTERM"); } catch {} } }
-  for (let i = 0; i < 20 && alive(info.pid); i++) await sleep(200);
-  fs.rmSync(INFO, { force: true });
-  return { closed: true, pid: info.pid, evidence_kept: path.join(EVIDENCE_ROOT, info.session) };
+  const rec = readRec(NAME);
+  if (!rec) return { closed: false, note: `no session ${NAME}` };
+  for (const pid of [rec.watcher, rec.pid]) if (pid && pid !== process.pid && alive(pid)) { try { process.kill(-pid, "SIGTERM"); } catch { try { process.kill(pid, "SIGTERM"); } catch {} } }
+  for (let i = 0; i < 20 && alive(rec.pid) && rec.pid !== process.pid; i++) await sleep(200);
+  release(rec);
+  return { closed: true, session: NAME, pid: rec.pid, freed: rec.workspace ? `workspace ${rec.workspace} ${rec.tile.side}` : null, evidence_kept: session() };
+}
+
+function sessions() {
+  return { sessions: liveRecs().map((r) => ({ session: r.session, workspace: r.workspace, tile: r.tile?.side ?? null, size: r.size, port: r.port, started: r.started })) };
 }
 
 async function doctor() {
-  const info = readInfo(), checks = [];
+  const rec = readRec(NAME), checks = [];
   const add = (name, ok, detail) => checks.push({ name, ok, detail });
-  add("browser recorded and alive", !!info && alive(info.pid), info ? `pid ${info.pid}, session ${info.session}` : "run ccv launch");
-  const v = await versionInfo(); add(`CDP on :${PORT}`, !!v, v?.Browser ?? "no answer");
+  const up = !!rec && alive(rec.pid);
+  add("session recorded and alive", up, rec ? `${NAME}: pid ${rec.pid}` : `no session ${NAME}: ccv launch --session ${NAME}`);
+  const v = up ? await versionInfo(rec.port) : null; add(`CDP on :${rec?.port ?? "?"}`, !!v, v?.Browser ?? "no answer");
+  if (up && !rec.headless) {
+    const m = seatMonitor(), w = sessionWindow(rec);
+    add(`window in its ${rec.size} tile on ${SEAT.output}`, onTile(w, m, rec), !m ? `no such output (created at Hyprland start by ${SEAT.config}; tell Mike)` : w ? `${w.size.join("x")} on workspace ${w.workspace.name}, ${rec.tile.side}` : `no ${rec.app_id} window`);
+  }
+  if (v) { try { const c = await CDP.attach(rec.port);
+    const fps = await c.eval("new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => (++n, performance.now() - t0 < 500 ? requestAnimationFrame(f) : r(n * 2)); requestAnimationFrame(f); })");
+    const vp = await c.eval("[innerWidth, innerHeight]"); c.close();
+    add("frames drawn", fps >= 30, `${fps} per second`);
+    add(`viewport at least ${MIN_VIEW.width}x${MIN_VIEW.height}`, vp[0] >= MIN_VIEW.width && vp[1] >= MIN_VIEW.height, vp.join("x"));
+  } catch (e) { add("frames drawn", false, e.message); } }
   try { const r = await fetch(`${APP}/api/v2/runs`); const j = await r.json(); add("app server and v2 store", r.ok, `${APP}, ${j.runs.length} runs in ${j.store}`); }
   catch (e) { add("app server and v2 store", false, `${APP}: ${e.message} (docker start ie-devtools-v2scene)`); }
+  try { const r = await fetch(`${APP}/api/v3/runs`); const j = r.ok ? await r.json() : null; add("v3 store (/api/v3/runs)", r.ok && j.runs.length > 0, r.ok ? `${j.runs.length} runs` : `HTTP ${r.status}`); }
+  catch (e) { add("v3 store (/api/v3/runs)", false, e.message); }
   try { const r = await fetch(`${APP}/runner/health`); add("runner (Run tab)", r.ok, r.ok ? "ok" : `HTTP ${r.status} (make runner in the main checkout)`); }
   catch (e) { add("runner (Run tab)", false, e.message); }
-  if (v) { try { const c = await CDP.attach(); const s = await c.eval(STATE_PROBE); c.close();
+  if (v) { try { const c = await CDP.attach(rec.port); const s = await c.eval(STATE_PROBE); c.close();
     add("page is the app", s.url.startsWith(APP), s.url); add("scene READY", s.ready, s.timeline ?? ""); } catch (e) { add("page", false, e.message); } }
-  return { ok: checks.every((c) => c.ok), checks, evidence: info ? path.join(EVIDENCE_ROOT, info.session) : null };
+  return { ok: checks.every((c) => c.ok), checks, evidence: session() };
 }
 
 // ---------------------------------------------------------------- commands
 async function run(cmd, pos, opt) {
   if (cmd === "help" || !cmd) { process.stdout.write(HELP); return null; }
+  if (cmd === "sessions") return sessions();
   if (cmd === "launch") return launch(opt);
   if (cmd === "close") return close();
   if (cmd === "doctor") return doctor();
@@ -345,7 +474,7 @@ async function run(cmd, pos, opt) {
           else hit = await c.eval(`(${FINDER})(${JSON.stringify(spec(opt))})`).then((r) => (r.error ? null : r));
           if (hit) break; await sleep(150); }
         if (!hit) throw new Error(`wait timed out: ${JSON.stringify(opt)}`); out = { waited: hit }; break; }
-      case "perf": out = await c.eval(`(() => { const q = (a, p) => { if (!a || !a.length) return null; const b = a.slice().sort((x, y) => x - y); return +b[Math.min(b.length - 1, Math.floor(b.length * p))].toFixed(2); };
+      case "perf": out = await c.eval(`(() => { if (window.PERF) return window.PERF.report(); const q = (a, p) => { if (!a || !a.length) return null; const b = a.slice().sort((x, y) => x - y); return +b[Math.min(b.length - 1, Math.floor(b.length * p))].toFixed(2); };
         return { draws: (window.FT || []).length, draw_p50_ms: q(window.FT, .5), draw_p95_ms: q(window.FT, .95), input_to_frame_p50_ms: q(window.LATS, .5), input_to_frame_p95_ms: q(window.LATS, .95) }; })()`); break;
       case "console": { const file = path.join(session(), "console.jsonl"); const lines = fs.existsSync(file) ? fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean) : [];
         out = { file, total: lines.length, errors: lines.filter((l) => /"kind":"(error|pageerror|log.error)"/.test(l)).length, tail: lines.slice(-Number(opt.tail || 30)).map((l) => JSON.parse(l)) }; break; }
@@ -363,9 +492,10 @@ async function run(cmd, pos, opt) {
 const [cmd, ...rest] = process.argv.slice(2);
 const { pos, opt } = parse(rest);
 try {
+  NAME = resolveName(cmd, opt);
   const out = await run(cmd, pos, opt);
-  if (out) { if (cmd !== "_watch" && cmd !== "help") logAction({ cmd, pos, opt, ok: true, out }); console.log(JSON.stringify(out, null, 1)); }
+  if (out) { if (NAME && cmd !== "_watch") logAction({ cmd, pos, opt, ok: true, out }); console.log(JSON.stringify(out, null, 1)); }
 } catch (e) {
-  if (cmd !== "_watch") { try { logAction({ cmd, pos, opt, ok: false, error: e.message }); } catch {} }
+  if (NAME && cmd !== "_watch") { try { logAction({ cmd, pos, opt, ok: false, error: e.message }); } catch {} }
   console.log(JSON.stringify({ ok: false, error: e.message })); process.exit(1);
 }
