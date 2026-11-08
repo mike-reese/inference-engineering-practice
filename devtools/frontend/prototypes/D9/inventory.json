@@ -1,0 +1,78 @@
+{
+ "gpu": {
+  "name": "NVIDIA GeForce RTX 5060 Ti",
+  "pci.bus_id": "00000000:01:00.0",
+  "memory.total": "16311",
+  "clocks.max.sm": "3090",
+  "clocks.max.memory": "14001",
+  "pcie.link.gen.current": "3",
+  "pcie.link.gen.max": "3",
+  "pcie.link.width.current": "8",
+  "pcie.link.width.max": "16",
+  "driver_version": "615.78.08",
+  "vbios_version": "98.06.39.40.F8",
+  "power.limit": "180.00",
+  "source": "nvidia-smi --query-gpu",
+  "link": {
+   "current_link_speed": "8.0 GT/s PCIe",
+   "current_link_width": "8",
+   "max_link_speed": "32.0 GT/s PCIe",
+   "max_link_width": "16",
+   "source": "sysfs /sys/bus/pci/devices/0000:01:00.0"
+  },
+  "path": [
+   "0000:00:01.0",
+   "0000:01:00.0"
+  ]
+ },
+ "nvme": [
+  {
+   "name": "nvme0",
+   "model": "WD_BLACK SN7100 1TB",
+   "firmware": "7615M0WD",
+   "pci": "0000:02:00.0",
+   "link": {
+    "current_link_speed": "8.0 GT/s PCIe",
+    "current_link_width": "4",
+    "max_link_speed": "16.0 GT/s PCIe",
+    "max_link_width": "4",
+    "source": "sysfs /sys/bus/pci/devices/0000:02:00.0"
+   },
+   "path": [
+    "0000:00:1d.0",
+    "0000:02:00.0"
+   ],
+   "source": "sysfs /sys/class/nvme/nvme0"
+  }
+ ],
+ "cpu": {
+  "Model name": "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
+  "Socket(s)": "1",
+  "Core(s) per socket": "8",
+  "Thread(s) per core": "2",
+  "CPU max MHz": "5000.0000",
+  "L1d cache": "256 KiB (8 instances)",
+  "L1i cache": "256 KiB (8 instances)",
+  "L2 cache": "2 MiB (8 instances)",
+  "L3 cache": "16 MiB (1 instance)",
+  "source": "lscpu -J"
+ },
+ "memory": {
+  "MemTotal": "MemTotal:       65762652 kB",
+  "source": "/proc/meminfo"
+ },
+ "board": {
+  "board_vendor": "Micro-Star International Co., Ltd.",
+  "board_name": "MPG Z390M GAMING EDGE AC (MS-7B50)",
+  "bios_version": "1.60",
+  "bios_date": "08/07/2019",
+  "product_name": "MS-7B50",
+  "source": "/sys/class/dmi/id"
+ },
+ "pci_tree": "-[0000:00]-+-00.0  Intel Corporation 8th/9th Gen Core 8-core Desktop Processor Host Bridge/DRAM Registers [Coffee Lake S]\n           +-01.0-[01]--+-00.0  NVIDIA Corporation GB206 [GeForce RTX 5060 Ti]\n           |            \\-00.1  NVIDIA Corporation GB206 High Definition Audio Controller\n           +-08.0  Intel Corporation Xeon E3-1200 v5/v6 / E3-1500 v5 / 6th/7th/8th Gen Core Processor Gaussian Mixture Model\n           +-12.0  Intel Corporation 300/C240 Series Chipset Family Thermal Subsystem\n           +-14.0  Intel Corporation 300/C240 Series Chipset Family USB 3.1 xHCI\n           +-14.2  Intel Corporation 300/C240 Series Chipset Family Shared SRAM\n           +-14.3  Intel Corporation 300/C240 Series Chipset Family CNVi Wi-Fi\n           +-16.0  Intel Corporation 300/C240 Series Chipset Family HECI #1\n           +-17.0  Intel Corporation 300/C240 Series Chipset Family SATA Controller (AHCI)\n           +-1d.0-[02]----00.0  Sandisk Corp WD_BLACK SN7100/WD PC SN7100S M.2 2280 NVMe SSD (DRAM-less)\n           +-1f.0  Intel Corporation Z390 Chipset LPC/eSPI Controller\n           +-1f.3  Intel Corporation 300/C240 Series Chipset Family HD Audio\n           +-1f.4  Intel Corporation 300/C240 Series Chipset Family SMBus\n           +-1f.5  Intel Corporation 300/C240 Series Chipset Family SPI (Flash) Controller\n           \\-1f.6  Intel Corporation Ethernet Connection (7) I219-V\n",
+ "unavailable": {
+  "memory modules (DIMM part numbers, channels)": "dmidecode needs root",
+  "GDDR7 chip count and board layout": "not exposed by the driver; Published only (vendor board photos/specs)",
+  "address-to-channel mapping": "not published; interleaving across all channels is Inferred"
+ }
+}

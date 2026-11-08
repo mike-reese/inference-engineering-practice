@@ -107,7 +107,10 @@ export class EngineView {
       <div><b>batch:</b> ${it.scheduled} scheduled = ${it.context_requests} context request(s), ${it.context_tokens} prompt tokens
         + ${it.generation_requests} generation request(s), one token each · paused ${it.paused}</div>
       <div><b>requests:</b> ${it.active} active of max ${it.max_active} · ${it.new_active} admitted this step
-        (waited ${ms(it.queue_latency_ms, 3)} ms in the queue) · ${it.queued} queued · ${it.completed} completed this step</div>
+        · ${it.queued} queued · ${it.completed} completed this step</div>
+      <div class="dim">raw engine accumulator <code>newActiveRequestsQueueLatencyMS</code> = ${escape(it.queue_latency_ms ?? "–")}
+        · not an elapsed wait: TensorRT-LLM 1.2.1 adds <code>time.time()</code> differences in seconds with <code>+=</code>
+        despite the MS suffix (<code>executor_request_queue.py:643–654</code>); shown as returned, not converted</div>
       <div><b>KV cache:</b> ${used} of ${max} blocks used (${used * tpb} token slots of ${max * tpb}; ${tpb} tokens per block) ·
         ${it.kv_new_blocks} blocks allocated, ${it.kv_reused_blocks} reused since start (hit rate ${ms(it.kv_hit_rate, 2)})
         <div class="kvbar"><span style="width:${max ? Math.max(0.3, (100 * used) / max) : 0}%"></span></div></div>

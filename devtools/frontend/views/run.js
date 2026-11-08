@@ -2,7 +2,7 @@
 // cancel it, open the run. The runner (scripts/runner.py) runs only the commands the manifest declares; this page sends
 // a rep id, an action id and option values the runner checks against the manifest's choices and patterns.
 // Register: write a rep.toml for a reps/* folder that has .py files and no manifest yet.
-import { escape, getJSON } from "./util.js";
+import { escape, getJSON, router } from "./util.js";
 
 const fmtTime = (ns) => new Date(ns / 1e6).toLocaleTimeString();
 const fmtDay = (ns) => new Date(ns / 1e6).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -28,7 +28,7 @@ export class RunView {
     this.selected = params[1] ? Number(params[1]) : null;
     this.seenLeft = this.seenRight = "";
     this.poll();
-    this.timer ??= setInterval(() => { if (location.hash.startsWith("#run")) this.poll(); }, 1000);
+    this.timer ??= setInterval(() => { if (router.hash().startsWith("#run")) this.poll(); }, 1000);
   }
 
   async poll() {
@@ -266,7 +266,7 @@ export class RunView {
       ${this.error ? `<p class="err">${escape(this.error)}</p>` : ""}
       ${rep ? this.repPanel(rep) : "<p>No reps registered yet.</p>"}
       ${this.registerPanel()}`;
-    left.querySelectorAll("[data-pick]").forEach((b) => (b.onclick = () => { location.hash = `run/${encodeURIComponent(b.dataset.pick)}`; }));
+    left.querySelectorAll("[data-pick]").forEach((b) => (b.onclick = () => { router.go(`run/${encodeURIComponent(b.dataset.pick)}`); }));
     left.querySelectorAll("button.start").forEach((b) => (b.onclick = () => { b.disabled = true; this.start(b.dataset.rep, b.dataset.action); }));
     left.querySelectorAll("[data-option]").forEach((el) => (el.oninput = () => {
       const d = el.dataset;

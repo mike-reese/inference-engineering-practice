@@ -1,0 +1,32 @@
+{
+ "source": "inventory",
+ "title": "Machine inventory: probed read-only (sysfs, lspci, lscpu, nvidia-smi, DMI) and CUDA device properties",
+ "order": 50,
+ "inputs": {
+  "probe": "store_v2/probe/inventory.json (D9 inventory.py, run at import)",
+  "cuda_device_properties": "explainers/I01C_gpu_dataflow/devquery.json (cudaGetDeviceProperties, Observed 2026-10)"
+ },
+ "things": [
+  {"id": "host", "kind": "host", "name": "{board_name} with {cpu_name}", "evidence": "Observed: DMI, lscpu"},
+  {"id": "host/board", "parent": "host", "kind": "board", "name": "{board_name}", "evidence": "Observed: /sys/class/dmi/id"},
+  {"id": "host/cpu", "parent": "host", "kind": "cpu", "name": "{cpu_name}", "attrs": ["cores", "threads", "l1d", "l2", "l3", "max_mhz"], "evidence": "Observed: lscpu"},
+  {"id": "host/ram", "parent": "host", "kind": "host memory", "name": "host RAM {ram_gib} GiB", "evidence": "Observed: /proc/meminfo"},
+  {"id": "host/chipset", "parent": "host", "kind": "chipset", "name": "Intel Z390 chipset (PCH)", "evidence": "Observed: lspci"},
+  {"id": "host/dmi", "parent": "host", "kind": "bus link", "name": "DMI 3.0 (chipset <-> CPU), x4 at 8 GT/s", "attrs_fixed": {"ends": ["host/chipset", "host/cpu"], "GBps": 3.93},
+   "evidence": "Published: Intel DMI 3.0 (x4 at 8 GT/s)"},
+  {"id": "host/pcie-gpu", "parent": "host", "kind": "bus link", "name": "PCIe Gen {gpu_gen} x{gpu_width} (CPU <-> GPU; device max x{gpu_width_max})", "attrs_fixed": {"ends": ["host/cpu", "gpu0"]},
+   "evidence": "Observed: sysfs at import; the link trains down at idle, nvidia-smi pcie.link.gen.current samples it during the run"},
+  {"id": "host/nvme", "parent": "host", "kind": "nvme", "name": "{nvme_model}", "evidence": "Observed: sysfs"},
+  {"id": "host/pcie-nvme", "parent": "host", "kind": "bus link", "name": "PCIe {nvme_link} (chipset <-> NVMe)", "attrs_fixed": {"ends": ["host/chipset", "host/nvme"]}, "evidence": "Observed: sysfs"},
+  {"id": "gpu0", "parent": "host", "kind": "gpu", "name": "{gpu_name}", "attrs": ["cc", "sms", "l2_bytes", "vram_bytes", "bus_bits", "copy_engines", "smem_per_sm", "regs_per_sm", "max_threads_per_sm", "clocks_max_sm"],
+   "evidence": "Observed: nvidia-smi, CUDA device properties"},
+  {"id": "gpu0/sm{i}", "parent": "gpu0", "kind": "SM", "name": "SM {i}", "repeat": "sms", "attrs": ["smem_per_sm", "regs_per_sm", "max_threads_per_sm"],
+   "evidence": "Observed: CUDA device properties (multiProcessorCount); the physical placement on the die is Unavailable"},
+  {"id": "gpu0/l2", "parent": "gpu0", "kind": "L2 cache", "name": "L2 cache {l2_mib} MiB", "evidence": "Observed: CUDA device properties"},
+  {"id": "gpu0/mc{i}", "parent": "gpu0", "kind": "memory controller", "name": "memory controller {i} (32-bit)", "repeat": "memory_controllers",
+   "evidence": "Inferred: 128-bit bus / 32 bits per GDDR7 controller; the controller count is not reported by the driver"},
+  {"id": "gpu0/vram", "parent": "gpu0", "kind": "VRAM", "name": "GDDR7 {vram_gib} GiB", "evidence": "Observed: CUDA device properties (totalGlobalMem)"},
+  {"id": "gpu0/copy{i}", "parent": "gpu0", "kind": "copy engine", "name": "copy engine {i}", "repeat": "copy_engines", "evidence": "Observed: CUDA device properties (asyncEngineCount)"}
+ ],
+ "measures": []
+}

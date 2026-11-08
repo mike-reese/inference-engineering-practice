@@ -1,12 +1,16 @@
 """Metrics as they are calculated: latency.json (rep.py's latency_records output) -> Metric records whose inputs are
-the spans each value was computed from, plus efficiency (efficiency.json) beside the GPU samples in the window.
+the spans each value was computed from, plus efficiency (efficiency.json) beside the GPU samples in the window,
+plus aggregate() for an unpaired native set (native_records.json; its file shapes are in engine.py).
 """
+import hashlib
 import json
+import math
+import re
 from pathlib import Path
 
-from ..schema import Metric, Run
+from ..schema import Metric, Run, Span
 from ...latency import N_TTFT
-from .common import find
+from .common import find, run_dir
 
 ENGINE = "{rid}/engine/{f}"
 
@@ -107,3 +111,83 @@ def efficiency(path: Path, run: Run) -> None:
                                           sum(values) / len(values) if values else None, key, rid))
         for u in eff.get("unavailable", []):
             run.unavailable.append({"what": f"{rid}: {u['what']}", "why": u["why"]})
+
+
+SAMPLE = re.compile(r"^([a-zA-Z_:][\w:]*)(\{[^}]*\})?\s+(\S+)")  # one sample line of the text format
+SCRAPES = ("baseline", "final")
+FAMILIES = {  # metric name -> (Prometheus series name, unit); every label set of the series is summed
+    "Prometheus queue sum delta": ("trtllm_request_queue_time_seconds_sum", "s"),
+    "Prometheus queue count delta": ("trtllm_request_queue_time_seconds_count", "requests"),
+    "Prometheus success delta": ("trtllm_request_success_total", "requests"),
+}
+
+
+def scrape_spans(run: Run, folder: Path, which: str, read: dict) -> dict[str, Span]:
+    """The sample lines of one saved scrape that FAMILIES use, as spans at its read time: {series: span}."""
+    file = f"prometheus_{which}.txt"
+    names = {series for series, _ in FAMILIES.values()}
+    out = {}
+    for n, line in enumerate((folder / file).read_text().splitlines(), 1):
+        match = SAMPLE.match(line)
+        if match and match.group(1) in names:
+            series = match.group(1) + (match.group(2) or "")
+            out[series] = Span(f"prometheus/{which}/line {n}", "server", "prometheus", f"{which} scrape: {series}",
+                               read["start_ns"], read["end_ns"], None,
+                               {"series": series, "value": float(match.group(3)), "scrape": which},
+                               {"file": file, "pointer": f"line {n}"})
+    run.spans += out.values()
+    return out
+
+
+def aggregate(path: Path, run: Run) -> None:
+    """Totals over the unpaired native set (request_id None): native queue sum and count, and matching-window
+    Prometheus deltas when both scrapes are saved. Sums use math.fsum, so the native list's order cannot change them."""
+    data, folder = json.loads(path.read_text()), run_dir(path)
+    queues = []  # (span id, seconds) for each positive interval: the producer observes only positive ones
+    for entry in data["first"]:
+        t = entry["perf_metrics"]["timing_metrics"]
+        interval = t["first_scheduled_time"] - t["arrival_time"]
+        if interval > 0:
+            queues.append((f"native/{entry['request_id']}/queue", interval))
+    queues.sort()  # inputs listed by span id, not by the list's order
+    ids = tuple(i for i, _ in queues)
+    native_sum = math.fsum(v for _, v in queues)
+    run.metrics += [
+        Metric("native queue sum (unpaired set)", "fsum(first_scheduled_time - arrival_time) over native records "
+               "with a positive interval", ids, native_sum, "s"),
+        Metric("native queue count (unpaired set)", "count(native records with first_scheduled_time - arrival_time "
+               "> 0)", ids, float(len(queues)), "requests"),
+    ]
+    files = [folder / f"prometheus_{w}.txt" for w in SCRAPES]
+    reads = data.get("prometheus_reads") or {}
+    if not all(f.exists() for f in files):
+        run.unavailable.append({"what": "Prometheus deltas", "why": "prometheus_baseline.txt and prometheus_final.txt "
+                                "are not both saved"})
+        return
+    if not all(w in reads for w in SCRAPES):
+        run.unavailable.append({"what": "Prometheus deltas", "why": "native_records.json has no prometheus_reads "
+                                "times for both scrapes"})
+        return
+    for f in files:
+        run.sources.append({"file": f.name, "sha256": hashlib.sha256(f.read_bytes()).hexdigest(),
+                            "adapter": f"{aggregate.__module__}.{aggregate.__name__}"})
+    before, after = (scrape_spans(run, folder, w, reads[w]) for w in SCRAPES)
+    deltas = {}
+    for name, (series_name, unit) in FAMILIES.items():
+        keys = sorted(k for k in {*before, *after} if k.split("{")[0] == series_name)
+        finals = [after[k].attrs["value"] if k in after else None for k in keys]
+        bases = [before[k].attrs["value"] if k in before else 0.0 for k in keys]  # absent at baseline: none yet
+        inputs = tuple(x.id for k in keys for x in (before.get(k), after.get(k)) if x)
+        if not keys or None in finals or any(a < b for a, b in zip(finals, bases)):
+            value = None  # missing at the final scrape, or a counter went down (restarted server): not clamped
+            run.unavailable.append({"what": name, "why": f"{series_name}: missing at the final scrape or lower "
+                                    "than at baseline (restarted server?)"})
+        else:
+            value = math.fsum(a - b for a, b in zip(finals, bases))
+        deltas[name] = (value, inputs)
+        run.metrics.append(Metric(name, f"sum over label sets of final - baseline {series_name}", inputs, value, unit))
+    prom, prom_inputs = deltas["Prometheus queue sum delta"]
+    run.metrics.append(Metric("native queue sum - Prometheus queue sum delta",
+                              "(native queue sum - Prometheus queue sum delta) x 1000; both from the engine's own "
+                              "timestamps, so this checks the export, not that clock", ids + prom_inputs,
+                              None if prom is None else (native_sum - prom) * 1000, "ms"))

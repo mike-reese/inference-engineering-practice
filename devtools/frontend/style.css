@@ -80,7 +80,13 @@ a { color: var(--accent); }
 .archmap .box.on rect { stroke: var(--accent); stroke-width: 3; fill: #10233d; } .archmap .box.prev rect { stroke: var(--dim); stroke-dasharray: 4 3; }
 .tracelanes { width: 100%; height: 290px; background: var(--panel); border: 1px solid var(--line); }
 .tracelanes .lanelabel, .tracelanes .tick { fill: var(--dim); font-size: 10px; pointer-events: none; }
+.tracelanes .lanelabel { paint-order: stroke; stroke: var(--panel); stroke-width: 2px; vector-effect: non-scaling-stroke; } /* readable over a span */
 .tracelanes .span { fill: #2d5a8a; cursor: pointer; } .tracelanes .mark { stroke: #58a6ff; stroke-width: 1.5; cursor: pointer; vector-effect: non-scaling-stroke; }
+/* pair view: one color per client lane; unpaired native evidence stays neutral (never a client's color) */
+.tracelanes .client0 { fill: #58a6ff; stroke: #58a6ff; } .tracelanes .client1 { fill: #3fb950; stroke: #3fb950; }
+.tracelanes .client2 { fill: #bc8cff; stroke: #bc8cff; } .tracelanes .client3 { fill: #39c5cf; stroke: #39c5cf; }
+.tracelanes .native { fill: #6e7681; stroke: #6e7681; }
+.tracelanes .genqueued { fill: #d29922; stroke: #d29922; } /* iteration with generation + queued input */
 .tracelanes .cur { fill: #e3b341; stroke: #e3b341; stroke-width: 3; } .tracelanes .lit { fill: #f778ba; stroke: #f778ba; stroke-width: 3; }
 .tracelanes .cursor { stroke: #e3b341; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
 .tracebody { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 8px; }

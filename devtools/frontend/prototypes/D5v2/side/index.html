@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D5v2 Side Layout</title><link rel="icon" href="data:,"><link rel="stylesheet" href="../shell.css">
+<script src="https://cdn.jsdelivr.net/npm/elkjs@0.11.1/lib/elk.bundled.js"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }</script></head><body>
+<script type="module">
+import { app, shell } from "../base/app.js"; import { side as layout } from "../layouts.js";
+shell("2 · Side by side, pan right to go deeper", `<label>siblings <select id="sib"><option value="show">show</option><option value="dim" selected>dim</option><option value="hide">hide</option></select></label>
+<label><input type="checkbox" id="follow" checked> follow cursor</label>`);
+app(layout, "side");
+</script></body></html>

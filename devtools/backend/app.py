@@ -8,6 +8,7 @@ import aiohttp
 from aiohttp import web
 
 import runs
+import store_v2
 from bus import Bus
 from collectors.components import ComponentsCollector
 from collectors.docker import DockerCollector
@@ -99,8 +100,26 @@ async def engine_iterations(request: web.Request) -> web.Response:
     return web.json_response({cid: list(its) for cid, its in request.app["engine"].iterations.items()})
 
 
+async def engine_iterations_raw(request: web.Request) -> web.Response:
+    """The collector's raw /metrics reads for one run folder (?run_id=) or server container (?container=), in
+    reader order, for rep.py to save as engine_iterations_raw.jsonl. Read-only: nothing is drained or written."""
+    run_id, container = request.query.get("run_id"), request.query.get("container")
+    if not run_id and not container:
+        return web.json_response({"error": "give run_id=<run folder name> or container=<server container name>"},
+                                 status=400)
+    data = request.app["engine"].raw_reads(run_id, container)
+    if data is None:
+        return web.json_response({"error": f"no engine with iteration stats known for "
+                                  f"{'run ' + run_id if run_id else 'container ' + container}: start the run's server "
+                                  "with enable_iter_perf_stats: true while the devtools run, and fetch within "
+                                  "10 minutes of its stop"}, status=404)
+    return web.json_response(data)
+
+
 async def component_stamps(request: web.Request) -> web.Response:
     """Every component stamp held, per run (?run= for one): what the Components tab starts from."""
+    if request.query.get("saved"):  # v2 scene: any saved run, read from disk (?saved=<run id>)
+        return web.json_response(await asyncio.to_thread(request.app["components"].saved, request.query["saved"]))
     return web.json_response(request.app["components"].history(request.query.get("run")))
 
 
@@ -219,6 +238,7 @@ def make_app() -> web.Application:
     r.add_get("/api/lifecycle/lines", phase_lines)
     r.add_get("/api/engine/history", engine_history)
     r.add_get("/api/engine/iterations", engine_iterations)
+    r.add_get("/api/engine/iterations/raw", engine_iterations_raw)
     r.add_get("/api/prometheus/targets", prometheus_targets)
     r.add_get("/api/components", component_stamps)
     r.add_get("/api/requests", requests_list)
@@ -229,6 +249,7 @@ def make_app() -> web.Application:
     r.add_get("/api/runs/{run_id}/source", run_source)
     r.add_get("/api/runs/{run_id}/file", run_file)
     r.add_route("*", "/{service:grafana|prometheus|runner}{tail:(/.*)?}", proxy)
+    store_v2.add_routes(r)  # command center v2 store (DuckDB over Parquet, ie-run/2); additive
     r.add_static("/static", FRONTEND)
     return app
 

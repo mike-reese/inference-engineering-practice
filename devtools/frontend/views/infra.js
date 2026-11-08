@@ -1,5 +1,6 @@
 
 // Infrastructure view, zoom level 0: projects -> networks -> containers, and the host's GPU.
+import { router } from "./util.js";
 const MiB = 1024 * 1024;
 const fmt = {
   pct: (v) => (v == null ? "–" : `${v.toFixed(0)} %`),
@@ -93,7 +94,7 @@ export class InfraView {
       <svg class="links"></svg></div>`;
     this.drawLinks(state);
     this.root.querySelectorAll(".card[data-service]").forEach((card) => (card.onclick = () => {
-      location.hash = `components/${encodeURIComponent(card.dataset.project)}/${encodeURIComponent(card.dataset.service)}`;
+      router.go(`components/${encodeURIComponent(card.dataset.project)}/${encodeURIComponent(card.dataset.service)}`);
     }));
   }
 

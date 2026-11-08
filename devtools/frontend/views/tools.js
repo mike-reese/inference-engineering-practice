@@ -1,5 +1,5 @@
 // Tools view: the hosted tools (Grafana, Prometheus) and a run's files for the desktop tools (Wireshark, Nsight).
-import { escape, openInTool } from "./util.js";
+import { escape, openInTool, router } from "./util.js";
 
 const OPENS_IN = [
   [/\.pcap$/, "Wireshark"], [/\.nsys-rep$/, "Nsight Systems"], [/\.ncu-rep$/, "Nsight Compute"],
@@ -34,7 +34,7 @@ export class ToolsView {
       ${this.opened ? `<p class="dim">${escape(this.opened)}</p>` : ""}
       ${run ? `<table class="files">${files}</table>` : "<p>No runs yet.</p>"}</section>`;
     const select = this.root.querySelector("select.run");
-    if (select) select.onchange = (e) => { location.hash = `tools/${encodeURIComponent(e.target.value)}`; };
+    if (select) select.onchange = (e) => { router.go(`tools/${encodeURIComponent(e.target.value)}`); };
     this.root.querySelectorAll("button.opentool").forEach((b) => (b.onclick = async () => {
       this.opened = await openInTool(run.run_id, b.dataset.path); this.render(state);
     }));

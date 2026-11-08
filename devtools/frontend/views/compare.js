@@ -1,7 +1,7 @@
 // Compare view: two or more runs side by side (#compare/<run A>/<run B>/...). The first run is the baseline: every
 // other column shows its difference from it. Values come from each run's run.json (/api/runs/<id>), the same numbers
 // the Trace view shows; nothing is recomputed here.
-import { escape, getJSON } from "./util.js";
+import { escape, getJSON, router } from "./util.js";
 
 const fixed = (v, d) => Number(v).toFixed(d);
 const FORMAT = { // unit -> [shown unit, scale, digits]
@@ -51,7 +51,7 @@ export class CompareView {
     this.redraw?.();
   }
 
-  go(ids) { location.hash = ["compare", ...ids].map(encodeURIComponent).join("/"); }
+  go(ids) { router.go(["compare", ...ids].map(encodeURIComponent).join("/")); }
 
   // Newest measured run (trace off) and newest no-graphs run: the pair that shows what CUDA graphs save.
   suggestion(runs) {
