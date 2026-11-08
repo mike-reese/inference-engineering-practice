@@ -1,7 +1,7 @@
 # Command center verification map
 
 The maintained recipes for verifying the side-by-side command center as a user. Read this index, then use the
-matching feature file. `$CCV` is `devtools/verify/ccv` in the `v2-scene` worktree. The page is v3
+matching feature file. `$CCV` is `devtools/verify/ccv` in the main checkout. The page is v3
 (`/static/cc/index.html`, what `$CCV open side` opens). The v2 prototype recipes are legacy and go at the cutover.
 
 ## Baseline preconditions

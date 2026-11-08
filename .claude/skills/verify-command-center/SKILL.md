@@ -12,12 +12,12 @@ Layout rule (owner, 2026-11-08): verify **only the side-by-side layout**. The pa
 CLI: `devtools/verify/ccv` (no dependencies; Node 26 built-in fetch and WebSocket). Every command prints one JSON object, exits 1 with `{"ok": false, "error": ...}` on failure, and appends itself to the session's `actions.jsonl`. `ccv help` lists everything.
 
 ```bash
-CCV=~/Work/Code/Personal/inference-engineering-practice-v2scene/devtools/verify/ccv
+CCV=~/Work/Code/Personal/inference-engineering-practice/devtools/verify/ccv
 ```
 
 ## Launch
 
-1. The app server: `docker start ie-devtools-v2scene` (port 7710; devtools and `src` from the `v2-scene` worktree, run folders from the main checkout, v2 store read-only). For the Run tab, the host runner: `make runner` in `~/Work/Code/Personal/inference-engineering-practice`. A backend change needs `docker restart ie-devtools-v2scene`; a frontend change needs only a reload (`$CCV open side`).
+1. The app server: `docker start ie-devtools-v2scene` (port 7710; serves the main checkout, mounted read-only at `/repo`; v3 store read-write, v2 store read-only). For the Run tab, the host runner: `make runner` in `~/Work/Code/Personal/inference-engineering-practice`. A backend change needs `docker restart ie-devtools-v2scene`; a frontend change needs only a reload (`$CCV open side`).
 2. The browser: `export CCV_SESSION=<feature-or-task>`, then `$CCV launch` (half tile, the default and the minimum) or `$CCV launch --size full`. Ready when the output has `"ready": {"scene": true, "ready": true}`: the page set `window.READY` after loading the run from the store and drawing the levels. The output also names the `workspace`, `tile` and `viewport`.
 
 ## Sessions
