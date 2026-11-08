@@ -1,4 +1,4 @@
-"""Live runs (COMMAND_CENTER_V3_DESIGN.md step 5): RunWatcher, the host run, the NVML sampler, and the stream socket.
+"""Live runs (COMMAND_CENTER.md 6.5): RunWatcher, the host run, the NVML sampler, and the stream socket.
 
 RunWatcher. Every SCAN_S it looks for run folders ($REPO/reps/*/results/<run>/labels.json):
   - labels.json appears (the rep started): a live run opens. RunWriter in the store, RunSources (store/ingest.py)

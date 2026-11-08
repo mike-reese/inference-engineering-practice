@@ -1,8 +1,8 @@
-"""Stop counts per tier of each dimension, for every run in the ie-run/3 store (COMMAND_CENTER_DIMENSIONS.md, section 4).
+"""Stop counts per tier of each dimension, for every run in the ie-run/3 store (COMMAND_CENTER.md, section 10).
 
 A stop is a place the cursor lands when stepping at that tier. The tier rules live in proposal.json; this script only
 applies them. Run: uv run --no-project --with duckdb python design/dimensions/stop_counts.py [--write]
---write replaces the block between the gen:stops markers in COMMAND_CENTER_DIMENSIONS.md. Exits 1 when the jump check
+--write replaces the block between the gen:stops markers in COMMAND_CENTER.md. Exits 1 when the jump check
 flags a tier.
 """
 import argparse
@@ -14,7 +14,7 @@ from pathlib import Path
 import duckdb
 
 HERE = Path(__file__).parent
-DOC = HERE.parent.parent / "COMMAND_CENTER_DIMENSIONS.md"
+DOC = HERE.parent.parent / "COMMAND_CENTER.md"
 STORE = Path("/mnt/ie-data/cc/store/runs")
 NONE16 = 65535
 

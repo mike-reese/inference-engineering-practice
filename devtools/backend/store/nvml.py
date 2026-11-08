@@ -1,4 +1,4 @@
-"""Live GPU samples from NVML (COMMAND_CENTER_V3_DESIGN.md step 5): GPM counters at 100 ms and the other NVML counters
+"""Live GPU samples from NVML (COMMAND_CENTER.md 6.5): GPM counters at 100 ms and the other NVML counters
 at the refresh interval probe_nvml.py measured (registry/kinds.json `metrics`, group nvml, `period_ms`).
 
 One thread per sample clock (registry kinds.json metrics, field clock) reads; every read becomes one record {mono_ns,

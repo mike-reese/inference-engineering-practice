@@ -1,4 +1,4 @@
-"""The live sources of one run folder (COMMAND_CENTER_V3_DESIGN.md step 5): each file is tailed as the rep writes it
+"""The live sources of one run folder (COMMAND_CENTER.md 6.5): each file is tailed as the rep writes it
 and fed to its adapter, the same parser the importer reads the whole file with (store/adapters). So every row the live
 writer holds comes back from the final import with the same eid.
 

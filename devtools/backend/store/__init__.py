@@ -1,4 +1,4 @@
-"""Command center v3 store (ie-run/3, COMMAND_CENTER_V3_DESIGN.md).
+"""Command center v3 store (ie-run/3, COMMAND_CENTER.md section 6).
 
 schema.py    the one column list, the manifest, the CCVB codec
 registry.py  devtools/registry/*.json, validated once

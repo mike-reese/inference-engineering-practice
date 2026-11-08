@@ -1,4 +1,4 @@
-"""The final import: a run folder -> the next ie-run/3 generation (COMMAND_CENTER_V3_DESIGN.md "Live and replay are
+"""The final import: a run folder -> the next ie-run/3 generation (COMMAND_CENTER.md section 6 "Live and replay are
 one path"). Reads the run folder and the run's capture/ files in the store; nothing from prototypes/ or ie-run/2.
 
 Every source is read by its adapter (store/adapters), the parser the live writer feeds as the files grow, so a row

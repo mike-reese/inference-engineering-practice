@@ -1,4 +1,4 @@
-"""Old-to-new map of every current surface (COMMAND_CENTER_DIMENSIONS.md, section 3).
+"""Old-to-new map of every current surface (COMMAND_CENTER.md, section 9).
 
 Finds the current tiers and kinds (registry/kinds.json), v3 levels (cc/levels/index.js), v2 levels (D5v2 model.js),
 v1 views (frontend/index.html), panels (cc/sidebar, cc/inspector, cc/control/bar.js) and controls (cc/control/keys.js)
@@ -13,7 +13,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 REPO = HERE.parent.parent
 FE = REPO / "devtools/frontend"
-DOC = REPO / "COMMAND_CENTER_DIMENSIONS.md"
+DOC = REPO / "COMMAND_CENTER.md"
 
 
 def current() -> list[tuple[str, str]]:

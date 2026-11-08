@@ -1,4 +1,4 @@
-"""RunWriter: the one writer of a run folder in the ie-run/3 store while the run is live (COMMAND_CENTER_V3_DESIGN.md
+"""RunWriter: the one writer of a run folder in the ie-run/3 store while the run is live (COMMAND_CENTER.md section 6
 step 5, "Live and replay are one path").
 
 Rows arrive from the adapters (store/ingest.py tails the run folder; stream.Live hands over Docker, engine and NVML

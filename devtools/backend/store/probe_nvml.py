@@ -1,4 +1,4 @@
-"""NVML refresh probe (COMMAND_CENTER_V3_DESIGN.md step 5): how often each NVML counter takes a new value, and what
+"""NVML refresh probe (COMMAND_CENTER.md 6.5): how often each NVML counter takes a new value, and what
 one read costs, so the live sampler polls each counter at its measured interval and not faster.
 
 Each counter is polled alone at 5 ms for 10 s (a slow read, such as PCIe throughput, cannot skew another counter).

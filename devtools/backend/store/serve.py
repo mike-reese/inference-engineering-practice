@@ -1,4 +1,4 @@
-"""/api/v3: the ie-run/3 store over HTTP (COMMAND_CENTER_V3_DESIGN.md, Retrieval).
+"""/api/v3: the ie-run/3 store over HTTP (COMMAND_CENTER.md 6.4).
 
 GET /api/v3/runs                              {runs: [...]}, newest run first
 GET /api/v3/runs/{run}/manifest               manifest.json; ETag, no-cache (revalidate: a new generation replaces it)

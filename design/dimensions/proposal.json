@@ -1,5 +1,5 @@
 {
-  "_doc": "The three-dimension proposal as data (COMMAND_CENTER_DIMENSIONS.md). Ladders: each dimension's tiers, coarse to fine. execution_rules: how a stored row becomes an execution stop (stop_counts.py). kinds: every registry kind placed in each dimension. surfaces: every current level, tier, view, panel and control, with its new home or 'dropped' or 'owner' (an open choice). map_surfaces.py fails when a current surface has no entry here. Proposal only: nothing reads this at runtime.",
+  "_doc": "The three-dimension proposal as data (COMMAND_CENTER.md). Ladders: each dimension's tiers, coarse to fine. execution_rules: how a stored row becomes an execution stop (stop_counts.py). kinds: every registry kind placed in each dimension. surfaces: every current level, tier, view, panel and control, with its new home or 'dropped' or 'owner' (an open choice). map_surfaces.py fails when a current surface has no entry here. Proposal only: nothing reads this at runtime.",
   "ladders": {
     "execution": ["request", "iteration", "phase", "layer", "module", "kernel"],
     "hardware": ["system", "node", "device", "unit", "kernel traffic", "SM internals"],
@@ -63,9 +63,9 @@
     "v2 level:Kernel":         {"new": "execution / kernel"},
     "v2 level:Hardware":       {"new": "hardware / unit and kernel traffic (the SM view)"},
 
-    "v1 view:runs":      {"new": "control plane (bottom), outside the world"},
-    "v1 view:run":       {"new": "rep launcher: control plane (bottom), outside the world"},
-    "v1 view:compare":   {"new": "control plane (owner): splits the stage into two panes, each run its own full world"},
+    "v1 view:runs":      {"new": "header session shell: Load (replay a run)"},
+    "v1 view:run":       {"new": "header session shell: Launch (live); results in the Rep world"},
+    "v1 view:compare":   {"new": "header session shell: Compare; Rep world side by side, A / B switch in other worlds"},
     "v1 view:requests":  {"new": "execution / request (list of stops)"},
     "v1 view:trace":     {"new": "execution / request and phase"},
     "v1 view:components":{"new": "architecture / component"},
@@ -88,7 +88,7 @@
     "control:previous row of any tier":           {"new": "kept (owner): same two modes as the forward walk"},
     "control:focus the next coarser level":       {"new": "fly one tier coarser in the focused dimension"},
     "control:focus the next finer level":         {"new": "fly one tier finer in the focused dimension"},
-    "control:focus <level> (keys 1-7)":           {"new": "fly to tier n of the focused dimension; a separate key picks the dimension (fly model, section 2)"},
+    "control:focus <level> (keys 1-7)":           {"new": "fly to tier n of the focused dimension; a separate key picks the dimension (fly model, section 3.4)"},
     "control:play / pause":                       {"new": "unchanged: plays stops of the focused (dimension, tier)"},
     "control:zoom the window in around the cursor":  {"new": "unchanged"},
     "control:zoom the window out around the cursor": {"new": "unchanged"},
