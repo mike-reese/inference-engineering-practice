@@ -5,12 +5,20 @@ import { N_TIERS, NONE16 } from "./columns.js";
 /** Rows longer than this go to the block's `long` list; window scans look back this far plus that list. */
 export const LONG_NS = 50e6;
 
+/** Local row numbers 0..65535 in one shared buffer. A block holds at most 32,768 rows (the writer's BLOCK_ROWS), so its
+ *  local row lists are Uint16; a tier index that holds every row of a block is a view of this buffer. */
+const IDENTITY = Uint16Array.from({ length: 65536 }, (_, i) => i);
+
+/** An empty list of `len` local row numbers of a block of n rows. */
+export const localRows = (n, len) => new (n <= IDENTITY.length ? Uint16Array : Uint32Array)(len);
+
 /**
- * @typedef {{off: Uint32Array, rows: Uint32Array}} Csr   rows of key k are rows[off[k] .. off[k+1])
+ * @typedef {Uint16Array | Uint32Array} Local   local row numbers (Uint32 only past 65,536 rows in a block)
+ * @typedef {{off: Uint32Array, rows: Local}} Csr   rows of key k are rows[off[k] .. off[k+1])
  * @typedef {{time: Float32Array, attr: Float32Array, ident: Float32Array, n: number}} GpuRows
  *   time: per row [startHi, startLo, endHi, endLo]; attr: [lane, kind, tier, depth]; ident: [id, name]
  * @typedef {{name: string, band: string, n: number, t: number[], cols: Record<string, any>,
- *   step: Uint32Array[], lane: Csr, comp: Csr, req: Csr, long: Uint32Array, gpu: GpuRows}} EventBlock
+ *   step: Local[], lane: Csr, comp: Csr, req: Csr, long: Local, gpu: GpuRows}} EventBlock
  */
 
 /** @returns {EventBlock} */
@@ -18,20 +26,27 @@ export function indexEvents(header, cols, nThings, nReqs) {
   const n = header.rows, { start, end } = cols;
   const long = [];
   for (let i = 0; i < n; i++) if (end[i] - start[i] > LONG_NS) long.push(i);
+  const longRows = localRows(n, long.length); longRows.set(long);
   return {
     name: header.block, band: header.band, n, t: header.t, cols, step: stepIndex(cols.tier, n),
     lane: csr(cols.lane, n, nThings), comp: csr(cols.comp, n, nThings), req: csr(cols.req, n, nReqs),
-    long: Uint32Array.from(long), gpu: gpuRows(cols, n),
+    long: longRows, gpu: gpuRows(cols, n),
   };
 }
 
-/** step[r]: the block's rows with tier <= r, in (start, id) order. The spine band (tiers 0..2) is step[2]. */
+/** step[r]: the block's rows with tier <= r, in (start, id) order. The spine band (tiers 0..2) is step[2]. A tier that
+ *  every row reaches (always the last) is the identity, a view of the shared buffer. */
 function stepIndex(tier, n) {
   const cnt = new Uint32Array(N_TIERS);
   for (let i = 0; i < n; i++) cnt[tier[i]]++;
-  const step = [], fill = new Uint32Array(N_TIERS);
-  for (let r = 0, acc = 0; r < N_TIERS; r++) { acc += cnt[r]; step.push(new Uint32Array(acc)); }
-  for (let i = 0; i < n; i++) for (let r = tier[i]; r < N_TIERS; r++) step[r][fill[r]++] = i;
+  const step = [], own = [];
+  for (let r = 0, acc = 0; r < N_TIERS; r++) {
+    acc += cnt[r];
+    const all = acc === n && n <= IDENTITY.length;
+    step.push(all ? IDENTITY.subarray(0, n) : localRows(n, acc)); own.push(!all);
+  }
+  const fill = new Uint32Array(N_TIERS);
+  for (let i = 0; i < n; i++) for (let r = tier[i]; r < N_TIERS; r++) if (own[r]) step[r][fill[r]++] = i;
   return step;
 }
 
@@ -59,7 +74,7 @@ function csr(key, n, k) {
   const off = new Uint32Array(k + 1);
   for (let i = 0; i < n; i++) if (key[i] !== NONE16) off[key[i] + 1]++;
   for (let j = 0; j < k; j++) off[j + 1] += off[j];
-  const rows = new Uint32Array(off[k]), at = off.slice(0, k);
+  const rows = localRows(n, off[k]), at = off.slice(0, k);
   for (let i = 0; i < n; i++) if (key[i] !== NONE16) rows[at[key[i]]++] = i;
   return { off, rows };
 }
@@ -76,9 +91,16 @@ function gpuRows(c, n) {
   return { time, attr, ident, n };
 }
 
-/** Global id -> (block, local row), and a children list per row (CSR over parent ids, children in (start, id) order). */
+/** Parents per entry of `ids.every`, the sampled start of each parent's children in `ids.child`. */
+export const KIDS_EVERY = 64;
+
+/**
+ * Global id -> (block, local row), and every row with a parent, grouped by parent id (ascending) and in (start, id)
+ * order inside a group. every[j] is where the children of parent j * KIDS_EVERY start in `child`; the children of p
+ * are one run between every[p / KIDS_EVERY] and the next entry, found by a binary search on the parent column.
+ */
 export function indexIds(blocks, N) {
-  const blk = new Uint16Array(N), row = new Uint32Array(N), kids = new Uint32Array(N + 1);
+  const blk = new Uint16Array(N), row = localRows(Math.max(0, ...blocks.map((b) => b.n)), N), kids = new Uint32Array(N + 1);
   blocks.forEach((b, k) => { const { id, parent } = b.cols;
     for (let i = 0; i < b.n; i++) { blk[id[i]] = k; row[id[i]] = i; if (parent[i] >= 0) kids[parent[i] + 1]++; } });
   for (let j = 0; j < N; j++) kids[j + 1] += kids[j];
@@ -90,5 +112,6 @@ export function indexIds(blocks, N) {
     for (let k = a + 1; k < b; k++) if (startOf(child[k]) < startOf(child[k - 1])) {
       child.subarray(a, b).sort((x, y) => startOf(x) - startOf(y) || x - y); break; }
   }
-  return { blk, row, kids, child };
+  const every = Uint32Array.from({ length: Math.floor(N / KIDS_EVERY) + 2 }, (_, j) => kids[Math.min(j * KIDS_EVERY, N)]);
+  return { blk, row, child, every };
 }

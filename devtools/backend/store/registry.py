@@ -42,7 +42,7 @@ class Registry:
     kinds: tuple[KindRule, ...]
     link_kinds: tuple[LinkKind, ...]
     levels: tuple[str, ...]
-    metric_rules: dict            # metric name -> {sidebar, label}
+    metric_rules: dict            # metric name -> its kinds.json metrics entry (sidebar, label, place, ...)
     components: dict              # components.json
     sample_tracks: dict           # sample evidence -> source track (registry "samples" rules)
     measures: dict                # measure name -> definition, from the source registries
@@ -52,6 +52,10 @@ class Registry:
     sources: dict                 # source name (run_json, nsys, torch_profiler, ncu, inventory) -> its registry file
     ladders: dict                 # dimension -> its tiers, coarse to fine (kinds.json ladders)
     dimensions: dict              # kinds.json dimensions: align, storage, stops, walk, handoff, ran_on, kernel_class, flow
+
+    def metric_places(self) -> dict:
+        """Every metric's place ({"hardware": a hardware tier or "-"}), served with each manifest (store/serve.py)."""
+        return {name: m["place"] for name, m in self.metric_rules.items()}
 
     def execution_kinds(self, tier: str) -> list[str]:
         """The kinds placed at an execution tier without a rule (e.g. "request": client request)."""

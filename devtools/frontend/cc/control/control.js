@@ -12,6 +12,7 @@
 // | state.rev | bumps when the shown store opens or changes (A/B side, live merge, aux.json) |
 // | subscribe(fn) | fn(state, changed) now with every key true, then at most once per frame; returns unsubscribe |
 // | store(), storeError() | the RunStore the worlds show (compare: side A or B), null while none is open; why the last open failed |
+// | openedStore(run) | Promise of the RunStore of a run the session holds (compare: A and B) once it opens; null when it holds no such run or the open failed |
 // | ladders(), tierOf(dim), tierName(dim, tier), aligned(from, tier, to) | the manifest's ladders; tier; tier name; aligned tier |
 // | stops(dim, tier) | {ids: Uint32Array, t: Float64Array}: stop rows of (dimension, tier) and their times, by (t, id) |
 // | units(tier) | {ids, start, end}: units of an execution tier by start (layer: one per (iter, layer) group, id = its first kernel) |
@@ -79,21 +80,22 @@ function frame(nowMs) {
 }
 
 // ---------------- stores: one RunStore per open run, A and B in compare; a few kept for switching back
-const cache = new Map();   // run -> {s: RunStore | null, used}
+const cache = new Map();   // run -> {s: RunStore | null, used, open: Promise of the RunStore}
 const unitsOf = new WeakMap(), auxOf = new WeakMap();
 let useClock = 0, openError = null;
 const shownRun = () => (state.session.mode === "compare" && state.session.side === "B" ? state.session.runB : state.session.run);
 export const store = () => cache.get(shownRun())?.s ?? null;
 export const storeError = () => openError;
+export const openedStore = (run) => cache.get(run)?.open.then((s) => s, () => null) ?? Promise.resolve(null);
 const U = (S) => { let u = unitsOf.get(S); if (!u) unitsOf.set(S, (u = new Units(S))); return u; };
 
 function need(run) {
   if (!run) return null;
   let e = cache.get(run);
   if (!e) {
-    e = { s: null, used: 0 };
+    e = { s: null, used: 0, open: openRun(run) };
     cache.set(run, e);
-    openRun(run).then((s) => { if (cache.get(run) === e) { e.s = s; opened(run, s); } else s.live?.ws?.close(); },
+    e.open.then((s) => { if (cache.get(run) === e) { e.s = s; opened(run, s); } else s.live?.ws?.close(); },
       (err) => { if (cache.get(run) === e) cache.delete(run); openError = `${run}: ${err.message ?? err}`; console.error(err); emit(); });
   }
   e.used = ++useClock;
@@ -414,8 +416,8 @@ async function defaultSession() {
   state.session = { side: "A", runB: null, live: null, ...state.session };
   if (state.sel != null && typeof state.sel !== "string") { pendingSel = typeof state.sel === "object" ? state.sel : null; state.sel = null; }
   state.playing = false;
-  // Per open store: RunStore.bytes() (its blocks, indexes, GPU arrays and samples) and typed_mb, every typed-array
-  // buffer reachable from the store and its units, each counted once (adds startOf, endOf, allRows, the stops).
+  // Per open store: RunStore.bytes() (every typed-array buffer the store holds, by part, and total_mb) and typed_mb,
+  // every typed-array buffer reachable from the store and its units, each counted once (adds the units' own lists).
   // js_heap_mb: Chrome's usedJSHeapSize, which excludes typed arrays, counts garbage not yet collected, and without
   // --enable-precise-memory-info is bucketed and refreshed at most every 20 minutes; a hint, not a measurement.
   perf.provide("memory_mb", () => {
