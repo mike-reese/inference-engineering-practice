@@ -46,8 +46,7 @@ def contain(lane: np.ndarray, start: np.ndarray, end: np.ndarray, mask: np.ndarr
             parent: np.ndarray) -> tuple[np.ndarray, int]:
     """Parent = the innermost row on the same lane whose interval holds this row (ties: the longer one is outer, then
     input order). Only rows in `mask` take part; a row that already has a parent keeps it; an instant or a zero-length
-    row never holds another. Returns (parent, rows that cross a sibling instead of nesting). The ie-run/2 rule
-    (D2 ingest.py contain)."""
+    row never holds another. Returns (parent, rows that cross a sibling instead of nesting). The ie-run/2 rule."""
     parent = parent.astype(np.int64).copy()
     rows = np.flatnonzero(mask)
     order = rows[np.lexsort((-end[rows], start[rows], lane[rows]))].tolist()
@@ -74,7 +73,7 @@ MESSAGE_RULE = "Calculated: same request id and message, k-th send -> k-th recei
 
 
 def message_links(req: list, comp: list, name: list) -> list[tuple[int, int, str]]:
-    """Cross-process hops (the ie-run/2 rule, D1 canonical.py stamp_links): ZMQ send -> receive (stamps of lane
+    """Cross-process hops (the ie-run/2 rule): ZMQ send -> receive (stamps of lane
     group ipc), and response headers server (http) -> wire (eth0) -> client (sdk). Rows are in (start, id) order;
     comp is the run.json component of a row (a stamp's lane group, the client or engine lane, eth0), None for rows
     of other sources. Returns (from, to, link kind)."""

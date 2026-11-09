@@ -9,7 +9,7 @@ import path from "node:path";
 import os from "node:os";
 
 const APP = process.env.CCV_APP || "http://127.0.0.1:7710";
-const SIDE = `${APP}/static/cc/index.html`;   // command center v3 (side-by-side); D5v2 stays reachable by its URL
+const SIDE = `${APP}/static/cc/index.html`;   // command center v3 (side-by-side)
 const STATE = process.env.CCV_STATE || path.join(os.homedir(), ".local/state/inference-engineering/ccv");
 const SESSIONS = path.join(STATE, "sessions");
 const EVIDENCE_ROOT = process.env.CCV_EVIDENCE || "/mnt/ie-data/cc-v2-verify/evidence";
@@ -55,7 +55,7 @@ Observe
   shot NAME [--css SEL]               screenshot (viewport or one element) into the session folder
   aria NAME                           accessibility tree (pierces shadow roots) as text
   state                               app snapshot: URL, title, READY, viewport and the page state window.__cc (world, tiers,
-                                      t, sel, session, dock, ...); on the legacy D5v2 page its timeline, camera, focus level, flyout tab
+                                      t, sel, session, dock, ...)
   find TARGET                         where a target is, in the viewport or not, covered or not (no input, no scrolling)
   wait (--text T | --css SEL | --gone-text T | --expr JS) [--timeout ms]
   perf                                frame and input-to-frame latency percentiles the page recorded
@@ -247,17 +247,7 @@ async function screenshot(c, name, css) {
 }
 const STATE_PROBE = String.raw`(() => {
   const base = { url: location.href, title: document.title, ready: !!window.READY, viewport: [innerWidth, innerHeight] };
-  if (window.__cc) return { ...base, ...JSON.parse(JSON.stringify(window.__cc)) };   // /static/cc: control.js state
-  const $ = (q) => document.querySelector(q);   // the legacy D5v2 page (until M4) sets SC, LEVELS, DEEPEST
-  const cam = window.SC?.camera?.position, tg = window.SC?.controls?.target;
-  const names = (window.LEVELS ?? []).map((l) => l.name), focus = typeof window.DEEPEST === "function" ? window.DEEPEST() : null;
-  return { ...base, t_first_ms: window.T_FIRST ?? null,
-    timeline: $("#tlabel")?.textContent ?? null, playing: $("#play")?.textContent?.includes("pause") ?? null,
-    focus_level: focus == null ? null : { index: focus, name: names[focus] ?? null }, levels: names,
-    camera: cam ? { position: [cam.x, cam.y, cam.z].map((v) => +v.toPrecision(6)), target: [tg.x, tg.y, tg.z].map((v) => +v.toPrecision(6)) } : null,
-    flyout_tab: document.querySelector("#ftabs button.on")?.dataset.t ?? null,
-    dock: document.body.classList.contains("dock-bottom") ? "bottom" : document.querySelector("#side") ? "right" : null,
-    summary_head: ($("#sum")?.innerText || "").split("\n").slice(0, 6) };
+  return window.__cc ? { ...base, ...JSON.parse(JSON.stringify(window.__cc)) } : base;   // /static/cc: control.js state
 })()`;
 
 async function axText(c) {
@@ -276,8 +266,8 @@ async function axText(c) {
 async function waitReady(c, timeout = 60000) {
   const end = Date.now() + timeout;
   while (Date.now() < end) {
-    // a scene page (prototypes/D5v2) is ready when it sets window.READY; any other page when it has loaded
-    const v = await c.eval("({ url: location.href, scene: /\\/(D5v2|cc)\\//.test(location.pathname), ready: !!window.READY, state: document.readyState })").catch(() => null);
+    // the command center (/static/cc/) is ready when it sets window.READY; any other page when it has loaded
+    const v = await c.eval("({ url: location.href, scene: /\\/cc\\//.test(location.pathname), ready: !!window.READY, state: document.readyState })").catch(() => null);
     if (v && v.url.startsWith("http") && v.state === "complete" && (!v.scene || v.ready)) return v;
     await sleep(250);
   }
@@ -427,14 +417,12 @@ async function doctor() {
     add("frames drawn", fps >= 30, `${fps} per second`);
     add(`viewport at least ${MIN_VIEW.width}x${MIN_VIEW.height}`, vp[0] >= MIN_VIEW.width && vp[1] >= MIN_VIEW.height, vp.join("x"));
   } catch (e) { add("frames drawn", false, e.message); } }
-  try { const r = await fetch(`${APP}/api/v2/runs`); const j = await r.json(); add("app server and v2 store", r.ok, `${APP}, ${j.runs.length} runs in ${j.store}`); }
-  catch (e) { add("app server and v2 store", false, `${APP}: ${e.message} (docker start ie-devtools-v2scene)`); }
-  try { const r = await fetch(`${APP}/api/v3/runs`); const j = r.ok ? await r.json() : null; add("v3 store (/api/v3/runs)", r.ok && j.runs.length > 0, r.ok ? `${j.runs.length} runs` : `HTTP ${r.status}`); }
-  catch (e) { add("v3 store (/api/v3/runs)", false, e.message); }
+  try { const r = await fetch(`${APP}/api/v3/runs`); const j = r.ok ? await r.json() : null; add("app server and v3 store (/api/v3/runs)", r.ok && j.runs.length > 0, r.ok ? `${APP}, ${j.runs.length} runs` : `HTTP ${r.status}`); }
+  catch (e) { add("app server and v3 store (/api/v3/runs)", false, `${APP}: ${e.message} (docker start ie-devtools-v2scene)`); }
   try { const r = await fetch(`${APP}/runner/health`); add("runner (Run tab)", r.ok, r.ok ? "ok" : `HTTP ${r.status} (make runner in the main checkout)`); }
   catch (e) { add("runner (Run tab)", false, e.message); }
   if (v) { try { const c = await CDP.attach(rec.port); const s = await c.eval(STATE_PROBE); c.close();
-    add("page is the app", s.url.startsWith(APP), s.url); add("scene READY", s.ready, s.world ?? s.timeline ?? ""); } catch (e) { add("page", false, e.message); } }
+    add("page is the app", s.url.startsWith(APP), s.url); add("scene READY", s.ready, s.world ?? ""); } catch (e) { add("page", false, e.message); } }
   return { ok: checks.every((c) => c.ok), checks, evidence: session() };
 }
 

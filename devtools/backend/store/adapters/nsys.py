@@ -2,7 +2,7 @@
 
 Every NVTX range and mark, kernel, memcpy, memset, CUDA runtime call, synchronization, CUDA event, graph node event,
 OS runtime call, profiler overhead range and diagnostic message is one row; GPU_METRICS rows are samples. Rows,
-names, attributes and quirk flags as the ie-run/2 prototype (D1 canonical.py import_nsys, D2 quirks), kinds and
+names, attributes and quirk flags as the ie-run/2 prototype, kinds and
 eids from registry nsys.json event_kinds.
 
 Clock: the export's times are ns from TARGET_INFO_SESSION_START_TIME.utcEpochNs (UTC); run clock = utcEpochNs +
@@ -64,7 +64,7 @@ class Nsys:
         procs = {g: n for g, _, n in db.execute("select globalPid, pid, name from PROCESSES")}
         self.session_utc_ns = int(db.execute("select utcEpochNs from TARGET_INFO_SESSION_START_TIME").fetchone()[0])
         base = self.session_utc_ns - ctx.wall_offset_ns
-        raw = []                                          # D1 rows in table order
+        raw = []                                          # rows in table order
 
         def who(gtid=None, gpid=None, st=None):
             g = gtid if gtid is not None else gpid
@@ -180,7 +180,7 @@ class Nsys:
             else:
                 lane = ctx.lane(ident["process"], ident["thread"], ident["pid"], ident["tid"], ident["kthread"])
             end, kind_note = r["end"], None
-            if r["source"] == "nvtx" and end is None:      # D2: no end by type (marks, names), or an open range
+            if r["source"] == "nvtx" and end is None:      # no end by type (marks, names), or an open range
                 kind_note = "open_ended" if r["args"].get("event_type") in (59, 60) else "no_end_by_type"
                 quirk.append(kind_note)
             if ident["pid"] == 0:

@@ -4,8 +4,7 @@ The maintained recipes for verifying the command center as a user. Read this ind
 `$CCV` is `devtools/verify/ccv`. The page is `/static/cc/index.html`: D13's layout drawn only from the v3 store
 (RunStore), the registry and the rep files. A header holds the worlds, the three ladders and Load, Launch and
 Compare. The stage shows one of four worlds: Rep, Stacked, Spine or Architecture. The inspector bar sits at the
-bottom (or right) and the hardware sidebar on the right. The D5v2 prototype recipes are legacy and go at M4
-(COMMAND_CENTER.md section 7).
+bottom (or right) and the hardware sidebar on the right.
 
 ## Baseline preconditions
 
@@ -42,8 +41,7 @@ $CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L
   `session`, `playing`, `pace`, `rate`, `follow` and `metric`.
 - A row's kind and name:
   `$CCV eval 'import("./control/control.js").then((m) => { const S = m.store(), id = __cc.sel; return S.kinds[S.field("kind", id)].name + ": " + S.nameText(S.field("name", id)); })'`.
-- `$CCV state` returns `url`, `title`, `ready`, `viewport` and every field of `window.__cc` (above). On the legacy
-  D5v2 page it returns that page's `timeline`, `camera`, `focus_level` and `flyout_tab` instead.
+- `$CCV state` returns `url`, `title`, `ready`, `viewport` and every field of `window.__cc` (above).
 
 ## Page handles
 
@@ -102,11 +100,3 @@ observable result) and `Gotchas`.
 - [Inspector](./cc-inspector.md): the bar's six tabs, links, history, raw record, dock, transport, strips and Nsight
   buttons.
 - [Hardware sidebar](./cc-sidebar.md): sampled metrics at the cursor, one group per clock, sparklines over the bounds.
-
-## Legacy (D5v2 prototype, `/static/prototypes/D5v2/side/index.html`, until M4)
-
-- [Level navigation](./level-navigation.md): header level buttons, wheel zoom and drag pan across the seven levels.
-- [Timeline](./timeline.md): scrub, step, play and speed on the footer timeline.
-- [Select and inspect](./select-inspect.md): click an item in the scene; the Selected panel, the URL and history follow.
-- [Flyout tabs](./flyout.md): the ten v1 tabs in the right-hand flyout, dock and size.
-- [Run launcher](./run-launcher.md): the Run tab's actions and jobs; starting a run has side effects.
