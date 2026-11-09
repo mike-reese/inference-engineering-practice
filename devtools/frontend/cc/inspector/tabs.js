@@ -9,7 +9,7 @@
 import { state, store, storeError, now, archName, units, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { NONE16 } from "../store/columns.js";
 import { roleOf, fmtValue, fmtBytes, fmtSpan, periodOf, why } from "../sidebar/samples.js";
-import { repOf, runOf, kindOf as runKind, whenOf, esc } from "../session.js";
+import { repOf, runOf, kindOf as runKind, whenOf, incompleteText, esc } from "../session.js";
 import { nsysWhere } from "./nsight.js";
 
 const ms = (ns, d = 3) => (ns / 1e6).toFixed(d);
@@ -603,7 +603,7 @@ const RESULTS = [["client TTFT"], ["wire TTFT"], ["engine TTFT"], ["engine queue
   ["client mean ITL"], ["client end-to-end"]];
 function sessionHtml(s) {
   const ss = s.session, rep = repOf(ss.rep);
-  const run = (id, label) => { const r = runOf(id); return `<tr><td>${label}</td><td><code>${esc(id)}</code> ${r ? `${esc(runKind(r))} · ${whenOf(r)}${r.result ? "" : " · results not computed"}` : ""}</td></tr>`; };
+  const run = (id, label) => { const r = runOf(id); return `<tr><td>${label}</td><td><code>${esc(id)}</code> ${r ? `${esc(runKind(r))} · ${whenOf(r)}${r.result ? "" : " · results not computed"}${r.incomplete ? ` · ${esc(incompleteText(r))}` : ""}` : ""}</td></tr>`; };
   return `<table class="kv"><tr><td>mode</td><td>${esc(ss.mode)}${ss.mode === "live" ? ` · ${esc(ss.live?.state ?? "")} · head at ${ms(s.head)} ms` : ""}</td></tr>
     <tr><td>rep</td><td>${esc(ss.rep)} · ${esc(rep?.title)}</td></tr>
     ${ss.mode === "compare" ? run(ss.run, "run A") + run(ss.runB, "run B") : run(ss.run, "run")}
