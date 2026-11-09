@@ -352,6 +352,19 @@ const EMPTY_NOW = { exec: [null, null, null, null, null, null], kernel: null, ph
   archPath: [], software: null, sample: new Float64Array(0), sampleIndex: 0, transfers: [], hwActive: new Set() };
 /** A thing's name on the architecture ladder: a process by its role in the component map, else its recorded name. */
 export const archName = (S, i) => { const x = S.things[i], role = x?.attrs?.role?.name; return role ? role.split(/ \(|:/)[0] : x?.name ?? ""; };
+/** The component a row runs under when the store records none for it (a module or layer row): of the first phase
+ *  holding its launch call (dims.launchOf) in that call's process, the rule nowOf uses at the cursor; -1 when none. */
+export function launchComponentOf(id) {
+  const S = store(); if (!S) return -1;
+  const c = S.dims.launchOf(id); if (c < 0) return -1;
+  const P = S.dims.ladders.execution.indexOf("phase"), u = U(S), proc = S.dims.laneLevel.process;
+  const mine = proc[S.field("lane", c)], ids = u.of(P).ids;
+  for (const k of u.holding(P, S.startOf[c])) {
+    const x = ids[k], comp = S.field("comp", x);
+    if (comp !== NONE16 && proc[S.field("lane", x)] === mine) return comp;
+  }
+  return -1;
+}
 /** What is true at the cursor in every dimension, at every tier (contract in the table above). */
 export function now(t = state.t) {
   const S = store(), key = `${S?.run}|${state.rev}|${t}`;
