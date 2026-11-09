@@ -189,7 +189,7 @@ today). Counts per iteration come from section 10.
 
 | tier | what you see | source | resolution | status |
 | --- | --- | --- | --- | --- |
-| system | utilization of every GPU and host: GPU %, VRAM, CPU %, RAM | `nvidia-smi` query; NVML; Docker stats per container; host `/proc/stat`, `/proc/meminfo` (P2) | 100 ms; 50 to 500 ms; about 1 s; 100 ms | GPU and per-container CPU and memory measured (Docker stats stored since run 1d82c9); host CPU % and RAM used added in P2 |
+| system | utilization of every GPU and host: GPU %, VRAM, CPU %, RAM | `nvidia-smi` query; NVML; per-container cgroup v2 (host sampler, Docker stats before 2026-11-09); host `/proc/stat`, `/proc/meminfo` (P2) | 100 ms; 50 ms; 100 ms (Docker stats about 1 s); 100 ms | GPU and per-container CPU and memory measured (Docker stats stored since run 1d82c9, cgroup reads at 100 ms since 2026-11-09); host CPU % and RAM used added in P2 |
 | node | the board: CPU, RAM, chipset, PCIe and DMI links, GPU, NVMe, NIC | inventory probe (`registry/inventory.json`) | static | measured |
 | device | bytes moving between devices: PCIe copies, network frames, NVMe reads, RAM traffic | memcpy rows with bytes; nsys PCIe RX/TX %; tcpdump; `/proc/diskstats` (P2); `perf` `uncore_imc` (P2) | per copy; 100 µs; per frame; 100 ms; 100 ms | PCIe and network measured; NVMe and RAM bandwidth added in P2 |
 | unit | parts inside a device: SMs active, tensor, warps in flight, DRAM read/write, copy engines; CPU cores, L3 | nsys GPU metrics; `/proc/stat` per core (P2); `perf` `uncore_cbox_*` (P2) | 100 µs; 100 ms; 100 ms | GPU measured; CPU cores and L3 added in P2 |
@@ -495,7 +495,7 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 | hardware things | `inventory.json` through the manifest | measured |
 | SMs active, DRAM read/write, PCIe, warps, copy engines | nsys GPU metrics (replay, 100 µs); NVML GPM (live, 100 ms) | measured |
 | GPU utilization, VRAM, SM clock, power, temperature | `nvidia-smi` `gpu.csv`; NVML 50 ms and 500 ms groups | measured (run 1d82c9) |
-| per-container CPU, memory, network | Docker stats sample groups | measured (stored since run 1d82c9) |
+| per-container CPU, memory, network | `containers` group: cgroup v2 `cpu.stat`, `memory.current` and `/proc/<pid>/net/dev` at 100 ms (host sampler); older runs: Docker stats groups, about 1 s | measured (Docker stats since run 1d82c9, cgroup since 2026-11-09) |
 | host CPU % (total and per core), RAM used | `/proc/stat`, `/proc/meminfo` at 100 ms (P2) | P2 |
 | L3 and RAM bandwidth | `perf stat -I 100` on `uncore_cbox_*` and `uncore_imc` (P2) | P2 |
 | NVMe I/O | `/proc/diskstats` for the SN7100 at 100 ms (P2) | P2 |
@@ -508,7 +508,7 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 | hardware each unit ran on | the kind's hardware place in `registry/kinds.json` (section 9), refined by lane (thread: CPU, stream: GPU) | inferred, P3 |
 | hardware tier of each sidebar metric (`hwside.js` `tier`) | the metric's hardware place in `registry/kinds.json` (section 3.2), joined to the manifest when served | inferred, M1 |
 | process role (HTTP process, executor worker) | each component boundary maps to the pid whose lanes carry its stamps | inferred, P3 |
-| GPU memory held per process and container | `nvidia-smi --query-compute-apps` at 500 ms, group `gpu-apps` | measured, P2 |
+| GPU memory held per process and container | NVML compute and graphics process lists at 50 ms, group `gpu-procs`, with the device's used memory split in the same read (driver reserve, listed processes, the rest); older runs: `nvidia-smi --query-compute-apps` at 500 ms, group `gpu-apps` | measured, P2; `gpu-procs` since 2026-11-09 |
 | kernel class (gemm, attention, memory, other) | name rule in `registry/kinds.json` | inferred, P3 |
 | SMs used by a kernel | min(36, grid blocks) from cold `args` | inferred, labelled |
 | containers shown | compose and docker names merged into one thing; only the rep's and devtools' projects kept | P3 importer fix |
@@ -1249,4 +1249,4 @@ Reading the counts:
 | 2026-11-09 | R1 re-recorded (7.3) with the GPU to itself: timeline `I02A-TRACE-timeline_20261109T060522Z_ee2252`, kernels run `I02A-TRACE-kernels_20261109T060737Z_8f4ae7` (Nsight Compute, iteration 67, 266 of 266 kernels tied). It replaces 69c1bb + 9c0b54 as R1; a fresh pair was needed because the importer pairs a timeline with the first kernels run after it | agent |
 | 2026-11-09 | M4 code: "the v2 collectors" read as the collector code only D5v2 called (`/api/components?saved=`); the nvidia-smi, dmon, engine, log, Docker and component collectors feed the v1 page, which stays. The `tier` column stays because the page and the stop check still read it (6.2). `map_surfaces.py` reads the worlds from `cc/control/control.js`, so section 9 labels them "world". `prototypes/D9` is not on the M4 list and stays | agent |
 | 2026-11-09 | Parity verified: audit 4 ran every verify-command-center recipe on D13 and production (R1 ee2252, 348959, 0ac2db, c37c3e, 5626f7): 91 checks, 46 identical, 25 data-driven, 20 spec-required, 0 gaps; all 15 gaps of audits 1–3 closed. Defaults the owner may reverse: the header at a kernel follows the kernel's lineage; a layer is selectable (`sel.unit`); a module's component comes from the phase holding its launch call, marked inferred; a kernel's component stays the store's "GPU kernels". D13 deleted per the owner's ruling (git history: 7f4f351). The v2 store on disk waits: the owner's :7710 still mounts it | agent |
-
+| 2026-11-09 | Faster container and GPU process samples (owner request: the Container tier did not move while stepping a request, and its GPU memory did not add up). `scripts/gpu_sampler.py` reads each Compose container's cgroup v2 and network counters every 100 ms (`containers.jsonl`, metrics `container.*`) and NVML's compute and graphics process lists with the device's memory info every 50 ms (`gpu_procs.jsonl`, metrics `gpu.proc.memory.used` and `gpu.mem.used`, `.reserved`, `.unattributed`). New metric names, so older runs keep their Docker stats and nvidia-smi evidence; the views read either through `SAMPLE_ROLE` (`store/run.js`), newest first. The GPU panel lists every process at the cursor, then the driver reserve and the rest, summing to the memory used. `devtools/verify/samplers_check.py` checks a run's fast samples against Docker stats and the backend's NVML reads | agent |

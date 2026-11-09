@@ -41,6 +41,18 @@ Preconditions:
 - **Processes.** `$CCV key 4`: `architecture › process`. The `.nowis` lines read
   `the request is now at: HTTP transport` and `the request is now at: model forward`.
 - **Containers.** `$CCV key 3`: `architecture › container`, same two lines.
+- **Container samples move inside a request.** Open the run `I02A_20261109T205538Z_14d5d8` (recorded with the 100 ms
+  cgroup and 50 ms NVML samplers) at `"tiers":{"execution":2,"hardware":2,"architecture":2},"t":67437000000` (its
+  measured request runs 67437 to 67672 ms) and press → twelve times, reading the server card's `[data-v=cpu]`,
+  `[data-v=mem]` and `[data-v=net]` after each. Recorded 2026-11-09: `CPU 118 %` and `↑ 175.5 KiB/s` up to 67440.1
+  ms, then `CPU 16 %` and `↑ 23.0 KiB/s` from 67457.1 ms; `RAM 3565` then `3566 MiB / 8192 MiB`. The memory row reads
+  `RAM`, not `mem`: it is host RAM (cgroup), the GPU memory is the card's blue `GPU` line. On a run recorded before
+  2026-11-09 (R1) the same steps show one Docker stats sample a second, so the values hold across a whole request.
+- **GPU memory adds up.** On the same view, `#gpu [data-held] li` lists every process holding GPU memory at the
+  cursor (the run's containers and the host's own, for example Hyprland), then `[data-part=reserved]` (driver
+  reserve), `[data-part=rest]` (no listed process) and `[data-part=used]` (`= 9.84 GiB used, one NVML read`). The
+  parts sum to the used line within display rounding. On R1 the list ends with one `[data-part=rest]` line, the used
+  memory minus the compute processes its sampler listed (1.52 GiB at t = 74 s, total 9.57 GiB).
 - **Select a card.** `$CCV click --css '#stage .arch .card[data-sel]'`: `sel` `host/client`; the bar starts
   `architecture · container` `client-1 (Locust client)` `Observed: topology.json (docker inspect)`.
 - **Software layers.** `$CCV key 6`: `architecture › software layer`. The cards read
@@ -58,6 +70,12 @@ Preconditions:
 - **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas
+
+- The page shows samples; it does not check them. `uv run --no-sync python devtools/verify/samplers_check.py
+  reps/I02A-L1_streamed_latency/results/<run>` checks a run's 100 ms cgroup and 50 ms NVML samples against Docker
+  stats and the backend's NVML reads of the same run (periods, RAM, CPU, GPU total, the GPU split). Run it on every new
+  run recorded after a sampler change. Docker stats records are stamped when they arrive, up to 0.6 s after their
+  read (measured on 14d5d8), so never compare them to the nearest fast sample.
 
 - `__cc.tiers.architecture` is 0-based: key 5 (component) is `4`. Keys 1 and 2 show the fleet and its hosts, 3 the
   container cards, 4 the cards with their processes, 5 the component map, and 6 the map with the software layers.

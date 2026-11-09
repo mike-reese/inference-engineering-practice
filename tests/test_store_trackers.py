@@ -10,8 +10,8 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "devtools" / "backend"))
 from store.adapters.base import Ctx  # noqa: E402
-from store.adapters.trackers import (GpuApps, HostSamples, NvmeSamples, ProcessStarts, Trackers,  # noqa: E402
-                                     UncoreSamples)
+from store.adapters.trackers import (ContainerSamples, GpuApps, GpuProcs, HostSamples, NvmeSamples,  # noqa: E402
+                                     ProcessStarts, Trackers, UncoreSamples)
 from store.registry import Registry  # noqa: E402
 
 REG = Registry.load()
@@ -123,6 +123,61 @@ def test_gpu_apps_one_clock_per_process_zero_once_released():
     assert c.stats["gpu_apps"]["failed reads"] == 1
 
 
+def nvml(t, used, reserved, *procs, ok=True):
+    return {"mono_ns": t, "ok": ok, "used_mib": used, "reserved_mib": reserved, "procs": list(procs)}
+
+
+HYPRLAND = {"pid": 1614, "used_mib": 335.0, "type": "G", "name": "Hyprland", "ns_pid": None, "container": None,
+            "service": None}
+
+
+def test_gpu_procs_split_the_devices_used_memory_into_reserve_processes_and_the_rest():
+    c = ctx()
+    a = GpuProcs(c)
+    out = a.feed([nvml(0, 1200.0, 372.0, HYPRLAND), nvml(50 * MS, 4400.0, 372.0, HYPRLAND, SERVER | {"type": "C"}),
+                  nvml(100 * MS, 0, 0, ok=False), nvml(150 * MS, 1300.0, 372.0, HYPRLAND)])
+    dev = [v for clock, _, v in out if clock == "gpu-mem"]
+    assert [v["gpu.mem.used"] for v in dev] == [1572.0, 4772.0, 1672.0]
+    for v, procs in zip(dev, (335.0, 3335.0, 335.0)):
+        assert v["gpu.mem.reserved"] + procs + v["gpu.mem.unattributed"] == v["gpu.mem.used"]
+    held = {(clock, t): v["gpu.proc.memory.used"] for clock, t, v in out if clock != "gpu-mem"}
+    assert held == {("gpu-proc-host-pid-1614", 0): 335.0, ("gpu-proc-host-pid-1614", 50 * MS): 335.0,
+                    ("gpu-proc-server-pid-87", 50 * MS): 3000.0, ("gpu-proc-host-pid-1614", 150 * MS): 335.0,
+                    ("gpu-proc-server-pid-87", 150 * MS): 0.0}
+    assert c.things["host/host pid 1614"][2] == "Hyprland (host pid 1614)"
+    assert a.clocks["gpu-proc-server-pid-87"][0].thing == "host/server/server pid 87"
+    assert c.stats["gpu_procs"]["failed reads"] == 1
+
+
+def cgroup(t, *cs, ok=True):
+    return {"mono_ns": t, "ok": ok, "containers": list(cs)}
+
+
+def cont(cid, name, cpu_usec, current, inactive, rx=None, tx=None, project="ie-x"):
+    return {"id": cid, "name": name, "project": project, "cpu_usec": cpu_usec, "memory_current": current,
+            "inactive_file": inactive, "mem_limit": None, "rx_bytes": rx, "tx_bytes": tx}
+
+
+def test_container_cpu_memory_and_network_from_two_cgroup_reads_of_one_container_id():
+    c = ctx()
+    c._projects = {"ie-x"}
+    a = ContainerSamples(c)
+    out = a.feed([cgroup(0, cont("a1", "ie-x-client-1", 1_000_000, 900, 100, rx=0, tx=0),
+                         cont("b1", "ie-x-capture-1", 0, 50, 0), cont("z9", "other-db-1", 0, 1, 0, project="other")),
+                  cgroup(100 * MS, cont("a1", "ie-x-client-1", 1_150_000, 1000, 100, rx=4000, tx=1000),
+                         cont("b1", "ie-x-capture-1", 10_000, 60, 0)),
+                  cgroup(200 * MS, cont("a2", "ie-x-client-1", 5_000, 500, 0, rx=10, tx=10))])
+    client = [v for clock, _, v in out if clock == "cgroup-ie-x-client-1"]
+    assert client[0]["container.mem_bytes"] == 800.0 and math.isnan(client[0]["container.cpu_pct"])
+    assert client[1]["container.cpu_pct"] == pytest.approx(150.0)
+    assert (client[1]["container.rx_rate"], client[1]["container.tx_rate"]) == (40000.0, 10000.0)
+    assert math.isnan(client[2]["container.cpu_pct"]) and math.isnan(client[2]["container.rx_rate"])
+    capture = [v for clock, _, v in out if clock == "cgroup-ie-x-capture-1"]
+    assert capture[1]["container.cpu_pct"] == pytest.approx(10.0) and math.isnan(capture[1]["container.rx_rate"])
+    assert list(a.clocks) == ["cgroup-ie-x-client-1", "cgroup-ie-x-capture-1"]
+    assert a.clocks["cgroup-ie-x-client-1"][0].thing == "host/ie-x-client-1"
+
+
 def write(path: Path, recs: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a") as f:
@@ -135,15 +190,18 @@ def test_tailing_the_files_in_two_reads_gives_what_one_whole_read_gives(tmp_path
              for i in range(4)]
     procs = [proc(1, 10, 0, first=True), proc(87, 50, 1)]
     gpu = [apps(0, DESKTOP), apps(500 * MS, DESKTOP, SERVER), apps(10 ** 9, SERVER)]
+    reads = [nvml(0, 1200.0, 372.0, HYPRLAND), nvml(50 * MS, 4400.0, 372.0, HYPRLAND, SERVER | {"type": "C"})]
     write(tmp_path / "trackers/host.jsonl", hosts[:2])
     write(tmp_path / "trackers/procs.jsonl", procs[:1])
     write(tmp_path / "gpu_apps.jsonl", gpu[:1])
+    write(tmp_path / "gpu_procs.jsonl", reads[:1])
     live = Trackers(tmp_path, ctx())
     got = live.read()
     rows, samples = live.rows(got).cols["eid"], live.samples(got)
     write(tmp_path / "trackers/host.jsonl", hosts[2:])
     write(tmp_path / "trackers/procs.jsonl", procs[1:])
     write(tmp_path / "gpu_apps.jsonl", gpu[1:])
+    write(tmp_path / "gpu_procs.jsonl", reads[1:])
     got = live.read(final=True)
     rows, samples = rows + live.rows(got).cols["eid"], samples + live.samples(got)
 
@@ -152,7 +210,8 @@ def test_tailing_the_files_in_two_reads_gives_what_one_whole_read_gives(tmp_path
     assert rows == whole.rows(got).cols["eid"] == ["process/1/start", "process/87/start"]
     assert sorted(samples, key=lambda s: s[:2]) == sorted(whole.samples(got), key=lambda s: s[:2])
     assert all(v == [] for v in live.read(final=True).values())
-    assert list(live.clocks) == list(whole.clocks) == ["host", "gpu-apps-host-pid-37764", "gpu-apps-server-pid-87"]
+    assert list(live.clocks) == list(whole.clocks) == ["host", "gpu-apps-host-pid-37764", "gpu-apps-server-pid-87",
+                                                       "gpu-proc-host-pid-1614", "gpu-mem", "gpu-proc-server-pid-87"]
 
 
 def test_a_second_tracker_session_starts_its_rates_over():

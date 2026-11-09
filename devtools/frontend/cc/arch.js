@@ -113,8 +113,8 @@ function buildModel(S, key) {
     const ps = procs.filter((p) => under(p, t));
     return { t, key: t.key, name: t.name, project: t.attrs?.project ?? null, events, health: events.some((e) => e.name.startsWith("health_status")),
       docker: t.attrs?.docker ?? null, image: t.attrs?.image ?? null, networks: t.attrs?.networks ?? null, netns: t.attrs?.netns ?? null, memLimit: t.attrs?.mem_limit ?? null,
-      cpu: metric("docker.cpu_pct", t.i), mem: metric("docker.mem_bytes", t.i), rx: metric("docker.rx_rate", t.i), tx: metric("docker.tx_rate", t.i),
-      procs: ps, gpu: ps.map((p) => ({ p, m: metric("gpu.app.memory.used", p.i) })).filter((x) => x.m >= 0) };
+      cpu: S.metricFor("container.cpu", t.i), mem: S.metricFor("container.ram", t.i), rx: S.metricFor("container.rx", t.i), tx: S.metricFor("container.tx", t.i),
+      procs: ps, gpu: ps.map((p) => ({ p, m: S.metricFor("process.gpu", p.i) })).filter((x) => x.m >= 0) };
   });
   for (const c of containers) c.sharesWith = c.netns ? containers.find((o) => o.docker === c.netns) ?? null : null;
   const networks = byKind("network").map((t) => ({ t, key: t.key, name: t.name, procs: procs.filter((p) => under(p, t)) }));
@@ -123,7 +123,9 @@ function buildModel(S, key) {
   const gpu = g && { t: g, vram: g.attrs?.vram_bytes ?? null,
     mem: first("nvml.memory.used", "memory.used"), util: first("utilization.gpu"), memutil: first("utilization.memory"),
     power: first("nvml.power.draw", "power.draw"), gen: first("pcie.link.gen.current"), clock: first("nvml.clocks.sm", "clocks.sm"),
-    temp: first("nvml.temperature.gpu", "temperature.gpu"), rx: first("nvml.pcie.rx"), tx: first("nvml.pcie.tx") };
+    temp: first("nvml.temperature.gpu", "temperature.gpu"), rx: first("nvml.pcie.rx"), tx: first("nvml.pcie.tx"),
+    split: { used: first("gpu.mem.used"), reserved: first("gpu.mem.reserved"), rest: first("gpu.mem.unattributed") },
+    held: procs.map((p) => ({ p, m: S.metricFor("process.gpu", p.i), where: containers.find((c) => c.procs.includes(p))?.name ?? "host" })).filter((x) => x.m >= 0) };
   // software layers: the kinds the registry places at architecture / software layer, by layer
   const layers = LAYERS.map(([name, role]) => ({ name, role, kinds: S.kinds.filter((k) => k.place?.architecture === `software layer (${name})`).map((k) => k.name) }));
   return { key, map, size: map?.attrs?.size ?? [1400, 700], edges: map?.attrs?.edges ?? [], drives: map?.attrs?.drives ?? {},
@@ -334,6 +336,24 @@ function gpuPanel(S, M) {
     <div class="label">GPU memory held by</div><ul data-held></ul></section>`;
 }
 
+/** GPU memory held by: every process at the cursor, then what no process holds, summing to the memory used. A run with
+ *  the gpu-mem clock splits one NVML read; an older run only lists compute processes, so its rest is a difference. */
+function heldHTML(G, val) {
+  const held = G.held.map((x) => ({ ...x, mib: val(x.m) })).filter((x) => x.mib > 0).sort((a, b) => b.mib - a.mib);
+  const row = (mib, what, key) => `<li data-part="${key}">${mib < 100 ? `${mib.toFixed(0)} MiB` : fmt.gib(mib)} · ${what}</li>`;
+  const out = held.map((x) => row(x.mib, `${escape(x.p.name)} · ${escape(x.where)}`, "process"));
+  const used = val(G.split.used);
+  if (!Number.isNaN(used)) {
+    out.push(row(val(G.split.reserved), "reserved by the driver", "reserved"),
+      row(val(G.split.rest), "no listed process (driver and display stack)", "rest"),
+      `<li data-part="used">= ${fmt.gib(used)} used, one NVML read</li>`);
+  } else if (!Number.isNaN(val(G.mem))) {
+    out.push(row(val(G.mem) - held.reduce((a, x) => a + x.mib, 0), "not listed per process: this run's sampler listed compute processes only, so graphics processes and the driver's reserve are in here", "rest"),
+      `<li data-part="used">= ${fmt.gib(val(G.mem))} used</li>`);
+  }
+  return out.join("") || `<li class="dim">no GPU memory sample at the cursor</li>`;
+}
+
 function infraHTML(S, M, X, withProcs) {
   const projects = new Map();
   for (const c of M.containers) (projects.get(c.project) ?? projects.set(c.project, []).get(c.project)).push(c);
@@ -533,7 +553,7 @@ export function mountArch(el, { size = "lens" } = {}) {
       setText(el_("cpu"), `CPU ${fmt.pct(val(c.cpu))}`);
       sp("cpu")?.setAttribute("points", c.cpu >= 0 ? sparkPoints(history(S, c.cpu, t)) : "");
       const mem = val(c.mem);
-      setText(el_("mem"), `mem ${fmt.mib(mem)}${c.memLimit ? ` / ${fmt.mib(c.memLimit)}` : ""}`);
+      setText(el_("mem"), `RAM ${fmt.mib(mem)}${c.memLimit ? ` / ${fmt.mib(c.memLimit)}` : ""}`);
       if (b("mem")) b("mem").style.width = `${Number.isNaN(mem) ? 0 : Math.min(100, (100 * mem) / c.memLimit).toFixed(1)}%`;
       const nv = el_("net"); if (nv) setText(nv, `↓ ${fmt.rate(val(c.rx))} ↑ ${fmt.rate(val(c.tx))}${c.networks?.length ? ` · ${c.networks.join(", ")}` : ""}`);
       const gv = el_("gpu");
@@ -559,8 +579,7 @@ export function mountArch(el, { size = "lens" } = {}) {
     set("pcie", `gen ${Number.isNaN(gen) ? "–" : gen} · ↓${kbs(G.rx)} ↑${kbs(G.tx)} KB/s`, 0, G.rx);
     set("clocks", `SM ${fmtValue(val(G.clock), "MHz")}`, 0, -1);
     set("temp", fmtValue(val(G.temp), "°C"), 0, -1);
-    const held = M.containers.flatMap((c) => c.gpu.map((x) => ({ ...x, c, mib: val(x.m) }))).filter((x) => x.mib > 0);
-    const ul = g.querySelector("[data-held]"), html = held.map((x) => `<li>${fmt.gib(x.mib)} · ${escape(x.p.name)} · ${escape(x.c.name)}</li>`).join("") || `<li class="dim">no process of the run's containers at the cursor</li>`;
+    const ul = g.querySelector("[data-held]"), html = heldHTML(G, val);
     if (ul.innerHTML !== html) ul.innerHTML = html;
   }
 

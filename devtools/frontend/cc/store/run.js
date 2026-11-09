@@ -75,6 +75,16 @@ const upper = (a, idx, t) => { let lo = 0, hi = idx.length; while (lo < hi) { co
 const upperArr = (a, t, lo = 0, hi = a.length) => { while (lo < hi) { const k = (lo + hi) >>> 1; if (a[k] <= t) lo = k + 1; else hi = k; } return lo; };
 const lowerArr = (a, t, lo = 0, hi = a.length) => { while (lo < hi) { const k = (lo + hi) >>> 1; if (a[k] < t) lo = k + 1; else hi = k; } return lo; };
 
+/** What the views read about a container or a process, and the metrics that record it, newest sampler first: a run has
+ *  the first one its samplers wrote (runs before 2026-11-09 have Docker stats and nvidia-smi's compute processes). */
+export const SAMPLE_ROLE = {
+  "container.cpu": ["container.cpu_pct", "docker.cpu_pct"],
+  "container.ram": ["container.mem_bytes", "docker.mem_bytes"],
+  "container.rx": ["container.rx_rate", "docker.rx_rate"],
+  "container.tx": ["container.tx_rate", "docker.tx_rate"],
+  "process.gpu": ["gpu.proc.memory.used", "gpu.app.memory.used"],
+};
+
 export class RunStore {
   constructor(m, raw, base) {
     this.base = base; this.run = m.run; this.generation = m.generation; this.status = m.status; this.t0 = m.t0_ns;
@@ -465,6 +475,12 @@ export class RunStore {
   sampleSpan(metric) { const g = this.groupOf(metric); return g.n ? [g.ts[0], g.ts[g.n - 1]] : null; }
 
   groupOf(metric) { return this.sampleGroups.find((x) => metric >= x.first && metric < x.first + x.codes.length); }
+
+  /** The metric index of a sample role (SAMPLE_ROLE) on thing i, or -1. */
+  metricFor(role, thing) {
+    for (const name of SAMPLE_ROLE[role]) { const i = this.metrics.findIndex((m) => m.metric === name && m.thing === thing); if (i >= 0) return i; }
+    return -1;
+  }
 
   /** Min and max of one metric per pixel column over a window (sparklines). */
   series(metric, [a, b], px) {

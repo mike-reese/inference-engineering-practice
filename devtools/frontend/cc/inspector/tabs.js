@@ -165,20 +165,19 @@ function lifecycle(S, ci, t) {
   for (const [t0, name] of evs) { if (t0 > t) break; if (name.startsWith("health_status")) health = name.replace(/^health_status:\s*/, ""); else at = name; }
   return { state: at, health };
 }
-const metricOf = (S, metric, thing) => S.metrics.findIndex((m) => m.metric === metric && m.thing === thing);
 /** The index of the newest sample of metric i at or before t (it changes when the metric's value does), or -1. */
 function sampleAt(S, i, t) { const g = i >= 0 ? S.groupOf(i) : null; return g ? upper(g.ts, t) - 1 : -1; }
 /** D13's container card: name, lifecycle, image and project, CPU, memory, network and GPU memory per process. */
 function card(S, ci, t) {
-  const c = S.things[ci], v = S.samplesAt(t), at = (metric, thing = ci) => { const i = metricOf(S, metric, thing); return i < 0 ? NaN : v[i]; };
+  const c = S.things[ci], v = S.samplesAt(t), at = (role, thing = ci) => { const i = S.metricFor(role, thing); return i < 0 ? NaN : v[i]; };
   const life = lifecycle(S, ci, t), a = c.attrs ?? {}, mib = (b) => (Number.isNaN(b) ? "–" : (b / 2 ** 20).toFixed(0));
   const limit = a.mem_limit ? ` / ${mib(a.mem_limit)}` : "image" in a ? " (no limit)" : "";
-  const cpu = at("docker.cpu_pct"), rx = at("docker.rx_rate"), tx = at("docker.tx_rate");
+  const cpu = at("container.cpu"), rx = at("container.rx"), tx = at("container.tx");
   const gpu = S.things.filter((p) => p.kind === "process" && p.pre >= c.pre && p.post <= c.post)
-    .map((p) => [p, at("gpu.app.memory.used", p.i)]).filter(([, m]) => !Number.isNaN(m));
+    .map((p) => [p, at("process.gpu", p.i)]).filter(([, m]) => !Number.isNaN(m));
   return `<div class="card"><div class="title">${thingLink(S, ci)}<span class="state">${esc(life.state ?? "no lifecycle event yet")}${life.health ? ` · ${esc(life.health)}` : ""}</span></div>
     <div class="image">${[esc(a.image ?? "image not recorded"), esc(a.project ?? "")].filter(Boolean).join(" · ")}</div>
-    <div>cpu ${Number.isNaN(cpu) ? "–" : cpu.toFixed(1)}% · mem ${mib(at("docker.mem_bytes"))}${limit} MiB${Number.isNaN(rx) ? "" : ` · rx ${rx.toFixed(0)} tx ${Number.isNaN(tx) ? "–" : tx.toFixed(0)} B/s`}</div>
+    <div>cpu ${Number.isNaN(cpu) ? "–" : cpu.toFixed(1)}% · RAM ${mib(at("container.ram"))}${limit} MiB${Number.isNaN(rx) ? "" : ` · rx ${rx.toFixed(0)} tx ${Number.isNaN(tx) ? "–" : tx.toFixed(0)} B/s`}</div>
     ${gpu.map(([p, m]) => `<div style="color:#9fc3ff">GPU held: ${m.toFixed(0)} MiB · ${esc(p.attrs?.role?.name ?? p.name)} pid ${esc(p.attrs?.pid ?? "–")}</div>`).join("")}</div>`;
 }
 /** Phase stops whose lane or component sits under thing i (D13's "phases here"). */
@@ -292,7 +291,7 @@ function thingView(S, s) {
   const right = [];
   if (x.kind === "container") right.push(card(S, i, s.t));
   if (x.kind === "process") {
-    const m = metricOf(S, "gpu.app.memory.used", i), v = m < 0 ? NaN : S.samplesAt(s.t)[m];
+    const m = S.metricFor("process.gpu", i), v = m < 0 ? NaN : S.samplesAt(s.t)[m];
     if (m >= 0) right.push(`<div class="label">GPU memory held at the cursor</div><div>${Number.isNaN(v) ? `– <span class="dim">${esc(why(S, m))}</span>` : `${v.toFixed(0)} MiB`} <span class="dim">${esc(periodOf(S, m))}</span></div>`);
   }
   if (dim === "architecture") {

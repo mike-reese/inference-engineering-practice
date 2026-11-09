@@ -58,7 +58,7 @@ function boardOf(S) {
   // inside its container
   const P = S.dims.ladders.execution.indexOf("phase"), L = S.dims.laneLevel, seen = new Map();
   if (P >= 0) for (const id of units(P).ids) { const p = L.process[S.field("lane", id)]; if (p >= 0 && !seen.has(p)) seen.set(p, id); }
-  const tenants = new Set(S.metrics.filter((m) => m.metric === "gpu.app.memory.used" && T[m.thing]?.kind === "process").map((m) => m.thing));
+  const tenants = new Set(T.filter((p) => p.kind === "process" && S.metricFor("process.gpu", p.i) >= 0).map((p) => p.i));
   for (const p of tenants) if (!seen.has(p) && T[T[p].parent]?.kind === "container") seen.set(p, null);
   const plates = [...seen].map(([p, id]) => {
     const proc = T[p], on = id != null ? S.dims.ranOn(id) : cpu ? cpu.i : -1, container = proc.parent >= 0 ? T[proc.parent] : null;
@@ -240,7 +240,7 @@ export function mount(el) {
         P.L = label(pl.label, P.pos.clone().add(V(left ? -7.5 : 7.5, 0.3, 0)), () => true, "proc"); P.L.o.center.set(left ? 1 : 0, 0.5);
         return P;
       });
-      const cpuPct = S.metrics.findIndex((x) => x.metric === "docker.cpu_pct" && x.thing === box.thing.i);
+      const cpuPct = S.metricFor("container.cpu", box.thing.i);
       const proj = box.thing.attrs?.project, name = shortName(box.thing.name).replace(proj ? `${proj}-` : "", "");
       boxes.push({ ...box, mat, em, legMat, L, procs, cpuPct, name: `${name}\ncontainer` });
     });

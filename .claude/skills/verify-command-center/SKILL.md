@@ -141,6 +141,7 @@ An "Nsight Systems ↗ / Nsight Compute ↗" button makes the runner start `nsys
 | --- | --- | --- |
 | `devtools/verify/ccv` | `$CCV <command> [options]`; `$CCV help` | the CLI: shell wrapper for `ccv.mjs` |
 | `devtools/verify/ccv.mjs` | run through `ccv` | launch, CDP input, observation, evidence logging, `record` (needs ImageMagick 7, `magick`) |
+| `devtools/verify/samplers_check.py` | `uv run --no-sync python devtools/verify/samplers_check.py RUN_DIR` | a recorded run's host sampler data (cgroup 100 ms, NVML 50 ms) against Docker stats and the backend's NVML reads; exits 1 on a miss |
 | console watcher | started by `$CCV launch` (`ccv.mjs _watch`); stopped by `$CCV close` | records console messages, page errors and navigations to `console.jsonl` |
 
 `launch` writes one record per session in `~/.local/state/inference-engineering/ccv/sessions/<session>.json` (`pid`, `watcher`, `port`, `profile`, `workspace`, `tile`); a lock in the same folder serializes concurrent launches. Environment: `CCV_SESSION`, `CCV_APP` (`http://127.0.0.1:7710`), `CCV_EVIDENCE`, `CCV_STATE`, `CCV_CHROMIUM` (`/usr/bin/chromium`).

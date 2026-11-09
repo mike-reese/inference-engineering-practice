@@ -1,11 +1,15 @@
 """The P2 trackers of a run folder (COMMAND_CENTER.md 3.2, 3.4, 7.2): the trackers sidecar's raw reads
-(deploy/trackers/trackers.py) and the host sampler's GPU process reads (scripts/gpu_sampler.py):
+(deploy/trackers/trackers.py) and the host sampler's GPU process and container reads (scripts/gpu_sampler.py):
 
   trackers/host.jsonl    clock host:    CPU busy % (all CPUs, then each) and RAM used, every 100 ms
   trackers/nvme.jsonl    clock nvme:    NVMe read and write bytes per second, time busy, every 100 ms
   trackers/uncore.jsonl  clock uncore:  RAM and L3 bandwidth from perf's uncore counters, every 100 ms interval
   trackers/procs.jsonl   rows of kind `process start`, one per process of the server container
-  gpu_apps.jsonl         clock gpu-apps-<process> per GPU process: the GPU memory it holds, every 500 ms
+  gpu_apps.jsonl         clock gpu-apps-<process> per GPU process: the GPU memory it holds, every 500 ms (runs
+                         before 2026-11-09; nvidia-smi --query-compute-apps)
+  gpu_procs.jsonl        clock gpu-proc-<process> per GPU process (compute and graphics) and clock gpu-mem (used,
+                         driver reserve, not attributed to a listed process), every 50 ms (NVML)
+  containers.jsonl       clock cgroup-<container> per Compose container: CPU %, memory, network rates, every 100 ms
 
 The live writer tails these files and the importer reads them whole, through the same feed(), so live and final
 samples and rows are the same. A rate needs two reads of one session (one tracker process; a second server start
@@ -28,6 +32,8 @@ PROC_EVIDENCE = ("Observed: starttime of /proc/<pid>/stat (USER_HZ ticks since b
                  "the poll). A process that lives under 100 ms can be missed.")
 GPU_APP_EVIDENCE = ("Observed: nvidia-smi --query-compute-apps (host pid, process name), polled by "
                     "scripts/gpu_sampler.py")
+GPU_PROC_EVIDENCE = ("Observed: NVML compute and graphics process lists (pid, process name), read every 50 ms by "
+                     "scripts/gpu_sampler.py")
 
 
 def busy(a: list[int] | None, b: list[int] | None) -> float:
@@ -155,6 +161,8 @@ class GpuApps:
     the read no longer lists it. A process of a rep container (registry lanes) sits on its process thing, named by its
     pid inside the container as the other adapters name it; any other process sits on the host by its host pid."""
     METRIC = "gpu.app.memory.used"
+    PREFIX = "gpu-apps-"
+    EVIDENCE = GPU_APP_EVIDENCE
 
     def __init__(self, ctx: Ctx):
         self.ctx, self.clock_of = ctx, {}
@@ -183,21 +191,91 @@ class GpuApps:
             name = f"host pid {a['pid']}"
             exe = a["name"].split(" --")[0].replace("\\", "/").rsplit("/", 1)[-1]
             thing = ctx.thing(f"host/{name}", "host", "process", f"{exe} ({name})",
-                              {"pid": a["pid"], "container": a.get("container")}, GPU_APP_EVIDENCE)
-        clock = self.clock_of[a["pid"]] = f"gpu-apps-{slug(name)}"
+                              {"pid": a["pid"], "container": a.get("container")}, self.EVIDENCE)
+        clock = self.clock_of[a["pid"]] = f"{self.PREFIX}{slug(name)}"
         self.clocks[clock] = [Column(self.METRIC, self.METRIC, thing, f"GPU memory held by {name}")]
         return clock
 
 
+class GpuProcs(GpuApps):
+    """NVML reads (gpu_procs.jsonl, every 50 ms): one clock per GPU process as GpuApps, compute and graphics, and one
+    device clock whose columns split the memory NVML reports as used (v1: used + reserved, as nvml.memory.used) into
+    the driver's reserve, the processes listed, and the rest no listed process accounts for."""
+    METRIC = "gpu.proc.memory.used"
+    PREFIX = "gpu-proc-"
+    EVIDENCE = GPU_PROC_EVIDENCE
+    DEVICE = ("gpu.mem.used", "gpu.mem.reserved", "gpu.mem.unattributed")
+
+    def feed(self, recs: list[dict]) -> list[Sample]:
+        out = []
+        for r in recs:
+            if not r["ok"]:
+                self.ctx.count("gpu_procs", "failed reads")
+                continue
+            held: dict[str, float] = {}
+            for a in r["procs"]:
+                if a["used_mib"] is None:
+                    self.ctx.count("gpu_procs", "process entries with no memory figure (NVML not available)")
+                    continue
+                clock = self.clock_of.get(a["pid"]) or self.declare(a)
+                held[clock] = held.get(clock, 0.0) + float(a["used_mib"])
+            self.clocks.setdefault("gpu-mem", [Column(m, m, "gpu0") for m in self.DEVICE])
+            used = r["used_mib"] + r["reserved_mib"]
+            out.append(("gpu-mem", r["mono_ns"], dict(zip(self.DEVICE, (used, r["reserved_mib"],
+                                                                        r["used_mib"] - sum(held.values()))))))
+            out += [(c, r["mono_ns"], {self.METRIC: held.get(c, 0.0)}) for c in self.clocks if c != "gpu-mem"]
+        return out
+
+
+class ContainerSamples:
+    """cgroup reads of every Compose container (containers.jsonl, every 100 ms): one clock per container on its
+    container thing. CPU % is CPU time over wall time between two reads of one container id (100 = one core, as
+    `docker stats`); memory is memory.current - inactive_file (what `docker stats` shows); network rates need two reads
+    and a network namespace of the container's own (NaN otherwise)."""
+    METRICS = ("container.cpu_pct", "container.mem_bytes", "container.rx_rate", "container.tx_rate")
+
+    def __init__(self, ctx: Ctx):
+        self.ctx, self.prev, self.thing_of = ctx, {}, {}
+        self.clocks: dict[str, list[Column]] = {}
+
+    def feed(self, recs: list[dict]) -> list[Sample]:
+        out = []
+        for r in recs:
+            if not r["ok"]:
+                self.ctx.count("containers", "failed reads")
+                continue
+            for c in r["containers"]:
+                name = c["name"]
+                if name not in self.thing_of:
+                    self.thing_of[name] = self.ctx.docker_container(name, c["project"])
+                thing = self.thing_of[name]
+                if thing is None:
+                    continue
+                clock = f"cgroup-{slug(name)}"
+                self.clocks.setdefault(clock, [Column(m, m, thing) for m in self.METRICS])
+                prev, self.prev[name] = self.prev.get(name), (r["mono_ns"], c)
+                v = {"container.mem_bytes": float(c["memory_current"] - c["inactive_file"]),
+                     "container.cpu_pct": NAN, "container.rx_rate": NAN, "container.tx_rate": NAN}
+                if prev is not None and prev[1]["id"] == c["id"]:
+                    dt, p = (r["mono_ns"] - prev[0]) / 1e9, prev[1]
+                    v["container.cpu_pct"] = 100.0 * (c["cpu_usec"] - p["cpu_usec"]) / 1e6 / dt
+                    if c["rx_bytes"] is not None and p["rx_bytes"] is not None:
+                        v["container.rx_rate"] = (c["rx_bytes"] - p["rx_bytes"]) / dt
+                        v["container.tx_rate"] = (c["tx_bytes"] - p["tx_bytes"]) / dt
+                out.append((clock, r["mono_ns"], v))
+        return out
+
+
 class Trackers:
     FILES = {"host": "trackers/host.jsonl", "nvme": "trackers/nvme.jsonl", "uncore": "trackers/uncore.jsonl",
-             "procs": "trackers/procs.jsonl", "gpu_apps": "gpu_apps.jsonl"}
+             "procs": "trackers/procs.jsonl", "gpu_apps": "gpu_apps.jsonl", "gpu_procs": "gpu_procs.jsonl",
+             "containers": "containers.jsonl"}
 
     def __init__(self, run_dir: Path, ctx: Ctx):
         self.tails = {k: LineTail(run_dir / rel) for k, rel in self.FILES.items()}
         self.procs = ProcessStarts(ctx)
         self.sampled = {"host": HostSamples(ctx), "nvme": NvmeSamples(ctx), "uncore": UncoreSamples(ctx),
-                        "gpu_apps": GpuApps(ctx)}
+                        "gpu_apps": GpuApps(ctx), "gpu_procs": GpuProcs(ctx), "containers": ContainerSamples(ctx)}
 
     def read(self, final: bool = False) -> dict[str, list[dict]]:
         return {k: t.read(final) for k, t in self.tails.items()}
