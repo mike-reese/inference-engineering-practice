@@ -1,0 +1,88 @@
+{
+  "warmup": [
+    {
+      "start_ns": 19853735009582,
+      "end_ns": 19853741429070,
+      "entries": [
+        {
+          "request_id": 2,
+          "perf_metrics": {
+            "first_iter": 1,
+            "last_iter": 32,
+            "timing_metrics": {
+              "server_arrival_time": 19852.971564,
+              "arrival_time": 19852.994631,
+              "first_scheduled_time": 19853.000442,
+              "first_token_time": 19853.028654,
+              "server_first_token_time": 19853.042868,
+              "last_token_time": 19853.68181
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 1,
+              "num_new_allocated_blocks": 1,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "pair": [
+    {
+      "start_ns": 19859296613504,
+      "end_ns": 19859302369917,
+      "entries": [
+        {
+          "request_id": 3,
+          "perf_metrics": {
+            "first_iter": 34,
+            "last_iter": 161,
+            "timing_metrics": {
+              "server_arrival_time": 19853.773318,
+              "arrival_time": 19853.773739,
+              "first_scheduled_time": 19853.776565,
+              "first_token_time": 19853.811928,
+              "server_first_token_time": 19853.813048,
+              "last_token_time": 19856.503446
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 2,
+              "num_new_allocated_blocks": 2,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        },
+        {
+          "request_id": 4,
+          "perf_metrics": {
+            "first_iter": 163,
+            "last_iter": 290,
+            "timing_metrics": {
+              "server_arrival_time": 19853.815756,
+              "arrival_time": 19853.81619,
+              "first_scheduled_time": 19856.504101,
+              "first_token_time": 19856.537637,
+              "server_first_token_time": 19856.538249,
+              "last_token_time": 19859.271717
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 2,
+              "num_new_allocated_blocks": 2,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "second": [
+    {
+      "start_ns": 19859302373556,
+      "end_ns": 19859307792541,
+      "entries": []
+    }
+  ]
+}

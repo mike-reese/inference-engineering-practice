@@ -1,0 +1,41 @@
+{
+  "kind": "pair",
+  "phase": "normal",
+  "isl": 42,
+  "pair": 0,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "release_timeout_s": 30,
+  "requests": [
+    {
+      "request_id": "I02C-TRACE-timeline_20261109T215304Z_96d3d8-A",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a concise assistant for an inference team."
+        },
+        {
+          "role": "user",
+          "content": "Explain why a second inference request can wait while another request is decoding."
+        }
+      ],
+      "max_tokens": 128
+    },
+    {
+      "request_id": "I02C-TRACE-timeline_20261109T215304Z_96d3d8-B",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a concise assistant for an inference team."
+        },
+        {
+          "role": "user",
+          "content": "Explain why a second inference request can wait while another request is decoding."
+        }
+      ],
+      "max_tokens": 128
+    }
+  ],
+  "timeout_s": 600
+}

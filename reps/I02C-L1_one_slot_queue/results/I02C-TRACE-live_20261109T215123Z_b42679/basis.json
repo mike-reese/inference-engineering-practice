@@ -1,0 +1,81 @@
+{
+  "utc": "2026-11-09T21:51:26.376939+00:00",
+  "gpu_start": {
+    "name": "NVIDIA GeForce RTX 5060 Ti",
+    "driver_version": "615.78.08",
+    "memory.total": "16311 MiB",
+    "memory.used": "2090 MiB",
+    "clocks.sm": "315 MHz",
+    "temperature.gpu": "33",
+    "power.draw": "10.79 W"
+  },
+  "docker": "29.9.2",
+  "compose": "5.6.1",
+  "images": {
+    "ie-tensorrt-llm:1.2.1-nvml-byref": "sha256:47969fb2bc7750d13e1a87dee9215fd36b041b0f37073910aa46cf16c33c0692",
+    "ie-capture:alpine3.20": "sha256:fc253e50aaec3259b139a2b85466ecf666de8cde8d7c8818c196ea7f01ab4ac2",
+    "ie-trackers:alpine3.20": "sha256:9c0b0e91bea398c3c1a4c5069f8b981cf29c4c7a34c89d5afb69722cbc9f127a",
+    "ie-client:i01-l2": "sha256:135b3d12019f044127fe2c168d162c6a2078d704a450db08ece971e1eb2ecae3"
+  },
+  "model": {
+    "name": "nvidia/Qwen3-8B-FP8",
+    "path": "/home/mike/.local/share/inference-engineering/models/Qwen3-8B-FP8/2cebc4c89e25abc17668c81b01dceaf3d8b914d5",
+    "revision": "2cebc4c89e25abc17668c81b01dceaf3d8b914d5",
+    "quantization_config": {
+      "config_groups": {
+        "group_0": {
+          "input_activations": {
+            "dynamic": false,
+            "num_bits": 8,
+            "type": "float"
+          },
+          "weights": {
+            "dynamic": false,
+            "num_bits": 8,
+            "type": "float"
+          },
+          "targets": [
+            "Linear"
+          ]
+        }
+      },
+      "ignore": [
+        "lm_head"
+      ],
+      "quant_algo": "FP8",
+      "kv_cache_scheme": {
+        "dynamic": false,
+        "num_bits": 8,
+        "type": "float"
+      },
+      "producer": {
+        "name": "modelopt",
+        "version": "0.35.0"
+      },
+      "quant_method": "modelopt"
+    },
+    "torch_dtype": "bfloat16",
+    "kv_cache_dtype": "FP8"
+  },
+  "storage": {
+    "model": "/dev/nvme0n1p2[/inference-engineering-models]",
+    "docker_root": "/dev/nvme0n1p2",
+    "site_packages": "/dev/nvme0n1p2"
+  },
+  "engine_config": "dtype: bfloat16\nmax_num_tokens: 1024\nreturn_perf_metrics: true\nperf_metrics_max_requests: 100\niter_stats_max_iterations: 1000\nkv_cache_config:\n  enable_block_reuse: false\n  free_gpu_memory_fraction: 0.1\n  max_tokens: 2048\n  dtype: auto\n",
+  "version": {
+    "version": "1.2.1"
+  },
+  "gpu_end": {
+    "name": "NVIDIA GeForce RTX 5060 Ti",
+    "driver_version": "615.78.08",
+    "memory.total": "16311 MiB",
+    "memory.used": "12061 MiB",
+    "clocks.sm": "2625 MHz",
+    "temperature.gpu": "35",
+    "power.draw": "22.42 W"
+  },
+  "iterations": {
+    "error": "HTTPStatusError: Client error '404 Not Found' for url 'http://127.0.0.1:7700/api/engine/iterations/raw?run_id=I02C-TRACE-live_20261109T215123Z_b42679'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
+  }
+}

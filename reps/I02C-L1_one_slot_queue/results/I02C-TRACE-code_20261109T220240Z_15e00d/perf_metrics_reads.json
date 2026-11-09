@@ -1,0 +1,117 @@
+{
+  "warmup": [
+    {
+      "start_ns": 19736229680777,
+      "end_ns": 19736235753146,
+      "entries": [
+        {
+          "request_id": 2,
+          "perf_metrics": {
+            "first_iter": 1,
+            "last_iter": 32,
+            "timing_metrics": {
+              "server_arrival_time": 19734.258714,
+              "arrival_time": 19734.281413,
+              "first_scheduled_time": 19734.288406,
+              "first_token_time": 19735.445013,
+              "server_first_token_time": 19735.46204,
+              "last_token_time": 19736.175686
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 1,
+              "num_new_allocated_blocks": 1,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "pair": [
+    {
+      "start_ns": 19744121312599,
+      "end_ns": 19744126865294,
+      "entries": [
+        {
+          "request_id": 3,
+          "perf_metrics": {
+            "first_iter": 34,
+            "last_iter": 161,
+            "timing_metrics": {
+              "server_arrival_time": 19736.265725,
+              "arrival_time": 19736.266415,
+              "first_scheduled_time": 19736.269597,
+              "first_token_time": 19736.318701,
+              "server_first_token_time": 19736.319854,
+              "last_token_time": 19739.597057
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 2,
+              "num_new_allocated_blocks": 2,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        },
+        {
+          "request_id": 4,
+          "perf_metrics": {
+            "first_iter": 163,
+            "last_iter": 290,
+            "timing_metrics": {
+              "server_arrival_time": 19736.322926,
+              "arrival_time": 19736.323544,
+              "first_scheduled_time": 19739.598463,
+              "first_token_time": 19739.699532,
+              "server_first_token_time": 19739.700532,
+              "last_token_time": 19744.09819
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 2,
+              "num_new_allocated_blocks": 2,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "second": [
+    {
+      "start_ns": 19744126869254,
+      "end_ns": 19744134363849,
+      "entries": []
+    }
+  ],
+  "closer": [
+    {
+      "start_ns": 19744969014856,
+      "end_ns": 19744974927114,
+      "entries": [
+        {
+          "request_id": 5,
+          "perf_metrics": {
+            "first_iter": 292,
+            "last_iter": 323,
+            "timing_metrics": {
+              "server_arrival_time": 19744.158175,
+              "arrival_time": 19744.158774,
+              "first_scheduled_time": 19744.160248,
+              "first_token_time": 19744.212545,
+              "server_first_token_time": 19744.213482,
+              "last_token_time": 19744.96161
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 1,
+              "num_new_allocated_blocks": 1,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

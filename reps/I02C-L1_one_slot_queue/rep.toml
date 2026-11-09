@@ -5,13 +5,113 @@ title = "One slot, queued requests"
 spec = "README.md"
 # The runner refuses to start while a container of this project exists (a run from the terminal, a stuck stack).
 compose_projects = ["ie-i02c-l1"]
+# The workload's last executor iteration (rep.py LAST_ITERATION): smoke 1-33, A 34-161, B 163-290. A profile range may
+# not pass it.
+last_iteration = 290
+# Progress a profiler prints in a container's log rather than in rep.py's output: the Run tab shows the newest match.
+[progress_log]
+service = "server"
+pattern = '==PROF== Profiling "([^"]+)" - (\d+)'
+label = "Nsight Compute: kernel {2} ({1})"
 
-# rep.py has one run level (TRACE=off) and no --progress json, so the runner learns no run id while it runs.
 [[actions]]
-id = "run"
+id = "off"
 group = "run"
-label = "Pair run (A, then B on A's first content)"
-description = "Correctness smoke, then requests A and B on one engine slot (--max_batch_size 1): B is sent on A's first content and waits for A. Perf metrics and iteration stats on; no profiler; labeled not measured."
-measured = false
+label = "Measured run"
+description = "Correctness smoke, then requests A and B on one engine slot (--max_batch_size 1): B is sent on A's first content and waits for A. Client times, /perf_metrics and the queue histogram; no profiler, no stamps, no iteration stats."
+measured = true
+graphs = true
 minutes = 2
-command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py"]
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "off", "--progress", "json"]
+
+[[actions]]
+id = "live"
+group = "run"
+label = "Live (engine iteration stats)"
+description = "The measured run's setup plus the engine's iteration stats (scheduled, active and queued counts per iteration): the evidence run for pass check 1. No profiler; labeled not measured."
+measured = false
+graphs = true
+minutes = 2
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "live", "--progress", "json"]
+
+[[actions]]
+id = "timeline"
+group = "run"
+label = "Timeline (Nsight Systems)"
+description = "Every kernel, copy and executor iteration of both requests on the run clock, CUDA graphs on. Slower than the measured run."
+measured = false
+graphs = true
+minutes = 6
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "timeline", "--progress", "json"]
+
+[[actions.options]]
+id = "profile_range"
+label = "Profile range"
+arg = "--profile-range"
+pattern = '^\d{1,3}-\d{1,3}$'
+default = "1-290"
+description = "Executor iterations to record, first-last (/perf_metrics numbering): smoke 1-33, A 34-161, B 163-290."
+
+[[actions]]
+id = "code"
+group = "run"
+label = "Code (PyTorch profiler)"
+description = "Each kernel with the op, tensor shapes and Python stack that launched it, over the slot hand-off. CUDA graphs off."
+measured = false
+graphs = false
+minutes = 6
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "code", "--progress", "json"]
+
+[[actions.options]]
+id = "profile_range"
+label = "Profile range"
+arg = "--profile-range"
+pattern = '^\d{1,3}-\d{1,3}$'
+default = "158-166"
+description = "Executor iterations to record, first-last: A's last is 161, B's prefill 163. The whole pair (34-290) is about 2 GB of trace."
+
+[[actions]]
+id = "kernels"
+group = "run"
+label = "Kernels (Nsight Compute)"
+description = "Every kernel of the chosen iterations, each replayed many times for its counters. CUDA graphs on. Not on the run clock."
+measured = false
+graphs = true
+minutes = 20
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "kernels", "--progress", "json"]
+
+[[actions.options]]
+id = "profile_range"
+label = "Profile range"
+arg = "--profile-range"
+pattern = '^\d{1,3}-\d{1,3}$'
+default = "164-164"
+description = "Executor iterations to profile, at most 3: 163 is B's prefill, 164-290 its decode steps. Minutes per iteration."
+
+[[actions]]
+id = "nographs"
+group = "run"
+label = "No graphs (no profiler)"
+description = "Same pair with CUDA graphs off and no profiler: against a measured run it shows what graphs save."
+measured = false
+graphs = false
+minutes = 2
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "nographs", "--progress", "json"]
+
+[[actions]]
+id = "components"
+group = "run"
+label = "Components (live component stamps)"
+description = "The measured run's setup plus a stamp at every component each request passes, client and server. No profiler; labeled not measured."
+measured = false
+graphs = true
+minutes = 2
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py", "--trace", "components", "--progress", "json"]
+
+[[actions]]
+id = "check"
+group = "check"
+label = "Pass check (3 checks)"
+description = "make check: the three pass checks on the newest saved live run. Reads saved records; starts no server."
+minutes = 1
+command = ["uv", "run", "--no-sync", "pytest", "-q", "{rep}/test_i02c_l1.py"]

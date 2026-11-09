@@ -76,9 +76,10 @@ def ncu_prefix(ncu_set: str = "full", ncu_cache: str = "all", ncu_clock: str = "
             f"--import-source yes --metrics {NCU_METRICS} -o /trace/kernels -f")
 
 
-def trace_settings(trace: str, options: dict | None = None) -> dict:
+def trace_settings(trace: str, options: dict | None = None, last_iteration: int = LAST_ITERATION) -> dict:
     """The profiler prefix and iteration range a level runs with after the run's options, and the options in full
-    (defaults filled in) for labels.json. ValueError names an option the level does not take or a bad value."""
+    (defaults filled in) for labels.json. ValueError names an option the level does not take or a bad value.
+    last_iteration: the last executor iteration of the rep's workload (I02A: 129); a range may not pass it."""
     level = TRACE_LEVELS[trace]
     given = {k: v for k, v in (options or {}).items() if v is not None}
     ncu = {"ncu_set": "full", "ncu_cache": "all", "ncu_clock": "base"}
@@ -92,8 +93,8 @@ def trace_settings(trace: str, options: dict | None = None) -> dict:
     rng = rng or level.get("profile_range")
     if rng:
         a, _, b = rng.partition("-")
-        if not (a.isdigit() and b.isdigit() and 1 <= int(a) <= int(b) <= LAST_ITERATION):
-            raise ValueError(f"profile range {rng!r}: first-last, 1 <= first <= last <= {LAST_ITERATION}")
+        if not (a.isdigit() and b.isdigit() and 1 <= int(a) <= int(b) <= last_iteration):
+            raise ValueError(f"profile range {rng!r}: first-last, 1 <= first <= last <= {last_iteration}")
         if trace == "kernels" and int(b) - int(a) + 1 > MAX_KERNEL_ITERATIONS:
             raise ValueError(f"profile range {rng!r}: at most {MAX_KERNEL_ITERATIONS} iterations under Nsight Compute")
     if given:
@@ -146,7 +147,8 @@ def sh(*cmd: str, capture: bool = True, check: bool = True) -> str:
 
 
 class Stack:
-    def __init__(self, project: str, results_dir: Path, run_id: str, trace: str = "off", options: dict | None = None, model_dir: Path | None = None):        
+    def __init__(self, project: str, results_dir: Path, run_id: str, trace: str = "off", options: dict | None = None,
+                 model_dir: Path | None = None, last_iteration: int = LAST_ITERATION):
         if trace not in TRACE_LEVELS:
             raise ValueError(f"TRACE={trace}: use one of {list(TRACE_LEVELS)}")
         self.project = project
@@ -155,7 +157,7 @@ class Stack:
         self.run_dir = results_dir / run_id
         self.trace = trace
         self.model_dir = model_dir
-        self.settings = trace_settings(trace, options)  # ValueError before anything starts
+        self.settings = trace_settings(trace, options, last_iteration)  # ValueError before anything starts
         self.server_start = 0
         self.next_step = 0
 

@@ -1,0 +1,118 @@
+{
+  "run_id": "I02C-TRACE-code_20261109T220240Z_15e00d",
+  "offline_prompt_tokens": 42,
+  "clients": {
+    "A": {
+      "request_id": "I02C-TRACE-code_20261109T220240Z_15e00d-A",
+      "status": 200,
+      "complete": true,
+      "send_ns": 19736263618910,
+      "first_content_ns": 19736320740965,
+      "release_ns": 19736320781257,
+      "protocol_complete_ns": 19739598771025,
+      "usage": {
+        "completion_tokens": 128,
+        "prompt_tokens": 42,
+        "total_tokens": 170,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0,
+          "image_tokens": null,
+          "text_tokens": null
+        }
+      },
+      "durations": {
+        "headers_ms": 5.647331,
+        "ttft_ms": 57.122055,
+        "e2e_ms": 3335.152115,
+        "attempt_ms": 3335.178737,
+        "unavailable": {
+          "transport_eof_ms": "the SDK stops at [DONE] and closes the response; transport EOF is not observed",
+          "exact_itl_ms": "content events are text deliveries, not tokens; the normal path has no per-token clock"
+        }
+      }
+    },
+    "B": {
+      "request_id": "I02C-TRACE-code_20261109T220240Z_15e00d-B",
+      "status": 200,
+      "complete": true,
+      "send_ns": 19736320899380,
+      "first_content_ns": 19739701332336,
+      "release_ns": null,
+      "protocol_complete_ns": 19744099665809,
+      "usage": {
+        "completion_tokens": 128,
+        "prompt_tokens": 42,
+        "total_tokens": 170,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0,
+          "image_tokens": null,
+          "text_tokens": null
+        }
+      },
+      "durations": {
+        "headers_ms": 3.691039,
+        "ttft_ms": 3380.432956,
+        "e2e_ms": 7778.766429,
+        "attempt_ms": 7778.783935,
+        "unavailable": {
+          "transport_eof_ms": "the SDK stops at [DONE] and closes the response; transport EOF is not observed",
+          "exact_itl_ms": "content events are text deliveries, not tokens; the normal path has no per-token clock"
+        }
+      }
+    }
+  },
+  "unavailable": [
+    {
+      "what": "A: engine queue interval",
+      "why": "no validated client/native join"
+    },
+    {
+      "what": "B: engine queue interval",
+      "why": "no validated client/native join"
+    }
+  ],
+  "native": {
+    "native_ids": [
+      3,
+      4
+    ],
+    "intervals_s": [
+      0.0031820000003790483,
+      3.2749189999994996
+    ],
+    "sum_s": 3.2781009999998787,
+    "count": 2,
+    "second_read_entries": 0
+  },
+  "prometheus_delta": {
+    "trtllm_request_queue_time_seconds_sum": 3.2781009999998787,
+    "trtllm_request_queue_time_seconds_count": 2.0,
+    "trtllm_request_success_total": 2.0
+  },
+  "queue_sum_difference_ms": 0.0,
+  "iterations_saved": null,
+  "trace": {
+    "profile_range": "158-166",
+    "native_iteration_spans": [
+      [
+        34,
+        161
+      ],
+      [
+        163,
+        290
+      ]
+    ],
+    "handoff_iterations": [
+      161,
+      163
+    ],
+    "handoff_in_range": true
+  }
+}

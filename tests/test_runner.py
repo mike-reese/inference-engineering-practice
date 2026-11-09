@@ -65,15 +65,16 @@ def test_options_outside_the_manifest_are_refused(given):
 
 def test_every_option_default_passes_the_runner_and_the_rep():
     sys.path.insert(0, str(REPO / "scripts"))
-    from compose_stack import trace_settings
+    from compose_stack import LAST_ITERATION, trace_settings
     for rep in runner.manifests().values():
+        last = rep.get("last_iteration", LAST_ITERATION)  # the rep's workload length in executor iterations
         for action in rep["actions"]:
             if not action.get("options"):
                 continue
             values, _ = runner.resolve_options(action, {})
             argv = action["argv"]
             if "--trace" in argv:  # rep.py checks the same values again (ranges, iteration count)
-                trace_settings(argv[argv.index("--trace") + 1], values)
+                trace_settings(argv[argv.index("--trace") + 1], values, last)
 
 
 # --- queue, cancel, history (P2) ------------------------------------------------------------------------------------

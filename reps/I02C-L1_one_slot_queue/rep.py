@@ -1,11 +1,14 @@
 """I02C-L1: two streamed requests sharing one engine slot (TensorRT-LLM 1.2.1, --max_batch_size 1).
 
-    make rep REP=I02C-L1_one_slot_queue      # one run: smoke and warm-up, the pair, the engine reads, stop, run.json
-    make check REP=I02C-L1_one_slot_queue    # the three pass checks on the newest saved run
+    make rep REP=I02C-L1_one_slot_queue              # the measured run: smoke and warm-up, the pair, the engine reads
+    make rep REP=I02C-L1_one_slot_queue TRACE=live   # the same pair with the engine's iteration stats: check 1's evidence
+    make rep REP=I02C-L1_one_slot_queue TRACE=timeline   # also code, kernels, nographs, components: labeled, not measured
+    make check REP=I02C-L1_one_slot_queue            # the three pass checks on the newest saved live run
 
-Keep the devtools open (http://127.0.0.1:7700): its engine collector is the only /metrics reader and saves the
-raw iteration reads into this run's folder.
+Keep the devtools open (http://127.0.0.1:7700): on a live run its engine collector is the only /metrics reader and
+this script copies its raw iteration reads into the run's folder.
 """
+import argparse
 import json
 import re
 import secrets
@@ -22,8 +25,10 @@ import httpx
 REP_DIR = Path(__file__).resolve().parent
 REPO = REP_DIR.parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
-from compose_stack import Stack, prepare_run_dir  # noqa: E402
+from compose_stack import (TRACE_IMAGE, TRACE_LEVELS, Stack, has_profiler, prepare_run_dir,  # noqa: E402
+                           trace_settings, uses_stamps)
 from gpu_sampler import GpuSampler  # noqa: E402
+from run_levels import level_engine_config, level_labels  # noqa: E402
 from inference_analysis.chat_records import chat_durations  # noqa: E402
 from inference_analysis.trace.build import write_run  # noqa: E402
 from prometheus_client.parser import text_string_to_metric_families  # noqa: E402
@@ -38,7 +43,6 @@ ENGINE_CONFIG = """dtype: bfloat16
 max_num_tokens: 1024
 return_perf_metrics: true
 perf_metrics_max_requests: 100
-enable_iter_perf_stats: true
 iter_stats_max_iterations: 1000
 kv_cache_config:
   enable_block_reuse: false
@@ -57,6 +61,25 @@ SMOKE_MAX_TOKENS = 32
 RELEASE_TIMEOUT_S = 30  # A's first content took well under 1 s in author QA; this only catches a stuck server
 HOLD_S = 6  # the collector's /metrics read waits ~2 s on the engine: let its last batch land before the stop
 DEVTOOLS = "http://127.0.0.1:7700"
+# Executor iterations (/perf_metrics numbering) of this workload: smoke 1-33, A 34-161, B 163-290.
+LAST_ITERATION = 290
+# The iterations each profiler covers by default (--profile-range changes it).
+#   timeline  the whole run: Nsight Systems records every kernel and copy of both requests.
+#   code      the slot hand-off. The PyTorch profiler writes one contiguous range, and all 257 iterations of the pair
+#             would be about 2 GB of trace. 158-166 holds every distinct code path: A decoding while B waits, A's
+#             last iteration, B scheduled, B's prefill, B's first decodes.
+#   kernels   B's first decode iteration (Nsight Compute replays every kernel: minutes per iteration).
+PROFILE_RANGES = {"timeline": f"1-{LAST_ITERATION}", "code": "158-166", "kernels": "164-164"}
+PROGRESS = False  # --progress json
+
+
+def progress(step: str, **data) -> None:
+    """--progress json: one line per step as it starts, for the devtools runner (scripts/runner.py)."""
+    if PROGRESS:
+        print("@@progress " + json.dumps({"step": step, "wall_ns": time.time_ns(), **data}), flush=True)
+    else:
+        print(step)
+
 
 def run(*cmd: str) -> str:
     return subprocess.run(cmd, check=True, text=True, capture_output=True).stdout.strip()
@@ -152,39 +175,54 @@ def save_iterations(run_id: str, run_dir: Path) -> dict:
             out.write(json.dumps(read) + "\n")
     return {key: data[key] for key in ("container", "retained", "dropped", "reading")}
 
-def run_stack(run_id: str, prompt: dict) -> Path:
+def run_stack(run_id: str, prompt: dict, trace: str, options: dict) -> Path:
     """Start, smoke and warm up, drain, baseline scrape, the pair, read its population, final scrape, stop."""
-    httpx.get(DEVTOOLS, timeout=2).raise_for_status()  # the collector must be up before the engine starts
-    run_dir = prepare_run_dir(RESULTS_DIR, run_id, ENGINE_CONFIG)
-    save_json(run_dir / "labels.json", {"trace": "off", "measured": False, "iter_stats": True, "rep": "I02C-L1"})
+    level = TRACE_LEVELS[trace]
+    profiled, slow = has_profiler(trace), trace == "kernels"
+    if level.get("iter_stats"):
+        httpx.get(DEVTOOLS, timeout=2).raise_for_status()  # the collector must be up before the engine starts
+    stack = Stack(PROJECT, RESULTS_DIR, run_id, trace=trace, options=options, model_dir=MODEL_DIR,
+                  last_iteration=LAST_ITERATION)  # a bad range fails here, before a run folder exists
+    run_dir = prepare_run_dir(RESULTS_DIR, run_id, level_engine_config(ENGINE_CONFIG, trace))
+    save_json(run_dir / "labels.json", level_labels(trace, stack.settings) | {"rep": "I02C-L1"})
     save_json(run_dir / "prompt.json", prompt)
     basis = execution_basis()
-    stack = Stack(PROJECT, RESULTS_DIR, run_id, model_dir=MODEL_DIR)
+    timeout_s = 7200 if slow else 600 if trace != "off" else 120  # a profiled iteration takes far longer
+    client_timeout = {"timeout_s": timeout_s} if profiled else {}
     sampler = GpuSampler(run_dir)
     perf, prom = {}, {}
     try:
-        print("stack up (devtools: #lifecycle)")
+        progress("stack up")
         base = stack.up()
         basis["version"] = httpx.get(f"{base}/version", timeout=5).json()
-        print("smoke and warm-up request (excluded)")
+        progress("smoke and warm-up request (excluded)")
         stack.run_step({"phase": "warmup", "isl": None, "chat_template_kwargs": TEMPLATE_KWARGS,
-                        "requests": [request(f"{run_id}-smoke", SMOKE_MESSAGES, SMOKE_MAX_TOKENS)]}, timeout_s=120)
+                        "requests": [request(f"{run_id}-smoke", SMOKE_MESSAGES, SMOKE_MAX_TOKENS)], **client_timeout},
+                       timeout_s=timeout_s)
         answer = smoke_answer(run_dir, f"{run_id}-smoke")
         print(f"smoke answer: {answer!r} (expect '4')")
         if answer != "4":
             raise RuntimeError(f"correctness smoke failed: {answer!r}; the pair is not run")
         perf["warmup"] = drain(base, expect=1, poll_s=2.0)
         prom["baseline"] = scrape(base, run_dir, "baseline")
-        print("pair: A, then B on A's first content (devtools: #requests, #engine)")
+        progress("pair: A, then B on A's first content")
         stack.run_step({"kind": "pair", "phase": "normal", "isl": prompt["tokens"], "pair": 0,
                         "chat_template_kwargs": TEMPLATE_KWARGS, "release_timeout_s": RELEASE_TIMEOUT_S,
                         "requests": [request(f"{run_id}-A", MESSAGES, MAX_TOKENS),
-                                     request(f"{run_id}-B", MESSAGES, MAX_TOKENS)]}, timeout_s=120)
+                                     request(f"{run_id}-B", MESSAGES, MAX_TOKENS)], **client_timeout},
+                       timeout_s=timeout_s)
         perf["pair"] = drain(base, expect=2, poll_s=2.0)
         perf["second"] = drain(base, expect=0, poll_s=0)  # one read, immediately after: expected empty
         prom["final"] = scrape(base, run_dir, "final")
-        print(f"hold {HOLD_S} s for the collector's last /metrics batch")
-        time.sleep(HOLD_S)
+        if profiled:  # the profiler's stop fires at the next iteration: one more request closes the capture
+            progress("closer request (ends the profiler range)")
+            stack.run_step({"phase": "closer", "isl": None, "chat_template_kwargs": TEMPLATE_KWARGS,
+                            "requests": [request(f"{run_id}-closer", SMOKE_MESSAGES, SMOKE_MAX_TOKENS)],
+                            **client_timeout}, timeout_s=timeout_s)
+            perf["closer"] = drain(base, expect=1, poll_s=2.0)
+        if level.get("iter_stats") or uses_stamps(trace):
+            progress(f"hold {HOLD_S} s for the devtools' last /metrics batch or stamp read")
+            time.sleep(HOLD_S)
     finally:
         sampler.stop()
         basis["gpu_end"] = gpu_state()
@@ -192,12 +230,13 @@ def run_stack(run_id: str, prompt: dict) -> Path:
         save_json(run_dir / "native_records.json", {"first": records(perf.get("pair", [])),
                                                     "second": records(perf.get("second", [])),
                                                     "prometheus_reads": prom})
-        try:
-            basis["iterations"] = save_iterations(run_id, run_dir)
-        except (httpx.HTTPError, KeyError) as error:
-            basis["iterations"] = {"error": f"{type(error).__name__}: {error}"}
-            print(f"WARNING: could not fetch the collector's /metrics reads: {error}")
-        print("stack down")
+        if level.get("iter_stats"):
+            try:
+                basis["iterations"] = save_iterations(run_id, run_dir)
+            except (httpx.HTTPError, KeyError) as error:
+                basis["iterations"] = {"error": f"{type(error).__name__}: {error}"}
+                print(f"WARNING: could not fetch the collector's /metrics reads: {error}")
+        progress("stack down")
         stack.down()
         log = (run_dir / f"server_s{stack.server_start}.log").read_text()
         realized = re.search(r"kv_cache_quant_algo=(\w+)", log)
@@ -206,6 +245,10 @@ def run_stack(run_id: str, prompt: dict) -> Path:
         stack.chown()
     if stack.pcap().exists():
         stack.pcap_frames()
+    if profiled:
+        progress("export profiler reports")
+        stack.export_trace()
+        stack.chown()
     return run_dir
 
 QUEUE_SUM = "trtllm_request_queue_time_seconds_sum"
@@ -249,7 +292,15 @@ def readout(run_id: str, run_dir: Path, prompt: dict) -> dict:
     out["prometheus_delta"] = {name: final[name] - base[name] if final[name] >= base[name] else None for name in base}
     prom_sum = out["prometheus_delta"][QUEUE_SUM]
     out["queue_sum_difference_ms"] = None if prom_sum is None else (out["native"]["sum_s"] - prom_sum) * 1000
-    out["iterations_saved"] = (run_dir / "engine_iterations_raw.jsonl").exists()
+    labels = json.loads((run_dir / "labels.json").read_text())
+    out["iterations_saved"] = (run_dir / "engine_iterations_raw.jsonl").exists() if labels["iter_stats"] else None
+    if labels.get("profile_range"):  # traced run: is the slot hand-off inside the profiled iterations?
+        first, last = (int(x) for x in labels["profile_range"].split("-"))
+        spans = sorted((e["perf_metrics"]["first_iter"], e["perf_metrics"]["last_iter"]) for e in native["first"])
+        handoff = [spans[0][1], spans[1][0]] if len(spans) == 2 else None  # earlier record's last, later one's first
+        out["trace"] = {"profile_range": labels["profile_range"], "native_iteration_spans": spans,
+                        "handoff_iterations": handoff,
+                        "handoff_in_range": bool(handoff) and first <= handoff[0] and handoff[1] <= last}
     save_json(run_dir / "readout.json", out)
     return out
 
@@ -278,23 +329,52 @@ def print_readout(out: dict) -> None:
     print(f"native - Prometheus queue sum: {out['queue_sum_difference_ms']} ms "
           f"(same engine timestamps: checks the export, not the clock)")
     print(f"A and B engine queue intervals: Unavailable ({NO_JOIN})")
-    if not out["iterations_saved"]:
-        print("WARNING: engine_iterations_raw.jsonl missing: the collector could not save /metrics reads "
-              "(devtools repo mount is read-only). Check 1 has no engine evidence for this run.")
+    if "trace" in out:
+        t = out["trace"]
+        print(f"traced iterations {t['profile_range']}; native iteration spans {t['native_iteration_spans']}; "
+              f"slot hand-off {t['handoff_iterations']} inside the range: {t['handoff_in_range']}")
+    if out["iterations_saved"] is None:
+        print("no iteration stats at this level: check 1's engine evidence comes from a TRACE=live run")
+    elif not out["iterations_saved"]:
+        print("WARNING: engine_iterations_raw.jsonl missing: the collector's /metrics reads were not saved. "
+              "Check 1 has no engine evidence for this run.")
 
 
 def main() -> None:
-    if os.environ.get("TRACE", "off") != "off":
-        sys.exit("I02C-L1 has one run level: TRACE=off")
-    run_id = datetime.now(timezone.utc).strftime("I02C_%Y%m%dT%H%M%SZ_") + secrets.token_hex(3)
-    print(f"run {run_id}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--trace", default=os.environ.get("TRACE") or "off", choices=list(TRACE_LEVELS))
+    parser.add_argument("--progress", choices=["none", "json"], default="none",
+                        help="json: one @@progress line per step (the devtools runner reads them)")
+    parser.add_argument("--profile-range", help="executor iterations to profile, first-last (A 34-161, B 163-290)")
+    args = parser.parse_args()
+    trace = args.trace
+    options = {"profile_range": args.profile_range or PROFILE_RANGES.get(trace)}
+    try:
+        trace_settings(trace, options, LAST_ITERATION)  # a bad option fails here, before a run folder exists
+    except ValueError as error:
+        parser.error(str(error))
+    global PROGRESS
+    PROGRESS = args.progress == "json"
+    if uses_stamps(trace):
+        run("docker", "image", "inspect", TRACE_IMAGE)  # fails clearly: run `make images` first
+    prefix = "I02C" if trace == "off" else f"I02C-TRACE-{trace}"
+    run_id = datetime.now(timezone.utc).strftime(f"{prefix}_%Y%m%dT%H%M%SZ_") + secrets.token_hex(3)
+    progress("run", run_id=run_id, trace=trace)
     prompt = offline_prompt(MESSAGES)
     print(f"offline prompt: {prompt['tokens']} tokens (thinking off)")
-    run_dir = run_stack(run_id, prompt)
+    run_dir = run_stack(run_id, prompt, trace, options)
     out = readout(run_id, run_dir, prompt)
     print_readout(out)
+    progress("run.json")
     path = write_run(run_dir)
     print(f"\nrun.json: {path}\ndevtools: {DEVTOOLS}/#trace/{run_id}")
+    progress("done", run_id=run_id)
+    if trace != "off":
+        kind = ("profiled run" if has_profiler(trace)
+                else "unprofiled run with engine iteration stats" if TRACE_LEVELS[trace].get("iter_stats")
+                else "unprofiled run with component stamps" if TRACE_LEVELS[trace].get("stamps")
+                else "unprofiled comparison run (CUDA graphs off)")
+        print(f"TRACE={trace}: {kind}, labeled; not a measured result.")
 
 
 if __name__ == "__main__":

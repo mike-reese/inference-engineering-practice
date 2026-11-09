@@ -1,0 +1,57 @@
+{
+  "first": [
+    {
+      "request_id": 3,
+      "perf_metrics": {
+        "first_iter": 34,
+        "last_iter": 161,
+        "timing_metrics": {
+          "server_arrival_time": 17998.490806,
+          "arrival_time": 17998.491491,
+          "first_scheduled_time": 17998.494686,
+          "first_token_time": 17998.540597,
+          "server_first_token_time": 17998.541551,
+          "last_token_time": 18001.469743
+        },
+        "kv_cache_metrics": {
+          "num_total_allocated_blocks": 2,
+          "num_new_allocated_blocks": 2,
+          "num_reused_blocks": 0,
+          "num_missed_blocks": 0
+        }
+      }
+    },
+    {
+      "request_id": 4,
+      "perf_metrics": {
+        "first_iter": 163,
+        "last_iter": 290,
+        "timing_metrics": {
+          "server_arrival_time": 17998.544352,
+          "arrival_time": 17998.544884,
+          "first_scheduled_time": 18001.471385,
+          "first_token_time": 18001.571341,
+          "server_first_token_time": 18001.572154,
+          "last_token_time": 18005.816851
+        },
+        "kv_cache_metrics": {
+          "num_total_allocated_blocks": 2,
+          "num_new_allocated_blocks": 2,
+          "num_reused_blocks": 0,
+          "num_missed_blocks": 0
+        }
+      }
+    }
+  ],
+  "second": [],
+  "prometheus_reads": {
+    "baseline": {
+      "start_ns": 17998464012069,
+      "end_ns": 17998470551675
+    },
+    "final": {
+      "start_ns": 18005838124532,
+      "end_ns": 18005846742343
+    }
+  }
+}
