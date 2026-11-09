@@ -44,9 +44,10 @@ Preconditions:
   `toolkit: no module row above this kernel (last kernel before the cursor)`,
   `runtime: cudaMemcpyAsync_v3020 at 73287.024 ms (CPU side) (last kernel before the cursor)` and
   `device code: device to host · 4 B (last kernel before the cursor)`.
-- **Strip select.** `$CCV click --css '#stage .aw .strip rect.u[data-l="4"]' --after arch-strip-kernel`: `sel` `9834`
+- **Strip select.** `$CCV click --css '#stage .aw .strip rect.u[data-l="4"]' --after arch-strip-kernel`: `sel` `9844`
   (`kernel: Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_128x64_64x3_tn_align8>`), `t` `72228656575`.
-  The layers read `runtime: cuLaunchKernel at 72228.648 ms (CPU side)` and
+  The layers read `toolkit: layer 0 · tensorrt_llm/_torch/modules/linear.py(2303): forward (inferred, M2)`,
+  `runtime: cuLaunchKernel at 72228.648 ms (CPU side)` and
   `device code: Kernel2<…> · grid 8×1×5 · 36 of 36 SMs (inferred from the grid)`.
 - **Strip fit.** `$CCV click --css '#stage .aw .strip [data-fit]'`: the toggle reads `[run]`, then `[fit]` again.
 - **Strip seek.** `$CCV click --css '#stage .aw .strip svg' --frac 0.6,0.97`: `t` moves (to `52317855238` here);

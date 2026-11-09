@@ -43,16 +43,25 @@ Preconditions:
   `$CCV click --css '.b-body details:has([data-raw]) > summary'`, then `$CCV click --css '.b-body [data-raw]'`.
   `.b-body [data-raw-out]` shows the record: `{ "t0": 2848238637901, "t1": null, "proc": "client", "box":
   "send_one", "name": "send", "xrid": "I02A-TRACE-timeline_20261109T060522Z_ee2252-measured", …`.
+- **Kernel path (M2).** Open R1 as above with `"sel":{"eid":"kernel/i66/Kernel2#96"}`. `.b-body ol.path` reads
+  request `measured`, iteration `iteration 66`, phase `[Executor] _forward_step 65: 1 ctx reqs, 0 gen reqs`, layer
+  `layer 24 of iteration 66`, three modules tagged `inferred (M2)` (`logits_processor.py(13)`, `embedding.py(90)`,
+  `linear.py(2303)`, innermost last), kernel (CPU side) `cuLaunchKernel`, kernel `Kernel2<…>`. With
+  `kernel/i70/kernel_mha#0` (decode attention, unmatched) the module step reads `none: no inferred module holds this
+  kernel (M2)` and the launch call is `cudaGraphLaunch_v10000`. The code run `I02A-TRACE-code_20261103T170709Z_0ac2db`
+  has no iteration or phase rows, so its kernel path reads request, layer, its measured module frames (untagged),
+  the launch call, the kernel.
 - **At cursor.** `$CCV click --css '.b-tabs [data-tab=cursor]'`: `73378.117 ms from the run's t0 · everything true at
   the cursor`, then request `measured`, iteration `iteration 64`, phase `_fetch_new_requests`, layer `layer 24 of
-  iteration 64`, module `–`, kernel `device to host (copy)`.
+  iteration 64`, module `tensorrt_llm/_torch/modules/linear.py(2303): forward` tagged `inferred (M2)`, kernel
+  `device to host (copy)`.
 - **Metrics.** `[data-tab=metrics]` starts `Metrics as they are calculated at import (aux.json), with the rows each
   one reads.` Its TTFT split bar (`.segbar .seg[data-m]`) selects a metric per segment; `walkthroughs.sh` clicks all 7.
 - **Tokens.** `[data-tab=tokens]` starts `requests: warmup · measured · closer` `measured · 64 tokens · each read on
   three clocks`. Its third row reads `3 " KV" iteration 68 27.739 ms 30.304 ms 30.628 ms 3.615 ms 2.565 ms 0.323 ms ↦`;
   `$CCV click --css '.b-body [data-seek]' --nth 2` moves `t` to `73405855954` and keeps `sel`.
 - **Kernels.** `[data-tab=kernels]` starts `iteration 64 · 310 device rows (266 kernels, 44 copies and memsets) · 0
-  profiled · module missing: no module frames in this run (M2)`. It holds one Nsight button:
+  profiled · modules inferred (M2): 101 of 310 device rows in no module`. It holds one Nsight button:
   `$CCV eval '[...document.querySelectorAll("#bar [data-open]")].map((b) => b.textContent.trim() + " " + b.dataset.open)'`
   gives `Nsight Systems ↗ {"run":"I02A-TRACE-timeline_20261109T060522Z_ee2252","path":"trace/timeline.nsys-rep"}`.
   Do not click it (see Gotchas).
