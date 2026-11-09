@@ -25,7 +25,8 @@
 // now(t): exec[i] is the unit of execution tier i holding t, else the last one started before t, as {id, t0, t1} or
 // null; kernel the kernel-tier unit holding t; phases every phase holding t; flow the flow name of exec[phase] and
 // flows those of phases; comp the component thing of exec[phase] (else of the request), -1 when none; archPath the
-// thing indexes from the host down to the lane of exec[phase]; process the process thing on it, or -1; sample is
+// thing indexes from the host down to the lane of exec[phase], then the phase's own component (never the request's:
+// that one runs in another process); process the process thing on it, or -1; sample is
 // RunStore.samplesAt(t) (aligned with store().metrics; NaN = no fresh sample) and sampleIndex changes exactly when
 // one of those samples does; transfers (memcpy and memset units holding t) and hwActive (the hardware things the
 // rows at t ran on, with their ancestors) are computed when read.
@@ -359,9 +360,10 @@ function nowOf(S, t) {
   const flow = exec[P] ? S.dims.flowOf(exec[P].id) : null;
   const flows = new Set(phases.map((x) => S.dims.flowOf(x.id)).filter(Boolean));
   const compOf = (x) => { const c = x ? S.field("comp", x.id) : NONE16; return c === NONE16 ? -1 : c; };
-  const comp = compOf(exec[P]) >= 0 ? compOf(exec[P]) : compOf(exec[0]);
+  const own = compOf(exec[P]), comp = own >= 0 ? own : compOf(exec[0]);
   const archPath = [];
   if (exec[P]) for (let x = S.things[S.field("lane", exec[P].id)]; x; x = x.parent >= 0 ? S.things[x.parent] : null) archPath.unshift(x.i);
+  if (own >= 0) archPath.push(own);
   const process = archPath.find((i) => S.things[i].kind === "process") ?? -1;
   let sampleIndex = 0;
   for (const g of S.sampleGroups) { let lo = 0, hi = g.n; while (lo < hi) { const k = (lo + hi) >>> 1; if (g.ts[k] <= t) lo = k + 1; else hi = k; } sampleIndex += lo; }
