@@ -340,30 +340,6 @@ export class RunStore {
   /** Alt ← →: the next or previous row of the every-row walk; scope null, {process: thing} or {object: row id}. */
   walk(dim, tier, c, dir, scope = null) { return this.dims.walk(dim, tier, c, dir, scope); }
 
-  /**
-   * Storage-tier stepping, for the page until M1 moves it to step(dim, tier): the next (dir +1) or previous (dir -1)
-   * row in (start, id) order with storage tier <= r. Ties at one start are visited one by one in id order. Returns
-   * null at the end of the run.
-   * @param {Cursor} c @param {1|-1} dir @param {number} r @returns {Cursor|null}
-   */
-  stepStorage(c, dir, r) {
-    let bt = dir > 0 ? Infinity : -Infinity, bid = -1;
-    for (const b of this.blocks) {
-      const idx = b.step[r]; if (!idx.length) continue;
-      const { start, id } = b.cols;
-      if (dir > 0) {
-        let k = lower(start, idx, c.t);
-        while (k < idx.length && start[idx[k]] === c.t && id[idx[k]] <= c.id) k++;
-        if (k < idx.length) { const s = start[idx[k]], i = id[idx[k]]; if (s < bt || (s === bt && i < bid)) { bt = s; bid = i; } }
-      } else {
-        let k = upper(start, idx, c.t) - 1;
-        while (k >= 0 && start[idx[k]] === c.t && (c.id < 0 || id[idx[k]] >= c.id)) k--;
-        if (k >= 0) { const s = start[idx[k]], i = id[idx[k]]; if (s > bt || (s === bt && i > bid)) { bt = s; bid = i; } }
-      }
-    }
-    return bid < 0 ? null : { t: bt, id: bid };
-  }
-
   /** The step tier for a window: the finest tier whose median start gap is at least 6 px at this width. */
   grainFor(width, px) {
     for (let r = N_TIERS - 1; r > 0; r--) if (this.gap[r] < this.gap[r - 1] && this.gap[r] * px / width >= MIN_TICK_PX) return r;
