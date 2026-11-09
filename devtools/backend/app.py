@@ -119,8 +119,6 @@ async def engine_iterations_raw(request: web.Request) -> web.Response:
 
 async def component_stamps(request: web.Request) -> web.Response:
     """Every component stamp held, per run (?run= for one): what the Components tab starts from."""
-    if request.query.get("saved"):  # v2 scene: any saved run, read from disk (?saved=<run id>)
-        return web.json_response(await asyncio.to_thread(request.app["components"].saved, request.query["saved"]))
     return web.json_response(request.app["components"].history(request.query.get("run")))
 
 
