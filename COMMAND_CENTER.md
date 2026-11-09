@@ -143,6 +143,7 @@ Every rep has a `moments.toml` beside its README (owner). Each moment names wher
 | `note` | why it matters, two sentences at most |
 | `evidence` | result paths shown beside it, each with a label |
 | `result` | optional: the run's result file the paths read, relative to the run folder. Default `latency.json`, read per request (the moments' `request` entry); any other file is read whole (I02C `readout.json`, I01-L2 `analysis/summary.json`) |
+| `complete` | optional: a result path that says whether the run's request finished, e.g. I02C `clients.B.complete`. A run where it is false is listed as "results not computed", as a `latency.json` with no entry for the request is (I02C run 5626f7: B timed out with no headers or tokens) |
 
 Paths read the run's result, so one file serves every run of the rep. A segment is picked by the start of its name
 (`segments[first_scheduled_time].ms`), never by index: older I02A runs have 8 TTFT segments, newer runs 7 (measured).
@@ -380,7 +381,7 @@ Server `backend/store/serve.py`:
 - `GET /api/v3/runs/{run}/raw?id=`: the raw record from the run folder
 - `GET /api/v3/reps` (`backend/store/reps.py`): `{reps, runs}` in D13's `session-data.json` shape; a run's `result`
   is read from the result file its rep's `moments.toml` names (2.6): `latency.json`'s summary of the moments' request,
-  or any other file whole; null when the run has none (results not computed)
+  or any other file whole; null when the run has none or its `complete` value is false (results not computed)
 - `WS /api/v3/stream?run=&have=`: append deltas, seal (`derived: {ids, parent, cause, tier, depth}`), generation
   and status frames
 
