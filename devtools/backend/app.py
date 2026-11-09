@@ -21,7 +21,7 @@ from collectors.records import RecordsCollector
 
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
 PROXIES = {"grafana": "http://127.0.0.1:7730", "prometheus": "http://127.0.0.1:7790",
-           "runner": "http://127.0.0.1:7701"}  # the host runner (scripts/runner.py), started by make devtools
+           "runner": os.environ.get("RUNNER_URL", "http://127.0.0.1:7701")}  # the host runner (scripts/runner.py), started by make devtools
 
 
 async def live(request: web.Request) -> web.StreamResponse:
