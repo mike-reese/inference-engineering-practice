@@ -52,6 +52,8 @@ const CSS = `
 .sp2 .rl { position:absolute; left:4px; width:${GL - 10}px; display:flex; align-items:center; padding:0 6px; cursor:pointer; border-radius:4px;
   font:11.5px ui-monospace, monospace; text-transform:uppercase; letter-spacing:.3px; border-left:3px solid currentColor; background:#070a10; white-space:nowrap; overflow:hidden; }
 .sp2 .rl:hover { background:#1a2333; } .sp2 .rl.on { font-weight:700; color:#fff !important; background:#ffffff1a; }
+.sp2 .rl.inf { flex-direction:column; align-items:flex-start; justify-content:center; }
+.sp2 .rl small { font-size:9.5px; text-transform:none; letter-spacing:0; opacity:.85; }
 .sp2 .hl { position:absolute; top:0; left:${GL}px; right:${GR}px; height:${HEAD}px; display:flex; gap:12px; align-items:center; overflow:hidden;
   white-space:nowrap; font-size:11.5px; color:#a9b8cc; pointer-events:none; }
 .sp2 .hl b { color:#fff; background:#ffffff14; padding:0 6px; border-radius:3px; }
@@ -77,6 +79,27 @@ function tickLabel(t, step) {
 }
 const isLive = (S) => !!S?.live && !S.live.ended;
 const nowText = (v) => (Number.isNaN(v) ? "no sample now" : `${fmtValue(v, "%")} now`);
+/** M2 (COMMAND_CENTER.md 7.4): a run's inferred module rows and, per iteration, its kernel stops and how many of them
+ *  no inferred module holds. null for a run with none (they come only from a final import, never a live one). */
+const inferredOf = new WeakMap();
+function inferred(S) {
+  if (inferredOf.has(S)) return inferredOf.get(S);
+  const mod = S.kinds.find((k) => k.name === "inferred module")?.code ?? -1, rows = mod >= 0 ? S.dims.byKind[mod] : null;
+  let out = null;
+  if (rows?.length) {
+    out = { modules: rows.length, byIter: new Map() };
+    for (const id of S.dims.stops("execution", "kernel").ids) {
+      const it = S.field("iter", id), p = S.field("parent", id);
+      if (it < 0) continue;
+      const c = out.byIter.get(it) ?? { stops: 0, unmatched: 0 };
+      c.stops++;
+      if (p < 0 || S.field("kind", p) !== mod) c.unmatched++;
+      out.byIter.set(it, c);
+    }
+  }
+  inferredOf.set(S, out);
+  return out;
+}
 
 export function mount(el) {
   const key = (k) => `cc.spine.lens.${k}`;
@@ -275,7 +298,11 @@ export function mount(el) {
     const dram = dr.length ? dr.reduce((s, i) => s + n.sample[i], 0) : NaN;
     const samples = sm < 0 && !dr.length ? "samples: this run has no SMs-active or DRAM samples"
       : `samples, ${fmtSpan(S.samplePeriod(sm >= 0 ? sm : dr[0]))} state, never stops${sm >= 0 ? ` · fill: SMs active avg (${nowText(n.sample[sm])})` : ""}${dr.length ? ` · line: DRAM read + write (${nowText(dram)})` : ""}`;
-    hl.innerHTML = `<span>t = ${ms(state.t)}</span><span style="color:${HWC}">${esc(samples)}</span>
+    const E = S.dims.ladders.execution, inf = inferred(S), at = n.exec[E.indexOf("iteration")];
+    const it = at ? S.field("iter", at.id) : -1, c = inf?.byIter.get(it);
+    const modules = !inf ? "" : `<span style="color:${BAND_COL[E.indexOf("module")]}">modules inferred (M2) · ${it < 0
+      ? "no iteration at t" : c ? `iteration ${it}: ${c.unmatched} of ${c.stops} kernel stops unmatched` : `iteration ${it}: no kernel stops`}</span>`;
+    hl.innerHTML = `<span>t = ${ms(state.t)}</span>${modules}<span style="color:${HWC}">${esc(samples)}</span>
       <span style="color:#e3b341">play bounds ${ms(state.bounds[0])} to ${ms(state.bounds[1])}</span><span class="hint">wheel zoom · drag pan · double-click fit</span>`;
   }
   /** Why no run is drawn: the open failed, a launch has no run yet, or the store is still opening. */
@@ -290,8 +317,12 @@ export function mount(el) {
     const S = store(), L_ = ladders(), et = state.tiers.execution;
     lit = metricInputs();
     rowLabels.forEach((d, i) => {
-      const n = L_?.execution?.[i] ?? "";
-      d.textContent = `${i + 1} ${n}`; d.title = `zoom the bands to execution tier ${i + 1}${n ? ` (${n})` : ""}`; d.classList.toggle("on", i === et);
+      const n = L_?.execution?.[i] ?? "", inf = n === "module" && S ? inferred(S) : null;
+      d.innerHTML = `${i + 1} ${esc(n)}${inf ? "<small>inferred</small>" : ""}`; d.classList.toggle("inf", !!inf);
+      d.title = `zoom the bands to execution tier ${i + 1}${n ? ` (${n})` : ""}${inf ? `. ${inf.modules.toLocaleString()} module rows are `
+        + "inferred (M2): matched to the code run's module frames by their kernels; the headline counts the kernel stops of the "
+        + "cursor's iteration that no module holds" : ""}`;
+      d.classList.toggle("on", i === et);
     });
     const sm = S ? roleOf(S, "sm_active") : -1;
     sampleLbl.title = S ? `samples, state not stops: fill ${sm >= 0 ? `${S.metrics[sm].label} avg (${fmtSpan(S.samplePeriod(sm))})` : "none (no SMs-active samples)"}, line DRAM read + write %` : "samples";

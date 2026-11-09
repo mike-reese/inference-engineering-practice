@@ -240,7 +240,9 @@ export class Bands {
     if (!band) return null;
     const r = L.rows[i], lower = y >= r.y + r.h / 2;
     const k = find(band.u, 1, (j) => !band.low || (band.low[j] === 1) === lower);
-    return k < 0 ? null : { id: band.u.ids[k], title: unitLabel(S, band.name, band.u.ids[k]) };
+    if (k < 0) return null;
+    const id = band.u.ids[k], kind = S.kinds.find((c) => c.code === S.field("kind", id));
+    return { id, title: `${unitLabel(S, band.name, id)}${kind?.name === "inferred module" ? " (inferred, M2)" : ""}` };
   }
 }
 
