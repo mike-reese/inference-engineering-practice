@@ -1,0 +1,1718 @@
+server-1  | 2026-11-09T06:07:41.534002993Z 
+server-1  | 2026-11-09T06:07:41.534086188Z =============
+server-1  | 2026-11-09T06:07:41.534090435Z == PyTorch ==
+server-1  | 2026-11-09T06:07:41.534129283Z =============
+server-1  | 2026-11-09T06:07:41.535531914Z 
+server-1  | 2026-11-09T06:07:41.535544319Z NVIDIA Release 25.12 (build 245654590)
+server-1  | 2026-11-09T06:07:41.535548253Z PyTorch Version 2.10.0a0+b4e4ee8
+server-1  | 2026-11-09T06:07:41.536129696Z Container image Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+server-1  | 2026-11-09T06:07:41.536692515Z Copyright (c) 2014-2024 Facebook Inc.
+server-1  | 2026-11-09T06:07:41.536696589Z Copyright (c) 2011-2014 Idiap Research Institute (Ronan Collobert)
+server-1  | 2026-11-09T06:07:41.536698365Z Copyright (c) 2012-2014 Deepmind Technologies    (Koray Kavukcuoglu)
+server-1  | 2026-11-09T06:07:41.536699845Z Copyright (c) 2011-2012 NEC Laboratories America (Koray Kavukcuoglu)
+server-1  | 2026-11-09T06:07:41.536701314Z Copyright (c) 2011-2013 NYU                      (Clement Farabet)
+server-1  | 2026-11-09T06:07:41.536702820Z Copyright (c) 2006-2010 NEC Laboratories America (Ronan Collobert, Leon Bottou, Iain Melvin, Jason Weston)
+server-1  | 2026-11-09T06:07:41.536704317Z Copyright (c) 2006      Idiap Research Institute (Samy Bengio)
+server-1  | 2026-11-09T06:07:41.536705737Z Copyright (c) 2001-2004 Idiap Research Institute (Ronan Collobert, Samy Bengio, Johnny Mariethoz)
+server-1  | 2026-11-09T06:07:41.536707322Z Copyright (c) 2015      Google Inc.
+server-1  | 2026-11-09T06:07:41.536708961Z Copyright (c) 2015      Yangqing Jia
+server-1  | 2026-11-09T06:07:41.536710414Z Copyright (c) 2013-2016 The Caffe contributors
+server-1  | 2026-11-09T06:07:41.536711911Z All rights reserved.
+server-1  | 2026-11-09T06:07:41.537278502Z 
+server-1  | 2026-11-09T06:07:41.537283472Z Various files include modifications (c) NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+server-1  | 2026-11-09T06:07:41.537284796Z 
+server-1  | 2026-11-09T06:07:41.537285643Z GOVERNING TERMS: The software and materials are governed by the NVIDIA Software License Agreement
+server-1  | 2026-11-09T06:07:41.537286574Z (found at https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-software-license-agreement/)
+server-1  | 2026-11-09T06:07:41.537287500Z and the Product-Specific Terms for NVIDIA AI Products
+server-1  | 2026-11-09T06:07:41.537288446Z (found at https://www.nvidia.com/en-us/agreements/enterprise-software/product-specific-terms-for-ai-products/).
+server-1  | 2026-11-09T06:07:41.892523253Z 
+server-1  | 2026-11-09T06:07:41.892537309Z NOTE: The SHMEM allocation limit is set to the default of 64MB.  This may be
+server-1  | 2026-11-09T06:07:41.892538812Z    insufficient for PyTorch.  NVIDIA recommends the use of the following flags:
+server-1  | 2026-11-09T06:07:41.892539857Z    docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 ...
+server-1  | 2026-11-09T06:07:41.892540922Z 
+server-1  | 2026-11-09T06:07:44.494734317Z ==PROF== Connected to process 208 (/usr/bin/python3.12)
+server-1  | 2026-11-09T06:07:46.085324891Z /usr/local/lib/python3.12/dist-packages/torch/library.py:356: UserWarning: Warning only once for all operators,  other operators may also be overridden.
+server-1  | 2026-11-09T06:07:46.085344891Z   Overriding a previously registered kernel for the same operator and the same dispatch key
+server-1  | 2026-11-09T06:07:46.085346881Z   operator: flash_attn::_flash_attn_backward(Tensor dout, Tensor q, Tensor k, Tensor v, Tensor out, Tensor softmax_lse, Tensor(a6!)? dq, Tensor(a7!)? dk, Tensor(a8!)? dv, float dropout_p, float softmax_scale, bool causal, SymInt window_size_left, SymInt window_size_right, float softcap, Tensor? alibi_slopes, bool deterministic, Tensor? rng_state=None) -> Tensor
+server-1  | 2026-11-09T06:07:46.085348734Z     registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922
+server-1  | 2026-11-09T06:07:46.085349705Z   dispatch key: ADInplaceOrView
+server-1  | 2026-11-09T06:07:46.085350560Z   previous kernel: no debug info
+server-1  | 2026-11-09T06:07:46.085351824Z        new kernel: registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922 (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/core/dispatch/OperatorEntry.cpp:208.)
+server-1  | 2026-11-09T06:07:46.085352944Z   self.m.impl(
+server-1  | 2026-11-09T06:07:49.496900906Z /usr/local/lib/python3.12/dist-packages/modelopt/torch/__init__.py:36: UserWarning: transformers version 4.57.3 is incompatible with nvidia-modelopt and may cause issues. Please install recommended version with `pip install nvidia-modelopt[hf]` if working with HF models.
+server-1  | 2026-11-09T06:07:49.496915800Z   _warnings.warn(
+server-1  | 2026-11-09T06:07:51.007740422Z ==PROF== Connected to process 276 (/usr/bin/python3.12)
+server-1  | 2026-11-09T06:08:02.734156402Z ==PROF== Disconnected from process 276
+server-1  | 2026-11-09T06:08:06.583838214Z [TensorRT-LLM] TensorRT LLM version: 1.2.1
+server-1  | 2026-11-09T06:08:07.037869191Z /usr/local/lib/python3.12/dist-packages/tensorrt_llm/serve/openai_protocol.py:104: UserWarning: Field name "schema" in "ResponseFormat" shadows an attribute in parent "OpenAIBaseModel"
+server-1  | 2026-11-09T06:08:07.037884173Z   class ResponseFormat(OpenAIBaseModel):
+server-1  | 2026-11-09T06:08:07.174916145Z [11/09/2026-06:08:07] [TRT-LLM] [W] Overriding kv_cache_config 
+server-1  | 2026-11-09T06:08:07.175126552Z [11/09/2026-06:08:07] [TRT-LLM] [I] Using LLM with PyTorch backend
+server-1  | 2026-11-09T06:08:07.175434248Z [11/09/2026-06:08:07] [TRT-LLM] [I] neither checkpoint_format nor checkpoint_loader were provided, checkpoint_format will be set to HF.
+server-1  | 2026-11-09T06:08:07.342309132Z The argument `trust_remote_code` is to be used with Auto classes. It has no effect here and is ignored.
+server-1  | 2026-11-09T06:08:07.342394307Z You are using a model of type qwen2 to instantiate a model of type . This is not supported for all configurations of models and can yield errors.
+server-1  | 2026-11-09T06:08:07.344122476Z `torch_dtype` is deprecated! Use `dtype` instead!
+server-1  | 2026-11-09T06:08:07.344345306Z [11/09/2026-06:08:07] [TRT-LLM] [W] Orchestrator is creating IPC executor
+server-1  | 2026-11-09T06:08:07.344405271Z [33;20mrank 0 using MpiPoolSession to spawn MPI processes
+server-1  | 2026-11-09T06:08:07.344972992Z [11/09/2026-06:08:07] [TRT-LLM] [I] Generating a new HMAC key for server proxy_request_queue
+server-1  | 2026-11-09T06:08:07.345192600Z [11/09/2026-06:08:07] [TRT-LLM] [I] Generating a new HMAC key for server worker_init_status_queue
+server-1  | 2026-11-09T06:08:07.345394751Z [11/09/2026-06:08:07] [TRT-LLM] [I] Generating a new HMAC key for server proxy_result_queue
+server-1  | 2026-11-09T06:08:07.643533708Z ==PROF== Connected to process 341 (/usr/bin/python3.12)
+server-1  | 2026-11-09T06:08:10.486293175Z [0m/usr/local/lib/python3.12/dist-packages/torch/library.py:356: UserWarning: Warning only once for all operators,  other operators may also be overridden.
+server-1  | 2026-11-09T06:08:10.486304093Z   Overriding a previously registered kernel for the same operator and the same dispatch key
+server-1  | 2026-11-09T06:08:10.486305757Z   operator: flash_attn::_flash_attn_backward(Tensor dout, Tensor q, Tensor k, Tensor v, Tensor out, Tensor softmax_lse, Tensor(a6!)? dq, Tensor(a7!)? dk, Tensor(a8!)? dv, float dropout_p, float softmax_scale, bool causal, SymInt window_size_left, SymInt window_size_right, float softcap, Tensor? alibi_slopes, bool deterministic, Tensor? rng_state=None) -> Tensor
+server-1  | 2026-11-09T06:08:10.486307490Z     registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922
+server-1  | 2026-11-09T06:08:10.486308618Z   dispatch key: ADInplaceOrView
+server-1  | 2026-11-09T06:08:10.486309530Z   previous kernel: no debug info
+server-1  | 2026-11-09T06:08:10.486310583Z        new kernel: registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922 (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/core/dispatch/OperatorEntry.cpp:208.)
+server-1  | 2026-11-09T06:08:10.486311695Z   self.m.impl(
+server-1  | 2026-11-09T06:08:13.965024758Z Multiple distributions found for package optimum. Picked distribution: optimum
+server-1  | 2026-11-09T06:08:13.966412147Z Multiple distributions found for package modelopt. Picked distribution: nvidia-modelopt
+server-1  | 2026-11-09T06:08:14.197253387Z /usr/local/lib/python3.12/dist-packages/modelopt/torch/__init__.py:36: UserWarning: transformers version 4.57.3 is incompatible with nvidia-modelopt and may cause issues. Please install recommended version with `pip install nvidia-modelopt[hf]` if working with HF models.
+server-1  | 2026-11-09T06:08:14.197271219Z   _warnings.warn(
+server-1  | 2026-11-09T06:08:17.999490724Z [TensorRT-LLM] TensorRT LLM version: 1.2.1
+server-1  | 2026-11-09T06:08:18.430125967Z /usr/local/lib/python3.12/dist-packages/tensorrt_llm/serve/openai_protocol.py:104: UserWarning: Field name "schema" in "ResponseFormat" shadows an attribute in parent "OpenAIBaseModel"
+server-1  | 2026-11-09T06:08:18.430140272Z   class ResponseFormat(OpenAIBaseModel):
+server-1  | 2026-11-09T06:08:18.568185512Z [11/09/2026-06:08:18] [TRT-LLM] [W] cloudpickle is not installed. TransformersTokenizer will not be serializable across nodes in multi-node setups. Install cloudpickle to fix this: pip install cloudpickle
+server-1  | 2026-11-09T06:08:18.843570649Z [TensorRT-LLM][INFO] Refreshed the MPI local session
+server-1  | 2026-11-09T06:08:18.931332026Z [11/09/2026-06:08:18] [TRT-LLM] [W] Worker process 341 is affined to run on the following CPUs: [2, 10] (subset of all logical CPUs). This may harm performance if set incorrectly.
+server-1  | 2026-11-09T06:08:18.931347845Z [11/09/2026-06:08:18] [TRT-LLM] [W] Worker process 341 has constrained CPU affinity but `TLLM_NUMA_AWARE_WORKER_AFFINITY` is not set. Removing CPU affinity constraints.
+server-1  | 2026-11-09T06:08:18.958913087Z [11/09/2026-06:08:18] [TRT-LLM] [I] ATTENTION RUNTIME FEATURES:  AttentionRuntimeFeatures(chunked_prefill=False, cache_reuse=False, has_speculative_draft_tokens=False, chunk_size=8192, chunked_prefill_buffer_batch_size=4)
+server-1  | 2026-11-09T06:08:18.960040275Z `torch_dtype` is deprecated! Use `dtype` instead!
+server-1  | 2026-11-09T06:08:18.961225927Z [11/09/2026-06:08:18] [TRT-LLM] [I] Validating KV Cache config against kv_cache_dtype="auto"
+server-1  | 2026-11-09T06:08:18.961234625Z [11/09/2026-06:08:18] [TRT-LLM] [I] KV cache quantization set to "auto". Using checkpoint KV quantization.
+server-1  | 2026-11-09T06:08:19.385013139Z [11/09/2026-06:08:19] [TRT-LLM] [I] Use 1.17 GB for model weights.
+server-1  | 2026-11-09T06:08:19.385263507Z [11/09/2026-06:08:19] [TRT-LLM] [I] Prefetching 0.92GB checkpoint files.
+server-1  | 2026-11-09T06:08:19.385532104Z [11/09/2026-06:08:19] [TRT-LLM] [I] Prefetching /model/model.safetensors to memory...
+server-1  | 2026-11-09T06:08:19.727417592Z [11/09/2026-06:08:19] [TRT-LLM] [I] Finished prefetching /model/model.safetensors.
+server-1  | 2026-11-09T06:08:19.728050351Z [11/09/2026-06:08:19] [TRT-LLM] [I] Start to load safetensor file /model/model.safetensors
+server-1  | 2026-11-09T06:08:19.733759813Z 
+Loading safetensors weights in parallel:   0%|          | 0/1 [00:00<?, ?it/s]
+Loading safetensors weights in parallel: 100%|██████████| 1/1 [00:00<00:00, 172.37it/s]
+server-1  | 2026-11-09T06:08:19.906042939Z 
+Loading weights concurrently:   0%|          | 0/488 [00:00<?, ?it/s]
+Loading weights concurrently:  37%|███▋      | 180/488 [00:00<00:00, 1793.86it/s]
+Loading weights concurrently: 100%|██████████| 488/488 [00:00<00:00, 2846.23it/s]
+server-1  | 2026-11-09T06:08:19.906877554Z Model init total -- 0.95s
+server-1  | 2026-11-09T06:08:19.910148686Z [11/09/2026-06:08:19] [TRT-LLM] [W] max_num_tokens (8192) shouldn't be greater than max_seq_len * max_batch_size (2048), specifying to max_seq_len * max_batch_size (2048).
+server-1  | 2026-11-09T06:08:19.912044893Z [11/09/2026-06:08:19] [TRT-LLM] [I] Using Sampler: TorchSampler
+server-1  | 2026-11-09T06:08:19.915635390Z [11/09/2026-06:08:19] [TRT-LLM] [I] [create_py_executor] Created execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0xa1566d0>
+server-1  | 2026-11-09T06:08:19.916761226Z [11/09/2026-06:08:19] [TRT-LLM] [I] [kv cache manager] Primary/secondary blocks for window sizes set to {2049: (66, 0)} for estimation dry run
+server-1  | 2026-11-09T06:08:19.916797109Z [11/09/2026-06:08:19] [TRT-LLM] [I] [KVCacheManager] execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0xa1566d0>
+server-1  | 2026-11-09T06:08:19.919561446Z [TensorRT-LLM][INFO] Max KV cache blocks per sequence: 65 [window size=2049], tokens per block=32, primary blocks=66, secondary blocks=0, max sequence length=2049
+server-1  | 2026-11-09T06:08:19.919604282Z [TensorRT-LLM][INFO] Number of tokens per block: 32.
+server-1  | 2026-11-09T06:08:19.919610889Z [TensorRT-LLM][INFO] [MemUsageChange] Allocated 0.02 GiB for max tokens in paged KV cache (2112).
+server-1  | 2026-11-09T06:08:19.920071648Z [11/09/2026-06:08:19] [TRT-LLM] [I] max_seq_len=2049, max_num_requests=1, max_num_tokens=2048, max_batch_size=1
+server-1  | 2026-11-09T06:08:19.920108434Z [11/09/2026-06:08:19] [TRT-LLM] [I] cache_transceiver is disabled
+server-1  | 2026-11-09T06:08:19.920130946Z [11/09/2026-06:08:19] [TRT-LLM] [I] [PyExecutor] execution_stream initialized: <torch.cuda.Stream device=cuda:0 cuda_stream=0xa1566d0>. 
+server-1  | 2026-11-09T06:08:19.920398735Z [11/09/2026-06:08:19] [TRT-LLM] [I] Running autotuner warmup...
+server-1  | 2026-11-09T06:08:19.920595239Z [11/09/2026-06:08:19] [TRT-LLM] [I] [Autotuner] Autotuning process starts ...
+server-1  | 2026-11-09T06:08:22.196959175Z [11/09/2026-06:08:22] [TRT-LLM] [I] PDL enabled
+server-1  | 2026-11-09T06:08:39.254908606Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33572096 bytes
+server-1  | 2026-11-09T06:08:42.202145097Z [11/09/2026-06:08:42] [TRT-LLM] [I] [Autotuner] Autotuning process ends
+server-1  | 2026-11-09T06:08:42.202160009Z [11/09/2026-06:08:42] [TRT-LLM] [I] [Autotuner] Cache size after warmup is 0
+server-1  | 2026-11-09T06:08:42.202181476Z [11/09/2026-06:08:42] [TRT-LLM] [I] Creating CUDA graph instances for 1 batch sizes.
+server-1  | 2026-11-09T06:08:42.202489577Z [11/09/2026-06:08:42] [TRT-LLM] [I] Run generation-only CUDA graph warmup for batch size=1, draft_len=0, max_seq_len=2048
+server-1  | 2026-11-09T06:08:42.407714234Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33555968 bytes
+server-1  | 2026-11-09T06:08:42.506095505Z [11/09/2026-06:08:42] [TRT-LLM] [I] global_steady_clock_offset at each rank: [0.0]
+server-1  | 2026-11-09T06:08:42.506105636Z [11/09/2026-06:08:42] [TRT-LLM] [I] Setting global_steady_clock_offset: 0.0 seconds for rank 0
+server-1  | 2026-11-09T06:08:42.506565362Z [11/09/2026-06:08:42] [TRT-LLM] [I] Memory used after loading model weights (inside torch) in memory usage profiling: 1.01 GiB
+server-1  | 2026-11-09T06:08:42.506571586Z [11/09/2026-06:08:42] [TRT-LLM] [I] Memory used after loading model weights (outside torch) in memory usage profiling: 1.84 GiB
+server-1  | 2026-11-09T06:08:43.660110317Z [TensorRT-LLM][WARNING] [kv cache manager] storeContextBlocks: Can not find sequence for request 1
+server-1  | 2026-11-09T06:08:43.693685490Z [TensorRT-LLM][WARNING] [kv cache manager] storeContextBlocks: Can not find sequence for request 1
+server-1  | 2026-11-09T06:08:43.694458896Z [TensorRT-LLM][WARNING] [kv cache manager] storeContextBlocks: Can not find sequence for request 2
+server-1  | 2026-11-09T06:08:43.695313522Z [11/09/2026-06:08:43] [TRT-LLM] [I] Memory dynamically allocated during inference (inside torch) in memory usage profiling: 0.08 GiB
+server-1  | 2026-11-09T06:08:43.695321005Z [11/09/2026-06:08:43] [TRT-LLM] [I] Memory used outside torch (e.g., NCCL and CUDA graphs) in memory usage profiling: 1.91 GiB
+server-1  | 2026-11-09T06:08:43.695457742Z [11/09/2026-06:08:43] [TRT-LLM] [I] Peak memory during memory usage profiling (torch + non-torch): 3.00 GiB, available KV cache memory when calculating max tokens: 6.29 GiB, fraction is set 0.5, kv size is 12288. device total memory 15.56 GiB, , tmp kv_mem 0.02 GiB
+server-1  | 2026-11-09T06:08:43.695541965Z [11/09/2026-06:08:43] [TRT-LLM] [I] Estimated max memory in KV cache : 6.29 GiB
+server-1  | 2026-11-09T06:08:43.695908726Z [11/09/2026-06:08:43] [TRT-LLM] [W] Both free_gpu_memory_fraction and max_tokens are set (to 0.5 and 549937 with free memory 12.65704345703125GiB of total memory 15.5645751953125GiB, respectively). The smaller value will be used.
+server-1  | 2026-11-09T06:08:43.695936221Z [11/09/2026-06:08:43] [TRT-LLM] [I] [KVCacheManager] execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0xa1566d0>
+server-1  | 2026-11-09T06:08:43.698265919Z [TensorRT-LLM][INFO] Max KV cache blocks per sequence: 65 [window size=2049], tokens per block=32, primary blocks=17185, secondary blocks=0, max sequence length=2049
+server-1  | 2026-11-09T06:08:43.698577209Z [TensorRT-LLM][INFO] Number of tokens per block: 32.
+server-1  | 2026-11-09T06:08:43.698587388Z [TensorRT-LLM][INFO] [MemUsageChange] Allocated 6.29 GiB for max tokens in paged KV cache (549920).
+server-1  | 2026-11-09T06:08:43.918052991Z [11/09/2026-06:08:43] [TRT-LLM] [I] max_seq_len=2049, max_num_requests=1, max_num_tokens=2048, max_batch_size=1
+server-1  | 2026-11-09T06:08:43.918086018Z [11/09/2026-06:08:43] [TRT-LLM] [I] cache_transceiver is disabled
+server-1  | 2026-11-09T06:08:43.918091037Z [11/09/2026-06:08:43] [TRT-LLM] [I] [PyExecutor] execution_stream initialized: <torch.cuda.Stream device=cuda:0 cuda_stream=0xa1566d0>. 
+server-1  | 2026-11-09T06:08:43.918319033Z [11/09/2026-06:08:43] [TRT-LLM] [I] Running autotuner warmup...
+server-1  | 2026-11-09T06:08:43.918324306Z [11/09/2026-06:08:43] [TRT-LLM] [I] [Autotuner] Autotuning process starts ...
+server-1  | 2026-11-09T06:08:43.921008323Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33572096 bytes
+server-1  | 2026-11-09T06:08:43.962395765Z [11/09/2026-06:08:43] [TRT-LLM] [I] [Autotuner] Autotuning process ends
+server-1  | 2026-11-09T06:08:43.962405340Z [11/09/2026-06:08:43] [TRT-LLM] [I] [Autotuner] Cache size after warmup is 0
+server-1  | 2026-11-09T06:08:43.962407001Z [11/09/2026-06:08:43] [TRT-LLM] [I] Creating CUDA graph instances for 1 batch sizes.
+server-1  | 2026-11-09T06:08:43.962651404Z [11/09/2026-06:08:43] [TRT-LLM] [I] Run generation-only CUDA graph warmup for batch size=1, draft_len=0, max_seq_len=2048
+server-1  | 2026-11-09T06:08:43.964416819Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33555968 bytes
+server-1  | 2026-11-09T06:08:44.055458407Z [11/09/2026-06:08:44] [TRT-LLM] [I] global_steady_clock_offset at each rank: [0.0]
+server-1  | 2026-11-09T06:08:44.055470999Z [11/09/2026-06:08:44] [TRT-LLM] [I] Setting global_steady_clock_offset: 0.0 seconds for rank 0
+server-1  | 2026-11-09T06:08:44.055870120Z [11/09/2026-06:08:44] [TRT-LLM] [I] Setting PyTorch memory fraction to 0.4784008470256068 (7.44610595703125 GiB)
+server-1  | 2026-11-09T06:08:44.056060062Z [11/09/2026-06:08:44] [TRT-LLM] [I] LLM Args:
+server-1  | 2026-11-09T06:08:44.056065919Z model='/model' tokenizer=None tokenizer_mode='auto' custom_tokenizer=None skip_tokenizer_init=False trust_remote_code=False tensor_parallel_size=1 dtype='auto' revision=None tokenizer_revision=None pipeline_parallel_size=1 context_parallel_size=1 gpus_per_node=1 moe_cluster_parallel_size=-1 moe_tensor_parallel_size=-1 moe_expert_parallel_size=-1 enable_attention_dp=False enable_lm_head_tp_in_adp=False pp_partition=None cp_config={} load_format=<LoadFormat.AUTO: 0> fail_fast_on_attention_window_too_large=False enable_lora=False lora_config=None kv_cache_config=KvCacheConfig(enable_block_reuse=False, max_tokens=549937, max_attention_window=None, sink_token_length=None, free_gpu_memory_fraction=0.5, host_cache_size=None, onboard_blocks=True, cross_kv_cache_fraction=None, secondary_offload_min_priority=None, event_buffer_max_size=0, attention_dp_events_gather_period_ms=5, enable_partial_reuse=True, copy_on_partial_reuse=True, use_uvm=False, max_gpu_total_bytes=6757630464, dtype='auto', mamba_ssm_cache_dtype='auto', tokens_per_block=32) enable_chunked_prefill=False guided_decoding_backend=None batched_logits_processor=None iter_stats_max_iterations=None request_stats_max_iterations=None peft_cache_config=None scheduler_config=SchedulerConfig(capacity_scheduler_policy=<CapacitySchedulerPolicy.GUARANTEED_NO_EVICT: 'GUARANTEED_NO_EVICT'>, context_chunking_policy=None, dynamic_batch_config=DynamicBatchConfig(enable_batch_size_tuning=True, enable_max_num_tokens_tuning=False, dynamic_batch_moving_average_window=128)) cache_transceiver_config=None sparse_attention_config=None speculative_config=None max_batch_size=1 max_input_len=1024 max_seq_len=2048 max_beam_width=1 max_num_tokens=8192 gather_generation_logits=False num_postprocess_workers=0 postprocess_tokenizer_dir='/model' reasoning_parser=None decoding_config=None mpi_session=None otlp_traces_endpoint=None backend='pytorch' return_perf_metrics=True orchestrator_type=None env_overrides=None garbage_collection_gen0_threshold=20000 cuda_graph_config=CudaGraphConfig(batch_sizes=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 64, 128], max_batch_size=128, enable_padding=False) attention_dp_config=None disable_overlap_scheduler=False moe_config=MoeConfig(backend='CUTLASS', max_num_tokens=None, load_balancer=None, disable_finalize_fusion=False, use_low_precision_moe_combine=False) nvfp4_gemm_config=Nvfp4GemmConfig(allowed_backends=['cutlass', 'cublaslt', 'cuda_core']) attn_backend='TRTLLM' sampler_type=<SamplerType.auto: 'auto'> sampler_force_async_worker=False enable_iter_perf_stats=False enable_iter_req_stats=False print_iter_log=False perf_metrics_max_requests=100 batch_wait_timeout_ms=0 batch_wait_timeout_iters=0 batch_wait_max_tokens_ratio=0 torch_compile_config=None enable_autotuner=True enable_layerwise_nvtx_marker=False enable_min_latency=False stream_interval=1 force_dynamic_quantization=False allreduce_strategy='AUTO' checkpoint_loader=None checkpoint_format='HF' kv_connector_config=None mm_encoder_only=False ray_worker_extension_cls=None ray_placement_config=None enable_sleep=False disable_flashinfer_sampling=False max_stats_len=1000
+server-1  | 2026-11-09T06:08:44.056835715Z [11/09/2026-06:08:44] [TRT-LLM] [I] RPCServer is bound to ipc:///tmp/rpc_test_2cd71866-b563-4278-b53b-763b4c8860ef
+server-1  | 2026-11-09T06:08:44.056841813Z [11/09/2026-06:08:44] [TRT-LLM] [I] RPC Server started and listening on ipc:///tmp/rpc_test_2cd71866-b563-4278-b53b-763b4c8860ef
+server-1  | 2026-11-09T06:08:44.057352684Z [11/09/2026-06:08:44] [TRT-LLM] [I] RPC Server has started.
+server-1  | 2026-11-09T06:08:44.058028471Z [11/09/2026-06:08:44] [TRT-LLM] [I] get signal from executor worker
+server-1  | 2026-11-09T06:08:44.634890082Z [11/09/2026-06:08:44] [TRT-LLM] [I] PROMETHEUS_MULTIPROC_DIR: /tmp/tmpa5keai7r
+server-1  | 2026-11-09T06:08:44.660791975Z INFO:     Started server process [208]
+server-1  | 2026-11-09T06:08:44.660834334Z INFO:     Waiting for application startup.
+server-1  | 2026-11-09T06:08:44.660969833Z INFO:     Application startup complete.
+server-1  | 2026-11-09T06:08:45.390974054Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:46.392842064Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:46.958624190Z INFO:     127.0.0.1:50830 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:47.394318537Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:47.395049693Z INFO:     172.20.0.1:57724 - "GET /version HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:47.436218358Z INFO:     172.20.0.1:57724 - "GET /v1/models HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:47.729715540Z INFO:     172.20.0.1:57740 - "GET /version HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:47.813747722Z INFO:     172.20.0.3:46028 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:47.995742655Z INFO:     127.0.0.1:50844 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:48.478380045Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:49.032645535Z INFO:     127.0.0.1:50856 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:49.480068723Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:49.544114338Z INFO:     172.20.0.1:57754 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:49.575459824Z INFO:     172.20.0.3:46038 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:49.615289928Z [11/09/2026-06:08:49] [TRT-LLM] [I] Profiling started at iteration 66.
+server-1  | 2026-11-09T06:08:50.066874955Z INFO:     127.0.0.1:50864 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:50.483568955Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:51.099609737Z ==PROF== Profiling "unrolled_elementwise_kernel" - 0: 0%INFO:     127.0.0.1:50868 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:51.386760267Z 
+server-1  | 2026-11-09T06:08:51.386772063Z ==WARNING== Backing up device memory in system memory. Kernel replay might be slow. Consider using "--replay-mode application" to avoid memory save-and-restore.
+server-1  | 2026-11-09T06:08:51.486367815Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:52.135220619Z INFO:     127.0.0.1:50870 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:52.490032021Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:53.166698775Z ...50%....INFO:     127.0.0.1:50882 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:53.323741939Z 100% - 40 passes
+server-1  | 2026-11-09T06:08:53.494088840Z ==PROF== Profiling "index_elementwise_kernel" - 1: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:54.199434844Z INFO:     127.0.0.1:46412 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:54.497719384Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:55.236949447Z ....50%....INFO:     127.0.0.1:46422 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:55.500647561Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:55.504653820Z 100% - 40 passes
+server-1  | 2026-11-09T06:08:56.269583838Z ==PROF== Profiling "vectorized_elementwise_kernel" - 2: 0%INFO:     127.0.0.1:46428 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:56.503465461Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:57.303352984Z ....50%..INFO:     127.0.0.1:46430 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:57.506881999Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:57.543624043Z 100% - 40 passes
+server-1  | 2026-11-09T06:08:58.336606560Z ==PROF== Profiling "vectorized_elementwise_kernel" - 3: 0%INFO:     127.0.0.1:46440 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:58.509628214Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:59.369225180Z ...INFO:     127.0.0.1:46444 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:59.512499338Z .50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:08:59.721848640Z .100% - 40 passes
+server-1  | 2026-11-09T06:09:00.402715944Z ==PROF== Profiling "vectorized_elementwise_kernel" - 4: 0%INFO:     127.0.0.1:46452 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:00.516213703Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:01.435032784Z ....50%INFO:     127.0.0.1:46462 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:01.518993643Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:01.747108782Z ..100% - 40 passes
+server-1  | 2026-11-09T06:09:02.469858696Z ==PROF== Profiling "unrolled_elementwise_kernel" - 5: 0%INFO:     127.0.0.1:46472 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:02.522529634Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:03.503180526Z ....50%..INFO:     127.0.0.1:52380 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:03.525503727Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:03.792479723Z ..100% - 40 passes
+server-1  | 2026-11-09T06:09:04.528483061Z ==PROF== Profiling "unrolled_elementwise_kernel" - 6: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:04.537560942Z INFO:     127.0.0.1:52396 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:05.533218783Z ....50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:05.573950734Z .INFO:     127.0.0.1:52404 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:05.903541474Z ...100% - 40 passes
+server-1  | 2026-11-09T06:09:06.536181743Z ==PROF== Profiling "unrolled_elementwise_kernel" - 7: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:06.608170920Z INFO:     127.0.0.1:52416 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:07.540560663Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:07.641835515Z ..50%.INFO:     127.0.0.1:52418 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:07.996850749Z ...100% - 40 passes
+server-1  | 2026-11-09T06:09:08.544904780Z ==PROF== Profiling "vectorized_elementwise_kernel" - 8: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:08.677277696Z INFO:     127.0.0.1:52430 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:09.548548993Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:09.710655238Z ..INFO:     127.0.0.1:52442 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:10.075480375Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:10.553846656Z ==PROF== Profiling "indexSelectSmallIndex" - 9: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:10.744094261Z INFO:     127.0.0.1:52450 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:11.558190631Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:11.780899773Z .INFO:     127.0.0.1:52464 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:12.371020060Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:12.561335581Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:12.814602537Z ==PROF== Profiling "elementwise_kernel" - 10: 0%INFO:     127.0.0.1:52478 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:13.565011443Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:13.847152751Z INFO:     127.0.0.1:36138 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:14.524023588Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:14.568075603Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:14.881742044Z ==PROF== Profiling "RMSNormKernel" - 11: 0%INFO:     127.0.0.1:36150 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:15.572007989Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:15.916593081Z INFO:     127.0.0.1:36154 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:16.576243124Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:16.586912070Z 100% - 39 passes
+server-1  | 2026-11-09T06:09:16.951309791Z ==PROF== Profiling "kernel" - 12: 0%INFO:     127.0.0.1:36170 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:17.579072304Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:17.985436915Z INFO:     127.0.0.1:36174 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:18.582767515Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:18.756748085Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:19.021416480Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 13: 0%INFO:     127.0.0.1:36178 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:19.585658122Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:20.055898614Z INFO:     127.0.0.1:36192 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:20.589244376Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:21.089765404Z ...50%....INFO:     127.0.0.1:36198 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:21.226957449Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:21.592609610Z ==PROF== Profiling "kernel_mha" - 14: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:22.125060992Z INFO:     127.0.0.1:36204 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:22.596275803Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:23.158076242Z ....50%.INFO:     127.0.0.1:36206 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:23.552363092Z ...100% - 40 passes
+server-1  | 2026-11-09T06:09:23.599134351Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:24.190602664Z ==PROF== Profiling "kernel" - 15: 0%INFO:     127.0.0.1:48948 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:24.602040816Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:25.224018415Z INFO:     127.0.0.1:48958 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:25.605522598Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:26.087024927Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:26.257376979Z INFO:     127.0.0.1:48966 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:26.609321419Z ==PROF== Profiling "FusedAddRMSNormKernel" - 16: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:27.291199351Z INFO:     127.0.0.1:48978 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:27.612954096Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:28.215064592Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:28.324435283Z INFO:     127.0.0.1:48980 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:28.615998195Z ==PROF== Profiling "kernel" - 17: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:29.358364287Z INFO:     127.0.0.1:48984 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:29.619644026Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:30.391876244Z ....50%....INFO:     127.0.0.1:49000 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:30.436723782Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:30.623115763Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:31.424706944Z ==PROF== Profiling "silu_and_mul_kernel" - 18: 0%INFO:     127.0.0.1:49008 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:31.626717386Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:32.457064839Z ....50%....INFO:     127.0.0.1:49014 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:32.513414443Z 100% - 39 passes
+server-1  | 2026-11-09T06:09:32.629599995Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:33.489899616Z ==PROF== Profiling "kernel" - 19: 0%INFO:     127.0.0.1:45982 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:33.632674462Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:34.523539354Z ....50%....INFO:     127.0.0.1:45996 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:34.636188158Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:34.695753934Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:35.556661023Z ==PROF== Profiling "FusedAddRMSNormKernel" - 20: 0%INFO:     127.0.0.1:46002 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:35.640165448Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:36.588584572Z ....50%..INFO:     127.0.0.1:46014 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:36.643684599Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:36.846995350Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:37.622973727Z ==PROF== Profiling "kernel" - 21: 0%INFO:     127.0.0.1:46028 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:37.646438559Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:38.649574029Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:38.656335374Z INFO:     127.0.0.1:46044 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:39.051500633Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:39.652582878Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 22: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:39.691512751Z INFO:     127.0.0.1:46054 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:40.656263937Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:40.725951354Z INFO:     127.0.0.1:46056 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:41.229416155Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:41.659176380Z ==PROF== Profiling "kernel_mha" - 23: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:41.760605002Z INFO:     127.0.0.1:46066 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:42.663257237Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:42.794550455Z .INFO:     127.0.0.1:46070 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:43.548513741Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:43.666978728Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:43.826796801Z INFO:     127.0.0.1:53866 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:44.670231834Z ==PROF== Profiling "kernel" - 24: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:44.860839041Z INFO:     127.0.0.1:53872 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:45.673466986Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:45.897104267Z 50%....INFO:     127.0.0.1:53880 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:46.083411136Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:46.676556218Z ==PROF== Profiling "FusedAddRMSNormKernel" - 25: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:46.932047704Z INFO:     127.0.0.1:53882 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:47.679394662Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:47.967507926Z ...50%...INFO:     127.0.0.1:53888 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:48.220579328Z .100% - 40 passes
+server-1  | 2026-11-09T06:09:48.682813964Z ==PROF== Profiling "kernel" - 26: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:49.000402769Z INFO:     127.0.0.1:53890 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:49.685902875Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:50.033929041Z ....INFO:     127.0.0.1:53902 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:50.460426662Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:50.688832120Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:51.067632012Z ==PROF== Profiling "silu_and_mul_kernel" - 27: 0%INFO:     127.0.0.1:53914 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:51.873009832Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:52.101489898Z .INFO:     127.0.0.1:53916 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:52.563811873Z ...50%....100% - 39 passes
+server-1  | 2026-11-09T06:09:52.876267614Z ==PROF== Profiling "kernel" - 28: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:53.136558915Z INFO:     127.0.0.1:53922 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:53.879917537Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:54.170101534Z .INFO:     127.0.0.1:50184 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:54.753513973Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:09:54.882823420Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:55.204907043Z ==PROF== Profiling "FusedAddRMSNormKernel" - 29: 0%INFO:     127.0.0.1:50200 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:55.886327690Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:56.241224226Z INFO:     127.0.0.1:50210 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:56.890312191Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:56.915934945Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:57.275159842Z ==PROF== Profiling "kernel" - 30: 0%INFO:     127.0.0.1:50214 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:57.893540753Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:58.310262784Z INFO:     127.0.0.1:50224 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:58.896800286Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:59.134939185Z 100% - 40 passes
+server-1  | 2026-11-09T06:09:59.343238958Z INFO:     127.0.0.1:50236 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:09:59.900212140Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 31: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:00.377174969Z INFO:     127.0.0.1:50240 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:00.903461432Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:01.330399712Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:01.412568318Z INFO:     127.0.0.1:50250 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:01.906942223Z ==PROF== Profiling "kernel_mha" - 32: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:02.446947655Z INFO:     127.0.0.1:50262 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:02.910757621Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:03.481854677Z ...50%....INFO:     127.0.0.1:33724 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:03.679025898Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:03.913624497Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:04.516836057Z ==PROF== Profiling "kernel" - 33: 0%INFO:     127.0.0.1:33730 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:04.916426641Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:05.551140701Z INFO:     127.0.0.1:33740 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:05.920660653Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:06.256268918Z ..100% - 40 passes
+server-1  | 2026-11-09T06:10:06.586658072Z ==PROF== Profiling "FusedAddRMSNormKernel" - 34: 0%INFO:     127.0.0.1:33754 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:06.923714802Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:07.621730575Z INFO:     127.0.0.1:33758 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:07.926793191Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:08.445822791Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:08.656803102Z INFO:     127.0.0.1:33770 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:08.930318257Z ==PROF== Profiling "kernel" - 35: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:09.691328036Z INFO:     127.0.0.1:33786 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:09.933460543Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:10.707412291Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:10.726462877Z INFO:     127.0.0.1:33794 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:10.937160234Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:11.762169802Z ==PROF== Profiling "silu_and_mul_kernel" - 36: 0%INFO:     127.0.0.1:33808 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:11.940111239Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:12.797525227Z ....50%....INFO:     127.0.0.1:33816 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:12.882867932Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:12.943054387Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:13.832099010Z ==PROF== Profiling "kernel" - 37: 0%INFO:     127.0.0.1:37112 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:13.946587416Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:14.865302074Z ....50%....INFO:     127.0.0.1:37116 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:14.951191530Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:15.105127502Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:15.898909206Z ==PROF== Profiling "FusedAddRMSNormKernel" - 38: 0%INFO:     127.0.0.1:37130 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:15.955005113Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:16.932890347Z ....INFO:     127.0.0.1:37134 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:16.958253240Z 50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:17.302082052Z ....100% - 40 passes
+server-1  | 2026-11-09T06:10:17.961475366Z ==PROF== Profiling "kernel" - 39: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:17.966109533Z INFO:     127.0.0.1:37142 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:18.965347842Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:19.000282447Z INFO:     127.0.0.1:37148 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:19.567997610Z ...50%....100% - 41 passes
+server-1  | 2026-11-09T06:10:19.970412944Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 40: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:20.034651064Z INFO:     127.0.0.1:37154 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:20.974220360Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:21.069035437Z INFO:     127.0.0.1:37166 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:21.795021941Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:21.978002949Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:22.103860993Z ==PROF== Profiling "kernel_mha" - 41: 0%INFO:     127.0.0.1:37182 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:22.981072203Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:23.139371975Z INFO:     127.0.0.1:37184 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:23.983931490Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:24.156622913Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:24.172808927Z INFO:     127.0.0.1:35958 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:24.987778243Z ==PROF== Profiling "kernel" - 42: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:25.206816141Z INFO:     127.0.0.1:35970 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:25.991940218Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:26.240557753Z .INFO:     127.0.0.1:35982 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:26.728403975Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:26.995536888Z ==PROF== Profiling "FusedAddRMSNormKernel" - 43: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:27.274272934Z INFO:     127.0.0.1:35990 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:27.998830525Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:28.308599617Z .INFO:     127.0.0.1:36006 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:28.916695900Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:29.002389439Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:29.343942250Z ==PROF== Profiling "kernel" - 44: 0%INFO:     127.0.0.1:36016 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:30.006816122Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:30.378067259Z INFO:     127.0.0.1:36020 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:31.009682055Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:31.201147294Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:31.413139924Z INFO:     127.0.0.1:36032 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:32.012415284Z ==PROF== Profiling "silu_and_mul_kernel" - 45: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:32.446995315Z INFO:     127.0.0.1:36048 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:33.015731519Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:33.365813733Z 50%....100% - 39 passes
+server-1  | 2026-11-09T06:10:33.479426687Z INFO:     127.0.0.1:33664 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:34.019156373Z ==PROF== Profiling "kernel" - 46: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:34.512297743Z INFO:     127.0.0.1:33670 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:35.022059345Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:35.546459084Z ...50%....INFO:     127.0.0.1:33686 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:35.610002340Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:36.025768001Z ==PROF== Profiling "FusedAddRMSNormKernel" - 47: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:36.581121244Z INFO:     127.0.0.1:33696 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:37.029606603Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:37.615271383Z ....50%....INFO:     127.0.0.1:33708 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:37.816444356Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:38.033115409Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:38.650253373Z ==PROF== Profiling "kernel" - 48: 0%INFO:     127.0.0.1:33722 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:39.036322401Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:39.684465989Z ....50%INFO:     127.0.0.1:33738 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:40.040011153Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:40.072981848Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:40.718337446Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 49: 0%INFO:     127.0.0.1:33752 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:41.042856564Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:41.754458201Z .INFO:     127.0.0.1:33754 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:42.046539399Z ...50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:42.311238348Z .100% - 40 passes
+server-1  | 2026-11-09T06:10:42.790861682Z ==PROF== Profiling "kernel_mha" - 50: 0%INFO:     127.0.0.1:33760 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:43.049475700Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:43.825085673Z INFO:     127.0.0.1:57896 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:44.052357232Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:44.684586943Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:44.859582722Z INFO:     127.0.0.1:57908 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:45.055711696Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:45.894776822Z ==PROF== Profiling "kernel" - 51: 0%INFO:     127.0.0.1:57922 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:46.059197886Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:46.927999094Z ....50%.INFO:     127.0.0.1:57938 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:47.062705899Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:47.275223685Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:47.961689111Z ==PROF== Profiling "FusedAddRMSNormKernel" - 52: 0%INFO:     127.0.0.1:57940 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:48.065925861Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:48.995667635Z .INFO:     127.0.0.1:57942 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:49.069385305Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:49.488320628Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:50.030195077Z ==PROF== Profiling "kernel" - 53: 0%INFO:     127.0.0.1:57948 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:50.072975321Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:51.065394591Z .INFO:     127.0.0.1:57952 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:51.076344126Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:51.779603039Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:10:52.080938366Z ==PROF== Profiling "silu_and_mul_kernel" - 54: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:52.102079606Z INFO:     127.0.0.1:57954 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:53.084675686Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:53.138044060Z INFO:     127.0.0.1:57956 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:53.951247470Z ....50%....100% - 39 passes
+server-1  | 2026-11-09T06:10:54.088626301Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:54.170692510Z INFO:     127.0.0.1:43180 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:55.092048934Z ==PROF== Profiling "kernel" - 55: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:55.205403741Z INFO:     127.0.0.1:43186 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:56.095513091Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:56.202146750Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:56.239355115Z INFO:     127.0.0.1:43188 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:57.099192004Z ==PROF== Profiling "FusedAddRMSNormKernel" - 56: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:57.273630071Z INFO:     127.0.0.1:43196 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:58.103634265Z ....50%.INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:58.307222745Z ...INFO:     127.0.0.1:43210 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:58.427477329Z 100% - 40 passes
+server-1  | 2026-11-09T06:10:59.106591012Z ==PROF== Profiling "kernel" - 57: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:10:59.343436649Z INFO:     127.0.0.1:43222 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:00.114068924Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:00.378488276Z ...50%..INFO:     127.0.0.1:43226 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:00.727043012Z ..100% - 41 passes
+server-1  | 2026-11-09T06:11:01.120631833Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 58: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:01.416408213Z INFO:     127.0.0.1:43238 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:02.123868864Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:02.450428478Z .INFO:     127.0.0.1:43254 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:02.967720969Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:11:03.126749640Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:03.485779756Z ==PROF== Profiling "kernel_mha" - 59: 0%INFO:     127.0.0.1:38302 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:04.130376024Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:04.519847466Z INFO:     127.0.0.1:38310 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:05.133675697Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:05.322850809Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:05.552703797Z INFO:     127.0.0.1:38316 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:06.137242779Z ==PROF== Profiling "kernel" - 60: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:06.585260890Z INFO:     127.0.0.1:38326 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:07.140366236Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:07.619643293Z ....50%...INFO:     127.0.0.1:38328 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:07.897054723Z .100% - 40 passes
+server-1  | 2026-11-09T06:11:08.145101101Z ==PROF== Profiling "FusedAddRMSNormKernel" - 61: INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:08.651811385Z 0%INFO:     127.0.0.1:38330 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:09.149016562Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:09.683832944Z ...INFO:     127.0.0.1:38334 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:10.098805872Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:11:10.152380452Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:10.718931561Z ==PROF== Profiling "kernel" - 62: 0%INFO:     127.0.0.1:38342 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:11.156729135Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:11.752218157Z .INFO:     127.0.0.1:38348 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:12.160152226Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:12.390458663Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:12.788562426Z ==PROF== Profiling "silu_and_mul_kernel" - 63: 0%INFO:     127.0.0.1:38364 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:13.163964689Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:13.821944468Z INFO:     127.0.0.1:39036 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:14.167884804Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:14.546163162Z 50%....100% - 39 passes
+server-1  | 2026-11-09T06:11:14.855880084Z ==PROF== Profiling "kernel" - 64: 0%INFO:     127.0.0.1:39052 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:15.171023483Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:15.891100028Z INFO:     127.0.0.1:39054 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:16.174140454Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:16.798634049Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:11:16.925295085Z INFO:     127.0.0.1:39058 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:17.177987842Z ==PROF== Profiling "FusedAddRMSNormKernel" - 65: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:17.961042742Z INFO:     127.0.0.1:39074 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:18.181270854Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:18.994916347Z ....50%....INFO:     127.0.0.1:39086 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:19.016821400Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:19.184936645Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:20.028585112Z ==PROF== Profiling "kernel" - 66: 0%INFO:     127.0.0.1:39092 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:20.188575759Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:21.064111855Z ....50%....INFO:     127.0.0.1:39102 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:21.192113855Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:21.298580499Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:22.097080698Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 67: 0%INFO:     127.0.0.1:39106 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:22.195342511Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:23.131144116Z ...INFO:     127.0.0.1:39114 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:23.199113686Z .50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:23.558324255Z ....100% - 40 passes
+server-1  | 2026-11-09T06:11:24.164684724Z ==PROF== Profiling "kernel_mha" - 68: 0%INFO:     127.0.0.1:34148 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:24.202926228Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:25.200199869Z .INFO:     127.0.0.1:34152 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:25.206033754Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:25.950586956Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:11:26.209920926Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:26.233989022Z INFO:     127.0.0.1:34164 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:27.213354921Z ==PROF== Profiling "kernel" - 69: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:27.268805623Z INFO:     127.0.0.1:34168 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:28.216490959Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:28.303005615Z ..INFO:     127.0.0.1:34172 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:28.550566170Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:29.219511749Z ==PROF== Profiling "FusedAddRMSNormKernel" - 70: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:29.338432853Z INFO:     127.0.0.1:34182 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:30.222942505Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:30.371480798Z ...INFO:     127.0.0.1:34188 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:30.767129508Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:11:31.226169430Z ==PROF== Profiling "kernel" - 71: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:31.406453402Z INFO:     127.0.0.1:34202 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:32.229445891Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:32.441079028Z .INFO:     127.0.0.1:34204 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:33.071030069Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:11:33.233895336Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:33.474360132Z ==PROF== Profiling "silu_and_mul_kernel" - 72: 0%INFO:     127.0.0.1:50794 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:34.237614021Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:34.508868207Z INFO:     127.0.0.1:50810 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:35.220687423Z ....50%....100% - 39 passes
+server-1  | 2026-11-09T06:11:35.240810819Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:35.542551696Z ==PROF== Profiling "kernel" - 73: 0%INFO:     127.0.0.1:50820 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:36.243762709Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:36.577526154Z INFO:     127.0.0.1:50832 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:37.246699627Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:37.473686437Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:37.611883620Z INFO:     127.0.0.1:50834 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:38.250484180Z ==PROF== Profiling "FusedAddRMSNormKernel" - 74: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:38.645625369Z INFO:     127.0.0.1:50850 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:39.254531708Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:39.679877897Z ..50%....INFO:     127.0.0.1:50854 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:39.705858838Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:40.257761791Z ==PROF== Profiling "kernel" - 75: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:40.713914486Z INFO:     127.0.0.1:50868 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:41.546644019Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:41.746490463Z .50%....INFO:     127.0.0.1:50878 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:42.001182104Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:42.550640431Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 76: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:42.780599841Z INFO:     127.0.0.1:50892 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:43.554647794Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:43.815184399Z ..INFO:     127.0.0.1:53750 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:44.390598009Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:11:44.558363280Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:44.852302766Z ==PROF== Profiling "kernel_mha" - 77: 0%INFO:     127.0.0.1:53760 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:45.561682813Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:45.887613123Z INFO:     127.0.0.1:53762 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:46.565031694Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:46.787107536Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:46.922424511Z INFO:     127.0.0.1:53774 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:47.568914229Z ==PROF== Profiling "kernel" - 78: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:47.957133971Z INFO:     127.0.0.1:53778 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:48.572559863Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:48.992342444Z ....50%INFO:     127.0.0.1:53794 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:49.395293431Z ....100% - 40 passes
+server-1  | 2026-11-09T06:11:49.576217684Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:50.028228145Z ==PROF== Profiling "FusedAddRMSNormKernel" - 79: 0%INFO:     127.0.0.1:53808 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:50.579151879Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:51.063316479Z .INFO:     127.0.0.1:53824 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:51.581804247Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:51.627690156Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:52.097958732Z ==PROF== Profiling "kernel" - 80: 0%INFO:     127.0.0.1:53826 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:52.585406705Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:53.133113926Z INFO:     127.0.0.1:53832 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:53.588816903Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:53.942702981Z ..100% - 40 passes
+server-1  | 2026-11-09T06:11:54.166468099Z INFO:     127.0.0.1:51282 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:54.591745437Z ==PROF== Profiling "silu_and_mul_kernel" - 81: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:55.200334028Z INFO:     127.0.0.1:51286 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:55.594615000Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:56.097588996Z ...50%....100% - 39 passes
+server-1  | 2026-11-09T06:11:56.235901952Z INFO:     127.0.0.1:51292 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:56.597912330Z ==PROF== Profiling "kernel" - 82: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:57.270556238Z INFO:     127.0.0.1:51300 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:57.600815744Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:58.312682851Z ....50%....INFO:     127.0.0.1:51308 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:58.505946571Z 100% - 40 passes
+server-1  | 2026-11-09T06:11:58.604632599Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:59.346612924Z ==PROF== Profiling "FusedAddRMSNormKernel" - 83: 0%INFO:     127.0.0.1:51324 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:11:59.608347409Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:00.381308984Z ....50%INFO:     127.0.0.1:51328 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:00.611401634Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:00.774368598Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:01.416310766Z ==PROF== Profiling "kernel" - 84: 0%INFO:     127.0.0.1:51334 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:01.614459144Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:02.451533608Z .INFO:     127.0.0.1:51336 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:02.617338893Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:03.099589150Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:12:03.488038985Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 85: 0%INFO:     127.0.0.1:42362 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:03.621394256Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:04.523035937Z INFO:     127.0.0.1:42376 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:04.624758032Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:05.480671844Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:12:05.559599435Z INFO:     127.0.0.1:42384 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:05.627637384Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:06.631711047Z ==PROF== Profiling "kernel_mha" - 86: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:06.636577312Z INFO:     127.0.0.1:42388 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:07.634873053Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:07.686180173Z .INFO:     127.0.0.1:42396 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:08.531077964Z .100% - 40 passes
+server-1  | 2026-11-09T06:12:08.639234585Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:08.720348954Z INFO:     127.0.0.1:42398 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:09.642357481Z ==PROF== Profiling "kernel" - 87: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:09.752579105Z INFO:     127.0.0.1:42408 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:10.645793587Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:10.786647633Z ...50%.INFO:     127.0.0.1:42412 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:11.350642827Z ...100% - 40 passes
+server-1  | 2026-11-09T06:12:11.649556142Z ==PROF== Profiling "FusedAddRMSNormKernel" - 88: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:11.822402656Z INFO:     127.0.0.1:42422 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:12.653272735Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:12.856105038Z INFO:     127.0.0.1:42434 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:13.587009046Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:12:13.657788635Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:13.890400596Z ==PROF== Profiling "kernel" - 89: 0%INFO:     127.0.0.1:55208 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:14.661341218Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:14.943343899Z INFO:     127.0.0.1:55224 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:15.664831326Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:15.960809404Z .100% - 40 passes
+server-1  | 2026-11-09T06:12:15.977660743Z INFO:     127.0.0.1:55228 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:16.673513223Z ==PROF== Profiling "silu_and_mul_kernel" - 90: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:17.010463146Z INFO:     127.0.0.1:55232 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:17.676274429Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:18.046453113Z ...50%....INFO:     127.0.0.1:55246 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:18.146940515Z 100% - 39 passes
+server-1  | 2026-11-09T06:12:18.680131918Z ==PROF== Profiling "kernel" - 91: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:19.080697404Z INFO:     127.0.0.1:55252 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:19.682998108Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:20.114416616Z ....50%..INFO:     127.0.0.1:55264 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:20.442684205Z ..100% - 40 passes
+server-1  | 2026-11-09T06:12:20.686141694Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:21.148811479Z ==PROF== Profiling "FusedAddRMSNormKernel" - 92: 0%INFO:     127.0.0.1:55278 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:21.689564817Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:22.183056179Z .INFO:     127.0.0.1:55286 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:22.693943650Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:22.718062413Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:23.217620035Z ==PROF== Profiling "kernel" - 93: 0%INFO:     127.0.0.1:49966 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:23.696925807Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:24.251642287Z INFO:     127.0.0.1:49982 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:24.700126843Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:25.051663982Z ..100% - 40 passes
+server-1  | 2026-11-09T06:12:25.285472456Z INFO:     127.0.0.1:49994 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:25.704954594Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 94: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:26.319315745Z INFO:     127.0.0.1:49996 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:26.707925799Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:27.380764736Z ...50%....INFO:     127.0.0.1:50008 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:27.490973818Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:27.710969117Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:28.415279018Z ==PROF== Profiling "kernel_mha" - 95: 0%INFO:     127.0.0.1:50010 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:28.714299952Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:29.450570112Z ....50%INFO:     127.0.0.1:50016 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:29.717101661Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:30.115502690Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:30.485176274Z INFO:     127.0.0.1:50028 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:30.720145609Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:31.520266017Z ==PROF== Profiling "kernel" - 96: 0%INFO:     127.0.0.1:50036 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:31.723550527Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:32.564016897Z ....50%....INFO:     127.0.0.1:50052 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:32.726537895Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:32.904538086Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:33.598288350Z ==PROF== Profiling "FusedAddRMSNormKernel" - 97: 0%INFO:     127.0.0.1:33044 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:33.730542699Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:34.632665852Z .INFO:     127.0.0.1:33050 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:34.733812723Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:35.182189895Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:12:35.668599493Z ==PROF== Profiling "kernel" - 98: 0%INFO:     127.0.0.1:33064 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:35.736824252Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:36.704045952Z INFO:     127.0.0.1:33070 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:36.741007781Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:37.575382618Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:12:37.739014264Z INFO:     127.0.0.1:33072 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:37.744349500Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:38.750555203Z ==PROF== Profiling "silu_and_mul_kernel" - 99: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:38.773566216Z INFO:     127.0.0.1:33088 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:39.754389626Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:39.789381814Z 100% - 39 passes
+server-1  | 2026-11-09T06:12:39.807772190Z INFO:     127.0.0.1:33096 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:40.758187230Z ==PROF== Profiling "kernel" - 100: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:40.842711775Z INFO:     127.0.0.1:33106 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:41.762027032Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:41.886816128Z ..INFO:     127.0.0.1:33122 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:42.098317019Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:42.765148064Z ==PROF== Profiling "FusedAddRMSNormKernel" - 101: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:42.921653976Z INFO:     127.0.0.1:33134 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:43.768857320Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:43.954871495Z ...INFO:     127.0.0.1:36984 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:44.367024622Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:12:44.772094992Z ==PROF== Profiling "kernel" - 102: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:44.990511561Z INFO:     127.0.0.1:37000 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:45.775476605Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:46.025260331Z .INFO:     127.0.0.1:37004 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:46.779377485Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:46.829569583Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:47.058868408Z INFO:     127.0.0.1:37010 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:47.782466365Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 103: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:48.093134962Z INFO:     127.0.0.1:37024 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:48.785923448Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:49.126305344Z ..INFO:     127.0.0.1:37040 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:49.152531289Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:49.789867228Z ==PROF== Profiling "kernel_mha" - 104: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:50.159324188Z INFO:     127.0.0.1:37048 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:50.793727439Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:51.193367318Z ...50%..INFO:     127.0.0.1:37064 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:51.654696818Z ..100% - 40 passes
+server-1  | 2026-11-09T06:12:51.797369070Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:52.228184530Z INFO:     127.0.0.1:37080 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:52.800490009Z ==PROF== Profiling "kernel" - 105: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:53.262260369Z INFO:     127.0.0.1:50378 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:53.804430165Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:54.295942901Z ...50%....INFO:     127.0.0.1:50394 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:54.314701916Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:54.807598272Z ==PROF== Profiling "FusedAddRMSNormKernel" - 106: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:55.330431890Z INFO:     127.0.0.1:50406 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:55.810832819Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:56.364527539Z ....50%....INFO:     127.0.0.1:50408 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:56.658377503Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:56.814248274Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:57.398670429Z ==PROF== Profiling "kernel" - 107: 0%INFO:     127.0.0.1:50420 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:57.817645314Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:58.431391037Z .INFO:     127.0.0.1:50428 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:58.820675561Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:58.986576319Z 100% - 40 passes
+server-1  | 2026-11-09T06:12:59.465627025Z ==PROF== Profiling "silu_and_mul_kernel" - 108: 0%INFO:     127.0.0.1:50430 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:12:59.824334161Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:00.498589911Z INFO:     127.0.0.1:50442 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:00.827922606Z ....50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:01.185543072Z ....100% - 39 passes
+server-1  | 2026-11-09T06:13:01.538020954Z ==PROF== Profiling "kernel" - 109: 0%INFO:     127.0.0.1:50458 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:01.830828471Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:02.572921630Z INFO:     127.0.0.1:50470 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:02.835104654Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:03.493434002Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:13:03.608787267Z INFO:     127.0.0.1:38302 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:03.838299401Z ==PROF== Profiling "FusedAddRMSNormKernel" - 110: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:04.642230346Z INFO:     127.0.0.1:38304 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:04.841530120Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:05.678365833Z ....50%....INFO:     127.0.0.1:38320 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:05.793839330Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:05.845227207Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:06.712832286Z ==PROF== Profiling "kernel" - 111: 0%INFO:     127.0.0.1:38330 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:06.848648005Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:07.746913084Z ....50%.INFO:     127.0.0.1:38340 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:07.853246856Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:08.124251174Z .100% - 40 passes
+server-1  | 2026-11-09T06:13:08.780628076Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 112: 0%INFO:     127.0.0.1:38342 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:08.856368302Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:09.815255785Z .INFO:     127.0.0.1:38346 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:09.861075027Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:10.551212860Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:13:10.849773860Z INFO:     127.0.0.1:38350 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:10.863927887Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:11.891340324Z ==PROF== Profiling "kernel_mha" - 113: 0%INFO:     127.0.0.1:38356 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:12.044426516Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:12.947477943Z ....50%....INFO:     127.0.0.1:38368 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:13.047839981Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:13.080886976Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:13.983051923Z ==PROF== Profiling "kernel" - 114: 0%INFO:     127.0.0.1:48244 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:14.050973044Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:15.019305992Z INFO:     127.0.0.1:48246 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:15.054716427Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:15.945723247Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:13:16.054002687Z INFO:     127.0.0.1:48256 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:16.058027274Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:17.061366064Z ==PROF== Profiling "FusedAddRMSNormKernel" - 115: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:17.088185122Z INFO:     127.0.0.1:48264 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:18.065222116Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:18.124888884Z INFO:     127.0.0.1:48272 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:18.231423715Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:19.068826282Z ==PROF== Profiling "kernel" - 116: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:19.159706723Z INFO:     127.0.0.1:48278 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:20.071988540Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:20.196443905Z ..50%.INFO:     127.0.0.1:48294 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:20.595241495Z ...100% - 40 passes
+server-1  | 2026-11-09T06:13:21.075959795Z ==PROF== Profiling "silu_and_mul_kernel" - 117: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:21.229595539Z INFO:     127.0.0.1:48310 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:22.079638866Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:22.263557123Z .INFO:     127.0.0.1:48316 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:23.019237982Z ...50%....100% - 39 passes
+server-1  | 2026-11-09T06:13:23.082876757Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:23.299366672Z ==PROF== Profiling "kernel" - 118: 0%INFO:     127.0.0.1:38010 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:24.086956793Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:24.334007406Z INFO:     127.0.0.1:38018 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:25.091336227Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:25.322267157Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:25.369448804Z INFO:     127.0.0.1:38030 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:26.095255207Z ==PROF== Profiling "FusedAddRMSNormKernel" - 119: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:26.427818295Z INFO:     127.0.0.1:38042 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:27.098625930Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:27.475124749Z ...50%...INFO:     127.0.0.1:38054 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:27.704433839Z .100% - 40 passes
+server-1  | 2026-11-09T06:13:28.102524143Z ==PROF== Profiling "kernel" - 120: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:28.522721211Z INFO:     127.0.0.1:38070 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:29.106593718Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:29.568628274Z ...INFO:     127.0.0.1:38074 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:30.024385803Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:13:30.110571701Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:30.601898432Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 121: 0%INFO:     127.0.0.1:38084 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:31.113838197Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:31.660512291Z INFO:     127.0.0.1:38098 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:32.117060991Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:32.695544755Z .INFO:     127.0.0.1:38108 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:32.757078409Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:33.120195155Z ==PROF== Profiling "kernel_mha" - 122: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:33.760837217Z INFO:     127.0.0.1:54968 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:34.123714567Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:34.805801983Z ....50%.INFO:     127.0.0.1:54982 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:35.127264390Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:35.504288977Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:35.838979699Z INFO:     127.0.0.1:54998 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:36.133618748Z ==PROF== Profiling "kernel" - 123: INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:36.899684652Z 0%INFO:     127.0.0.1:55000 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:37.137491976Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:37.948092295Z ....50%INFO:     127.0.0.1:55016 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:38.141019162Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:38.361090896Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:38.982477452Z ==PROF== Profiling "FusedAddRMSNormKernel" - 124: 0%INFO:     127.0.0.1:55024 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:39.144207666Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:40.016913915Z .INFO:     127.0.0.1:55034 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:40.147584407Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:40.641939874Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:13:41.051959153Z ==PROF== Profiling "kernel" - 125: 0%INFO:     127.0.0.1:55040 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:41.151491069Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:42.087298229Z INFO:     127.0.0.1:55056 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:42.155179663Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:42.992362176Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:13:43.124207609Z INFO:     127.0.0.1:55066 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:43.159631912Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:44.162906999Z ==PROF== Profiling "silu_and_mul_kernel" - 126: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:44.175648932Z INFO:     127.0.0.1:50264 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:45.166796067Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:45.233380870Z INFO:     127.0.0.1:50272 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:45.344392168Z 100% - 39 passes
+server-1  | 2026-11-09T06:13:46.170493597Z ==PROF== Profiling "kernel" - 127: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:46.270076135Z INFO:     127.0.0.1:50282 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:47.174315440Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:47.304199440Z ..50%..INFO:     127.0.0.1:50284 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:47.664601341Z ..100% - 40 passes
+server-1  | 2026-11-09T06:13:48.177907459Z ==PROF== Profiling "FusedAddRMSNormKernel" - 128: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:48.338077479Z INFO:     127.0.0.1:50286 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:49.181654942Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:49.371760892Z .INFO:     127.0.0.1:50300 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:49.969559564Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:13:50.185011876Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:50.406721351Z ==PROF== Profiling "kernel" - 129: 0%INFO:     127.0.0.1:50316 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:51.188213358Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:51.441487143Z INFO:     127.0.0.1:50318 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:52.191130136Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:52.344551529Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:52.477989348Z INFO:     127.0.0.1:50320 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:53.194398351Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 130: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:53.512628710Z INFO:     127.0.0.1:58040 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:54.198067439Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:54.587289172Z .50%....INFO:     127.0.0.1:58054 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:54.987995973Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:55.202205689Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:55.623736539Z ==PROF== Profiling "kernel_mha" - 131: 0%INFO:     127.0.0.1:58068 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:56.205791631Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:56.682679099Z INFO:     127.0.0.1:58070 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:57.208771670Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:57.744835734Z ...50%....INFO:     127.0.0.1:58086 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:58.058941315Z 100% - 40 passes
+server-1  | 2026-11-09T06:13:58.211886275Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:58.780144271Z ==PROF== Profiling "kernel" - 132: 0%INFO:     127.0.0.1:58092 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:59.216348700Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:13:59.840369811Z INFO:     127.0.0.1:58100 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:00.220880646Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:00.874856686Z ...50%....INFO:     127.0.0.1:58116 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:00.890384019Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:01.223946715Z ==PROF== Profiling "FusedAddRMSNormKernel" - 133: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:01.910156132Z INFO:     127.0.0.1:58122 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:02.227617628Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:02.945411730Z ....50%...INFO:     127.0.0.1:58126 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:03.180201608Z .100% - 40 passes
+server-1  | 2026-11-09T06:14:03.231719741Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:03.979875694Z ==PROF== Profiling "kernel" - 134: 0%INFO:     127.0.0.1:53270 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:04.235530949Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:05.012413769Z .INFO:     127.0.0.1:53272 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:05.238397074Z ...50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:05.570674072Z .100% - 40 passes
+server-1  | 2026-11-09T06:14:06.047410323Z ==PROF== Profiling "silu_and_mul_kernel" - 135: 0%INFO:     127.0.0.1:53274 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:06.241808341Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:07.081376995Z INFO:     127.0.0.1:53284 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:07.244784938Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:07.846759155Z ...50%....100% - 39 passes
+server-1  | 2026-11-09T06:14:08.114618571Z INFO:     127.0.0.1:53286 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:08.247928428Z ==PROF== Profiling "kernel" - 136: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:09.147493793Z INFO:     127.0.0.1:53288 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:09.251871233Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:10.180132834Z ....50%....INFO:     127.0.0.1:53294 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:10.189971318Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:10.254858176Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:11.214797253Z ==PROF== Profiling "FusedAddRMSNormKernel" - 137: 0%INFO:     127.0.0.1:53302 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:11.258438100Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:12.248811305Z ....50%...INFO:     127.0.0.1:53310 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:12.261699772Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:12.505472273Z .100% - 40 passes
+server-1  | 2026-11-09T06:14:13.265216602Z ==PROF== Profiling "kernel" - 138: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:13.282951394Z INFO:     127.0.0.1:60276 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:14.268572145Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:14.317729732Z INFO:     127.0.0.1:60278 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:14.845497413Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:14:15.276743391Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 139: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:15.353021594Z INFO:     127.0.0.1:60290 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:16.280534798Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:16.387730530Z INFO:     127.0.0.1:60298 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:17.218515831Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:14:17.285752201Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:17.421820235Z INFO:     127.0.0.1:60312 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:18.288837319Z ==PROF== Profiling "kernel_mha" - 140: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:18.457497462Z INFO:     127.0.0.1:60320 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:19.292092764Z ....50%.INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:19.492919815Z ...INFO:     127.0.0.1:60330 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:19.702585021Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:20.295375961Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:20.528859117Z ==PROF== Profiling "kernel" - 141: 0%INFO:     127.0.0.1:60338 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:21.298811310Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:21.564443643Z INFO:     127.0.0.1:60340 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:22.302029178Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:22.401342946Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:22.603307713Z INFO:     127.0.0.1:60354 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:23.305037071Z ==PROF== Profiling "FusedAddRMSNormKernel" - 142: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:23.637502585Z INFO:     127.0.0.1:42782 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:24.308571888Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:24.673408876Z 50%....INFO:     127.0.0.1:42786 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:24.720846336Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:25.312287014Z ==PROF== Profiling "kernel" - 143: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:25.707443760Z INFO:     127.0.0.1:42792 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:26.315561176Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:26.740353044Z ....50%..INFO:     127.0.0.1:42798 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:27.089790564Z ..100% - 40 passes
+server-1  | 2026-11-09T06:14:27.319334960Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:27.775284104Z ==PROF== Profiling "silu_and_mul_kernel" - 144: 0%INFO:     127.0.0.1:42800 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:28.322716094Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:28.809084189Z .INFO:     127.0.0.1:42806 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:29.324895417Z ...50%....100% - 39 passes
+server-1  | 2026-11-09T06:14:29.326215149Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:29.842564150Z ==PROF== Profiling "kernel" - 145: 0%INFO:     127.0.0.1:42820 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:30.332732348Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:30.878612184Z INFO:     127.0.0.1:42826 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:31.335849498Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:31.665425347Z .100% - 40 passes
+server-1  | 2026-11-09T06:14:31.914327823Z INFO:     127.0.0.1:42828 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:32.339287207Z ==PROF== Profiling "FusedAddRMSNormKernel" - 146: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:32.949615656Z INFO:     127.0.0.1:42834 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:33.343615585Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:33.964542097Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:14:33.984772332Z INFO:     127.0.0.1:48480 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:34.346877291Z ==PROF== Profiling "kernel" - 147: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:35.019385954Z INFO:     127.0.0.1:48494 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:35.350409633Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:36.054242484Z ....50%....INFO:     127.0.0.1:48510 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:36.309492941Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:36.353574754Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:37.088351618Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 148: 0%INFO:     127.0.0.1:48518 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:37.357236537Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:38.122333218Z .INFO:     127.0.0.1:48520 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:38.360588405Z ...50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:38.635158808Z .100% - 40 passes
+server-1  | 2026-11-09T06:14:39.156814692Z ==PROF== Profiling "kernel_mha" - 149: 0%INFO:     127.0.0.1:48532 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:39.364062395Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:40.199676790Z INFO:     127.0.0.1:48546 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:40.367035065Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:41.295001945Z ...50%....INFO:     127.0.0.1:48558 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:41.370876569Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:41.520656252Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:42.329852896Z ==PROF== Profiling "kernel" - 150: 0%INFO:     127.0.0.1:48570 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:42.373932119Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:43.364588086Z INFO:     127.0.0.1:57906 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:43.377246504Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:44.337448835Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:14:44.381309988Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:44.401890264Z INFO:     127.0.0.1:57914 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:45.385150320Z ==PROF== Profiling "FusedAddRMSNormKernel" - 151: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:45.437164263Z INFO:     127.0.0.1:57926 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:46.389405014Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:46.518906324Z INFO:     127.0.0.1:57932 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:46.708949907Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:47.392632183Z ==PROF== Profiling "kernel" - 152: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:47.552280851Z INFO:     127.0.0.1:57936 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:48.396439322Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:48.586182127Z .INFO:     127.0.0.1:57940 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:49.106996930Z ..50%....100% - 41 passes
+server-1  | 2026-11-09T06:14:49.399595438Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:49.622170645Z ==PROF== Profiling "silu_and_mul_kernel" - 153: 0%INFO:     127.0.0.1:57956 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:50.402579485Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:50.658571111Z INFO:     127.0.0.1:57972 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:51.346146198Z ....50%....100% - 39 passes
+server-1  | 2026-11-09T06:14:51.405929173Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:51.692938675Z ==PROF== Profiling "kernel" - 154: 0%INFO:     127.0.0.1:57976 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:52.409605273Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:52.728602386Z INFO:     127.0.0.1:57984 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:53.413120446Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:53.763522920Z .INFO:     127.0.0.1:54182 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:53.793987865Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:54.416274669Z ==PROF== Profiling "FusedAddRMSNormKernel" - 155: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:54.797972448Z INFO:     127.0.0.1:54188 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:55.420589070Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:55.831821181Z ....50%...INFO:     127.0.0.1:54198 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:56.155767656Z .100% - 40 passes
+server-1  | 2026-11-09T06:14:56.424355708Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:56.866101904Z ==PROF== Profiling "kernel" - 156: 0%INFO:     127.0.0.1:54214 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:57.427765556Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:57.900515174Z .INFO:     127.0.0.1:54222 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:58.431117066Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:58.547345790Z 100% - 40 passes
+server-1  | 2026-11-09T06:14:58.935607405Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 157: 0%INFO:     127.0.0.1:54230 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:59.434676931Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:14:59.970405266Z INFO:     127.0.0.1:54234 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:00.439720437Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:00.892358034Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:01.006062569Z INFO:     127.0.0.1:54246 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:01.443483871Z ==PROF== Profiling "kernel_mha" - 158: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:02.052684425Z INFO:     127.0.0.1:54260 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:02.448283739Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:03.089541764Z ....50%.INFO:     127.0.0.1:54276 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:03.452002818Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:03.783270226Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:04.122042156Z INFO:     127.0.0.1:56632 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:04.455577426Z ==PROF== Profiling "kernel" - 159: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:05.158677701Z INFO:     127.0.0.1:56634 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:05.459268612Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:06.194184560Z ....50%...INFO:     127.0.0.1:56642 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:06.462367564Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:06.574190517Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:07.229497060Z ==PROF== Profiling "FusedAddRMSNormKernel" - 160: 0%INFO:     127.0.0.1:56644 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:07.466867211Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:08.265005098Z .INFO:     127.0.0.1:56646 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:08.470672228Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:08.891834742Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:09.300379193Z ==PROF== Profiling "kernel" - 161: 0%INFO:     127.0.0.1:56654 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:09.473706477Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:10.336071150Z INFO:     127.0.0.1:56668 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:10.477839667Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:11.300480302Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:11.372516723Z INFO:     127.0.0.1:56674 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:11.797831740Z ==PROF== Profiling "silu_and_mul_kernel" - 162: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:12.407061483Z INFO:     127.0.0.1:56678 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:12.801555057Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:13.452278587Z ....50%....INFO:     127.0.0.1:37992 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:13.601240088Z 100% - 39 passes
+server-1  | 2026-11-09T06:15:13.805332018Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:14.487089692Z ==PROF== Profiling "kernel" - 163: 0%INFO:     127.0.0.1:38002 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:14.808789077Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:15.520615753Z ....INFO:     127.0.0.1:38004 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:15.813431348Z 50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:15.966789656Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:16.554427331Z ==PROF== Profiling "FusedAddRMSNormKernel" - 164: 0%INFO:     127.0.0.1:38012 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:16.817637242Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:17.587158966Z INFO:     127.0.0.1:38028 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:17.820541906Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:18.303812713Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:18.621540105Z INFO:     127.0.0.1:38040 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:18.824519171Z ==PROF== Profiling "kernel" - 165: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:19.653293282Z INFO:     127.0.0.1:38052 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:19.828317109Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:20.686977651Z ....50%....INFO:     127.0.0.1:38062 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:20.687661909Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:20.831451435Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:21.725158161Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 166: 0%INFO:     127.0.0.1:38072 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:21.834310868Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:22.762551725Z ....50%...INFO:     127.0.0.1:38080 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:22.837509918Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:23.061853284Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:23.796303839Z ==PROF== Profiling "kernel_mha" - 167: 0%INFO:     127.0.0.1:51828 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:23.840499312Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:24.830876199Z .INFO:     127.0.0.1:51840 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:24.843381323Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:25.731411925Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:25.846726144Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:25.866366459Z INFO:     127.0.0.1:51848 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:26.850343481Z ==PROF== Profiling "kernel" - 168: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:26.921738317Z INFO:     127.0.0.1:51864 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:27.853373596Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:27.962096794Z ..INFO:     127.0.0.1:51874 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:28.481354345Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:28.856294645Z ==PROF== Profiling "FusedAddRMSNormKernel" - 169: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:28.998190895Z INFO:     127.0.0.1:51876 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:29.859446722Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:30.036099534Z INFO:     127.0.0.1:51884 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:30.799895077Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:30.864414163Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:31.072712620Z INFO:     127.0.0.1:51892 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:31.868435875Z ==PROF== Profiling "kernel" - 170: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:32.109583611Z INFO:     127.0.0.1:51908 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:32.872058919Z ....50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:33.181742323Z ..INFO:     127.0.0.1:51920 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:33.385863634Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:33.875379431Z ==PROF== Profiling "silu_and_mul_kernel" - 171: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:34.216101225Z INFO:     127.0.0.1:40802 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:34.878464948Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:35.249781965Z ....INFO:     127.0.0.1:40814 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:35.641719708Z 50%....100% - 39 passes
+server-1  | 2026-11-09T06:15:35.882750643Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:36.284980254Z ==PROF== Profiling "kernel" - 172: 0%INFO:     127.0.0.1:40818 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:36.887464666Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:37.319197354Z .INFO:     127.0.0.1:40824 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:37.891699357Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:38.012012170Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:38.354652099Z ==PROF== Profiling "FusedAddRMSNormKernel" - 173: 0%INFO:     127.0.0.1:40826 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:38.896520522Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:39.387909676Z INFO:     127.0.0.1:40836 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:39.901200987Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:40.355852095Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:40.422155067Z INFO:     127.0.0.1:40850 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:40.905251768Z ==PROF== Profiling "kernel" - 174: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:41.455942490Z INFO:     127.0.0.1:40862 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:41.909666911Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:42.494045749Z ....50%....INFO:     127.0.0.1:40864 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:42.764833204Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:42.912597271Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:43.529070541Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 175: 0%INFO:     127.0.0.1:57406 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:43.915840273Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:44.563961554Z .INFO:     127.0.0.1:57414 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:44.919769169Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:45.149467185Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:45.599874722Z ==PROF== Profiling "kernel_mha" - 176: 0%INFO:     127.0.0.1:57418 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:45.923617639Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:46.661145184Z INFO:     127.0.0.1:57420 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:46.927221797Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:47.719510546Z ....50%....INFO:     127.0.0.1:57434 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:47.930739404Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:48.221088665Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:48.752515159Z INFO:     127.0.0.1:57448 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:48.935518805Z ==PROF== Profiling "kernel" - 177: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:49.786360344Z INFO:     127.0.0.1:57460 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:49.938540898Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:50.845975738Z ....50%....INFO:     127.0.0.1:57470 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:50.942175748Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:51.022707699Z 100% - 40 passes
+server-1  | 2026-11-09T06:15:51.879063032Z ==PROF== Profiling "FusedAddRMSNormKernel" - 178: 0%INFO:     127.0.0.1:57484 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:51.946184969Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:52.912023508Z ...INFO:     127.0.0.1:57490 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:52.949286816Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:53.355262246Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:53.947205829Z ==PROF== Profiling "kernel" - 179: 0%INFO:     127.0.0.1:38008 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:53.952572866Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:54.955948974Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:54.982957615Z INFO:     127.0.0.1:38012 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:55.793821887Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:15:55.959430317Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:56.018309154Z INFO:     127.0.0.1:38016 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:56.963325286Z ==PROF== Profiling "silu_and_mul_kernel" - 180: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:57.052763763Z INFO:     127.0.0.1:38020 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:57.966858665Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:58.083633784Z 100% - 39 passes
+server-1  | 2026-11-09T06:15:58.087370387Z INFO:     127.0.0.1:38032 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:58.970342496Z ==PROF== Profiling "kernel" - 181: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:59.121820326Z INFO:     127.0.0.1:38040 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:15:59.973656537Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:00.155760681Z 50%...INFO:     127.0.0.1:38056 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:00.450717651Z .100% - 40 passes
+server-1  | 2026-11-09T06:16:00.980635987Z ==PROF== Profiling "FusedAddRMSNormKernel" - 182: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:01.189997508Z INFO:     127.0.0.1:38058 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:01.984280564Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:02.224214904Z .INFO:     127.0.0.1:38066 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:02.737386322Z ...50%....100% - 39 passes
+server-1  | 2026-11-09T06:16:02.987468875Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:03.258858365Z ==PROF== Profiling "kernel" - 183: 0%INFO:     127.0.0.1:44840 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:03.992069674Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:04.293530364Z INFO:     127.0.0.1:44844 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:04.995760198Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:05.151204526Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:05.329389555Z INFO:     127.0.0.1:44850 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:05.999357991Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 184: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:06.363779859Z INFO:     127.0.0.1:44858 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:07.002662189Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:07.408546612Z ...50%....INFO:     127.0.0.1:44862 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:07.572862355Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:08.005772178Z ==PROF== Profiling "kernel_mha" - 185: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:08.442252137Z INFO:     127.0.0.1:44872 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:09.009603487Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:09.475608258Z .INFO:     127.0.0.1:44876 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:10.012774280Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:10.412367272Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:10.512768101Z INFO:     127.0.0.1:44882 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:11.017102192Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:11.549033824Z ==PROF== Profiling "kernel" - 186: 0%INFO:     127.0.0.1:44890 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:12.020089183Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:12.584327537Z .INFO:     127.0.0.1:44894 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:13.023256918Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:13.271716419Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:13.620881586Z ==PROF== Profiling "FusedAddRMSNormKernel" - 187: 0%INFO:     127.0.0.1:35254 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:14.026937449Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:14.654100089Z INFO:     127.0.0.1:35268 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:15.029934019Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:15.688615534Z ...50%....INFO:     127.0.0.1:35276 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:15.691251119Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:16.034701338Z ==PROF== Profiling "kernel" - 188: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:16.721754354Z INFO:     127.0.0.1:35292 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:17.038117346Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:17.755433124Z ....50%..INFO:     127.0.0.1:35296 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:18.040870503Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:18.127712547Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:18.791795120Z ==PROF== Profiling "silu_and_mul_kernel" - 189: 0%INFO:     127.0.0.1:35312 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:19.043935726Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:19.826736154Z .INFO:     127.0.0.1:35320 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:20.047315536Z ...50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:20.444082290Z ....100% - 39 passes
+server-1  | 2026-11-09T06:16:20.862969112Z ==PROF== Profiling "kernel" - 190: 0%INFO:     127.0.0.1:35336 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:21.051105894Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:21.900811327Z INFO:     127.0.0.1:35342 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:22.054303185Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:22.857438895Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:16:22.935417567Z INFO:     127.0.0.1:35350 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:23.057704546Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:23.970112521Z ==PROF== Profiling "FusedAddRMSNormKernel" - 191: 0%INFO:     127.0.0.1:34706 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:24.061360780Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:25.006260231Z ....50%....INFO:     127.0.0.1:34714 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:25.070556071Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:25.243914041Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:26.040891972Z ==PROF== Profiling "kernel" - 192: 0%INFO:     127.0.0.1:34718 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:26.074062411Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:27.077276096Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:27.077780008Z INFO:     127.0.0.1:34726 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:27.664195326Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:16:28.081466910Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 193: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:28.112838023Z INFO:     127.0.0.1:34738 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:29.084994134Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:29.147061189Z INFO:     127.0.0.1:34750 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:30.087814051Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:30.099131078Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:30.185164736Z INFO:     127.0.0.1:34760 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:31.090609283Z ==PROF== Profiling "kernel_mha" - 194: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:31.218925453Z INFO:     127.0.0.1:34768 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:32.093544552Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:32.252595142Z .50%..INFO:     127.0.0.1:34782 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:33.097126650Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:33.252203552Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:33.288281139Z INFO:     127.0.0.1:50746 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:34.100442887Z ==PROF== Profiling "kernel" - 195: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:34.323076155Z INFO:     127.0.0.1:50760 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:35.104268992Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:35.356242995Z .INFO:     127.0.0.1:50772 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:36.107936236Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:36.116155015Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:36.390259928Z INFO:     127.0.0.1:50782 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:37.110963848Z ==PROF== Profiling "FusedAddRMSNormKernel" - 196: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:37.424968823Z INFO:     127.0.0.1:50798 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:38.114411639Z ....50%.INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:38.465410395Z ...INFO:     127.0.0.1:50804 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:38.468755525Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:39.119216155Z ==PROF== Profiling "kernel" - 197: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:39.498942094Z INFO:     127.0.0.1:50810 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:40.122994154Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:40.532968346Z ....50%..INFO:     127.0.0.1:50818 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:40.938275526Z ..100% - 40 passes
+server-1  | 2026-11-09T06:16:41.125879697Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:41.567681045Z ==PROF== Profiling "silu_and_mul_kernel" - 198: 0%INFO:     127.0.0.1:50832 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:42.129758214Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:42.602591796Z INFO:     127.0.0.1:50836 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:43.133120907Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:43.385755688Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:43.636217114Z INFO:     127.0.0.1:42882 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:44.136845396Z ==PROF== Profiling "kernel" - 199: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:44.670088471Z INFO:     127.0.0.1:42898 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:45.139931505Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:45.705625326Z ...50%....INFO:     127.0.0.1:42904 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:45.768648784Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:46.143025352Z ==PROF== Profiling "FusedAddRMSNormKernel" - 200: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:46.740331387Z INFO:     127.0.0.1:42916 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:47.146974363Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:47.775524930Z ....50%.INFO:     127.0.0.1:42924 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:48.150327200Z ...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:48.155311018Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:48.811038844Z ==PROF== Profiling "kernel" - 201: 0%INFO:     127.0.0.1:42938 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:49.155063129Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:49.845647953Z .INFO:     127.0.0.1:42950 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:50.158005073Z ...50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:50.565908219Z ....100% - 40 passes
+server-1  | 2026-11-09T06:16:50.879352491Z INFO:     127.0.0.1:42960 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:51.162216707Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 202: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:51.915471263Z INFO:     127.0.0.1:42968 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:52.305948181Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:52.953129867Z ...50%....INFO:     127.0.0.1:42980 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:53.097826696Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:53.309282361Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:54.000996571Z ==PROF== Profiling "kernel_mha" - 203: 0%INFO:     127.0.0.1:38400 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:54.312910532Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:55.043765033Z .INFO:     127.0.0.1:38414 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:55.316133746Z ...50%..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:56.077802515Z ..INFO:     127.0.0.1:38424 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:56.189608844Z 100% - 40 passes
+server-1  | 2026-11-09T06:16:56.319779107Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:57.112381339Z ==PROF== Profiling "kernel" - 204: 0%INFO:     127.0.0.1:38426 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:57.323554970Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:58.146319613Z INFO:     127.0.0.1:38440 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:58.327054339Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:58.993529335Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:16:59.180097919Z INFO:     127.0.0.1:38442 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:16:59.331648736Z ==PROF== Profiling "FusedAddRMSNormKernel" - 205: INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:00.214222822Z 0%INFO:     127.0.0.1:38452 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:00.335239860Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:01.248661944Z ....50%....INFO:     127.0.0.1:38466 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:01.338348673Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:01.351194926Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:02.283124203Z ==PROF== Profiling "kernel" - 206: 0%INFO:     127.0.0.1:38482 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:02.342149157Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:03.317071455Z ...INFO:     127.0.0.1:44398 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:03.345995267Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:03.786768144Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:17:04.349278032Z ==PROF== Profiling "silu_and_mul_kernel" - 207: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:04.350841564Z INFO:     127.0.0.1:44400 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:05.353782530Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:05.384084963Z INFO:     127.0.0.1:44412 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:06.139681663Z ....50%....100% - 39 passes
+server-1  | 2026-11-09T06:17:06.357994883Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:06.418140349Z INFO:     127.0.0.1:44422 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:07.361300406Z ==PROF== Profiling "kernel" - 208: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:07.453074564Z INFO:     127.0.0.1:44430 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:08.365000711Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:08.487075074Z INFO:     127.0.0.1:44440 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:08.571381222Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:09.370023184Z ==PROF== Profiling "FusedAddRMSNormKernel" - 209: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:09.522602744Z INFO:     127.0.0.1:44444 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:10.373718617Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:10.558469060Z ...50%INFO:     127.0.0.1:44458 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:10.993952317Z ....100% - 40 passes
+server-1  | 2026-11-09T06:17:11.377447418Z ==PROF== Profiling "kernel" - 210: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:11.593674398Z INFO:     127.0.0.1:44474 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:12.382015228Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:12.630299303Z INFO:     127.0.0.1:44482 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:13.385308589Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:13.428067259Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:13.663465004Z INFO:     127.0.0.1:40776 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:14.388752353Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 211: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:14.699434225Z INFO:     127.0.0.1:40784 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:15.392168966Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:15.748834692Z 50%....INFO:     127.0.0.1:40792 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:15.951072681Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:16.396090205Z ==PROF== Profiling "kernel_mha" - 212: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:16.783531864Z INFO:     127.0.0.1:40808 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:17.400435318Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:17.819348187Z .INFO:     127.0.0.1:40812 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:18.404514030Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:18.786290630Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:18.855251962Z INFO:     127.0.0.1:40822 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:19.408085846Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:19.889488703Z ==PROF== Profiling "kernel" - 213: 0%INFO:     127.0.0.1:40828 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:20.411226076Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:20.924207501Z .INFO:     127.0.0.1:40834 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:21.415180523Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:21.702683660Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:21.958673159Z INFO:     127.0.0.1:40844 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:22.418817765Z ==PROF== Profiling "FusedAddRMSNormKernel" - 214: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:22.992117561Z INFO:     127.0.0.1:40852 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:23.422526986Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:24.026121689Z ...50%....INFO:     127.0.0.1:36544 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:24.090044542Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:24.426019913Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:25.063499612Z ==PROF== Profiling "kernel" - 215: 0%INFO:     127.0.0.1:36560 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:25.429740322Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:26.096669874Z ....50%INFO:     127.0.0.1:36562 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:26.433033632Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:26.539502523Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:27.131425562Z ==PROF== Profiling "silu_and_mul_kernel" - 216: 0%INFO:     127.0.0.1:36568 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:27.436285296Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:28.165340137Z INFO:     127.0.0.1:36582 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:28.439274150Z ....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:28.838173519Z 50%....100% - 39 passes
+server-1  | 2026-11-09T06:17:29.200843372Z ==PROF== Profiling "kernel" - 217: 0%INFO:     127.0.0.1:36592 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:29.443938324Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:30.236928924Z INFO:     127.0.0.1:36594 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:30.446966679Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:31.242317094Z ....50%....100% - 40 passes
+server-1  | 2026-11-09T06:17:31.273601200Z INFO:     127.0.0.1:36600 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:31.451680233Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:32.307866484Z ==PROF== Profiling "FusedAddRMSNormKernel" - 218: 0%INFO:     127.0.0.1:36612 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:32.454909149Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:33.342334173Z ....50%...INFO:     127.0.0.1:59066 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:33.457822266Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:33.616129830Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:34.376481635Z ==PROF== Profiling "kernel" - 219: 0%INFO:     127.0.0.1:59068 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:34.461438259Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:35.411371650Z .INFO:     127.0.0.1:59084 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:35.464919495Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:36.042527093Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:17:36.445769043Z ==PROF== Profiling "applyBiasRopeUpdateKVCacheV2" - 220: 0%INFO:     127.0.0.1:59086 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:36.468536369Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:37.471696116Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:37.480832260Z INFO:     127.0.0.1:59088 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:38.475005769Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:38.533072991Z INFO:     127.0.0.1:59098 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:38.700409172Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:39.478536405Z ==PROF== Profiling "kernel_mha" - 221: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:39.575819066Z INFO:     127.0.0.1:59114 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:40.481950623Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:40.616781201Z INFO:     127.0.0.1:59130 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:41.485711899Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:41.609769704Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:41.656591242Z INFO:     127.0.0.1:59142 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:42.489474514Z ==PROF== Profiling "kernel" - 222: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:42.692821532Z INFO:     127.0.0.1:59148 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:43.492730097Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:43.726690505Z .INFO:     127.0.0.1:39968 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:44.385734109Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:17:44.495851378Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:44.762338274Z ==PROF== Profiling "FusedAddRMSNormKernel" - 223: 0%INFO:     127.0.0.1:39984 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:45.499244631Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:45.797300387Z INFO:     127.0.0.1:39998 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:46.502236451Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:46.788452087Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:46.833472128Z INFO:     127.0.0.1:40014 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:47.506038363Z ==PROF== Profiling "kernel" - 224: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:47.867536642Z INFO:     127.0.0.1:40028 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:48.509324221Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:48.903008318Z ...50%...INFO:     127.0.0.1:40034 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:49.231141876Z .100% - 40 passes
+server-1  | 2026-11-09T06:17:49.513126774Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:49.937973706Z ==PROF== Profiling "silu_and_mul_kernel" - 225: 0%INFO:     127.0.0.1:40050 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:50.516001855Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:50.973353920Z .INFO:     127.0.0.1:40066 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:51.520401915Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:51.548192381Z 100% - 39 passes
+server-1  | 2026-11-09T06:17:52.008850810Z ==PROF== Profiling "kernel" - 226: 0%INFO:     127.0.0.1:40070 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:52.524870166Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:53.044445889Z INFO:     127.0.0.1:40080 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:53.528470595Z ....50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:53.971319832Z ....100% - 40 passes
+server-1  | 2026-11-09T06:17:54.080179004Z INFO:     127.0.0.1:44480 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:54.531918627Z ==PROF== Profiling "FusedAddRMSNormKernel" - 227: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:55.112881383Z INFO:     127.0.0.1:44486 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:55.535117157Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:56.153992154Z ....50%....INFO:     127.0.0.1:44488 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:56.367427401Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:56.544408807Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:57.189140415Z ==PROF== Profiling "unrolled_elementwise_kernel" - 228: 0%INFO:     127.0.0.1:44490 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:57.548492981Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:58.222473993Z .INFO:     127.0.0.1:44494 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:58.552206008Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:58.806083252Z 100% - 40 passes
+server-1  | 2026-11-09T06:17:59.259139845Z ==PROF== Profiling "DeviceScanInitKernel" - 229: 0%INFO:     127.0.0.1:44508 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:17:59.559000634Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:00.294915831Z INFO:     127.0.0.1:44510 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:00.562769200Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:01.214632780Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:01.328630916Z INFO:     127.0.0.1:44512 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:01.566079609Z ==PROF== Profiling "DeviceScanKernel" - 230: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:02.365057052Z INFO:     127.0.0.1:44520 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:02.569210052Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:03.400090294Z ....50%....INFO:     127.0.0.1:42864 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:03.521044702Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:03.572546071Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:04.435845183Z ==PROF== Profiling "vectorized_elementwise_kernel" - 231: 0%INFO:     127.0.0.1:42876 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:04.576010784Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:05.470336016Z ....INFO:     127.0.0.1:42880 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:05.579790368Z 50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:05.867100377Z .100% - 40 passes
+server-1  | 2026-11-09T06:18:06.511146572Z ==PROF== Profiling "index_elementwise_kernel" - 232: 0%INFO:     127.0.0.1:42888 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:06.584074257Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:07.544816472Z .INFO:     127.0.0.1:42896 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:07.587581763Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:08.359957155Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:08.581752055Z INFO:     127.0.0.1:42904 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:08.590982955Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:09.594170626Z ==PROF== Profiling "Kernel2" - 233: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:09.616176207Z INFO:     127.0.0.1:42908 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:10.597106053Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:10.649161416Z INFO:     127.0.0.1:42922 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:10.941842436Z .100% - 40 passes
+server-1  | 2026-11-09T06:18:11.601397966Z ==PROF== Profiling "unrolled_elementwise_kernel" - 234: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:11.683941246Z INFO:     127.0.0.1:42938 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:12.604490030Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:12.718787776Z .INFO:     127.0.0.1:42948 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:13.405829296Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:13.607769754Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:13.752409650Z INFO:     127.0.0.1:51722 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:14.611347556Z ==PROF== Profiling "index_elementwise_kernel" - 235: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:14.785371373Z INFO:     127.0.0.1:51726 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:15.615451817Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:15.821091087Z INFO:     127.0.0.1:51740 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:15.933513679Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:16.619386916Z ==PROF== Profiling "cunn_SoftMaxForward" - 236: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:16.855896165Z INFO:     127.0.0.1:51748 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:17.622981850Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:17.890024582Z ...INFO:     127.0.0.1:51754 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:18.337794666Z 50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:18.626860217Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:18.924690915Z ==PROF== Profiling "fill" - 237: 0%INFO:     127.0.0.1:51762 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:19.630120677Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:19.958246693Z INFO:     127.0.0.1:51778 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:20.633468248Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:20.745993244Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:20.992460693Z INFO:     127.0.0.1:51780 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:21.637307972Z ==PROF== Profiling "computeBlockDigitCounts" - 238: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:22.026583666Z INFO:     127.0.0.1:51782 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:22.640824553Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:23.061943846Z ...50%....INFO:     127.0.0.1:51798 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:23.145621718Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:23.645455182Z ==PROF== Profiling "computeDigitCumSum" - 239: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:24.096410646Z INFO:     127.0.0.1:58034 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:24.648639246Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:25.130780062Z ....50%INFO:     127.0.0.1:58036 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:25.534979764Z ....100% - 40 passes
+server-1  | 2026-11-09T06:18:25.652522000Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:26.166504243Z ==PROF== Profiling "computeBlockwiseWithinKCounts" - 240: 0%INFO:     127.0.0.1:58052 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:26.656058951Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:27.202282493Z INFO:     127.0.0.1:58058 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:27.660506514Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:27.921359432Z .100% - 40 passes
+server-1  | 2026-11-09T06:18:28.237621209Z INFO:     127.0.0.1:58064 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:28.663590967Z ==PROF== Profiling "computeBlockDigitCounts" - 241: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:29.271820646Z INFO:     127.0.0.1:58074 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:29.667208355Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:30.305930576Z ...50%....INFO:     127.0.0.1:58088 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:30.307804369Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:30.672043144Z ==PROF== Profiling "computeDigitCumSum" - 242: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:31.341308484Z INFO:     127.0.0.1:58100 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:31.992898339Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:32.376598615Z ...50%..INFO:     127.0.0.1:58112 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:32.699438756Z ..100% - 40 passes
+server-1  | 2026-11-09T06:18:32.996287842Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:33.412258264Z ==PROF== Profiling "computeBlockwiseWithinKCounts" - 243: 0%INFO:     127.0.0.1:54302 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:33.999989372Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:34.450984705Z .INFO:     127.0.0.1:54314 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:35.003652033Z ...50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:35.096734175Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:35.487662934Z ==PROF== Profiling "computeBlockDigitCounts" - 244: 0%INFO:     127.0.0.1:54318 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:36.007401649Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:36.522769954Z INFO:     127.0.0.1:54330 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:37.010791588Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:37.480355780Z ..50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:37.559323760Z INFO:     127.0.0.1:54346 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:38.014134046Z ==PROF== Profiling "computeDigitCumSum" - 245: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:38.593779664Z INFO:     127.0.0.1:54354 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:39.018104165Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:39.628214553Z ....50%....INFO:     127.0.0.1:54370 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:39.877428571Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:40.021515787Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:40.664377064Z ==PROF== Profiling "computeBlockwiseWithinKCounts" - 246: 0%INFO:     127.0.0.1:54380 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:41.025990670Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:41.699829344Z .INFO:     127.0.0.1:54390 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:42.030115440Z ...50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:42.290080273Z .100% - 40 passes
+server-1  | 2026-11-09T06:18:42.735354738Z ==PROF== Profiling "computeBlockDigitCounts" - 247: 0%INFO:     127.0.0.1:54398 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:43.034004858Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:43.770226075Z INFO:     127.0.0.1:58396 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:44.038399683Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:44.707159015Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:44.807085220Z INFO:     127.0.0.1:58410 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:45.042187921Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:45.842453050Z ==PROF== Profiling "computeDigitCumSum" - 248: 0%INFO:     127.0.0.1:58412 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:46.051834025Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:46.876785037Z ....50%....INFO:     127.0.0.1:58424 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:47.055370442Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:47.123242936Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:47.910513365Z ==PROF== Profiling "computeBlockwiseWithinKCounts" - 249: 0%INFO:     127.0.0.1:58430 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:48.059827073Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:48.945497920Z .INFO:     127.0.0.1:58434 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:49.063058431Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:49.539596481Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:49.981244615Z ==PROF== Profiling "computeBlockwiseKthCounts" - 250: 0%INFO:     127.0.0.1:58446 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:50.067471386Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:51.015891227Z INFO:     127.0.0.1:58456 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:51.071734142Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:52.050692279Z ....50%....INFO:     127.0.0.1:58464 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:52.075116794Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:52.116630975Z 100% - 40 passes
+server-1  | 2026-11-09T06:18:53.078178367Z ==PROF== Profiling "DeviceScanByKeyInitKernel" - 251: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:53.085550896Z INFO:     127.0.0.1:58476 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:54.081307788Z ....50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:54.121315342Z .INFO:     127.0.0.1:35034 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:54.468519654Z ...100% - 39 passes
+server-1  | 2026-11-09T06:18:55.085066890Z ==PROF== Profiling "DeviceScanByKeyKernel" - 252: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:55.158035740Z INFO:     127.0.0.1:35046 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:56.088170546Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:56.193189142Z .INFO:     127.0.0.1:35062 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:56.941576454Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:18:57.091378079Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:57.227777669Z INFO:     127.0.0.1:35070 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:58.095052169Z ==PROF== Profiling "DeviceScanByKeyInitKernel" - 253: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:58.264928044Z INFO:     127.0.0.1:35082 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:59.099118612Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:59.299611614Z .INFO:     127.0.0.1:35084 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:18:59.426392469Z 100% - 40 passes
+server-1  | 2026-11-09T06:19:00.102254454Z ==PROF== Profiling "DeviceScanByKeyKernel" - 254: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:00.333639283Z INFO:     127.0.0.1:35092 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:01.105211749Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:01.368655358Z ...INFO:     127.0.0.1:35104 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:02.024503711Z .50%....100% - 40 passes
+server-1  | 2026-11-09T06:19:02.110158779Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:02.404099894Z ==PROF== Profiling "gatherTopK" - 255: INFO:     127.0.0.1:35106 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:03.113320912Z 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:03.439416745Z INFO:     127.0.0.1:53758 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:04.116822640Z ....50%.INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:04.459024466Z ...100% - 40 passes
+server-1  | 2026-11-09T06:19:04.475025973Z INFO:     127.0.0.1:53768 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:05.120836201Z ==PROF== Profiling "reduce_kernel" - 256: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:05.510172134Z INFO:     127.0.0.1:53778 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:06.124365996Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:06.546111752Z ....50%..INFO:     127.0.0.1:53794 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:06.981208497Z ..100% - 40 passes
+server-1  | 2026-11-09T06:19:07.127792766Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:07.581209064Z ==PROF== Profiling "unrolled_elementwise_kernel" - 257: 0%INFO:     127.0.0.1:53804 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:08.137300415Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:08.615561686Z INFO:     127.0.0.1:53808 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:09.140035268Z ....50%...INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:09.438880261Z .100% - 40 passes
+server-1  | 2026-11-09T06:19:09.650488296Z INFO:     127.0.0.1:53816 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:10.144154289Z ==PROF== Profiling "_scatter_gather_elementwise_k..." - 258: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:10.687780714Z INFO:     127.0.0.1:53832 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:11.147879748Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:11.751647803Z ....50%....INFO:     127.0.0.1:53842 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:12.097979408Z 100% - 40 passes
+server-1  | 2026-11-09T06:19:12.151770810Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:12.787430072Z ==PROF== Profiling "index_elementwise_kernel" - 259: 0%INFO:     127.0.0.1:53858 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:13.155040312Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:13.826346946Z INFO:     127.0.0.1:48400 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:14.158088986Z ....50%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:14.888351623Z ....INFO:     127.0.0.1:48410 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:15.147974549Z 100% - 40 passes
+server-1  | 2026-11-09T06:19:15.161455457Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:15.965973389Z ==PROF== Profiling "index_elementwise_kernel" - 260: 0%INFO:     127.0.0.1:48424 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:16.165099151Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:17.011860306Z .INFO:     127.0.0.1:48428 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:17.168030533Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:18.039336754Z .50%....100% - 39 passes
+server-1  | 2026-11-09T06:19:18.046894550Z INFO:     127.0.0.1:48432 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:18.171740095Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:19.083441249Z ==PROF== Profiling "index_elementwise_kernel" - 261: 0%INFO:     127.0.0.1:48446 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:19.175653738Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:20.118044213Z ....50%.INFO:     127.0.0.1:48458 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:20.178920792Z ..INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:20.730332155Z .100% - 40 passes
+server-1  | 2026-11-09T06:19:21.151549915Z ==PROF== Profiling "vectorized_elementwise_kernel" - 262: 0%INFO:     127.0.0.1:48474 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:21.182907260Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:22.187634834Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:22.188892711Z INFO:     127.0.0.1:48488 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:23.195466550Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:23.225797711Z INFO:     127.0.0.1:57580 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:23.354718717Z 100% - 40 passes
+server-1  | 2026-11-09T06:19:24.198898750Z ==PROF== Profiling "vectorized_elementwise_kernel" - 263: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:24.261246201Z INFO:     127.0.0.1:57590 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:25.202039215Z .INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:25.295920417Z INFO:     127.0.0.1:57606 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:25.978113043Z ...50%....100% - 40 passes
+server-1  | 2026-11-09T06:19:26.205077552Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:26.329840193Z INFO:     127.0.0.1:57608 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:27.208316824Z ==PROF== Profiling "vectorized_elementwise_kernel" - 264: 0%INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:27.365661210Z INFO:     127.0.0.1:57620 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:28.211912025Z ....50%....INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:28.402550093Z INFO:     127.0.0.1:57636 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:28.618525558Z 100% - 40 passes
+server-1  | 2026-11-09T06:19:29.219289453Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:29.469768558Z ==PROF== Profiling "index_elementwise_kernel" - 265: 0%INFO:     127.0.0.1:57642 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:30.223969466Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:30.508135824Z INFO:     127.0.0.1:57656 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:31.229231751Z ....50%.INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:31.542369426Z ...INFO:     127.0.0.1:57664 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:31.746192257Z 100% - 40 passes
+server-1  | 2026-11-09T06:19:32.232382382Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:32.576235074Z INFO:     127.0.0.1:57670 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:33.209819709Z INFO:     172.20.0.1:41648 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:33.214877952Z INFO:     172.20.0.1:41660 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:33.235240210Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:33.261742057Z INFO:     172.20.0.3:46872 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:33.610019380Z INFO:     127.0.0.1:36644 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:34.238973742Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:34.405740221Z INFO:     172.20.0.1:50738 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:34.643237028Z INFO:     127.0.0.1:36646 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:35.242918407Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:35.679003583Z INFO:     127.0.0.1:36652 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:36.247263930Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:36.712943566Z INFO:     127.0.0.1:36658 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:37.251165776Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:37.748555707Z INFO:     127.0.0.1:36666 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:38.254680098Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:38.780746747Z INFO:     127.0.0.1:36672 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:39.258670946Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:39.813860033Z INFO:     127.0.0.1:36680 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T06:19:40.261990735Z INFO:     172.20.0.1:57724 - "GET /prometheus/metrics HTTP/1.1" 200 OK

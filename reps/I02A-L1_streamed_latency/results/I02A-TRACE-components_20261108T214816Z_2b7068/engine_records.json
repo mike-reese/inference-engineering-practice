@@ -1,0 +1,44 @@
+{
+  "I02A-TRACE-components_20261108T214816Z_2b7068-warmup": {
+    "request_id": 2,
+    "perf_metrics": {
+      "first_iter": 1,
+      "last_iter": 64,
+      "timing_metrics": {
+        "server_arrival_time": 58539.61209,
+        "arrival_time": 58539.620878,
+        "first_scheduled_time": 58539.623347,
+        "first_token_time": 58540.273469,
+        "server_first_token_time": 58540.275612,
+        "last_token_time": 58540.557701
+      },
+      "kv_cache_metrics": {
+        "num_total_allocated_blocks": 2,
+        "num_new_allocated_blocks": 2,
+        "num_reused_blocks": 0,
+        "num_missed_blocks": 0
+      }
+    }
+  },
+  "I02A-TRACE-components_20261108T214816Z_2b7068-measured": {
+    "request_id": 3,
+    "perf_metrics": {
+      "first_iter": 66,
+      "last_iter": 129,
+      "timing_metrics": {
+        "server_arrival_time": 58540.654186,
+        "arrival_time": 58540.654772,
+        "first_scheduled_time": 58540.65622,
+        "first_token_time": 58540.676012,
+        "server_first_token_time": 58540.677612,
+        "last_token_time": 58542.807067
+      },
+      "kv_cache_metrics": {
+        "num_total_allocated_blocks": 2,
+        "num_new_allocated_blocks": 2,
+        "num_reused_blocks": 0,
+        "num_missed_blocks": 0
+      }
+    }
+  }
+}

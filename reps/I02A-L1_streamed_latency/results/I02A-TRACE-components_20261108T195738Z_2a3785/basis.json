@@ -1,0 +1,23 @@
+{
+  "utc": "2026-11-08T19:57:41.128911+00:00",
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5060 Ti",
+    "compute_cap": "12.0",
+    "driver_version": "615.78.08",
+    "clocks.sm": "885 MHz",
+    "temperature.gpu": "30",
+    "power.draw": "14.08 W"
+  },
+  "docker": "29.9.2",
+  "compose": "5.6.1",
+  "images": {
+    "ie-tensorrt-llm:1.2.1-nvml-byref": "sha256:47969fb2bc7750d13e1a87dee9215fd36b041b0f37073910aa46cf16c33c0692",
+    "ie-capture:alpine3.20": "sha256:fc253e50aaec3259b139a2b85466ecf666de8cde8d7c8818c196ea7f01ab4ac2",
+    "ie-client:i01-l2": "sha256:135b3d12019f044127fe2c168d162c6a2078d704a450db08ece971e1eb2ecae3"
+  },
+  "patched_file_sha256": "85570e359efb2e36263e032a6ef7a4c55705c621cbe8143f880a21a53856207e",
+  "torch": "2.15.0+cu134",
+  "version": {
+    "version": "1.2.1"
+  }
+}

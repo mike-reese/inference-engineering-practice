@@ -1,0 +1,44 @@
+{
+  "I02A-TRACE-timeline_20261109T013347Z_69c1bb-warmup": {
+    "request_id": 2,
+    "perf_metrics": {
+      "first_iter": 1,
+      "last_iter": 64,
+      "timing_metrics": {
+        "server_arrival_time": 168.687064,
+        "arrival_time": 168.696578,
+        "first_scheduled_time": 168.699823,
+        "first_token_time": 169.614089,
+        "server_first_token_time": 169.626053,
+        "last_token_time": 169.917229
+      },
+      "kv_cache_metrics": {
+        "num_total_allocated_blocks": 2,
+        "num_new_allocated_blocks": 2,
+        "num_reused_blocks": 0,
+        "num_missed_blocks": 0
+      }
+    }
+  },
+  "I02A-TRACE-timeline_20261109T013347Z_69c1bb-measured": {
+    "request_id": 3,
+    "perf_metrics": {
+      "first_iter": 66,
+      "last_iter": 129,
+      "timing_metrics": {
+        "server_arrival_time": 170.009345,
+        "arrival_time": 170.013692,
+        "first_scheduled_time": 170.01509,
+        "first_token_time": 170.034126,
+        "server_first_token_time": 170.035021,
+        "last_token_time": 177.364956
+      },
+      "kv_cache_metrics": {
+        "num_total_allocated_blocks": 2,
+        "num_new_allocated_blocks": 2,
+        "num_reused_blocks": 0,
+        "num_missed_blocks": 0
+      }
+    }
+  }
+}

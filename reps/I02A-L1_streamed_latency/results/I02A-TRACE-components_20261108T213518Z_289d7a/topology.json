@@ -1,0 +1,1080 @@
+{
+  "captured_ns": 57750814093809,
+  "project": "ie-i02a-l1",
+  "containers": [
+    {
+      "Id": "0df23cdf220e1b084db8c4edc1e9706679dfcb2603b2c46ea64f225842d3eeb7",
+      "Created": "2026-11-08T21:35:22.364510596Z",
+      "Path": "tcpdump",
+      "Args": [
+        "--immediate-mode",
+        "-i",
+        "eth0",
+        "-p",
+        "-n",
+        "-s",
+        "0",
+        "-U",
+        "--time-stamp-precision=nano",
+        "-w",
+        "/cap/I02A-TRACE-components_20261108T213518Z_289d7a_s1.pcap",
+        "tcp port 8080"
+      ],
+      "State": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 983999,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-08T21:35:22.56077301Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "Image": "sha256:fc253e50aaec3259b139a2b85466ecf666de8cde8d7c8818c196ea7f01ab4ac2",
+      "ResolvConfPath": "/mnt/ie-data/docker/containers/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73/resolv.conf",
+      "HostnamePath": "/mnt/ie-data/docker/containers/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73/hostname",
+      "HostsPath": "/mnt/ie-data/docker/containers/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73/hosts",
+      "LogPath": "/mnt/ie-data/docker/containers/0df23cdf220e1b084db8c4edc1e9706679dfcb2603b2c46ea64f225842d3eeb7/0df23cdf220e1b084db8c4edc1e9706679dfcb2603b2c46ea64f225842d3eeb7-json.log",
+      "Name": "/ie-i02a-l1-capture-1",
+      "RestartCount": 0,
+      "Driver": "overlayfs",
+      "Platform": "linux",
+      "MountLabel": "",
+      "ProcessLabel": "",
+      "AppArmorProfile": "",
+      "ExecIDs": null,
+      "HostConfig": {
+        "Binds": [
+          "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a:/cap:rw"
+        ],
+        "ContainerIDFile": "",
+        "LogConfig": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "5",
+            "max-size": "10m"
+          }
+        },
+        "NetworkMode": "container:d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73",
+        "PortBindings": {},
+        "RestartPolicy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "CapAdd": [
+          "CAP_NET_RAW"
+        ],
+        "CapDrop": [
+          "ALL"
+        ],
+        "CgroupnsMode": "private",
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": [],
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": false,
+        "SecurityOpt": null,
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "nvidia",
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 268435456,
+        "NanoCpus": 0,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "MemoryReservation": 0,
+        "MemorySwap": 536870912,
+        "MemorySwappiness": null,
+        "OomKillDisable": null,
+        "PidsLimit": null,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware",
+          "/sys/devices/system/cpu/cpu0/thermal_throttle",
+          "/sys/devices/system/cpu/cpu1/thermal_throttle",
+          "/sys/devices/system/cpu/cpu2/thermal_throttle",
+          "/sys/devices/system/cpu/cpu3/thermal_throttle",
+          "/sys/devices/system/cpu/cpu4/thermal_throttle",
+          "/sys/devices/system/cpu/cpu5/thermal_throttle",
+          "/sys/devices/system/cpu/cpu6/thermal_throttle",
+          "/sys/devices/system/cpu/cpu7/thermal_throttle",
+          "/sys/devices/system/cpu/cpu8/thermal_throttle",
+          "/sys/devices/system/cpu/cpu9/thermal_throttle",
+          "/sys/devices/system/cpu/cpu10/thermal_throttle",
+          "/sys/devices/system/cpu/cpu11/thermal_throttle",
+          "/sys/devices/system/cpu/cpu12/thermal_throttle",
+          "/sys/devices/system/cpu/cpu13/thermal_throttle",
+          "/sys/devices/system/cpu/cpu14/thermal_throttle",
+          "/sys/devices/system/cpu/cpu15/thermal_throttle"
+        ],
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ]
+      },
+      "Storage": {
+        "RootFS": {
+          "Snapshot": {
+            "Name": "overlayfs"
+          }
+        }
+      },
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Source": "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a",
+          "Destination": "/cap",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": "rprivate"
+        }
+      ],
+      "Config": {
+        "Hostname": "d4946f2ee8f7",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": true,
+        "AttachStderr": true,
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Cmd": [
+          "tcpdump",
+          "--immediate-mode",
+          "-i",
+          "eth0",
+          "-p",
+          "-n",
+          "-s",
+          "0",
+          "-U",
+          "--time-stamp-precision=nano",
+          "-w",
+          "/cap/I02A-TRACE-components_20261108T213518Z_289d7a_s1.pcap",
+          "tcp port 8080"
+        ],
+        "Image": "ie-capture:alpine3.20",
+        "Volumes": null,
+        "WorkingDir": "/",
+        "Entrypoint": null,
+        "Labels": {
+          "com.docker.compose.config-hash": "ab48f954a3ea619ad4eee18e40131760c73bea57c69747c37e1ba54c861f1e60",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "server:service_started:false",
+          "com.docker.compose.image": "sha256:0cd509cb0ad2ceaccc5f5de36df6d31b94f1f8ee50469fdede617330aa61f957",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ie-i02a-l1",
+          "com.docker.compose.project.config_files": "/home/mike/Work/Code/Personal/inference-engineering-practice/deploy/compose.yaml,/home/mike/Work/Code/Personal/inference-engineering-practice/deploy/compose.stamps.yaml",
+          "com.docker.compose.project.working_dir": "/home/mike/Work/Code/Personal/inference-engineering-practice/deploy",
+          "com.docker.compose.service": "capture",
+          "com.docker.compose.version": "5.6.1"
+        }
+      },
+      "NetworkSettings": {
+        "SandboxID": "",
+        "SandboxKey": "",
+        "Ports": {},
+        "Networks": {}
+      },
+      "ImageManifestDescriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:0cd509cb0ad2ceaccc5f5de36df6d31b94f1f8ee50469fdede617330aa61f957",
+        "size": 674,
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      }
+    },
+    {
+      "Id": "4e5bb3045b76adb6a0a473ec43b91657e49bd5ebefd05f0742665a94820dd8e1",
+      "Created": "2026-11-08T21:35:22.365488268Z",
+      "Path": "python",
+      "Args": [
+        "-u",
+        "/app/locust_load.py"
+      ],
+      "State": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 999070,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-08T21:36:28.061974183Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "Image": "sha256:135b3d12019f044127fe2c168d162c6a2078d704a450db08ece971e1eb2ecae3",
+      "ResolvConfPath": "/mnt/ie-data/docker/containers/4e5bb3045b76adb6a0a473ec43b91657e49bd5ebefd05f0742665a94820dd8e1/resolv.conf",
+      "HostnamePath": "/mnt/ie-data/docker/containers/4e5bb3045b76adb6a0a473ec43b91657e49bd5ebefd05f0742665a94820dd8e1/hostname",
+      "HostsPath": "/mnt/ie-data/docker/containers/4e5bb3045b76adb6a0a473ec43b91657e49bd5ebefd05f0742665a94820dd8e1/hosts",
+      "LogPath": "/mnt/ie-data/docker/containers/4e5bb3045b76adb6a0a473ec43b91657e49bd5ebefd05f0742665a94820dd8e1/4e5bb3045b76adb6a0a473ec43b91657e49bd5ebefd05f0742665a94820dd8e1-json.log",
+      "Name": "/ie-i02a-l1-client-1",
+      "RestartCount": 0,
+      "Driver": "overlayfs",
+      "Platform": "linux",
+      "MountLabel": "",
+      "ProcessLabel": "",
+      "AppArmorProfile": "",
+      "ExecIDs": null,
+      "HostConfig": {
+        "Binds": [
+          "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a/control:/control:ro",
+          "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a/client:/records:rw"
+        ],
+        "ContainerIDFile": "",
+        "LogConfig": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "5",
+            "max-size": "10m"
+          }
+        },
+        "NetworkMode": "ie-i02a-l1_default",
+        "PortBindings": {
+          "9410/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": ""
+            }
+          ]
+        },
+        "RestartPolicy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "CapAdd": null,
+        "CapDrop": null,
+        "CgroupnsMode": "private",
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": [],
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": false,
+        "SecurityOpt": null,
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "nvidia",
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 536870912,
+        "NanoCpus": 0,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "MemoryReservation": 0,
+        "MemorySwap": 1073741824,
+        "MemorySwappiness": null,
+        "OomKillDisable": null,
+        "PidsLimit": null,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware",
+          "/sys/devices/system/cpu/cpu0/thermal_throttle",
+          "/sys/devices/system/cpu/cpu1/thermal_throttle",
+          "/sys/devices/system/cpu/cpu2/thermal_throttle",
+          "/sys/devices/system/cpu/cpu3/thermal_throttle",
+          "/sys/devices/system/cpu/cpu4/thermal_throttle",
+          "/sys/devices/system/cpu/cpu5/thermal_throttle",
+          "/sys/devices/system/cpu/cpu6/thermal_throttle",
+          "/sys/devices/system/cpu/cpu7/thermal_throttle",
+          "/sys/devices/system/cpu/cpu8/thermal_throttle",
+          "/sys/devices/system/cpu/cpu9/thermal_throttle",
+          "/sys/devices/system/cpu/cpu10/thermal_throttle",
+          "/sys/devices/system/cpu/cpu11/thermal_throttle",
+          "/sys/devices/system/cpu/cpu12/thermal_throttle",
+          "/sys/devices/system/cpu/cpu13/thermal_throttle",
+          "/sys/devices/system/cpu/cpu14/thermal_throttle",
+          "/sys/devices/system/cpu/cpu15/thermal_throttle"
+        ],
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ]
+      },
+      "Storage": {
+        "RootFS": {
+          "Snapshot": {
+            "Name": "overlayfs"
+          }
+        }
+      },
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Source": "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a/control",
+          "Destination": "/control",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a/client",
+          "Destination": "/records",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": "rprivate"
+        }
+      ],
+      "Config": {
+        "Hostname": "4e5bb3045b76",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": true,
+        "AttachStderr": true,
+        "ExposedPorts": {
+          "9410/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+          "IE_CLIENT_STAMPS=/records/client_stamps.jsonl",
+          "CONTROL_DIR=/control",
+          "RECORDS_DIR=/records",
+          "SERVER_BASE_URL=http://server:8080/v1",
+          "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=C.UTF-8",
+          "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+          "PYTHON_VERSION=3.12.14",
+          "PYTHON_SHA256=5c8462af5790baf43a321a1559dbe0db06d1be4300fb85fb53c40060668e548a"
+        ],
+        "Cmd": [
+          "python",
+          "-u",
+          "/app/locust_load.py"
+        ],
+        "Image": "ie-client:i01-l2",
+        "Volumes": null,
+        "WorkingDir": "/app",
+        "Entrypoint": null,
+        "Labels": {
+          "com.docker.compose.config-hash": "e4e45c2683db51af70d151001aabde839e793b9727937119593f083cebcf9c95",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "server:service_healthy:false",
+          "com.docker.compose.image": "sha256:2f862ad8e9e7a86f4158072c6104b1b491156fc52b7ae01068d8d3a374969622",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ie-i02a-l1",
+          "com.docker.compose.project.config_files": "/home/mike/Work/Code/Personal/inference-engineering-practice/deploy/compose.yaml,/home/mike/Work/Code/Personal/inference-engineering-practice/deploy/compose.stamps.yaml",
+          "com.docker.compose.project.working_dir": "/home/mike/Work/Code/Personal/inference-engineering-practice/deploy",
+          "com.docker.compose.service": "client",
+          "com.docker.compose.version": "5.6.1"
+        }
+      },
+      "NetworkSettings": {
+        "SandboxID": "83f6d5d37f6a87051c3ba9b670e628b32e61f83d22b752ef6d031168bab68e74",
+        "SandboxKey": "/var/run/docker/netns/83f6d5d37f6a",
+        "Ports": {
+          "9410/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "32789"
+            }
+          ]
+        },
+        "Networks": {
+          "ie-i02a-l1_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ie-i02a-l1-client-1",
+              "client"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "1a27f8f30fc379b4658c0214721d9364dd1a18d52bce4b8aa2c584e93881837a",
+            "EndpointID": "63c12912ce455106e694239b7788a5658d18a543002ed47dd1dba50960f896f0",
+            "Gateway": "172.20.0.1",
+            "IPAddress": "172.20.0.3",
+            "MacAddress": "a2:cf:75:e2:ff:44",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ie-i02a-l1-client-1",
+              "client",
+              "4e5bb3045b76"
+            ]
+          }
+        }
+      },
+      "ImageManifestDescriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:2f862ad8e9e7a86f4158072c6104b1b491156fc52b7ae01068d8d3a374969622",
+        "size": 1812,
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      }
+    },
+    {
+      "Id": "d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73",
+      "Created": "2026-11-08T21:35:22.34279684Z",
+      "Path": "/opt/nvidia/nvidia_entrypoint.sh",
+      "Args": [
+        "trtllm-serve",
+        "serve",
+        "/model",
+        "--backend",
+        "pytorch",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+        "--max_batch_size",
+        "1",
+        "--max_seq_len",
+        "2048",
+        "--config",
+        "/config/config.yaml"
+      ],
+      "State": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 983781,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-08T21:35:22.405183941Z",
+        "FinishedAt": "0001-01-01T00:00:00Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-08T13:36:07.832433433-08:00",
+              "End": "2026-11-08T13:36:07.864404362-08:00",
+              "ExitCode": 7,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-08T13:36:12.864854634-08:00",
+              "End": "2026-11-08T13:36:12.897102307-08:00",
+              "ExitCode": 7,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-08T13:36:17.897811477-08:00",
+              "End": "2026-11-08T13:36:17.93263143-08:00",
+              "ExitCode": 7,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-08T13:36:22.933308518-08:00",
+              "End": "2026-11-08T13:36:22.9756142-08:00",
+              "ExitCode": 7,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-08T13:36:27.976756593-08:00",
+              "End": "2026-11-08T13:36:28.009392347-08:00",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "Image": "sha256:91b14ec17e7bcaf80a953d09ad2743b0c7470baacc9886de7f294eb226af82f1",
+      "ResolvConfPath": "/mnt/ie-data/docker/containers/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73/resolv.conf",
+      "HostnamePath": "/mnt/ie-data/docker/containers/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73/hostname",
+      "HostsPath": "/mnt/ie-data/docker/containers/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73/hosts",
+      "LogPath": "/mnt/ie-data/docker/containers/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73/d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73-json.log",
+      "Name": "/ie-i02a-l1-server-1",
+      "RestartCount": 0,
+      "Driver": "overlayfs",
+      "Platform": "linux",
+      "MountLabel": "",
+      "ProcessLabel": "",
+      "AppArmorProfile": "",
+      "ExecIDs": null,
+      "HostConfig": {
+        "Binds": [
+          "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a:/config:ro",
+          "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a/trace:/trace:rw",
+          "/home/mike/.local/share/inference-engineering/models/Qwen2.5-0.5B-Instruct/7ae557604adf67be50417f59c2c2f167def9a775:/model:ro"
+        ],
+        "ContainerIDFile": "",
+        "LogConfig": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "5",
+            "max-size": "10m"
+          }
+        },
+        "NetworkMode": "ie-i02a-l1_default",
+        "PortBindings": {
+          "8080/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": ""
+            }
+          ]
+        },
+        "RestartPolicy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "CapAdd": null,
+        "CapDrop": null,
+        "CgroupnsMode": "private",
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": [],
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": false,
+        "SecurityOpt": null,
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "nvidia",
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 8589934592,
+        "NanoCpus": 0,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": [
+          {
+            "Driver": "",
+            "Count": -1,
+            "DeviceIDs": null,
+            "Capabilities": [
+              [
+                "gpu"
+              ]
+            ],
+            "Options": null
+          }
+        ],
+        "MemoryReservation": 0,
+        "MemorySwap": 17179869184,
+        "MemorySwappiness": null,
+        "OomKillDisable": null,
+        "PidsLimit": null,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware",
+          "/sys/devices/system/cpu/cpu0/thermal_throttle",
+          "/sys/devices/system/cpu/cpu1/thermal_throttle",
+          "/sys/devices/system/cpu/cpu2/thermal_throttle",
+          "/sys/devices/system/cpu/cpu3/thermal_throttle",
+          "/sys/devices/system/cpu/cpu4/thermal_throttle",
+          "/sys/devices/system/cpu/cpu5/thermal_throttle",
+          "/sys/devices/system/cpu/cpu6/thermal_throttle",
+          "/sys/devices/system/cpu/cpu7/thermal_throttle",
+          "/sys/devices/system/cpu/cpu8/thermal_throttle",
+          "/sys/devices/system/cpu/cpu9/thermal_throttle",
+          "/sys/devices/system/cpu/cpu10/thermal_throttle",
+          "/sys/devices/system/cpu/cpu11/thermal_throttle",
+          "/sys/devices/system/cpu/cpu12/thermal_throttle",
+          "/sys/devices/system/cpu/cpu13/thermal_throttle",
+          "/sys/devices/system/cpu/cpu14/thermal_throttle",
+          "/sys/devices/system/cpu/cpu15/thermal_throttle"
+        ],
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ]
+      },
+      "Storage": {
+        "RootFS": {
+          "Snapshot": {
+            "Name": "overlayfs"
+          }
+        }
+      },
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Source": "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a",
+          "Destination": "/config",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/home/mike/.local/share/inference-engineering/models/Qwen2.5-0.5B-Instruct/7ae557604adf67be50417f59c2c2f167def9a775",
+          "Destination": "/model",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/home/mike/Work/Code/Personal/inference-engineering-practice/reps/I02A-L1_streamed_latency/results/I02A-TRACE-components_20261108T213518Z_289d7a/trace",
+          "Destination": "/trace",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": "rprivate"
+        }
+      ],
+      "Config": {
+        "Hostname": "d4946f2ee8f7",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": true,
+        "AttachStderr": true,
+        "ExposedPorts": {
+          "6006/tcp": {},
+          "8080/tcp": {},
+          "8888/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+          "IE_SERVER_STAMPS=/trace/server_stamps.jsonl",
+          "HF_HUB_OFFLINE=1",
+          "TRANSFORMERS_OFFLINE=1",
+          "PATH=/usr/local/lib/python3.12/dist-packages/torch_tensorrt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/mpi/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/amazon/efa/bin:/opt/tensorrt/bin",
+          "NVIDIA_REQUIRE_JETPACK_HOST_MOUNTS=",
+          "GDRCOPY_VERSION=2.5.1",
+          "HPCX_VERSION=2.25.1-RC2",
+          "MOFED_VERSION=5.4-rdmacore56.0",
+          "OPENUCX_VERSION=1.20.0",
+          "OPENMPI_VERSION=4.1.7",
+          "RDMACORE_VERSION=56.0",
+          "EFA_VERSION=1.43.1",
+          "AWS_OFI_NCCL_VERSION=1.17.0",
+          "OPAL_PREFIX=/opt/hpcx/ompi",
+          "OMPI_MCA_coll_hcoll_enable=0",
+          "CUDA_VERSION=13.1.0.036",
+          "CUDA_DRIVER_VERSION=590.44.01",
+          "NVVM_VERSION=13.1.80",
+          "DOCA_VERSION=3.1.0",
+          "_CUDA_COMPAT_PATH=/usr/local/cuda/compat",
+          "ENV=/etc/shinit_v2",
+          "BASH_ENV=/etc/bash.bashrc",
+          "SHELL=/bin/bash",
+          "NVIDIA_REQUIRE_CUDA=cuda>=9.0",
+          "NCCL_VERSION=2.28.9+cuda13.0",
+          "CUBLAS_VERSION=13.2.0.9",
+          "CUFFT_VERSION=12.1.0.31",
+          "CURAND_VERSION=10.4.1.34",
+          "CUSPARSE_VERSION=12.7.2.19",
+          "CUSPARSELT_VERSION=0.8.1.1",
+          "CUSOLVER_VERSION=12.0.7.41",
+          "NPP_VERSION=13.0.2.21",
+          "NVJPEG_VERSION=13.0.2.28",
+          "CUFILE_VERSION=1.16.0.49",
+          "NVJITLINK_VERSION=13.1.80",
+          "NVFATBIN_VERSION=13.1.80",
+          "CUBLASMP_VERSION=0.7.0.125",
+          "NVSHMEM_VERSION=3.4.5",
+          "CUDLA_VERSION=13.1.0.036",
+          "NVPTXCOMPILER_VERSION=13.1.80",
+          "CUDNN_VERSION=9.17.0.29",
+          "CUDNN_FRONTEND_VERSION=1.16.0",
+          "TRT_VERSION=10.14.1.48+cuda13.0",
+          "TRTOSS_VERSION=",
+          "NSIGHT_SYSTEMS_VERSION=2025.5.2.266",
+          "NSIGHT_COMPUTE_VERSION=2025.4.0.12",
+          "DALI_VERSION=1.52.0",
+          "DALI_BUILD=",
+          "DALI_URL_SUFFIX=130",
+          "POLYGRAPHY_VERSION=0.49.26",
+          "TRANSFORMER_ENGINE_VERSION=2.10",
+          "MODEL_OPT_VERSION=0.39.0",
+          "CUDA_ARCH_LIST=7.5 8.0 8.6 9.0 10.0 12.0",
+          "MAXSMVER=",
+          "NVRX_VERSION=0.5.0",
+          "LD_LIBRARY_PATH=/usr/local/lib/python3.12/dist-packages/torch/lib:/usr/local/lib/python3.12/dist-packages/torch_tensorrt/lib:/usr/local/cuda/compat/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64",
+          "NVIDIA_VISIBLE_DEVICES=all",
+          "NVIDIA_DRIVER_CAPABILITIES=compute,utility,video",
+          "NVIDIA_PRODUCT_NAME=PyTorch",
+          "CUDA_COMPONENT_LIST=cccl crt nvrtc driver-dev culibos-dev cudart cudart-dev nvcc",
+          "LIBRARY_PATH=/usr/local/cuda/lib64/stubs:/usr/local/cuda/lib64/stubs:",
+          "PYTORCH_BUILD_VERSION=2.10.0a0+b4e4ee8",
+          "PYTORCH_VERSION=2.10.0a0+b4e4ee8",
+          "PYTORCH_BUILD_NUMBER=0",
+          "NVIDIA_PYTORCH_VERSION=25.12",
+          "NVFUSER_BUILD_VERSION=073e91b",
+          "NVFUSER_VERSION=073e91b",
+          "TORCHAO_BUILD_VERSION=+git01374eb5",
+          "PIP_BREAK_SYSTEM_PACKAGES=1",
+          "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python",
+          "PIP_CONSTRAINT=/etc/pip/constraint.txt",
+          "NVPL_LAPACK_MATH_MODE=PEDANTIC",
+          "PYTHONIOENCODING=utf-8",
+          "LC_ALL=C.UTF-8",
+          "PIP_DEFAULT_TIMEOUT=100",
+          "JUPYTER_PORT=8888",
+          "TENSORBOARD_PORT=6006",
+          "UCC_CL_BASIC_TLS=^sharp",
+          "UCC_EC_CUDA_EXEC_NUM_THREADS=256",
+          "TORCH_CUDA_ARCH_LIST=7.5 8.0 8.6 9.0 10.0 12.0+PTX",
+          "PYTORCH_HOME=/opt/pytorch/pytorch",
+          "CUDA_HOME=/usr/local/cuda",
+          "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE=1",
+          "TRITON_PTXAS_PATH=/usr/local/cuda/bin/ptxas",
+          "TRITON_CUOBJDUMP_PATH=/usr/local/cuda/bin/cuobjdump",
+          "TRITON_NVDISASM_PATH=/usr/local/cuda/bin/nvdisasm",
+          "TRITON_CUDACRT_PATH=/usr/local/cuda/include",
+          "TRITON_CUDART_PATH=/usr/local/cuda/include",
+          "TRITON_CUPTI_LIB_PATH=/usr/local/cuda/lib64",
+          "TRITON_CUPTI_INCLUDE_PATH=/usr/local/cuda/include",
+          "COCOAPI_VERSION=2.0+nv0.8.1",
+          "CUDA_BINARY_LOADER_THREAD_COUNT=8",
+          "CUDA_MODULE_LOADING=LAZY",
+          "TORCH_NCCL_USE_COMM_NONBLOCKING=0",
+          "TORCHINDUCTOR_LOOP_ORDERING_AFTER_FUSION=0",
+          "NVIDIA_BUILD_ID=245654590",
+          "PYTORCH_ALLOC_CONF=garbage_collection_threshold:0.99999",
+          "TRT_LLM_GIT_COMMIT=376f7e1bd8ed543f75014309e3fd4b237e9b0e73",
+          "TRT_LLM_VERSION=1.2.1"
+        ],
+        "Cmd": [
+          "trtllm-serve",
+          "serve",
+          "/model",
+          "--backend",
+          "pytorch",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8080",
+          "--max_batch_size",
+          "1",
+          "--max_seq_len",
+          "2048",
+          "--config",
+          "/config/config.yaml"
+        ],
+        "Healthcheck": {
+          "Test": [
+            "CMD",
+            "curl",
+            "-sf",
+            "http://127.0.0.1:8080/health"
+          ],
+          "Interval": 1000000000,
+          "Timeout": 2000000000,
+          "StartPeriod": 120000000000,
+          "Retries": 3
+        },
+        "Image": "ie-tensorrt-llm:1.2.1-nvml-byref-trace",
+        "Volumes": null,
+        "WorkingDir": "/app/tensorrt_llm",
+        "Entrypoint": [
+          "/opt/nvidia/nvidia_entrypoint.sh"
+        ],
+        "Labels": {
+          "com.docker.compose.config-hash": "89c960236607c9a8756b51d2ca809e610171bebcc15ca700b9d04bf51a8bb695",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "",
+          "com.docker.compose.image": "sha256:3d53dc551bc9c93e313ad44ee5304a399c75d41e734e1fa2a5bf9c3642367867",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ie-i02a-l1",
+          "com.docker.compose.project.config_files": "/home/mike/Work/Code/Personal/inference-engineering-practice/deploy/compose.yaml,/home/mike/Work/Code/Personal/inference-engineering-practice/deploy/compose.stamps.yaml",
+          "com.docker.compose.project.working_dir": "/home/mike/Work/Code/Personal/inference-engineering-practice/deploy",
+          "com.docker.compose.service": "server",
+          "com.docker.compose.version": "5.6.1",
+          "com.nvidia.ai-terms": "https://www.nvidia.com/en-us/agreements/enterprise-software/product-specific-terms-for-ai-products/",
+          "com.nvidia.build.id": "245654590",
+          "com.nvidia.build.ref": "0214a1e1471678f0c2928e94807c940c6961ca2c",
+          "com.nvidia.cublas.version": "13.2.0.9",
+          "com.nvidia.cublasmp.version": "0.7.0.125",
+          "com.nvidia.cuda.version": "9.0",
+          "com.nvidia.cudla.version": "13.1.0.036",
+          "com.nvidia.cudnn.version": "9.17.0.29",
+          "com.nvidia.cufft.version": "12.1.0.31",
+          "com.nvidia.curand.version": "10.4.1.34",
+          "com.nvidia.cusolver.version": "12.0.7.41",
+          "com.nvidia.cusparse.version": "12.7.2.19",
+          "com.nvidia.cusparselt.version": "0.8.1.1",
+          "com.nvidia.eula": "https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-software-license-agreement/",
+          "com.nvidia.nccl.version": "2.28.9+cuda13.0",
+          "com.nvidia.npp.version": "13.0.2.21",
+          "com.nvidia.nsightcompute.version": "2025.4.0.12",
+          "com.nvidia.nsightsystems.version": "2025.5.2.266",
+          "com.nvidia.nvjpeg.version": "13.0.2.28",
+          "com.nvidia.nvvm.version": "13.1.80",
+          "com.nvidia.pytorch.version": "2.10.0a0+b4e4ee8",
+          "com.nvidia.tensorrt.version": "10.14.1.48+cuda13.0",
+          "com.nvidia.tensorrtoss.version": "",
+          "com.nvidia.volumes.needed": "nvidia_driver",
+          "org.opencontainers.image.ref.name": "ubuntu",
+          "org.opencontainers.image.version": "24.04"
+        }
+      },
+      "NetworkSettings": {
+        "SandboxID": "d94a472276760aa335d67410945a0a0bdd00dd1bbac22a1fbef3d283056d3705",
+        "SandboxKey": "/var/run/docker/netns/d94a47227676",
+        "Ports": {
+          "6006/tcp": null,
+          "8080/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "32788"
+            }
+          ],
+          "8888/tcp": null
+        },
+        "Networks": {
+          "ie-i02a-l1_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ie-i02a-l1-server-1",
+              "server"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "1a27f8f30fc379b4658c0214721d9364dd1a18d52bce4b8aa2c584e93881837a",
+            "EndpointID": "bfc0becc8ab4058ca74659364a6a7fe1a0d7b0ebfa04527d5522c707c42ad516",
+            "Gateway": "172.20.0.1",
+            "IPAddress": "172.20.0.2",
+            "MacAddress": "d2:b5:81:84:da:fe",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ie-i02a-l1-server-1",
+              "server",
+              "d4946f2ee8f7"
+            ]
+          }
+        }
+      },
+      "ImageManifestDescriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:3d53dc551bc9c93e313ad44ee5304a399c75d41e734e1fa2a5bf9c3642367867",
+        "size": 21047,
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      }
+    }
+  ],
+  "networks": [
+    {
+      "Name": "ie-i02a-l1_default",
+      "Id": "1a27f8f30fc379b4658c0214721d9364dd1a18d52bce4b8aa2c584e93881837a",
+      "Created": "2026-11-08T13:35:22.29879836-08:00",
+      "Scope": "local",
+      "Driver": "bridge",
+      "EnableIPv4": true,
+      "EnableIPv6": false,
+      "IPAM": {
+        "Driver": "default",
+        "Options": null,
+        "Config": [
+          {
+            "Subnet": "172.20.0.0/16",
+            "Gateway": "172.20.0.1"
+          }
+        ]
+      },
+      "Internal": false,
+      "Attachable": false,
+      "Ingress": false,
+      "ConfigFrom": {
+        "Network": ""
+      },
+      "ConfigOnly": false,
+      "Options": {},
+      "Labels": {
+        "com.docker.compose.config-hash": "79b9b4666f1b66c829ea75a61dd923072088bdcce360a0ceeeb0a397f0d7d56c",
+        "com.docker.compose.network": "default",
+        "com.docker.compose.project": "ie-i02a-l1",
+        "com.docker.compose.version": "5.6.1"
+      },
+      "Containers": {
+        "4e5bb3045b76adb6a0a473ec43b91657e49bd5ebefd05f0742665a94820dd8e1": {
+          "Name": "ie-i02a-l1-client-1",
+          "EndpointID": "63c12912ce455106e694239b7788a5658d18a543002ed47dd1dba50960f896f0",
+          "MacAddress": "a2:cf:75:e2:ff:44",
+          "IPv4Address": "172.20.0.3/16",
+          "IPv6Address": ""
+        },
+        "d4946f2ee8f7d64f1bf6f9fb33c51b38d5bbadc1b3a22d3c502751fb22a7ab73": {
+          "Name": "ie-i02a-l1-server-1",
+          "EndpointID": "bfc0becc8ab4058ca74659364a6a7fe1a0d7b0ebfa04527d5522c707c42ad516",
+          "MacAddress": "d2:b5:81:84:da:fe",
+          "IPv4Address": "172.20.0.2/16",
+          "IPv6Address": ""
+        }
+      },
+      "Status": {
+        "IPAM": {
+          "Subnets": {
+            "172.20.0.0/16": {
+              "IPsInUse": 5,
+              "DynamicIPsAvailable": 65531
+            }
+          }
+        }
+      }
+    }
+  ],
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5060 Ti",
+    "compute_cap": "12.0",
+    "driver_version": "615.78.08",
+    "memory.total": "16311 MiB",
+    "pci.bus_id": "00000000:01:00.0"
+  }
+}

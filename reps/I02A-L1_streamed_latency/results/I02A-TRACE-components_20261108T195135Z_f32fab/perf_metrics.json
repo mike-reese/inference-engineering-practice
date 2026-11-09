@@ -1,0 +1,49 @@
+{
+  "warmup_drain": [
+    {
+      "request_id": 2,
+      "perf_metrics": {
+        "first_iter": 1,
+        "last_iter": 64,
+        "timing_metrics": {
+          "server_arrival_time": 51533.196822,
+          "arrival_time": 51533.204914,
+          "first_scheduled_time": 51533.207721,
+          "first_token_time": 51533.853671,
+          "server_first_token_time": 51533.859491,
+          "last_token_time": 51534.066679
+        },
+        "kv_cache_metrics": {
+          "num_total_allocated_blocks": 2,
+          "num_new_allocated_blocks": 2,
+          "num_reused_blocks": 0,
+          "num_missed_blocks": 0
+        }
+      }
+    }
+  ],
+  "first": [
+    {
+      "request_id": 3,
+      "perf_metrics": {
+        "first_iter": 66,
+        "last_iter": 129,
+        "timing_metrics": {
+          "server_arrival_time": 51534.160034,
+          "arrival_time": 51534.160678,
+          "first_scheduled_time": 51534.162066,
+          "first_token_time": 51534.17813,
+          "server_first_token_time": 51534.179135,
+          "last_token_time": 51534.391375
+        },
+        "kv_cache_metrics": {
+          "num_total_allocated_blocks": 2,
+          "num_new_allocated_blocks": 2,
+          "num_reused_blocks": 0,
+          "num_missed_blocks": 0
+        }
+      }
+    }
+  ],
+  "second": []
+}

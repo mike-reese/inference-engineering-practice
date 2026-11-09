@@ -1,0 +1,22 @@
+{
+  "phase": "diagnostic",
+  "isl": 34,
+  "diagnostic": true,
+  "detail": true,
+  "requests": [
+    {
+      "request_id": "I02A-TRACE-timeline_20261108T200246Z_764014-measured",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a concise assistant for an inference team."
+        },
+        {
+          "role": "user",
+          "content": "Why does decode slow down as the KV cache grows?"
+        }
+      ],
+      "max_tokens": 64
+    }
+  ]
+}

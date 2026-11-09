@@ -1,0 +1,223 @@
+server-1  | 2026-11-09T01:33:52.183738972Z 
+server-1  | 2026-11-09T01:33:52.183798635Z =============
+server-1  | 2026-11-09T01:33:52.183807459Z == PyTorch ==
+server-1  | 2026-11-09T01:33:52.183861748Z =============
+server-1  | 2026-11-09T01:33:52.186035278Z 
+server-1  | 2026-11-09T01:33:52.186049683Z NVIDIA Release 25.12 (build 245654590)
+server-1  | 2026-11-09T01:33:52.186067757Z PyTorch Version 2.10.0a0+b4e4ee8
+server-1  | 2026-11-09T01:33:52.186683853Z Container image Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+server-1  | 2026-11-09T01:33:52.187332356Z Copyright (c) 2014-2024 Facebook Inc.
+server-1  | 2026-11-09T01:33:52.187339731Z Copyright (c) 2011-2014 Idiap Research Institute (Ronan Collobert)
+server-1  | 2026-11-09T01:33:52.187341308Z Copyright (c) 2012-2014 Deepmind Technologies    (Koray Kavukcuoglu)
+server-1  | 2026-11-09T01:33:52.187342269Z Copyright (c) 2011-2012 NEC Laboratories America (Koray Kavukcuoglu)
+server-1  | 2026-11-09T01:33:52.187343184Z Copyright (c) 2011-2013 NYU                      (Clement Farabet)
+server-1  | 2026-11-09T01:33:52.187344092Z Copyright (c) 2006-2010 NEC Laboratories America (Ronan Collobert, Leon Bottou, Iain Melvin, Jason Weston)
+server-1  | 2026-11-09T01:33:52.187345012Z Copyright (c) 2006      Idiap Research Institute (Samy Bengio)
+server-1  | 2026-11-09T01:33:52.187345922Z Copyright (c) 2001-2004 Idiap Research Institute (Ronan Collobert, Samy Bengio, Johnny Mariethoz)
+server-1  | 2026-11-09T01:33:52.187346835Z Copyright (c) 2015      Google Inc.
+server-1  | 2026-11-09T01:33:52.187347668Z Copyright (c) 2015      Yangqing Jia
+server-1  | 2026-11-09T01:33:52.187348493Z Copyright (c) 2013-2016 The Caffe contributors
+server-1  | 2026-11-09T01:33:52.187349367Z All rights reserved.
+server-1  | 2026-11-09T01:33:52.187978764Z 
+server-1  | 2026-11-09T01:33:52.187986301Z Various files include modifications (c) NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+server-1  | 2026-11-09T01:33:52.187987978Z 
+server-1  | 2026-11-09T01:33:52.187988914Z GOVERNING TERMS: The software and materials are governed by the NVIDIA Software License Agreement
+server-1  | 2026-11-09T01:33:52.187989971Z (found at https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-software-license-agreement/)
+server-1  | 2026-11-09T01:33:52.187990925Z and the Product-Specific Terms for NVIDIA AI Products
+server-1  | 2026-11-09T01:33:52.187991844Z (found at https://www.nvidia.com/en-us/agreements/enterprise-software/product-specific-terms-for-ai-products/).
+server-1  | 2026-11-09T01:33:52.261197973Z 
+server-1  | 2026-11-09T01:33:52.261210515Z NOTE: The SHMEM allocation limit is set to the default of 64MB.  This may be
+server-1  | 2026-11-09T01:33:52.261212023Z    insufficient for PyTorch.  NVIDIA recommends the use of the following flags:
+server-1  | 2026-11-09T01:33:52.261233339Z    docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 ...
+server-1  | 2026-11-09T01:33:52.261238447Z 
+server-1  | 2026-11-09T01:33:57.345819625Z /usr/local/lib/python3.12/dist-packages/torch/library.py:356: UserWarning: Warning only once for all operators,  other operators may also be overridden.
+server-1  | 2026-11-09T01:33:57.345840246Z   Overriding a previously registered kernel for the same operator and the same dispatch key
+server-1  | 2026-11-09T01:33:57.345842270Z   operator: flash_attn::_flash_attn_backward(Tensor dout, Tensor q, Tensor k, Tensor v, Tensor out, Tensor softmax_lse, Tensor(a6!)? dq, Tensor(a7!)? dk, Tensor(a8!)? dv, float dropout_p, float softmax_scale, bool causal, SymInt window_size_left, SymInt window_size_right, float softcap, Tensor? alibi_slopes, bool deterministic, Tensor? rng_state=None) -> Tensor
+server-1  | 2026-11-09T01:33:57.345844243Z     registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922
+server-1  | 2026-11-09T01:33:57.345845250Z   dispatch key: ADInplaceOrView
+server-1  | 2026-11-09T01:33:57.345846133Z   previous kernel: no debug info
+server-1  | 2026-11-09T01:33:57.345847036Z        new kernel: registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922 (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/core/dispatch/OperatorEntry.cpp:208.)
+server-1  | 2026-11-09T01:33:57.345848090Z   self.m.impl(
+server-1  | 2026-11-09T01:34:02.098712055Z /usr/local/lib/python3.12/dist-packages/modelopt/torch/__init__.py:36: UserWarning: transformers version 4.57.3 is incompatible with nvidia-modelopt and may cause issues. Please install recommended version with `pip install nvidia-modelopt[hf]` if working with HF models.
+server-1  | 2026-11-09T01:34:02.098724404Z   _warnings.warn(
+server-1  | 2026-11-09T01:34:21.961691741Z [TensorRT-LLM] TensorRT LLM version: 1.2.1
+server-1  | 2026-11-09T01:34:22.539694758Z /usr/local/lib/python3.12/dist-packages/tensorrt_llm/serve/openai_protocol.py:104: UserWarning: Field name "schema" in "ResponseFormat" shadows an attribute in parent "OpenAIBaseModel"
+server-1  | 2026-11-09T01:34:22.539710800Z   class ResponseFormat(OpenAIBaseModel):
+server-1  | 2026-11-09T01:34:22.697547525Z [11/09/2026-01:34:22] [TRT-LLM] [W] Overriding kv_cache_config 
+server-1  | 2026-11-09T01:34:22.697895123Z [11/09/2026-01:34:22] [TRT-LLM] [I] Using LLM with PyTorch backend
+server-1  | 2026-11-09T01:34:22.698103364Z [11/09/2026-01:34:22] [TRT-LLM] [I] neither checkpoint_format nor checkpoint_loader were provided, checkpoint_format will be set to HF.
+server-1  | 2026-11-09T01:34:22.896162518Z The argument `trust_remote_code` is to be used with Auto classes. It has no effect here and is ignored.
+server-1  | 2026-11-09T01:34:22.896305886Z You are using a model of type qwen2 to instantiate a model of type . This is not supported for all configurations of models and can yield errors.
+server-1  | 2026-11-09T01:34:22.898110735Z `torch_dtype` is deprecated! Use `dtype` instead!
+server-1  | 2026-11-09T01:34:22.898317489Z [11/09/2026-01:34:22] [TRT-LLM] [W] Orchestrator is creating IPC executor
+server-1  | 2026-11-09T01:34:22.898360548Z [33;20mrank 0 using MpiPoolSession to spawn MPI processes
+server-1  | 2026-11-09T01:34:22.898851503Z [11/09/2026-01:34:22] [TRT-LLM] [I] Generating a new HMAC key for server proxy_request_queue
+server-1  | 2026-11-09T01:34:22.899132794Z [11/09/2026-01:34:22] [TRT-LLM] [I] Generating a new HMAC key for server worker_init_status_queue
+server-1  | 2026-11-09T01:34:22.899420081Z [11/09/2026-01:34:22] [TRT-LLM] [I] Generating a new HMAC key for server proxy_result_queue
+server-1  | 2026-11-09T01:34:26.623257433Z [0m/usr/local/lib/python3.12/dist-packages/torch/library.py:356: UserWarning: Warning only once for all operators,  other operators may also be overridden.
+server-1  | 2026-11-09T01:34:26.623280573Z   Overriding a previously registered kernel for the same operator and the same dispatch key
+server-1  | 2026-11-09T01:34:26.623284436Z   operator: flash_attn::_flash_attn_backward(Tensor dout, Tensor q, Tensor k, Tensor v, Tensor out, Tensor softmax_lse, Tensor(a6!)? dq, Tensor(a7!)? dk, Tensor(a8!)? dv, float dropout_p, float softmax_scale, bool causal, SymInt window_size_left, SymInt window_size_right, float softcap, Tensor? alibi_slopes, bool deterministic, Tensor? rng_state=None) -> Tensor
+server-1  | 2026-11-09T01:34:26.623286975Z     registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922
+server-1  | 2026-11-09T01:34:26.623288492Z   dispatch key: ADInplaceOrView
+server-1  | 2026-11-09T01:34:26.623289804Z   previous kernel: no debug info
+server-1  | 2026-11-09T01:34:26.623291231Z        new kernel: registered at /usr/local/lib/python3.12/dist-packages/torch/_library/custom_ops.py:922 (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/core/dispatch/OperatorEntry.cpp:208.)
+server-1  | 2026-11-09T01:34:26.623293127Z   self.m.impl(
+server-1  | 2026-11-09T01:34:30.985258764Z Multiple distributions found for package optimum. Picked distribution: optimum
+server-1  | 2026-11-09T01:34:30.987401371Z Multiple distributions found for package modelopt. Picked distribution: nvidia-modelopt
+server-1  | 2026-11-09T01:34:31.293402901Z /usr/local/lib/python3.12/dist-packages/modelopt/torch/__init__.py:36: UserWarning: transformers version 4.57.3 is incompatible with nvidia-modelopt and may cause issues. Please install recommended version with `pip install nvidia-modelopt[hf]` if working with HF models.
+server-1  | 2026-11-09T01:34:31.293419804Z   _warnings.warn(
+server-1  | 2026-11-09T01:34:35.958350609Z [TensorRT-LLM] TensorRT LLM version: 1.2.1
+server-1  | 2026-11-09T01:34:36.832097949Z /usr/local/lib/python3.12/dist-packages/tensorrt_llm/serve/openai_protocol.py:104: UserWarning: Field name "schema" in "ResponseFormat" shadows an attribute in parent "OpenAIBaseModel"
+server-1  | 2026-11-09T01:34:36.832110315Z   class ResponseFormat(OpenAIBaseModel):
+server-1  | 2026-11-09T01:34:37.014452462Z [11/09/2026-01:34:37] [TRT-LLM] [W] cloudpickle is not installed. TransformersTokenizer will not be serializable across nodes in multi-node setups. Install cloudpickle to fix this: pip install cloudpickle
+server-1  | 2026-11-09T01:34:37.364868139Z [TensorRT-LLM][INFO] Refreshed the MPI local session
+server-1  | 2026-11-09T01:34:37.449468293Z [11/09/2026-01:34:37] [TRT-LLM] [W] Worker process 414 is affined to run on the following CPUs: [2, 10] (subset of all logical CPUs). This may harm performance if set incorrectly.
+server-1  | 2026-11-09T01:34:37.449482848Z [11/09/2026-01:34:37] [TRT-LLM] [W] Worker process 414 has constrained CPU affinity but `TLLM_NUMA_AWARE_WORKER_AFFINITY` is not set. Removing CPU affinity constraints.
+server-1  | 2026-11-09T01:34:37.482780004Z [11/09/2026-01:34:37] [TRT-LLM] [I] ATTENTION RUNTIME FEATURES:  AttentionRuntimeFeatures(chunked_prefill=False, cache_reuse=False, has_speculative_draft_tokens=False, chunk_size=8192, chunked_prefill_buffer_batch_size=4)
+server-1  | 2026-11-09T01:34:37.483889657Z `torch_dtype` is deprecated! Use `dtype` instead!
+server-1  | 2026-11-09T01:34:37.484942485Z [11/09/2026-01:34:37] [TRT-LLM] [I] Validating KV Cache config against kv_cache_dtype="auto"
+server-1  | 2026-11-09T01:34:37.484956050Z [11/09/2026-01:34:37] [TRT-LLM] [I] KV cache quantization set to "auto". Using checkpoint KV quantization.
+server-1  | 2026-11-09T01:34:37.994019693Z [11/09/2026-01:34:37] [TRT-LLM] [I] Use 1.17 GB for model weights.
+server-1  | 2026-11-09T01:34:37.994278119Z [11/09/2026-01:34:37] [TRT-LLM] [I] Prefetching 0.92GB checkpoint files.
+server-1  | 2026-11-09T01:34:37.994509627Z [11/09/2026-01:34:37] [TRT-LLM] [I] Prefetching /model/model.safetensors to memory...
+server-1  | 2026-11-09T01:34:38.377158037Z [11/09/2026-01:34:38] [TRT-LLM] [I] Finished prefetching /model/model.safetensors.
+server-1  | 2026-11-09T01:34:38.377708933Z [11/09/2026-01:34:38] [TRT-LLM] [I] Start to load safetensor file /model/model.safetensors
+server-1  | 2026-11-09T01:34:38.385367398Z 
+Loading safetensors weights in parallel:   0%|          | 0/1 [00:00<?, ?it/s]
+Loading safetensors weights in parallel: 100%|██████████| 1/1 [00:00<00:00, 131.08it/s]
+server-1  | 2026-11-09T01:34:38.555355613Z 
+Loading weights concurrently:   0%|          | 0/488 [00:00<?, ?it/s]
+Loading weights concurrently:  42%|████▏     | 206/488 [00:00<00:00, 2053.10it/s]
+Loading weights concurrently: 100%|██████████| 488/488 [00:00<00:00, 2884.88it/s]
+server-1  | 2026-11-09T01:34:38.556284247Z Model init total -- 1.07s
+server-1  | 2026-11-09T01:34:38.559781390Z [11/09/2026-01:34:38] [TRT-LLM] [W] max_num_tokens (8192) shouldn't be greater than max_seq_len * max_batch_size (2048), specifying to max_seq_len * max_batch_size (2048).
+server-1  | 2026-11-09T01:34:38.561929686Z [11/09/2026-01:34:38] [TRT-LLM] [I] Using Sampler: TorchSampler
+server-1  | 2026-11-09T01:34:38.564506584Z [11/09/2026-01:34:38] [TRT-LLM] [I] [create_py_executor] Created execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0xe8303b0>
+server-1  | 2026-11-09T01:34:38.566741715Z [11/09/2026-01:34:38] [TRT-LLM] [I] [kv cache manager] Primary/secondary blocks for window sizes set to {2049: (66, 0)} for estimation dry run
+server-1  | 2026-11-09T01:34:38.566791029Z [11/09/2026-01:34:38] [TRT-LLM] [I] [KVCacheManager] execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0xe8303b0>
+server-1  | 2026-11-09T01:34:38.569725228Z [TensorRT-LLM][INFO] Max KV cache blocks per sequence: 65 [window size=2049], tokens per block=32, primary blocks=66, secondary blocks=0, max sequence length=2049
+server-1  | 2026-11-09T01:34:38.570189060Z [TensorRT-LLM][INFO] Number of tokens per block: 32.
+server-1  | 2026-11-09T01:34:38.570198650Z [TensorRT-LLM][INFO] [MemUsageChange] Allocated 0.02 GiB for max tokens in paged KV cache (2112).
+server-1  | 2026-11-09T01:34:38.570656778Z [11/09/2026-01:34:38] [TRT-LLM] [I] max_seq_len=2049, max_num_requests=1, max_num_tokens=2048, max_batch_size=1
+server-1  | 2026-11-09T01:34:38.570711472Z [11/09/2026-01:34:38] [TRT-LLM] [I] cache_transceiver is disabled
+server-1  | 2026-11-09T01:34:38.570783075Z [11/09/2026-01:34:38] [TRT-LLM] [I] [PyExecutor] execution_stream initialized: <torch.cuda.Stream device=cuda:0 cuda_stream=0xe8303b0>. 
+server-1  | 2026-11-09T01:34:38.571125832Z [11/09/2026-01:34:38] [TRT-LLM] [I] Running autotuner warmup...
+server-1  | 2026-11-09T01:34:38.571232136Z [11/09/2026-01:34:38] [TRT-LLM] [I] [Autotuner] Autotuning process starts ...
+server-1  | 2026-11-09T01:34:40.482840049Z [11/09/2026-01:34:40] [TRT-LLM] [I] PDL enabled
+server-1  | 2026-11-09T01:34:58.536703032Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33572096 bytes
+server-1  | 2026-11-09T01:35:01.194726324Z [11/09/2026-01:35:01] [TRT-LLM] [I] [Autotuner] Autotuning process ends
+server-1  | 2026-11-09T01:35:01.194739261Z [11/09/2026-01:35:01] [TRT-LLM] [I] [Autotuner] Cache size after warmup is 0
+server-1  | 2026-11-09T01:35:01.194819196Z [11/09/2026-01:35:01] [TRT-LLM] [I] Creating CUDA graph instances for 1 batch sizes.
+server-1  | 2026-11-09T01:35:01.195012540Z [11/09/2026-01:35:01] [TRT-LLM] [I] Run generation-only CUDA graph warmup for batch size=1, draft_len=0, max_seq_len=2048
+server-1  | 2026-11-09T01:35:01.387076125Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33555968 bytes
+server-1  | 2026-11-09T01:35:01.429402163Z [11/09/2026-01:35:01] [TRT-LLM] [I] global_steady_clock_offset at each rank: [0.0]
+server-1  | 2026-11-09T01:35:01.429416574Z [11/09/2026-01:35:01] [TRT-LLM] [I] Setting global_steady_clock_offset: 0.0 seconds for rank 0
+server-1  | 2026-11-09T01:35:01.429786306Z [11/09/2026-01:35:01] [TRT-LLM] [I] Memory used after loading model weights (inside torch) in memory usage profiling: 1.01 GiB
+server-1  | 2026-11-09T01:35:01.429793690Z [11/09/2026-01:35:01] [TRT-LLM] [I] Memory used after loading model weights (outside torch) in memory usage profiling: 2.12 GiB
+server-1  | 2026-11-09T01:35:02.789248313Z [TensorRT-LLM][WARNING] [kv cache manager] storeContextBlocks: Can not find sequence for request 1
+server-1  | 2026-11-09T01:35:02.803235825Z [TensorRT-LLM][WARNING] [kv cache manager] storeContextBlocks: Can not find sequence for request 1
+server-1  | 2026-11-09T01:35:02.803902199Z [TensorRT-LLM][WARNING] [kv cache manager] storeContextBlocks: Can not find sequence for request 2
+server-1  | 2026-11-09T01:35:02.804707323Z [11/09/2026-01:35:02] [TRT-LLM] [I] Memory dynamically allocated during inference (inside torch) in memory usage profiling: 0.08 GiB
+server-1  | 2026-11-09T01:35:02.804715226Z [11/09/2026-01:35:02] [TRT-LLM] [I] Memory used outside torch (e.g., NCCL and CUDA graphs) in memory usage profiling: 2.20 GiB
+server-1  | 2026-11-09T01:35:02.804858806Z [11/09/2026-01:35:02] [TRT-LLM] [I] Peak memory during memory usage profiling (torch + non-torch): 3.29 GiB, available KV cache memory when calculating max tokens: 6.15 GiB, fraction is set 0.5, kv size is 12288. device total memory 15.56 GiB, , tmp kv_mem 0.02 GiB
+server-1  | 2026-11-09T01:35:02.804892725Z [11/09/2026-01:35:02] [TRT-LLM] [I] Estimated max memory in KV cache : 6.15 GiB
+server-1  | 2026-11-09T01:35:02.805232722Z [11/09/2026-01:35:02] [TRT-LLM] [W] Both free_gpu_memory_fraction and max_tokens are set (to 0.5 and 537494 with free memory 12.37225341796875GiB of total memory 15.5645751953125GiB, respectively). The smaller value will be used.
+server-1  | 2026-11-09T01:35:02.805274426Z [11/09/2026-01:35:02] [TRT-LLM] [I] [KVCacheManager] execution_stream: <torch.cuda.Stream device=cuda:0 cuda_stream=0xe8303b0>
+server-1  | 2026-11-09T01:35:02.807746949Z [TensorRT-LLM][INFO] Max KV cache blocks per sequence: 65 [window size=2049], tokens per block=32, primary blocks=16796, secondary blocks=0, max sequence length=2049
+server-1  | 2026-11-09T01:35:02.808043146Z [TensorRT-LLM][INFO] Number of tokens per block: 32.
+server-1  | 2026-11-09T01:35:02.808050567Z [TensorRT-LLM][INFO] [MemUsageChange] Allocated 6.15 GiB for max tokens in paged KV cache (537472).
+server-1  | 2026-11-09T01:35:03.007703263Z [11/09/2026-01:35:03] [TRT-LLM] [I] max_seq_len=2049, max_num_requests=1, max_num_tokens=2048, max_batch_size=1
+server-1  | 2026-11-09T01:35:03.007741007Z [11/09/2026-01:35:03] [TRT-LLM] [I] cache_transceiver is disabled
+server-1  | 2026-11-09T01:35:03.007808287Z [11/09/2026-01:35:03] [TRT-LLM] [I] [PyExecutor] execution_stream initialized: <torch.cuda.Stream device=cuda:0 cuda_stream=0xe8303b0>. 
+server-1  | 2026-11-09T01:35:03.007927091Z [11/09/2026-01:35:03] [TRT-LLM] [I] Running autotuner warmup...
+server-1  | 2026-11-09T01:35:03.007983149Z [11/09/2026-01:35:03] [TRT-LLM] [I] [Autotuner] Autotuning process starts ...
+server-1  | 2026-11-09T01:35:03.009517222Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33572096 bytes
+server-1  | 2026-11-09T01:35:03.050806588Z [11/09/2026-01:35:03] [TRT-LLM] [I] [Autotuner] Autotuning process ends
+server-1  | 2026-11-09T01:35:03.050814790Z [11/09/2026-01:35:03] [TRT-LLM] [I] [Autotuner] Cache size after warmup is 0
+server-1  | 2026-11-09T01:35:03.050853075Z [11/09/2026-01:35:03] [TRT-LLM] [I] Creating CUDA graph instances for 1 batch sizes.
+server-1  | 2026-11-09T01:35:03.051067614Z [11/09/2026-01:35:03] [TRT-LLM] [I] Run generation-only CUDA graph warmup for batch size=1, draft_len=0, max_seq_len=2048
+server-1  | 2026-11-09T01:35:03.052002809Z [TensorRT-LLM][WARNING] Attention workspace size is not enough, increase the size from 0 bytes to 33555968 bytes
+server-1  | 2026-11-09T01:35:03.089627922Z [11/09/2026-01:35:03] [TRT-LLM] [I] global_steady_clock_offset at each rank: [0.0]
+server-1  | 2026-11-09T01:35:03.089638735Z [11/09/2026-01:35:03] [TRT-LLM] [I] Setting global_steady_clock_offset: 0.0 seconds for rank 0
+server-1  | 2026-11-09T01:35:03.089972780Z [11/09/2026-01:35:03] [TRT-LLM] [I] Setting PyTorch memory fraction to 0.4691384651582291 (7.30194091796875 GiB)
+server-1  | 2026-11-09T01:35:03.090128317Z [11/09/2026-01:35:03] [TRT-LLM] [I] LLM Args:
+server-1  | 2026-11-09T01:35:03.090134908Z model='/model' tokenizer=None tokenizer_mode='auto' custom_tokenizer=None skip_tokenizer_init=False trust_remote_code=False tensor_parallel_size=1 dtype='auto' revision=None tokenizer_revision=None pipeline_parallel_size=1 context_parallel_size=1 gpus_per_node=1 moe_cluster_parallel_size=-1 moe_tensor_parallel_size=-1 moe_expert_parallel_size=-1 enable_attention_dp=False enable_lm_head_tp_in_adp=False pp_partition=None cp_config={} load_format=<LoadFormat.AUTO: 0> fail_fast_on_attention_window_too_large=False enable_lora=False lora_config=None kv_cache_config=KvCacheConfig(enable_block_reuse=False, max_tokens=537494, max_attention_window=None, sink_token_length=None, free_gpu_memory_fraction=0.5, host_cache_size=None, onboard_blocks=True, cross_kv_cache_fraction=None, secondary_offload_min_priority=None, event_buffer_max_size=0, attention_dp_events_gather_period_ms=5, enable_partial_reuse=True, copy_on_partial_reuse=True, use_uvm=False, max_gpu_total_bytes=6604734976, dtype='auto', mamba_ssm_cache_dtype='auto', tokens_per_block=32) enable_chunked_prefill=False guided_decoding_backend=None batched_logits_processor=None iter_stats_max_iterations=None request_stats_max_iterations=None peft_cache_config=None scheduler_config=SchedulerConfig(capacity_scheduler_policy=<CapacitySchedulerPolicy.GUARANTEED_NO_EVICT: 'GUARANTEED_NO_EVICT'>, context_chunking_policy=None, dynamic_batch_config=DynamicBatchConfig(enable_batch_size_tuning=True, enable_max_num_tokens_tuning=False, dynamic_batch_moving_average_window=128)) cache_transceiver_config=None sparse_attention_config=None speculative_config=None max_batch_size=1 max_input_len=1024 max_seq_len=2048 max_beam_width=1 max_num_tokens=8192 gather_generation_logits=False num_postprocess_workers=0 postprocess_tokenizer_dir='/model' reasoning_parser=None decoding_config=None mpi_session=None otlp_traces_endpoint=None backend='pytorch' return_perf_metrics=True orchestrator_type=None env_overrides=None garbage_collection_gen0_threshold=20000 cuda_graph_config=CudaGraphConfig(batch_sizes=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 64, 128], max_batch_size=128, enable_padding=False) attention_dp_config=None disable_overlap_scheduler=False moe_config=MoeConfig(backend='CUTLASS', max_num_tokens=None, load_balancer=None, disable_finalize_fusion=False, use_low_precision_moe_combine=False) nvfp4_gemm_config=Nvfp4GemmConfig(allowed_backends=['cutlass', 'cublaslt', 'cuda_core']) attn_backend='TRTLLM' sampler_type=<SamplerType.auto: 'auto'> sampler_force_async_worker=False enable_iter_perf_stats=False enable_iter_req_stats=False print_iter_log=False perf_metrics_max_requests=100 batch_wait_timeout_ms=0 batch_wait_timeout_iters=0 batch_wait_max_tokens_ratio=0 torch_compile_config=None enable_autotuner=True enable_layerwise_nvtx_marker=False enable_min_latency=False stream_interval=1 force_dynamic_quantization=False allreduce_strategy='AUTO' checkpoint_loader=None checkpoint_format='HF' kv_connector_config=None mm_encoder_only=False ray_worker_extension_cls=None ray_placement_config=None enable_sleep=False disable_flashinfer_sampling=False max_stats_len=1000
+server-1  | 2026-11-09T01:35:03.090937534Z [11/09/2026-01:35:03] [TRT-LLM] [I] RPCServer is bound to ipc:///tmp/rpc_test_3f0670e6-e0fc-4374-8285-7ee96150e679
+server-1  | 2026-11-09T01:35:03.091007244Z [11/09/2026-01:35:03] [TRT-LLM] [I] RPC Server started and listening on ipc:///tmp/rpc_test_3f0670e6-e0fc-4374-8285-7ee96150e679
+server-1  | 2026-11-09T01:35:03.091260941Z [11/09/2026-01:35:03] [TRT-LLM] [I] RPC Server has started.
+server-1  | 2026-11-09T01:35:03.830374069Z [11/09/2026-01:35:03] [TRT-LLM] [I] Profiling started at iteration 0.
+server-1  | 2026-11-09T01:35:03.831019546Z [11/09/2026-01:35:03] [TRT-LLM] [I] get signal from executor worker
+server-1  | 2026-11-09T01:35:04.421115625Z [11/09/2026-01:35:04] [TRT-LLM] [I] PROMETHEUS_MULTIPROC_DIR: /tmp/tmpi2b6bshn
+server-1  | 2026-11-09T01:35:04.451721088Z INFO:     Started server process [217]
+server-1  | 2026-11-09T01:35:04.451763901Z INFO:     Waiting for application startup.
+server-1  | 2026-11-09T01:35:04.451819434Z INFO:     Application startup complete.
+server-1  | 2026-11-09T01:35:05.222930233Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:06.226274514Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:07.228513306Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:07.679032982Z INFO:     127.0.0.1:56488 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:08.230790509Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:08.231580666Z INFO:     172.21.0.1:45328 - "GET /version HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:08.273044839Z INFO:     172.21.0.1:45328 - "GET /v1/models HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:08.713028762Z INFO:     127.0.0.1:56504 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:08.888121252Z INFO:     172.21.0.1:45330 - "GET /version HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:09.104636306Z INFO:     172.21.0.3:35628 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:09.315124780Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:09.749695408Z INFO:     127.0.0.1:56512 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:10.317472191Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:10.380824958Z INFO:     172.21.0.1:45346 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:10.417650593Z INFO:     172.21.0.3:35632 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:10.784220115Z INFO:     127.0.0.1:56514 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:11.320095995Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:11.819351460Z INFO:     127.0.0.1:56528 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:12.323425400Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:12.853724888Z INFO:     127.0.0.1:56534 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:13.079383072Z GPU 0: General Metrics for NVIDIA GB20x
+server-1  | 2026-11-09T01:35:13.079394735Z Capture range started in the application.
+server-1  | 2026-11-09T01:35:13.079396472Z Capture range ended in the application.
+server-1  | 2026-11-09T01:35:13.079397715Z Generating '/tmp/nsys-report-691e.qdstrm'
+server-1  | 2026-11-09T01:35:13.326784942Z 
+[1/1] [0%                          ] timeline.nsys-repINFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:13.437549480Z Processing events...
+server-1  | 2026-11-09T01:35:13.886315088Z 
+[1/1] [0%                          ] timeline.nsys-rep
+[1/1] [5%                          ] timeline.nsys-rep
+[1/1] [8%                          ] timeline.nsys-rep
+[1/1] [11%                         ] timeline.nsys-rep
+[1/1] [13%                         ] timeline.nsys-rep
+[1/1] [=16%                        ] timeline.nsys-rep
+[1/1] [==19%                       ] timeline.nsys-repINFO:     127.0.0.1:43954 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:14.329967627Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:14.920194219Z INFO:     127.0.0.1:43966 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:15.334025420Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:15.954413541Z INFO:     127.0.0.1:43972 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:16.337768469Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:16.989264650Z INFO:     127.0.0.1:43978 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:17.345749590Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:17.764946519Z 
+[1/1] [==21%                       ] timeline.nsys-rep
+[1/1] [====25%                     ] timeline.nsys-rep
+[1/1] [=====29%                    ] timeline.nsys-rep
+[1/1] [======34%                   ] timeline.nsys-rep
+[1/1] [========40%                 ] timeline.nsys-rep
+[1/1] [=========46%                ] timeline.nsys-rep
+[1/1] [===========51%              ] timeline.nsys-rep
+[1/1] [============56%             ] timeline.nsys-rep
+[1/1] [=============58%            ] timeline.nsys-rep
+[1/1] [========================100%] timeline.nsys-rep
+[1/1] [========================100%] timeline.nsys-rep
+server-1  | 2026-11-09T01:35:17.799212603Z INFO:     172.21.0.1:35640 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:17.804291925Z INFO:     172.21.0.1:35646 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:17.828765144Z INFO:     172.21.0.3:42378 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:18.024383566Z INFO:     127.0.0.1:43986 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:18.091039353Z INFO:     172.21.0.1:35650 - "GET /perf_metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:18.349556476Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:19.058583389Z INFO:     127.0.0.1:44000 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:19.352960193Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:20.092921442Z INFO:     127.0.0.1:44016 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:20.356115249Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:21.126574913Z INFO:     127.0.0.1:44028 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:21.359536626Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:22.161641306Z INFO:     127.0.0.1:44034 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:22.362386819Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:23.195131399Z INFO:     127.0.0.1:44050 - "GET /health HTTP/1.1" 200 OK
+server-1  | 2026-11-09T01:35:23.366142941Z INFO:     172.21.0.1:45328 - "GET /prometheus/metrics HTTP/1.1" 200 OK

@@ -1,0 +1,90 @@
+{
+  "I02A-TRACE-components_20261108T214816Z_2b7068-warmup": {
+    "first_iter": 1,
+    "last_iter": 64,
+    "weights_bytes": 988065536,
+    "params": 494032768,
+    "metrics": [
+      {
+        "name": "weight bytes read per decode step",
+        "formula": "sum of safetensors tensor bytes (tied embedding = output projection) + KV bytes x mean context",
+        "value": 988876544.0,
+        "unit": "byte"
+      },
+      {
+        "name": "decode memory throughput",
+        "formula": "bytes per decode step / engine mean ITL",
+        "value": 219184406655.14185,
+        "unit": "byte/s"
+      },
+      {
+        "name": "decode MBU",
+        "formula": "bytes per decode step / ITL / 448 GB/s (Published)",
+        "value": 0.4892509077123702,
+        "unit": "fraction"
+      },
+      {
+        "name": "prefill FLOPs",
+        "formula": "2 x params x prompt tokens + 2 x layers x hidden x prompt tokens^2",
+        "value": 33643945472,
+        "unit": "FLOP"
+      },
+      {
+        "name": "prefill achieved FLOPS",
+        "formula": "prefill FLOPs / (first_token_time - first_scheduled_time)",
+        "value": 51750202995.81699,
+        "unit": "FLOP/s"
+      }
+    ],
+    "unavailable": [
+      {
+        "what": "prefill MFU",
+        "why": "peak tensor FLOPS for this card not yet sourced; I03 measures it. Achieved FLOPS is reported instead"
+      }
+    ]
+  },
+  "I02A-TRACE-components_20261108T214816Z_2b7068-measured": {
+    "first_iter": 66,
+    "last_iter": 129,
+    "weights_bytes": 988065536,
+    "params": 494032768,
+    "metrics": [
+      {
+        "name": "weight bytes read per decode step",
+        "formula": "sum of safetensors tensor bytes (tied embedding = output projection) + KV bytes x mean context",
+        "value": 988876544.0,
+        "unit": "byte"
+      },
+      {
+        "name": "decode memory throughput",
+        "formula": "bytes per decode step / engine mean ITL",
+        "value": 29233981418.620384,
+        "unit": "byte/s"
+      },
+      {
+        "name": "decode MBU",
+        "formula": "bytes per decode step / ITL / 448 GB/s (Published)",
+        "value": 0.0652544228094205,
+        "unit": "fraction"
+      },
+      {
+        "name": "prefill FLOPs",
+        "formula": "2 x params x prompt tokens + 2 x layers x hidden x prompt tokens^2",
+        "value": 33643945472,
+        "unit": "FLOP"
+      },
+      {
+        "name": "prefill achieved FLOPS",
+        "formula": "prefill FLOPs / (first_token_time - first_scheduled_time)",
+        "value": 1699875983280.5703,
+        "unit": "FLOP/s"
+      }
+    ],
+    "unavailable": [
+      {
+        "what": "prefill MFU",
+        "why": "peak tensor FLOPS for this card not yet sourced; I03 measures it. Achieved FLOPS is reported instead"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "phase": "warmup",
+  "isl": 34,
+  "diagnostic": true,
+  "detail": true,
+  "requests": [
+    {
+      "request_id": "I02A-TRACE-components_20261108T214816Z_2b7068-warmup",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a concise assistant for an inference team."
+        },
+        {
+          "role": "user",
+          "content": "Why does decode slow down as the KV cache grows?"
+        }
+      ],
+      "max_tokens": 64
+    }
+  ]
+}
