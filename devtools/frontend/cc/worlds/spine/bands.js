@@ -150,7 +150,7 @@ export class Bands {
         if (run && xa <= run.at(-1)) run[run.length - 1] = Math.max(run.at(-1), xa + w);
         else if (run) run.push(xa, xa + w); else runs.set(key, [xa, xa + w]);
       }
-      if (label && w >= LABEL_MIN_PX && R.h >= 11) labels.push([k, xa, w, half, on]);
+      if (label && w >= LABEL_MIN_PX && R.h >= 11) labels.push([k, xa, w, half, on, sel]);
     });
     const yh = (half) => (half === 0 ? [R.y, R.h] : [half === 2 ? R.y + R.h / 2 : R.y, R.h / 2 - 0.5]);
     g.globalAlpha = base;
@@ -168,11 +168,12 @@ export class Bands {
       if (stroke) { g.globalAlpha = 1; g.strokeStyle = stroke[0]; g.lineWidth = stroke[1]; g.strokeRect(xa, y, w, h); }
     }
     if (labels.length) {
-      // Units of one band can overlap in time (phases of two processes), so a label that would cross one already
-      // drawn in its half is left out; the cursor's units label first.
+      // Units of one band can overlap in time (phases of two processes, nested modules), so a label that would cross
+      // one already drawn in its half is left out: the selected unit labels first, then the innermost (deepest row),
+      // then the cursor's units.
       g.globalAlpha = 1; g.fillStyle = "#0a0f18"; g.textAlign = "center"; g.textBaseline = "middle";
-      const taken = [[], [], []];
-      labels.sort((p, q) => q[4] - p[4]);
+      const taken = [[], [], []], S = this.S, depth = (k) => S.field("depth", L.ids[k]);
+      labels.sort((p, q) => q[5] - p[5] || depth(q[0]) - depth(p[0]) || q[4] - p[4]);
       for (const [k, xa, w, half, on] of labels) {
         const [y, h] = yh(half), va = Math.max(xa, xmin), vb = Math.min(xa + w, xmax), vw = vb - va, chars = Math.floor((vw - 8) / CHAR_PX);
         if (vw < LABEL_MIN_PX || chars < 3 || h < 11) continue;
