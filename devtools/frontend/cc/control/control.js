@@ -15,7 +15,7 @@
 // | openedStore(run) | Promise of the RunStore of a run the session holds (compare: A and B) once it opens; null when it holds no such run or the open failed |
 // | ladders(), tierOf(dim), tierName(dim, tier), aligned(from, tier, to) | the manifest's ladders; tier; tier name; aligned tier |
 // | stops(dim, tier) | {ids: Uint32Array, t: Float64Array}: stop rows of (dimension, tier) and their times, by (t, id) |
-// | units(tier) | {ids, start, end}: units of an execution tier by start (layer: one per (iter, layer) group, id = its first kernel) |
+// | units(tier) | {ids, start, end, reach, long}: units of an execution tier by start (layer: one per (iter, layer) group, id = its first kernel); reach: the longest duration outside the longest 1%; long: the indexes of those longer units (a query at t reads the starts in [t - reach, t] and long) |
 // | now(t) | {exec[6], kernel, phases, flow, flows, comp, process, archPath, sample, sampleIndex, transfers, hwActive} |
 // | boundsAt(t), eventsIn(b) | playback bounds at t; Uint32Array of every row starting in [b0, b1), by (start, id) |
 // | metrics(), metricInputs() | aux.json metrics [{id, name, value, unit, request, rows}]; Set of row ids the selected one reads |
@@ -126,8 +126,10 @@ function adopt(S) {
   if (typeof state.sel === "string" && !S.things.some((x) => x.key === state.sel)) state.sel = null;
   if (pendingSel) {   // from the hash or a final reload: an eid resolves in any generation, a row id only in its own
     const p = pendingSel; pendingSel = null;
-    if (p.eid) S.resolve(p.eid).then((id) => { if (id != null && store() === S && state.sel == null) { state.sel = id; emit(); } }, (err) => console.error(err));
-    else if (p.generation === S.generation && p.id < S.N) state.sel = p.id;
+    // a selection from the URL also moves the cursor to its row, as select() does; a final reload keeps t (6.5)
+    const take = (id) => { state.sel = id; if (p.seek) state.t = S.startOf[id]; };
+    if (p.eid) S.resolve(p.eid).then((id) => { if (id != null && store() === S && state.sel == null) { take(id); rebound(); emit(); } }, (err) => console.error(err));
+    else if (p.generation === S.generation && p.id < S.N) take(p.id);
   }
   state.bounds = boundsAt(state.t);
   state.rev++;
@@ -169,7 +171,7 @@ export function setDock(patch) { Object.assign(state.dock, patch); emit(); }
 
 // ---------------- stops, steps, the every-row walk, seek
 export function stops(dim = state.focus, tier = state.tiers[dim]) { const S = store(); return S ? S.dims.stops(dim, S.dims.ladders[dim][tier]) : NO_STOPS; }
-export function units(tier) { const S = store(); return S ? U(S).of(tier) : { ids: new Uint32Array(0), start: new Float64Array(0), end: new Float64Array(0) }; }
+export function units(tier) { const S = store(); return S ? U(S).of(tier) : { ids: new Uint32Array(0), start: new Float64Array(0), end: new Float64Array(0), reach: 0, long: new Uint32Array(0) }; }
 /** The cursor for RunStore.step / walk: the selected row breaks ties at t, else the step leaves t (3.4). */
 const cursor = (S, dir) => ({ t: state.t, id: typeof state.sel === "number" && S.startOf[state.sel] === state.t ? state.sel : dir > 0 ? 0xffffffff : -1 });
 export function step(dir, coarser = false) {
@@ -288,11 +290,12 @@ export const metricInputs = () => new Set(metrics().find((x) => x.id === state.m
 
 // ---------------- playback (owner, 2026-11-08): every event of every tier inside the bounds, looping
 /** The bounds at t: the unit of the execution tier holding t; between units of that tier, the nearest coarser unit
- *  holding t; the request tier is the whole run. */
+ *  holding t; the request tier is the whole run, from its t0 (as D13). Rows recorded before t0 (capture frames from
+ *  before the run) stay reachable by stepping but never stretch the bounds. */
 export function boundsAt(t) {
   const S = store(); if (!S) return [0, 0];
   for (let e = state.tiers.execution; e > 0; e--) { const k = U(S).at(e, t); if (k >= 0) { const u = U(S).of(e); return [u.start[k], u.end[k]]; } }
-  return [S.extent[0], Math.max(S.extent[1], S.extent[0] + 1)];
+  return [0, Math.max(S.extent[1], 1)];
 }
 const rebound = () => { if (state.t < state.bounds[0] || state.t >= state.bounds[1]) state.bounds = boundsAt(state.t); };
 /** Every row starting inside the bounds, by (start, id). */
@@ -414,7 +417,7 @@ async function defaultSession() {
   if (state.session.mode === "live") state.session = { ...state.session, mode: "replay" };   // a live session reloads as a replay
   if (!state.session.run) state.session = await defaultSession();
   state.session = { side: "A", runB: null, live: null, ...state.session };
-  if (state.sel != null && typeof state.sel !== "string") { pendingSel = typeof state.sel === "object" ? state.sel : null; state.sel = null; }
+  if (state.sel != null && typeof state.sel !== "string") { pendingSel = typeof state.sel === "object" ? { ...state.sel, seek: true } : null; state.sel = null; }
   state.playing = false;
   // Per open store: RunStore.bytes() (every typed-array buffer the store holds, by part, and total_mb) and typed_mb,
   // every typed-array buffer reachable from the store and its units, each counted once (adds the units' own lists).

@@ -24,7 +24,10 @@ const CSS = `
 .hwrow .val { grid-area:val; font-size:12px; color:#ffd36b; font-variant-numeric:tabular-nums; }
 .hwrow .sp { grid-area:spark; position:relative; height:${SPARK_H}px; margin-top:2px; }
 .hwrow canvas { width:100%; height:${SPARK_H}px; display:block; }
-.hwrow .cur { position:absolute; top:0; left:0; width:1px; height:100%; background:#ffd36b; will-change:transform; }
+/* the cursor line is the left border of a box 1px narrower than the sparkline, moved by a share of its own width:
+   no layout read per frame */
+.hwrow .cur { position:absolute; top:0; left:0; box-sizing:border-box; width:calc(100% - 1px); height:100%; border-left:1px solid #ffd36b;
+  pointer-events:none; will-change:transform; }
 .hwrow .ev { grid-area:ev; font-size:10px; color:var(--dim); }
 .hwrow .why { grid-area:why; font-size:10px; color:#c9a26b; }
 .hwrow.stale .nm, .hwrow.stale .val { color:var(--dim); }
@@ -83,7 +86,8 @@ export function mountHardwareSide(el) {
     if (ch.focus || ch.tiers || ch.rev || ch.session) for (const r of ROWS) r.row.classList.toggle("tier", s.focus === "hardware" && r.tier === s.tiers.hardware);
     if (ch.t || ch.bounds || ch.rev || ch.session) {
       const x = Math.max(0, Math.min(1, (s.t - a) / (b - a || 1)));
-      for (const r of ROWS) r.cur.style.transform = `translateX(${x * (r.sp.clientWidth - 1)}px)`;
+      const at = `translateX(${(100 * x).toFixed(3)}%)`;
+      for (const r of ROWS) r.cur.style.transform = at;
       const v = S ? S.samplesAt(s.t) : null;
       for (const r of ROWS) {
         const y = v[r.i], stale = Number.isNaN(y), bad = stale ? "" : implausible(y, r.m.unit);
