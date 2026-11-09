@@ -21,19 +21,19 @@ second line is the row's name. The GPU column shows the GPU metric samples at th
 
 Preconditions:
 
-- Baseline. Results taken on 2026-11-08 in a half tile (1259 x 1301 viewport), timeline run generation 11, and
-  reproduced at generation 12.
+- Baseline. Results taken on 2026-11-08 in a half tile (1259 x 1301 viewport), timeline run generation 11,
+  reproduced at generation 12; row ids below are from generation 13 (2026-11-09).
 
 - **Open at a kernel of iteration 67.** Run
   `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52&t=72714460148&f=1"`.
-  `state`: `timeline` `72714.460148 ms / 85717.066124 ms · window 85.717 s`, `focus_level` `1 Infra`.
+  `state`: `timeline` `72714.460148 ms / 91930.364906 ms · window 92.334 s`, `focus_level.name` `Infra`.
 - **Read the headers.** Run
   `$CCV eval 'JSON.stringify([...document.querySelectorAll(".labels .lab.group")].filter(e => e.style.display !== "none").map(e => e.textContent))'`.
   It returns `client-1 (Locust client) · 2 of 3 threads active`, `bridge network · 0 of 1 threads active`,
   `server-1 (trtllm-serve) · 17 of 66 threads active`, `NVIDIA GeForce RTX 5060 Ti · 1 of 5 streams active`.
   Screenshot: `cc-step4-v3/s4-focus-L1.png` (full tile).
 - **Select a thread.** Click the `Thread-3 (_event_loop_wrapper)` tile. Run
-  `$CCV click --text "Thread-3 (_event_loop_wrapper)" --exact --force --after cc-infra-select`. `sel` is `52498`;
+  `$CCV click --text "Thread-3 (_event_loop_wrapper)" --exact --force --after cc-infra-select`. `sel` is `53011`;
   the URL has `sel=stamp/forward/measured/i67/model-forward-launched#0`; the inspector's Selected tab shows
   `component stamp: model forward launched`; the tile has a white border.
 - **Proof.** Run `$CCV console`: `errors: 0`.

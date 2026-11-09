@@ -22,7 +22,7 @@ A user scrubs it, steps with ◀ and ▶|, and plays it at a chosen speed. Every
 
 Preconditions:
 
-- Baseline; `$CCV open side` done.
+- Baseline; `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` done (`$CCV open side` opens the v3 page).
 
 - **Scrub.** Click the middle of the timeline. Run `$CCV click --css "#tl" --frac 0.5,0.5 --after tl-scrub`. `$CCV state` shows `timeline` `122.185 ms / 244.369 ms · step: stamps`.
 - **Step forward.** Choose ▶|. Run `$CCV click --css "#next" --after tl-step`. `timeline` reads `122.967 ms / 244.369 ms · step: stamps`.
@@ -37,6 +37,6 @@ Preconditions:
 
 - Known bug (gaps doc T7, 2026-11-08): the scrub sets a fractional cursor; the Summary panel's store queries fail with
   HTTP 500 and log one `pageerror`. The Proof step fails until T7 is fixed. Report it; do not skip the scrub.
-- At kernel steps, play advances microseconds per step; a 1.5 s play moves the cursor by about 0.03 ms.
+- At kernel steps, play advances microseconds per step; at 5 steps/s a 1.5 s play moved the cursor 0.078 ms (2026-11-09).
 - Keyboard stepping does not exist: `$CCV key ArrowRight` changes nothing (gap T8).
 - The timeline has no zoom; it always shows the whole request window (gap T3).

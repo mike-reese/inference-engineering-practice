@@ -23,7 +23,10 @@ flyout docks right or bottom and can be made larger.
 
 Preconditions:
 
-- Baseline; `$CCV open side` done; no rep stack running.
+- Baseline; `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` done (`$CCV open side` opens the v3 page); no rep stack running.
+- For Logs: the app server has seen the `ie-devtools` Compose stack's `devtools` container since it started.
+  `curl -s 127.0.0.1:7710/api/logs/sources` lists it. The list holds only Compose containers followed since the server
+  started, so after a reboot it is `[]` and the Logs picker is empty until a Compose stack runs.
 
 - **Summary.** Choose `Summary`. Run `$CCV click --role button --name "Summary" --exact --after fly-summary` and `$CCV wait --text "At the cursor"`. `state.flyout_tab` is `summary`.
 - **Run.** Choose `Run`. Run `$CCV click --role button --name "Run" --exact --after fly-run` and `$CCV wait --text "Streamed latency"`. `flyout_tab` is `run`.

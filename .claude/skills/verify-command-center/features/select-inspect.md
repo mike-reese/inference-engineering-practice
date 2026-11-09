@@ -23,7 +23,7 @@ Forward step through selections.
 
 Preconditions:
 
-- Baseline; `$CCV open side` done; the Summary tab is open.
+- Baseline; `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` done (`$CCV open side` opens the v3 page); the Summary tab is open.
 
 - **Frame the level.** Choose `4 Iteration`. Run `$CCV click --role button --name "4 Iteration" --exact`. `$CCV state` shows `focus_level.name` `Iteration`.
 - **Find the item.** Run `$CCV find --text "model forward launched"`. It returns a `div.lab` label with `in_viewport` `true`.

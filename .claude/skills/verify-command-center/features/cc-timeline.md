@@ -31,30 +31,30 @@ at `/static/prototypes/D5v2/side/index.html` (legacy); this file covers only v3.
 Preconditions:
 
 - Baseline, plus `$CCV doctor` shows `v3 store (/api/v3/runs)` ok and the timeline run
-  `I02A-TRACE-timeline_20261107T172848Z_f2ac52` is generation 12 or later.
+  `I02A-TRACE-timeline_20261107T172848Z_f2ac52` is generation 13 or later (the row ids below are generation 13's).
 - `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52"`
   done (`open side` loads the newest run, which is no longer this one). `$CCV state` shows `timeline`
-  `71088.037123 ms / 85717.066124 ms · window 1.519 s`, `grain` `request`, `focus_level` `3 Trace`.
-- The results below were taken in a half tile (`$CCV launch`, viewport 1259 x 1301), the default and minimum size; three concurrent sessions reproduced them on 2026-11-08, and one session again at generation 12. Window widths after a wheel zoom and the tick counts depend
+  `71088.037123 ms / 91930.364906 ms · window 1.519 s`, `grain` `request`, `focus_level.name` `Trace`.
+- The results below were taken in a half tile (`$CCV launch`, viewport 1259 x 1301), the default and minimum size; three concurrent sessions reproduced them on 2026-11-08, one session again at generation 12, and one at generation 13 on 2026-11-09. Window widths after a wheel zoom and the tick counts depend
   on the strip width.
 
-- **Step forward.** Press →. Run `$CCV key ArrowRight --after cc-tl-step`. `timeline` reads `72692.873711 ms / 85717.066124 ms · window 1.519 s`; the URL has `t=72692873711`.
+- **Step forward.** Press →. Run `$CCV key ArrowRight --after cc-tl-step`. `timeline` reads `72692.873711 ms / 91930.364906 ms · window 1.519 s`; the URL has `t=72692873711`.
 - **Step back.** Press ←. Run `$CCV key ArrowLeft`. `timeline` reads `71088.037123 ms`.
 - **Zoom on the strip.** Wheel up over the strip. Run `$CCV wheel --css "#detail" --dy -240 --steps 3 --after cc-tl-zoom`. `timeline` ends `window 516.011 ms`; `grain` is `iteration`.
-- **Step at the new grain.** Press →. Run `$CCV key ArrowRight`. `cursor` is `{t: 71117821110, id: 8726}`; `#grain` reads `grain: iteration · 9 in view`.
-- **One tier coarser.** Press Shift+→. Run `$CCV key ArrowRight --mods shift`. `cursor` is `{t: 72692873711, id: 51247}`, the next request.
-- **Every row.** Press Alt+→. Run `$CCV key ArrowRight --mods alt`. `cursor` is `{t: 72692873711, id: 51248}`: the same start, the next id.
+- **Step at the new grain.** Press →. Run `$CCV key ArrowRight`. `cursor` is `{t: 71117821110, id: 9204}`; `#grain` reads `grain: iteration · 9 in view`.
+- **One tier coarser.** Press Shift+→. Run `$CCV key ArrowRight --mods shift`. `cursor` is `{t: 72692873711, id: 51752}`, the next request.
+- **Every row.** Press Alt+→. Run `$CCV key ArrowRight --mods alt`. `cursor` is `{t: 72692873711, id: 51753}`: the same start, the next id.
 - **Natural window.** Press 0. Run `$CCV key 0`. `timeline` ends `window 10.247 s`; `grain` is `request`.
-- **Focus a level.** Press 4. Run `$CCV key 4 --after cc-tl-focus-4`. `focus_level` is `4 Iteration`, `timeline` ends `window 5.503 ms`, `#grain` reads `grain: stage · 52 in view`.
-- **Coarser and finer level.** Press ↑, then ↓. Run `$CCV key ArrowUp`: `focus_level` `3 Trace`, `window 10.247 s`. Run `$CCV key ArrowDown`: `focus_level` `4 Iteration`, `window 5.503 ms`.
+- **Focus a level.** Press 4. Run `$CCV key 4 --after cc-tl-focus-4`. `focus_level.name` is `Iteration`, `timeline` ends `window 5.503 ms`, `#grain` reads `grain: stage · 52 in view`.
+- **Coarser and finer level.** Press ↑, then ↓. Run `$CCV key ArrowUp`: `focus_level.name` `Trace`, `window 10.247 s`. Run `$CCV key ArrowDown`: `focus_level.name` `Iteration`, `window 5.503 ms`.
 - **Scrub.** Press 3, then drag on the strip. Run `$CCV key 3` and `$CCV drag --css "#detail" --by 120,0 --after cc-tl-scrub`. `cursor` is `{t: 78803919740, id: -1}`: an integer ns, no row.
-- **Select a row.** Click its label. Run `$CCV click --text "http11.receive_response_body" --exact --force --after cc-tl-select`. `sel` is `51324`; the URL has `sel=client/transport/measured/http11.receive_response_body#0`.
-- **Back and Forward.** Run `$CCV back`: `sel` is `-1` and the URL has no `sel`. Run `$CCV forward`: `sel` is `51324` again.
+- **Select a row.** Click its label. Run `$CCV click --text "http11.receive_response_body" --exact --force --after cc-tl-select`. `sel` is `51830`; the URL has the eid, URL-encoded: `sel=client%2Ftransport%2Fmeasured%2Fhttp11.receive_response_body%230`.
+- **Back and Forward.** Run `$CCV back`: `sel` is `-1` and the URL has no `sel`. Run `$CCV forward`: `sel` is `51830` again.
 - **Clear.** Press Esc. Run `$CCV key Escape`. `sel` is `-1`.
 - **Help.** Press ?. Run `$CCV key ? --after cc-tl-help`. `$CCV eval '!document.querySelector("#help").hidden'` returns `true`. Run `$CCV key Escape`; it returns `false`.
 - **Play.** Choose ▶ play. Run `$CCV click --css "#play"`. `playing` is `true` and `#play` reads `⏸ pause`. A `state` read 1.5 s later shows the cursor about 2.1 s further (time pace plays the 10.247 s window in 8 s); the URL `t` trails it by at most 150 ms.
 - **Pause.** Choose ⏸ pause. Run `$CCV click --css "#play" --after cc-tl-paused`. `playing` is `false`; the URL `t` equals `cursor.t`.
-- **A kernel and its Nsight Systems target.** Run `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52&t=72750000000&f=5"`: `timeline` `72750.000000 ms / 85717.066124 ms · window 294.1 µs`, `grain` `device`, `focus_level` `5 Model ops`. Run `$CCV click --text "internal::gemvx::kernel" --exact --force --after cc-tl-kernel` (the first of three; at this height the label shows the full kernel name). After 1 s, `$CCV eval 'CC.control.frame.selRow.open.nsys'` returns `run` `I02A-TRACE-timeline_20261107T172848Z_f2ac52`, `path` `trace/timeline.nsys-rep`, `t` `[4642867724, 4642917580]`; the URL has `sel=kernel/i77/kernel#2`.
+- **A kernel and its Nsight Systems target.** Run `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52&t=72750000000&f=5"`: `timeline` `72750.000000 ms / 91930.364906 ms · window 294.1 µs`, `grain` `device`, `focus_level.name` `Model ops`. Run `$CCV click --text "internal::gemvx::kernel" --exact --force --after cc-tl-kernel` (the first of three; at this height the label shows the full kernel name). After 1 s, `$CCV eval 'CC.control.frame.selRow.open.nsys'` returns `run` `I02A-TRACE-timeline_20261107T172848Z_f2ac52`, `path` `trace/timeline.nsys-rep`, `t` `[4642867724, 4642917580]`; `sel` is `59177`; the URL has `sel=kernel%2Fi77%2Fkernel%232`.
 - **A live run (only when the task allows a rep run).** From the main checkout, with no `ie-i02a-*` container, run
   `make rep REP=I02A-L1_streamed_latency TRACE=components` in the background. When `/api/v3/runs` lists a new run
   with `status` `live`, run `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=<run>&f=3"`. For about

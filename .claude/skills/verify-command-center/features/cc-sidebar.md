@@ -20,7 +20,7 @@ samples in the run are left out and counted in a note.
 
 Preconditions:
 
-- Baseline. Results taken on 2026-11-08 in a half tile (1259 x 1301), generation 12. 13 rows: DRAM read, DRAM write,
+- Baseline. Results taken on 2026-11-08 in a half tile (1259 x 1301), generation 12, re-checked at generation 13 (2026-11-09). 13 rows: DRAM read, DRAM write,
   GPC clock, PCIe RX, PCIe TX, SMs active, tensor cores active (Nsight Systems), and SM clock, GPU memory used, power,
   GPU temperature, GPU utilization, memory controller utilization (nvidia-smi).
 
@@ -28,7 +28,7 @@ Preconditions:
   `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52&t=72717916267&f=7"`.
   Read the rows with
   `$CCV eval 'JSON.stringify([...document.querySelectorAll("#hw .hwrow")].map(r => r.querySelector(".nm").textContent + " = " + r.querySelector(".val").textContent))'`.
-  It returns `DRAM read = 77 %`, `DRAM write = 1.0 %`, `GPC clock = invalid`, `SMs active = 86 %`,
+  It returns `DRAM read = 77 %`, `DRAM write = 1.0 %`, `GPC clock = 2790 MHz`, `SMs active = 86 %`,
   `tensor cores active = 16 %`, `SM clock = 2610 MHz`, `GPU memory used = 9678 MiB`, `power = 37.3 W`.
 - **Step.** Press → twice. Run `$CCV key ArrowRight` twice. The cursor is `72717954304`; the rows read
   `DRAM read = 94 %`, `DRAM write = 3.0 %`, `SMs active = 100 %`, `tensor cores active = 26 %`; the nvidia-smi rows
@@ -40,8 +40,9 @@ Preconditions:
 
 ## Gotchas
 
-- `GPC clock` is always `invalid`: the run's Nsight Systems export holds only negative values. The row's why text names
-  the recorded value, for example `the source recorded -1505403904 MHz, not a valid reading`.
+- `GPC clock` reads a number from generation 13: the export holds only negative values, and the importer decodes them
+  as unsigned Hz. A negative value in %, MHz, W or MiB still reads `invalid`, and the row's why text names the recorded
+  value (`the source recorded <value> <unit>, not a valid reading`).
 - nvidia-smi `GPU utilization` can read `0.0 %` while `SMs active` reads 86 %: they come from different tools and
   sample periods, and the sidebar shows each as recorded.
 - The sidebar is not a level: it updates on every cursor change whatever the focused level.

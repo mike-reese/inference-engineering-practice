@@ -25,7 +25,7 @@ ask the host runner to open a report in Nsight Systems or Nsight Compute. Tab, d
 
 Preconditions:
 
-- Baseline. Values below were taken on 2026-11-08, generation 11, and reproduced at generation 12. Sizes are from a half tile (1259 x 1301); the tab
+- Baseline. Values below were taken on 2026-11-08, generation 11, reproduced at generation 12; row ids and counts below are from generation 13 (2026-11-09). Sizes are from a half tile (1259 x 1301); the tab
   contents match a full tile (2534 x 1301, session `cc-step4-v3`).
 - `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52&t=72714460148&f=6"`.
 
@@ -40,11 +40,11 @@ Preconditions:
   `…-warmup · 33 metrics` (the cursor's request has none); then `unavailable (2)` and `measures (definitions)`. Its
   first rows are `client TTFT 1296.14 ms first token event - send …` and `client headers 60.7146 ms …`.
 - **Select a metric input.** Run `$CCV click --css "#fbody details[open] button[data-sel]" --after cc-insp-metric-sel`
-  (the first of 58). `sel` is `8666`, eid `client/sdk/warmup/send#0`. Screenshot:
+  (the first of 58). `sel` is `9143`, eid `client/sdk/warmup/send#0`. Screenshot:
   `cc-step4-v3/s4-metric-input-select.png`.
 - **Light a metric's inputs.** Open the run at `t=71200000000&f=3`, choose Metrics, and hover the row
   `TTFT remainder`: `$CCV hover --text "TTFT remainder" --exact --after cc-insp-light`.
-  `$CCV eval 'CC.control.frame.lit'` returns `[8666, 14396, 8761, 12816]` (send, event: token, arrival_time,
+  `$CCV eval 'CC.control.frame.lit'` returns `[9143, 14888, 9239, 13307]` (send, event: token, arrival_time,
   first_token_time). Level 3 draws four magenta boxes (`CC.scene.levels[2].litN` is `4`). Press 1: the tiles `sdk`,
   `executor` and `llm_api` get magenta borders. Press 2: the boxes `send_one` and `OpenAI SDK` do. Both timeline
   strips mark the four starts. Levels 4 and 5 draw none (`litN` `0`): no input lies in level 4's iteration window,
@@ -54,7 +54,7 @@ Preconditions:
 - **Tokens.** Run `$CCV click --role tab --name "Tokens" --exact`. It reads
   `…-measured · 63 token events · 63 on the wire. Text: When the KV (Key-Value) cache grows, …`.
 - **Kernels.** Run `$CCV click --role tab --name "Kernels" --exact`. It reads `iteration 67 · 310 device ops · 4.753 ms
-  from its scheduler stamp to the end of its device work · 235 with Nsight Compute counters`, then the buttons
+  from its scheduler stamp to the end of its device work · 266 with Nsight Compute counters`, then the buttons
   `Nsight Systems ↗` and `Nsight Compute ↗`, then a table whose row 2 is
   `kernel: unrolled_elementwise_kernel 1×1×1 × 128×1×1 1.2 …`.
 - **Run.** Run `$CCV click --role tab --name "Run" --exact`. The results row reads
@@ -62,7 +62,7 @@ Preconditions:
   `2 of 3 requests have no calculated metrics in aux.json.`
   `$CCV eval 'JSON.stringify([...document.querySelectorAll("#fbody [data-open]")].map(b => [b.textContent, b.dataset.open]))'`
   returns `Nsight Systems report ↗` with `{"run":"I02A-TRACE-timeline_20261107T172848Z_f2ac52","path":"trace/timeline.nsys-rep"}`.
-- **Raw record.** On Selected with row 8666 selected, run `$CCV click --text "raw record"` and
+- **Raw record.** On Selected with row 9143 selected, run `$CCV click --text "raw record"` and
   `$CCV click --role button --name "load the raw record" --after cc-insp-raw`.
   `$CCV eval 'document.querySelector("#fbody [data-raw-out]")?.textContent'` returns `84183357509013`.
 - **Enlarge.** Run `$CCV click --css "#fbig"`. The body class is `dock-bottom fly-big`; the inspector is 989 x 567 and
@@ -93,5 +93,5 @@ Preconditions:
   `document.body.className` instead.
 - Only the warmup request has metrics in `aux.json`; for the measured request the Metrics tab opens the warmup group
   and says the cursor's request has none.
-- The Kernels and Selected tabs fetch detail rows after the first render; wait about a second before reading them.
+- The Kernels, Selected and Tokens tabs fetch detail rows after the first render; wait about a second before reading them.
 - In a half tile, right dock plus ⤢ leaves the stage 208 px wide.

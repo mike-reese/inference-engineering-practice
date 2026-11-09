@@ -8,12 +8,12 @@ matching feature file. `$CCV` is `devtools/verify/ccv` in the main checkout. The
 
 - `docker start ie-devtools-v2scene` is up, and the host runner is up (`make runner` in the main checkout).
 - `$CCV doctor` passes: the browser is ours, the app answers at `http://127.0.0.1:7710`, the v3 store
-  (`/api/v3/runs`) lists its runs (18 on 2026-11-08; every rep run adds one), the runner answers, and the scene is
+  (`/api/v3/runs`) lists its runs (25 on 2026-11-09; every rep run adds one), the runner answers, and the scene is
   READY.
 - `$CCV open side` loads the v3 page without a hash on the newest run in the store, which changes with every rep run.
   Recipes therefore open their run by URL. The timeline run `I02A-TRACE-timeline_20261107T172848Z_f2ac52` is
-  generation 12 on 2026-11-08: `#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52` opens it at
-  `timeline` `71088.037123 ms / 85717.066124 ms · window 1.519 s`, `focus_level` `3 Trace`.
+  generation 13 on 2026-11-09: `#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52` opens it at
+  `timeline` `71088.037123 ms / 91930.364906 ms · window 1.519 s`, `focus_level.name` `Trace`.
 - A fresh `launch` has a fresh profile: the inspector is docked at the bottom at normal size on its `Selected` tab
   (`$CCV state` → `dock` `bottom`, `flyout_tab` `selected`). Dock, size and tab persist per profile in
   `localStorage["cc.inspector"]`.

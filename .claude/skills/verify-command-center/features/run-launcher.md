@@ -21,7 +21,7 @@ on the host runner. The right side follows a job's steps and output, with links 
 
 Preconditions:
 
-- Baseline; `$CCV open side` done; `$CCV doctor` reports the runner ok.
+- Baseline; `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` done (`$CCV open side` opens the v3 page); `$CCV doctor` reports the runner ok.
 - The runner's job history has jobs 1 to 3 (I02A-L1, 2026-11-03). Check with `curl -s "127.0.0.1:7701/runner/jobs?limit=3"`; on another history, use an existing job id.
 - `run-start` only when the task or Mike asks for a run: the GPU is shared.
 
@@ -35,6 +35,10 @@ Preconditions:
 ## Gotchas
 
 - The jobs list is below the visible part of the flyout; `ccv` scrolls it into view before clicking, as a user would.
-- The job panel shows the newest job until a job link is chosen.
+- The job panel shows the running job, else the newest, until a job link is chosen.
+- The action button reads `Queue` while a job is running or queued (`views/run.js`). With nothing running or queued
+  and the rep's containers present, it is disabled and `ccv` names it by its `title` (`containers exist: …`), not `Start`.
+- `POST /runner/jobs` with `"dry_run": true` returns the job with `state` `dry run` and `id` null and starts nothing
+  (checked 2026-11-09). The Run tab never sends it, so it does not verify the button.
 - `run-start` has not been verified (no run was authorized, 2026-11-08). Report it as unverified until a run is asked for.
 - A finished run does not appear in the v2 scene: the v2 store is imported by hand (gap T4). Check it in the Runs tab.

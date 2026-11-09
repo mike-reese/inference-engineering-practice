@@ -23,7 +23,7 @@ Hardware. A user frames a level with its header button, zooms with the mouse whe
 
 Preconditions:
 
-- Baseline; `$CCV open side` done.
+- Baseline; `$CCV open "http://127.0.0.1:7710/static/prototypes/D5v2/side/index.html"` done (`$CCV open side` opens the v3 page).
 
 - **Frame Infrastructure.** Choose `1 Infrastructure`. Run `$CCV click --role button --name "1 Infrastructure" --exact --after nav-1`. `$CCV state` shows `focus_level` `{"index": 0, "name": "Infrastructure"}` and camera `target` `[0, 0, 0]`.
 - **Frame Components.** Choose `2 Components`. Run `$CCV click --role button --name "2 Components" --exact --after nav-2`. `focus_level.index` is `1`; `target` is `[11500, 0, 0]`.
@@ -42,4 +42,4 @@ Preconditions:
 
 - Camera heights depend on the window size that Hyprland gives the browser; assert directions and target x values, not heights.
 - Zoomed fully out, the side layout shrinks to a dot (gap P1): an empty-looking screenshot there is the current behavior, not a load failure.
-- The camera reaches the URL (`z=`) after a 120 ms debounce. Use `wait`, not a read straight after the action.
+- The camera reaches state 120 ms after it stops and the URL (`z=`) 150 ms after that. Use `wait`, not a read straight after the action.
