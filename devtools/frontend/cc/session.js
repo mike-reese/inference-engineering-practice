@@ -24,18 +24,19 @@ export const ttftSegments = (result) => {
 export const resultFile = (rep) => rep?.moments?.result ?? "latency.json";
 /** How the shell shows a result, by its file. cols(result): the table's columns, each a base path into the result;
  *  rows: [label, leaf path, or {column: leaf path}]; marker(result, request): the Load panel's [label, TTFT path];
- *  fromRows: the [row, column] cell compare recomputes from the store's client rows (7.4). */
+ *  fromRows(request): the [row, column] cell compare recomputes from the store's client rows (7.4). */
 const RESULT_VIEWS = {
   "latency.json": {
     cols: () => [["client", "#7cc4ff"], ["wire", "#58d68d"], ["engine", "#f5a623"]].map(([name, color]) => ({ name, base: name, color })),
     rows: [["TTFT", "ttft_ms"], ["Mean ITL", "mean_itl_ms"], ["End-to-end", { client: "e2e_ms", wire: "done_ms", engine: "e2e_ms" }]],
     marker: () => ["TTFT", "client.ttft_ms"],
-    fromRows: ["TTFT", "client"],
+    fromRows: () => ["TTFT", "client"],
   },
   "readout.json": {
     cols: (r) => Object.keys(r?.clients ?? {}).map((k) => ({ name: k, base: `clients.${k}.durations` })),
     rows: [["Headers", "headers_ms"], ["TTFT", "ttft_ms"], ["End-to-end", "e2e_ms"]],
     marker: (r, request) => [`TTFT ${request}`, `clients.${request}.durations.ttft_ms`],
+    fromRows: (request) => ["TTFT", request],
   },
   "analysis/summary.json": {
     cols: (r) => (r?.pooled ?? []).map((p, i) => ({ name: `ISL ${p.isl}`, base: `pooled[${i}]` })),
@@ -53,7 +54,7 @@ export function resultTable(rep, results) {
   const has = (p) => results.some((r) => isNum(valueAt(r, p)));
   const rows = v.rows.map(([label, leaf]) => ({ label, path: Object.fromEntries(all.map((c) => [c.name, `${c.base}.${typeof leaf === "string" ? leaf : leaf[c.name]}`])) }))
     .filter((r) => all.some((c) => has(r.path[c.name])));
-  return { file, cols: all.filter((c) => rows.some((r) => has(r.path[c.name]))), rows, fromRows: v.fromRows };
+  return { file, cols: all.filter((c) => rows.some((r) => has(r.path[c.name]))), rows, fromRows: v.fromRows?.(rep?.moments?.request) };
 }
 /** The Load panel's TTFT marker of a run result: {label, value, file}, null when the file has no layout or no TTFT. */
 export function ttftMark(rep, result) {

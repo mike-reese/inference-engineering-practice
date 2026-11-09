@@ -13,12 +13,14 @@ function eventRow(S, event, suffix) {
   return -1;
 }
 /** Client TTFT from a run's client rows, as latency.py defines it: the request's first "event: token" client event
- *  minus its "send" client event, in ms. null when the run holds neither. */
+ *  minus its "send" client event. {ms}, or {why} naming the row the run lacks. */
 function clientTtft(S, suffix) {
   const req = S.requests.findIndex((r) => r.endsWith(suffix)), kind = S.kinds.find((k) => k.name === "client event")?.code;
   const at = (name) => { for (const id of S.allRows) if (S.field("req", id) === req && S.field("kind", id) === kind && S.nameText(S.field("name", id)) === name) return S.startOf[id]; return null; };
-  const send = req < 0 ? null : at("send"), token = send == null ? null : at("event: token");
-  return token == null ? null : (token - send) / 1e6;
+  if (req < 0) return { why: `no request ${suffix}` };
+  const send = at("send"); if (send == null) return { why: "no send row" };
+  const token = at("event: token"); if (token == null) return { why: "no token event" };
+  return { ms: (token - send) / 1e6 };
 }
 const SEG_COL = { "client → pcap": "#7cc4ff", "pcap → engine": "#58d68d", engine: "#f5a623", "engine → pcap": "#58d68d", "pcap → client": "#7cc4ff" };
 
@@ -99,9 +101,11 @@ export function mount(el) {
     return `<table class="res"><tr><th></th><th>A</th><th>B</th><th>B − A</th><th>%</th></tr>${rows}</table>
       <p class="muted src">${t.fromRows ? `${t.fromRows.join(" ")}: recomputed from each run's client rows in the store (first token event − send). Other rows: the runs' ${esc(t.file)}.` : `Values from the runs' ${esc(t.file)}.`}</p>`;
   }
-  function delta(va, vb) {
+  /** whyA, whyB: shown in place of a missing value, saying why it is missing. */
+  function delta(va, vb, whyA, whyB) {
     const d = va != null && vb != null ? vb - va : null, cls = d > 0 ? "up" : d < 0 ? "down" : "";
-    return `<td>${fmtMs(va)}</td><td>${fmtMs(vb)}</td><td class="${cls}">${d == null ? "–" : `${d > 0 ? "+" : ""}${d.toFixed(3)}`}</td>
+    const cell = (v, why) => `<td>${v == null && why ? `<span class="none">${esc(why)}</span>` : fmtMs(v)}</td>`;
+    return `${cell(va, whyA)}${cell(vb, whyB)}<td class="${cls}">${d == null ? "–" : `${d > 0 ? "+" : ""}${d.toFixed(3)}`}</td>
       <td class="${cls}">${d == null || !va ? "–" : `${d > 0 ? "+" : ""}${(100 * d / va).toFixed(1)}%`}</td>`;
   }
 
@@ -158,7 +162,8 @@ export function mount(el) {
       </div>`;
     if (b) Promise.all([openedStore(ss.run), openedStore(ss.runB)]).then(([SA, SB]) => {
       const tr = box.querySelector('tr[data-rows="ttft"]'), req = rep.moments?.request ?? "measured";
-      if (state.session === ss && tr) tr.innerHTML = tr.firstElementChild.outerHTML + delta(SA && clientTtft(SA, req), SB && clientTtft(SB, req));
+      const [ta, tb] = [SA, SB].map((S) => (S ? clientTtft(S, req) : { why: "run not open" }));
+      if (state.session === ss && tr) tr.innerHTML = tr.firstElementChild.outerHTML + delta(ta.ms, tb.ms, ta.why, tb.why);
     });
   }
   const unsub = subscribe((s, ch) => { if (ch.session) render(s); });
