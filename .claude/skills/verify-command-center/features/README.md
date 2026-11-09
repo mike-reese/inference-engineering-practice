@@ -80,6 +80,9 @@ focus; 1-6 tier; P paired; W world; D dock; Space play; T pace; `[` `]` back and
 - `devtools/verify/regress.sh` (51 checks) and `devtools/verify/walkthroughs.sh` (section 5: 79 checks on R1 and
   I02C) check these recipes' numbers against the store and the results files. Set `CC_URL` (and `CC_STORE` for the
   walkthroughs) to the server you verify.
+- `devtools/verify/motion.sh` (22 checks) checks the data movement of `cc-architecture.md` (packets, beam) and
+  `cc-stacked.md` (GPU stream) while playing: paint rate, mover paths and recorded motion (SKILL.md, Watching an
+  animation).
 
 ## Feature entry contract
 

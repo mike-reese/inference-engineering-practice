@@ -16,7 +16,8 @@ part's tier. The lens on the stage shows the architecture view and collapses.
 - `stk-labels` CSS2D labels `#stage .sw-lbl`: `big` parts, `proc` plates (`proc on` while the process has a live
   row or GPU work at the cursor), `proc box` containers (name, `container`, Docker CPU sample), `pulse` (the unit at
   the cursor), `stat` (utilization text, `launches GPU work` on the tether of the process whose GPU work is live).
-- `stk-motion` the in-GPU stream moves while playing and between kernels (`$CCV record`).
+- `stk-motion` the in-GPU stream moves while playing and between kernels (`$CCV record`); `devtools/verify/motion.sh`
+  checks it moves at 60 Hz.
 - `stk-live` concurrent work: each lit plate, container, device and particle takes the flow colour of its own row.
 - `stk-tiers` with hardware focused, keys 1 to 6 set the tier; `.ch-focus .t` and `.d` name it.
 - `stk-pick` a click on a part's mesh selects it (`__cc.sel` is the part's key) and sets its hardware tier.

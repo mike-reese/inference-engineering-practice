@@ -17,6 +17,9 @@ below it holds the request, phase and kernel rows on one time axis, and a beam j
 - `arch-strip` `#stage .aw .strip`: `rect.u[data-l=i]` selects a row, `[data-fit]` toggles `[fit]` and `[run]`, a
   click on empty space seeks.
 - `arch-beam` `#stage .aw .beam path` from the strip to the lit box or card.
+- `arch-motion` while playing, a packet (`.compmap .packet`) glides from the previous box to the new one over 300 ms
+  (about 18 frames), and the beam's dot (`.aw .beam circle`) follows the cursor along the strip, at 60 Hz.
+  `devtools/verify/motion.sh` checks both.
 
 ## How to get to it (user POV)
 
@@ -61,3 +64,5 @@ Preconditions:
 - A box click selects that box's phase at or after the cursor, so `t` moves forward.
 - A strip seek lands between rows, so `t` can be fractional.
 - `walkthroughs.sh` checks the lit boxes and the forward box's busy state at the ASGI headers against the store.
+- Packets fire only when the phases at the cursor change. Whole-run bounds at time pace cut most trips short (a newer
+  packet of the same flow replaces one in flight); event pace gives full trips, with the map still between them.

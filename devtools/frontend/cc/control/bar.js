@@ -41,6 +41,9 @@ const CSS = `
 .b-strips { padding:0 8px 6px; display:grid; gap:3px; }
 .b-strips svg { width:100%; display:block; border-radius:3px; background:#101216; }
 .b-over { height:14px; cursor:pointer; } .b-detail { height:40px; cursor:crosshair; touch-action:none; }
+/* own compositor layer: its 1000-2000 rows were overlap-tested against the sidebar's cursor layers every frame,
+   which held playback in every world to ~24-40 fps (motion.sh) */
+.b-detail { will-change:transform; }
 .b-strips line, .b-strips rect.mk { vector-effect:non-scaling-stroke; }
 .b-grip { position:absolute; z-index:5; }
 body.dock-bottom .b-grip { left:0; right:0; top:-3px; height:6px; cursor:ns-resize; }
@@ -259,9 +262,11 @@ export function mountBar(el) {
     for (const id of metricInputs()) if (id < S.N && S.startOf[id] >= a && S.startOf[id] <= b) lit += `<rect x="${X(S.startOf[id])}" width="${Math.max(VW / 300, X(Math.min(b, S.endOf[id])) - X(S.startOf[id]))}" y="0" height="40" fill="#ff3df0" opacity=".22"/>`;
     // the focused tier's stops in the window; past a few per pixel, one line per pixel
     const st = stops(), k0 = lowerT(st.t, a), k1 = upperT(st.t, b), n = k1 - k0;
-    let lines = "";
-    if (n <= 4 * W) for (let k = k0; k < k1; k++) lines += `<line x1="${X(st.t[k])}" x2="${X(st.t[k])}" y1="0" y2="40" stroke="${col}" stroke-width="${n > 200 ? 1 : 2}" opacity=".9"/>`;
-    else { let last = -1; for (let k = k0; k < k1; k++) { const p = Math.floor((X(st.t[k]) / VW) * W); if (p !== last) { last = p; lines += `<line x1="${(p / W) * VW}" x2="${(p / W) * VW}" y1="0" y2="40" stroke="${col}" stroke-width="1" opacity=".9"/>`; } } }
+    // one path, not a <line> per stop: re-rastering ~900 lines on each play-event mark held event pace near 28 fps
+    let d = "";
+    if (n <= 4 * W) for (let k = k0; k < k1; k++) d += `M${X(st.t[k])} 0V40`;
+    else { let last = -1; for (let k = k0; k < k1; k++) { const p = Math.floor((X(st.t[k]) / VW) * W); if (p !== last) { last = p; d += `M${(p / W) * VW} 0V40`; } } }
+    const lines = d ? `<path d="${d}" fill="none" vector-effect="non-scaling-stroke" stroke="${col}" stroke-width="${n <= 4 * W && n <= 200 ? 2 : 1}" opacity=".9"/>` : "";
     const sel = selRow(s.sel) != null && selRow(s.sel) < S.N ? S.startOf[selRow(s.sel)] : null;
     detail.setAttribute("viewBox", `0 0 ${VW} 40`);
     detail.innerHTML = `<rect x="${X(b0)}" width="${X(b1) - X(b0)}" y="0" height="40" fill="#ffd36b" opacity=".08"/>

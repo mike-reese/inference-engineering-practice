@@ -115,6 +115,15 @@ The command prints the summary of `motion.json` with the three paths. Read it th
   recording proves little; the Stacked recipe computes the GPU board's box from its labels (`features/cc-stacked.md`).
 - Always look at the sheet before reporting: the numbers say that pixels changed, the sheet says what changed.
 
+`devtools/verify/motion.sh` is the regression check for data movement (22 checks, about 2 minutes). It plays R1 in
+three views (component map packets, container beam, Stacked GPU stream) and checks three things: the paint rate
+(`record` and the page's own frame intervals, 60 Hz), the moving parts' paths (`devtools/verify/movers.js`, a
+read-only per-frame sampler: packet trips must glide over about 18 frames, the beam dot must follow the cursor), and
+`record`'s motion numbers. Run it after any change to the worlds, the bar, the sidebar or anything painted every
+frame. Movement alone is not enough: on 2026-11-09 every view still moved but painted at 8 to 40 fps, because the
+bar's detail strip (1000-2000 elements) was overlap-tested against the sidebar's cursor layers each frame. Set
+`CC_URL` to the server you verify.
+
 - For performance claims, use `$CCV perf`: draw time and input-to-frame latency recorded by the page.
 - Report a path you could not reach with the command that failed and the unmet precondition. Never report it as verified through a different path.
 
