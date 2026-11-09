@@ -133,6 +133,17 @@
     "pcie.link.gen.current": "generation"
    },
    "evidence": "Observed: nvidia-smi query every 100 ms (gpu.csv)"
+  },
+  {
+   "match": {
+    "track": "prometheus"
+   },
+   "units": {
+    "trtllm_request_queue_time_seconds_sum": "s",
+    "trtllm_request_queue_time_seconds_count": "requests",
+    "trtllm_request_success_total": "requests"
+   },
+   "evidence": "Observed: the rep's own /prometheus/metrics scrapes before and after its measured requests (prometheus_baseline.txt, prometheus_final.txt; run.json spans prometheus/<scrape>/line <n>), CLOCK_MONOTONIC at the scrape's end; each series summed over its label sets"
   }
  ],
  "links": [

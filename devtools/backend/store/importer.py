@@ -58,6 +58,7 @@ from .adapters.engine import ITER_CAPTURE, ITER_FILE, EngineIterations, EngineRe
 from .adapters.gpu import FILE as GPU_CSV, TRACK as GPU_TRACK, CsvTail, parse as parse_gpu
 from .adapters.ncu import NcuHeadline, labels as read_labels, profile_run_for
 from .adapters.nsys import FORWARD_STEP, Nsys
+from .adapters.prometheus import series as prometheus_series
 from .adapters.stamps import (FILE as STAMPS, INFERRED_ITERATION_BOX, MESSAGE_SOURCES, SRC, ServerStamps,
                               add_iteration, message_comp)
 from .adapters.torch import Torch
@@ -179,9 +180,10 @@ def _import(run_dir: Path, root: Path, reg: Registry, repo: Path, force: bool) -
 
 
 # ---------------------------------------------------------------------- sources
-def read_sources(ctx: Ctx, run_dir: Path, root: Path, labels: dict, notes: dict) -> tuple[Rows, list, dict, list]:
+def read_sources(ctx: Ctx, run_dir: Path, root: Path, labels: dict, rj: dict,
+                 notes: dict) -> tuple[Rows, list, dict, list]:
     """Every source's rows (concatenated in this order: the source order of equal starts), launch links, the
-    request of an iteration (engine records), and sample series."""
+    request of an iteration (engine records), and sample series. rj: the run's run.json ({} without one)."""
     rows, links, series = Rows(), [], []
 
     def take(adapter, got: Rows) -> None:
@@ -238,14 +240,15 @@ def read_sources(ctx: Ctx, run_dir: Path, root: Path, labels: dict, notes: dict)
     if (run_dir / GPU_CSV).is_file():
         rule = reg_samples(ctx.reg, "run_json")
         reads = parse_gpu(CsvTail(run_dir / GPU_CSV).read(final=True))
-        ts = np.array([r[1] for r in reads], np.int64)
         for m in rule["units"]:
-            have = np.array([m in r[2] for r in reads], bool)
-            if have.any():
+            kept = [r for r in reads if m in r[2]]
+            if kept:
                 series.append({"track": rule["match"]["track"], "metric": m, "thing": rule["thing"],
-                               "unit": rule["units"][m], "evidence": rule["evidence"], "ts": ts[have],
-                               "values": np.array([r[2][m] for r in reads if m in r[2]], np.float64),
-                               "span_ids": [f"gpu/sample/{r[0]}" for r in reads if m in r[2]]})
+                               "unit": rule["units"][m], "evidence": rule["evidence"],
+                               "ts": np.array([r[1] for r in kept], np.int64),
+                               "values": np.array([r[2][m] for r in kept], np.float64),
+                               "spans": {f"gpu/sample/{r[0]}": k for k, r in enumerate(kept)}})
+    series += prometheus_series(ctx, rj.get("spans", []))
     notes["nsys session"] = None if nsys is None else nsys.session_utc_ns
     return rows, links, {"engine": er, "nsys": nsys}, series
 
@@ -273,7 +276,7 @@ def sample_groups(series: list[dict], reg: Registry, pos_of: dict) -> tuple[list
                              "samples rule declares")
         key = (s["track"], hashlib.sha256(s["ts"].astype(np.int64).tobytes()).hexdigest())
         g = by_key.setdefault(key, {"track": s["track"], "ts": s["ts"].astype(np.int64), "metrics": [], "values": [],
-                                    "series": [], "span_ids": s.get("span_ids")})
+                                    "series": []})
         g["metrics"].append(s["metric"])
         g["values"].append(s["values"].astype(np.float64))
         g["series"].append(s)
@@ -376,8 +379,9 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     clk = clock(run_dir, root)
     ctx = Ctx(run, run_dir, reg, clk["wall_offset_ns"], stamped=labels.get("stamps") is True)
     notes: dict = {}
+    rj = json.loads((run_dir / "run.json").read_bytes()) if (run_dir / "run.json").is_file() else {}
     try:
-        src, launch, by, series = read_sources(ctx, run_dir, root, labels, notes)
+        src, launch, by, series = read_sources(ctx, run_dir, root, labels, rj, notes)
     except KeyError as e:
         raise ImportStop(f"{run}: {e.args[0]}") from None
     caps, cap_stats = read_captures(root, ctx)
@@ -558,10 +562,10 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     # Samples, run.json metrics (inputs by span id), guard
     groups, catalog = sample_groups(series, reg, pos_of)
     groups += capture_groups(caps, cap_stats, reg, pos_of, catalog)
-    rj = json.loads((run_dir / "run.json").read_bytes()) if (run_dir / "run.json").is_file() else {}
     span_s = col("span_id")
     row_of_span = {s: i for i, s in enumerate(span_s.tolist()) if s}
-    sample_of_span = {sid: [g["name"], k] for g in groups if g.get("span_ids") for k, sid in enumerate(g["span_ids"])}
+    sample_of_span = {sid: [g["name"], k] for g in groups for s in g.get("series", [])
+                      for sid, k in s.get("spans", {}).items()}
     guard = {"run.json spans": len(rj.get("spans", [])), "matched": 0, "superseded (nsys, PyTorch, ncu)": 0}
     for sp in rj.get("spans", []):
         sid = sp["id"]
