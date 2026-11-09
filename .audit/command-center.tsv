@@ -53,3 +53,6 @@ ts	phase	decision	why	evidence	result
 2026-11-09T08:21:42Z	M1c	default: keep the verify skill's owner rule reworded to name the production page (D13 frozen reference, D5v2 legacy)	the cutover moves /static/cc to production; the old rule named the side-by-side page	m1c report	owner may restore wording
 2026-11-09T08:21:42Z	M1c	default: Stacked recipe clicks parts by coordinates found at run time	part labels take no clicks in D13 either; no element handle reaches a part	m1c report	owner may want handles added instead
 2026-11-09T08:21:42Z	M1c	ccv state reads window.__cc on the new page	only url/title/ready/viewport fields were valid	m1c report gap	follow-up agent
+2026-11-09T08:22:33Z	M3	merged m3-reps into cc-migration (88f33ba)	clean merge	git	merged; follow-ups on fix-work
+2026-11-09T08:22:33Z	M2	launched M2 agent in worktree m2-work with store copy store-m2 (:7717)	importer re-imports; a store copy keeps writes separate	scratchpad brief in prompt	running
+2026-11-09T08:22:33Z	fix	launched follow-up agent on fix-work (:7718): lint complete key, session.js segments, Rep results from the rep's result file, I01-L2 import into store-cc, ccv state	M3 gaps and M1c gap	m3 and m1c reports	running
