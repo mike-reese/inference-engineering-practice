@@ -32,20 +32,21 @@ check "launch: live mode, not a dry run" "$(ev '__cc.session.mode + " " + __cc.s
 echo "     job $(ev '__cc.session.live?.job'): waiting up to $WAIT s for the run's first rows"
 waited=0; state=""
 while [ $waited -lt "$WAIT" ]; do
-  [ "$(ev '__cc.session.mode === "live" && __cc.head > 0')" = True ] && break
+  [ "$(ev 'import("./control/control.js").then(m => !!m.store()?.live && __cc.head > 0)')" = True ] && break
   now=$(ev '__cc.session.live?.state + " " + (__cc.session.live?.note ?? "")')
   [ "$now" != "$state" ] && { state=$now; echo "     ${waited} s: $state"; }
   case "$now" in ok*|failed*|cancelled*) break;; esac   # the job ended before its run streamed
   sleep 2; waited=$((waited+2))
 done
-check "launch: the run streams rows (head > 0 within $WAIT s)" "$(ev '__cc.session.mode === "live" && __cc.head > 0')" "True"
+check "launch: the live run's store streams rows (head > 0 within $WAIT s)" "$(ev 'import("./control/control.js").then(m => !!m.store()?.live && __cc.head > 0)')" "True"
 [ $fail = 0 ] || { $C shot live-no-rows >/dev/null; done_; }
 
 h1=$(ev '__cc.head'); sleep 0.5
 check "launch: head moves" "$(real "$h1" && ev "__cc.head > $h1 && $h1 > 0")" "True"
 check "launch: follow keeps cursor at head" "$(ev 'Math.abs(__cc.t-__cc.head) <= __cc.head*0.2')" "True"
-# The mask is 0 while the view glides (220 ms) to new bounds and the head is still right of it: poll for up to 1 s.
-for _ in 1 2 3 4 5 6 7 8 9 10; do
+# The mask is 0 while the view glides to new bounds, and in the run's first seconds before a unit is open at the
+# head: poll for up to 15 s.
+for _ in $(seq 1 150); do
   mask=$(ev "+document.querySelector('#stage .sp2 svg rect[fill=\"#0b0f16\"]')?.getAttribute('width') > 0")
   [ "$mask" = True ] && break; sleep 0.1
 done
