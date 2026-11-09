@@ -9,6 +9,7 @@ import { state, subscribe, setTier, select, now, archName, store, units, metricI
 import { fmtValue, fmtBytes } from "../sidebar/samples.js";
 import { NONE16 } from "../store/columns.js";
 import { perf } from "../perf.js";
+import { unitLabel } from "./spine/bands.js";
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const CSS = `
@@ -342,7 +343,7 @@ export function mount(el) {
     pulseMat.color.copy(col); halo.material.color.copy(col); trail.forEach((m) => m.material.color.copy(col));
     stream.forEach((p) => p.m.material.color.copy(col)); packet.material.color.copy(col);
     pulseEl.style.setProperty("--pc", `#${col.getHexString()}`);
-    pulseEl.textContent = u ? stripName(S.nameText(S.field("name", u.id))) : `before the first ${E[s.tiers.execution]}`;
+    pulseEl.textContent = u ? stripName(unitLabel(S, E[s.tiers.execution], u.id)) : `before the first ${E[s.tiers.execution]}`;
     pulseEl.classList.toggle("sel", !!u && s.sel === u.id);
 
     for (const L of LBL) L.o.visible = !!L.show(hwT);
