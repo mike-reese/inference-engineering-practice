@@ -35,6 +35,7 @@ services:
       timeout: 2s
       retries: 3
       start_period: 120s
+      start_interval: 1s   # Docker probes at start_interval (default 5 s) during start_period; 5 s added up to 4.8 s to every cold start
   capture:
     build:
       context: ./capture

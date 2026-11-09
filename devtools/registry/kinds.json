@@ -96,7 +96,11 @@
     {"kind": "process start",        "tier": 0, "color": "#ebcb8b", "label": "process start",    "home": "Infrastructure",
      "place": {"execution": "detail", "hardware": "-", "architecture": "process (lifecycle stop)"}},
     {"kind": "inferred module",      "tier": 3, "color": "#81a1c1", "label": "inferred module",  "home": "Model ops", "derived": true,
-     "place": {"execution": "module", "hardware": "device (GPU)", "architecture": "software layer (toolkit)"}}
+     "place": {"execution": "module", "hardware": "device (GPU)", "architecture": "software layer (toolkit)"}},
+    {"kind": "container startup",    "tier": 0, "color": "#ebcb8b", "label": "startup",          "home": "Infrastructure", "derived": true,
+     "place": {"execution": "request (a container's cold start, no request)", "hardware": "-", "architecture": "container (startup span)"}},
+    {"kind": "startup phase",        "tier": 2, "color": "#ebcb8b", "label": "startup phase",    "home": "Infrastructure",
+     "place": {"execution": "phase", "hardware": "-", "architecture": "container (startup phases)"}}
   ],
   "link_kinds": [
     {"kind": "cuda launch", "cause": true,  "label": "launch"},

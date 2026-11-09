@@ -214,6 +214,7 @@ today). Counts per iteration come from section 10.
 | fleet | cluster, control plane, nodes | Kubernetes API (from I27) | per object event | missing until I27 |
 | node | one host (a Kubernetes node later) | inventory probe | static | measured |
 | container | client, server, network sidecar; lifecycle | Docker events (`container event` kind) | per event | measured |
+| container cold start | `container startup` span (Docker `start` to first health status, execution request band); `startup phase` rows inside it (execution phase band: imports, worker spawn, weight load, autotuner, CUDA graphs, HTTP up, healthcheck wait) | Docker events; `server_s<N>.log` markers per engine (`registry/server_log.json`) | per event; per log line (ns, UTC) | measured from 2026-11-09 (TensorRT-LLM markers only) |
 | process | `trtllm-serve` HTTP process, executor worker (MPI-spawned), `orted`, client | nsys pids, things tree | per process | measured in nsys runs |
 | component | the 26 boxes in `registry/components.json` (ASGI, LLM API, ZMQ, scheduler, forward, sampler, ...) | component stamps | per stamp | measured in stamped runs |
 | software layer | toolkit (Python, PyTorch ops) → runtime (CUDA runtime, driver) → device code (kernels) | row kind | per row | measured |

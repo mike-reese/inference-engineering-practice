@@ -10,7 +10,8 @@ the live path wrote has the same eid in the final generation:
   engine_iterations_raw.jsonl (or capture/)             engine iteration stats (adapters/engine.py)
   trace/*.sqlite                                        Nsight Systems rows and GPU metrics (adapters/nsys.py)
   trace/torch_trace.json                                PyTorch profiler rows (adapters/torch.py)
-  capture/docker.jsonl                                  container events (adapters/docker.py)
+  capture/docker.jsonl                                  container events and startup spans (adapters/docker.py)
+  server_s<n>.log                                       engine startup phases (adapters/server_log.py)
   gpu.csv; capture/gpu.jsonl, docker-stats.jsonl, engine.jsonl   samples (nvidia-smi, NVML, Docker stats, Prometheus)
   run.json spans prometheus/*                           samples-prometheus, the rep's own scrapes (adapters/prometheus.py)
   trackers/*.jsonl, gpu_apps.jsonl                      host, NVMe, uncore and GPU process samples, process starts
@@ -64,6 +65,7 @@ from .adapters.gpu import FILE as GPU_CSV, TRACK as GPU_TRACK, CsvTail, parse as
 from .adapters.ncu import NcuHeadline, labels as read_labels, profile_run_for, timeline_run_for
 from .adapters.nsys import FORWARD_STEP, Nsys
 from .adapters.prometheus import series as prometheus_series
+from .adapters.server_log import ServerLog
 from .adapters.stamps import (FILE as STAMPS, INFERRED_ITERATION_BOX, MESSAGE_SOURCES, SRC, ServerStamps,
                               add_iteration, message_comp)
 from .adapters.torch import Torch
@@ -81,6 +83,7 @@ SRC_CODE = ["schema.py", *(f"adapters/{x}.py" for x in ("client", "common", "com
 FACT_FILES = ("labels.json", "config.yaml", "basis.json", "topology.json", "latency.json", "perf_metrics.json",
               "efficiency.json")
 CLOCK = "capture/clock.json"
+SERVER_LOG = re.compile(r"server_s\d+\.log")
 NVML_CAPTURE = "capture/gpu.jsonl"
 NVML_EVIDENCE = ("Observed: NVML (nvidia-ml-py) read by the devtools backend while the run was live (store/nvml.py), "
                  "CLOCK_MONOTONIC at the read's return; capture/gpu.jsonl of the run in the store")
@@ -134,7 +137,7 @@ def clock(run_dir: Path, root: Path) -> dict:
 def inputs_signature(run_dir: Path, root: Path, reg: Registry, profile_run: Path | None, tie: dict | None,
                      reference: dict | None) -> str:
     h = hashlib.sha256()
-    paths = [p for p in sorted(run_dir.rglob("*")) if p.is_file() and p.suffix != ".log"]
+    paths = [p for p in sorted(run_dir.rglob("*")) if p.is_file() and (p.suffix != ".log" or SERVER_LOG.fullmatch(p.name))]
     paths += sorted((root / "capture").glob("*")) if (root / "capture").is_dir() else []
     paths += [probe.CACHE]
     if profile_run is not None:
@@ -374,10 +377,13 @@ def read_sources(ctx: Ctx, run_dir: Path, root: Path, labels: dict, rj: dict,
         torch = Torch(ctx, er.request_of, first)
         take(torch, torch.read(run_dir / "trace" / "torch_trace.json"))
         notes["torch"] = torch.stats
-    dk = root / "capture" / f"{DOCKER_CAPTURE}.jsonl"
+    de, dk = DockerEvents(ctx), root / "capture" / f"{DOCKER_CAPTURE}.jsonl"
     if dk.is_file():
-        de, tail = DockerEvents(ctx), LineTail(dk)
-        take(de, de.feed(tail.read(final=True)))
+        take(de, de.feed(LineTail(dk).read(final=True)))
+        take(de, de.flush())
+    sl = ServerLog(ctx, de.health)
+    for log in sorted(p for p in run_dir.glob("server_s*.log") if SERVER_LOG.fullmatch(p.name)):
+        take(sl, sl.read(log))
     if (run_dir / GPU_CSV).is_file():
         rule = reg_samples(ctx.reg, "run_json")
         reads = parse_gpu(CsvTail(run_dir / GPU_CSV).read(final=True))

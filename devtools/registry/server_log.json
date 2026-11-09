@@ -1,0 +1,26 @@
+{
+ "source": "server_log",
+ "title": "Engine startup phases from the server container's log (docker compose logs --timestamps)",
+ "order": 60,
+ "inputs": {
+  "server_s<N>.log": "the run folder: scripts/compose_stack.py down() saves the server service's log before compose down, one file per server start N; each line '<service>  | <UTC timestamp, ns> <text>'"
+ },
+ "_doc": "engines: one entry per engine. detect: a regex that only that engine's log matches. phases: in order; each phase starts at the first line after the previous phase's start that matches its 'from' regex (null: the log's first line) and ends where the next phase starts; the last one ends at 'end'. health: the name of the phase from 'end' to the container's first health status (adapters/docker.py), the wait for the healthcheck. A marker that is missing stops the phases there (counted). Names say what the engine does in that stretch, from its own log lines.",
+ "engines": [
+  {
+   "engine": "TensorRT-LLM",
+   "detect": "\\[TensorRT-LLM\\] TensorRT LLM version",
+   "phases": [
+    {"phase": "main process imports", "from": null},
+    {"phase": "LLM API setup", "from": "\\[TensorRT-LLM\\] TensorRT LLM version"},
+    {"phase": "worker spawn and imports", "from": "MpiPoolSession to spawn MPI processes"},
+    {"phase": "model init and weight load", "from": "Refreshed the MPI local session"},
+    {"phase": "autotuner warmup", "from": "\\[Autotuner\\] Autotuning process starts"},
+    {"phase": "CUDA graphs, memory profile, KV cache", "from": "\\[Autotuner\\] Autotuning process ends"},
+    {"phase": "HTTP server startup", "from": "Started server process"}
+   ],
+   "end": "Application startup complete",
+   "health": "waiting for the healthcheck"
+  }
+ ]
+}
