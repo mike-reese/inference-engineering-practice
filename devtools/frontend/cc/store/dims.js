@@ -171,13 +171,18 @@ export class Dimensions {
 
   flowOf(id) { const f = this.s.field("flow", id); return f === this.FLOW_NONE ? null : this.flowNames[f]; }
 
-  /** The hardware thing a row ran on (index into things), or -1: by kind first, else by its lane's kind. */
+  /** The hardware thing a row ran on (index into things), or -1: by kind first, else by its lane's kind. A stream
+   *  lane sits under its GPU; a thread lane sits under its process, so its CPU is the one under the same host. */
   ranOn(id) {
     const s = this.s, kind = s.kinds[s.field("kind", id)].name, lane = s.things[s.field("lane", id)];
     const want = this.d.ran_on.kinds[kind] ?? this.d.ran_on.lanes[lane?.kind];
     if (!want) return -1;
-    for (let x = lane; x; x = x.parent != null && x.parent >= 0 ? s.things[x.parent] : null) if (x.kind === want) return x.i;
-    return s.things.find((t) => t.kind === want)?.i ?? -1;
+    let host = null;
+    for (let x = lane; x; x = x.parent != null && x.parent >= 0 ? s.things[x.parent] : null) {
+      if (x.kind === want) return x.i;
+      if (x.kind === "host") host = x;
+    }
+    return host ? s.things.find((t) => t.kind === want && t.pre >= host.pre && t.post <= host.post)?.i ?? -1 : -1;
   }
 
   /** gemm, attention, memory or other (kinds.json kernel_class: by kind, else by the short name), for device rows. */
