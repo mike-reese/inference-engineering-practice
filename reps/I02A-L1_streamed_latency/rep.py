@@ -34,7 +34,7 @@ from inference_analysis.trace.build import write_run  # noqa: E402
 PROJECT = "ie-i02a-l1"
 RESULTS_DIR = REP_DIR / "results"
 SERVER_IMAGE = "ie-tensorrt-llm:1.2.1-nvml-byref"
-IMAGES = (SERVER_IMAGE, "ie-capture:alpine3.20", "ie-client:i01-l2")
+IMAGES = (SERVER_IMAGE, "ie-capture:alpine3.20", "ie-trackers:alpine3.20", "ie-client:i01-l2")
 PATCHED_FILE = "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py"
 MODEL_DIR = Path.home() / (".local/share/inference-engineering/models/Qwen2.5-0.5B-Instruct/"
                            "7ae557604adf67be50417f59c2c2f167def9a775")
@@ -142,7 +142,7 @@ def run_stack(run_id: str, trace: str = "off", options: dict | None = None) -> d
     stack = Stack(PROJECT, RESULTS_DIR, run_id, trace=trace, options=options)
     measured_id = f"{run_id}-measured"
     slow = trace == "kernels"  # Nsight Compute replays each kernel: the profiled iteration takes minutes
-    sampler = GpuSampler(run_dir / "gpu.csv")
+    sampler = GpuSampler(run_dir)
     try:
         progress("stack up")
         base = stack.up()

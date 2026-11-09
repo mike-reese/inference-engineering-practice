@@ -18,7 +18,7 @@ from pathlib import Path
 MODEL_DIR = Path.home() / (".local/share/inference-engineering/models/Qwen2.5-0.5B-Instruct/"
                            "7ae557604adf67be50417f59c2c2f167def9a775")
 MODEL_FILES = {"config.json", "model.safetensors", "tokenizer.json", "tokenizer_config.json"}
-IMAGES = ("ie-tensorrt-llm:1.2.1-nvml-byref", "ie-capture:alpine3.20", "ie-client:i01-l2")
+IMAGES = ("ie-tensorrt-llm:1.2.1-nvml-byref", "ie-capture:alpine3.20", "ie-trackers:alpine3.20", "ie-client:i01-l2")
 PROJECT_PREFIX = "ie-"
 GPU_QUERY = "name,compute_cap,driver_version,memory.used,memory.total,temperature.gpu"
 EXPECTED_COMPUTE_CAP = "12.0"

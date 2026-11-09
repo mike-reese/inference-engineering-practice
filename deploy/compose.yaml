@@ -47,6 +47,24 @@ services:
     volumes:
       - "${RESULTS_DIR:?}/${RUN_ID:?}:/cap"
     mem_limit: 256m
+  # Host CPU, RAM, L3 and RAM bandwidth, NVMe I/O and the server container's process starts, read every 100 ms into
+  # the run folder's trackers/ (deploy/trackers/trackers.py). In the server's PID namespace, so its pids are the
+  # ones the profilers and stamps record. CAP_PERFMON lets perf read the uncore counters without the host sysctl.
+  trackers:
+    build:
+      context: ./trackers
+    image: "ie-trackers:alpine3.20"
+    pid: "service:server"
+    network_mode: "none"
+    cap_drop: ["ALL"]
+    cap_add: ["PERFMON"]
+    depends_on: ["server"]
+    environment:
+      NVME_MODEL: "SN7100"
+    command: ["python3", "-u", "/trackers.py", "/out"]
+    volumes:
+      - "${RESULTS_DIR:?}/${RUN_ID:?}/trackers:/out"
+    mem_limit: 256m
   client:
     build:
       context: ..

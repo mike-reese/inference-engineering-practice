@@ -1,4 +1,4 @@
-"""Start, drive and stop the Compose stack: TensorRT-LLM server, packet capture, Locust client.
+"""Start, drive and stop the Compose stack: TensorRT-LLM server, packet capture, trackers, Locust client.
 
 TRACE (off, timeline, code, kernels) adds deploy/compose.profile.yaml: the trace image, SYS_ADMIN, and the
 profiler around trtllm-serve. Traced runs are labeled and never feed the measured numbers.
@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 COMPOSE_FILE = REPO_ROOT / "deploy" / "compose.yaml"
 PROFILE_FILE = REPO_ROOT / "deploy" / "compose.profile.yaml"
 STAMPS_FILE = REPO_ROOT / "deploy" / "compose.stamps.yaml"
-SERVICES = ("server", "capture", "client")
+SERVICES = ("server", "capture", "trackers", "client")
 SERVER_PORT = 8080
 CAPTURE_IMAGE = "ie-capture:alpine3.20"
 TRACE_IMAGE = "ie-tensorrt-llm:1.2.1-nvml-byref-trace"
@@ -134,8 +134,9 @@ def prepare_run_dir(results_dir: Path, run_id: str, engine_config: str) -> Path:
     (run_dir / "client").mkdir(parents=True)
     (run_dir / "control").mkdir()
     (run_dir / "trace").mkdir()
+    (run_dir / "trackers").mkdir()
     (run_dir / "config.yaml").write_text(engine_config)
-    for d in (run_dir, run_dir / "trace"):
+    for d in (run_dir, run_dir / "trace", run_dir / "trackers"):
         d.chmod(0o777)
     return run_dir
 

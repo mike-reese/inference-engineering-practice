@@ -30,7 +30,7 @@ from prometheus_client.parser import text_string_to_metric_families  # noqa: E40
 PROJECT = "ie-i02c-l1"
 RESULTS_DIR = REP_DIR / "results"
 SERVER_IMAGE = "ie-tensorrt-llm:1.2.1-nvml-byref"
-IMAGES = (SERVER_IMAGE, "ie-capture:alpine3.20", "ie-client:i01-l2")
+IMAGES = (SERVER_IMAGE, "ie-capture:alpine3.20", "ie-trackers:alpine3.20", "ie-client:i01-l2")
 MODEL_NAME = "nvidia/Qwen3-8B-FP8"
 MODEL_REVISION = "2cebc4c89e25abc17668c81b01dceaf3d8b914d5"
 MODEL_DIR = Path.home() / ".local/share/inference-engineering/models/Qwen3-8B-FP8" / MODEL_REVISION
@@ -160,7 +160,7 @@ def run_stack(run_id: str, prompt: dict) -> Path:
     save_json(run_dir / "prompt.json", prompt)
     basis = execution_basis()
     stack = Stack(PROJECT, RESULTS_DIR, run_id, model_dir=MODEL_DIR)
-    sampler = GpuSampler(run_dir / "gpu.csv")
+    sampler = GpuSampler(run_dir)
     perf, prom = {}, {}
     try:
         print("stack up (devtools: #lifecycle)")

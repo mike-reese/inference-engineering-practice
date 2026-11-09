@@ -8,11 +8,11 @@ TRACE ?= off
 doctor:
 	$(IECTL) doctor
 
-# Step 0: the engine image, its trace-only variant (TRACE=code|kernels), the capture and client images.
+# Step 0: the engine image, its trace-only variant (TRACE=code|kernels), the capture, trackers and client images.
 images:
 	deploy/server/build.sh
 	docker build -t ie-tensorrt-llm:1.2.1-nvml-byref-trace -f deploy/server/Dockerfile.trace deploy/server
-	RESULTS_DIR=/tmp RUN_ID=none SERVER_START=0 docker compose -f deploy/compose.yaml build capture client
+	RESULTS_DIR=/tmp RUN_ID=none SERVER_START=0 docker compose -f deploy/compose.yaml build capture trackers client
 
 # The devtools and the monitoring it hosts (own project ie-devtools): http://127.0.0.1:7700
 devtools:
