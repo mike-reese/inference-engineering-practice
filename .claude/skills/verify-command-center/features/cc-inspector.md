@@ -1,97 +1,86 @@
 # Inspector
 
-The inspector sits below the stage (or on its right) and reads the control frame. Six tabs: Selected (the selected
-row's detail, evidence, links, Nsight Compute values and raw record), At cursor (the request, iteration and device op
-at the cursor, busy components, active lanes), Metrics (the `aux.json` metrics with formula and input rows), Tokens
-(the cursor request's token events and text), Kernels (the cursor iteration's device ops with counters) and Run
-(headline results, workload, config, basis). Row ids are links that select; times are links that seek; "↗" buttons
-ask the host runner to open a report in Nsight Systems or Nsight Compute. Tab, dock and size persist in
-`localStorage` key `cc.inspector`.
+The inspector bar sits below the stage (or on its right). Six tabs: Selected (the selected row's detail, evidence,
+place in the three dimensions, links and raw record), At cursor (everything true at the cursor on every tier),
+Metrics (the run's `aux.json` metrics with their formulas and input rows, and the TTFT split), Tokens (the cursor
+request's tokens on three clocks), Kernels (the cursor iteration's device rows) and Run (the run's generation,
+requests, iterations and units, with the Nsight buttons). Under the tabs: the transport (step, play, pace, rate)
+and two strips, the run overview and the detail window. Row names are links that select, `↦` links seek, and "↗"
+buttons ask the host runner to open a report in Nsight Systems or Nsight Compute.
 
 ## Sub-features
 
-- `insp-tabs` the six tabs; a tab re-renders only when its inputs change (selection, cursor request, iteration).
-- `insp-links` `button[data-sel]` selects a row, `button[data-seek]` seeks, `button[data-open]` posts `/runner/open`.
-- `insp-raw` "load the raw record" fetches the row's source record from `/raw?id=`.
-- `insp-layout` `#fbig` (⤢) enlarges the inspector; `#fdock` moves it between bottom and right.
-- `insp-light` a hover on a Metrics row lights all its input rows on every level (`CC.control.frame.lit`); a hover on
-  one input link lights that row. Levels and the timeline strips draw lit rows in magenta.
+- `insp-tabs` `.b-tabs [data-tab=T]`; a tab re-renders only when its inputs change.
+- `insp-links` `.b-body [data-sel]` selects, `[data-seek]` seeks, `[data-m]` selects a metric, `[data-world]` and
+  `[data-run]` switch world or run, `#bar [data-open]` posts `/runner/open`.
+- `insp-history` `.b-hist[aria-label=Back]` and `Forward`, and the keys `[` `]`, walk selections (`__cc.nav`).
+- `insp-raw` the Selected tab's `raw record` summary, then `[data-raw]`, fetches the row's source record (`/raw?id=`).
+- `insp-dock` `[data-act=pos]` (or key D) docks bottom or right, `[data-act=big]` enlarges, `.b-collapse` closes and
+  opens; `body` gets `dock-bottom`, `dock-right`, `dock-closed`.
+- `insp-transport` `[data-act=back]`, `[data-act=next]`, `[data-act=play]`, `.b-pace` (events, time), `.b-rate`.
+- `insp-strips` `.b-over` (the run extent: a click seeks), `.b-detail` (the bounds plus 10 % each side: a click
+  selects the nearest stop within 6 px, else seeks; a drag seeks).
 
 ## How to get to it (user POV)
 
-- It is always on screen below the stage. Click a tab name; click ⤢ or "dock → right" in its header.
+- It is always on screen. Click a tab name; click ⤢ or the dock button in its header; press D.
 
 ## Driving it with ccv
 
 Preconditions:
 
-- Baseline. Values below were taken on 2026-11-08, generation 11, and reproduced at generation 12. Sizes are from a half tile (1259 x 1301); the tab
-  contents match a full tile (2534 x 1301, session `cc-step4-v3`).
-- `$CCV open "http://127.0.0.1:7710/static/cc/index.html#side?run=I02A-TRACE-timeline_20261107T172848Z_f2ac52&t=72714460148&f=6"`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-inspector`.
+- Open R1 at the send, Selected tab:
+  `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"spine","focus":"execution","tiers":{"execution":2,"hardware":2,"architecture":4},"sel":{"eid":"client/sdk/measured/send#0"},"dock":{"pos":"bottom","tab":"selected","open":true}}')"`,
+  then `$CCV wait --expr 'typeof __cc.sel === "number"'`.
 
-- **Selected.** Select a row from any level (see `cc-infra.md`). `#fbody` starts
-  `component stamp: model forward launched` then `eid stamp/forward/measured/i67/model-forward-launched#0`.
-- **At cursor.** Run `$CCV click --role tab --name "At cursor" --exact --after cc-insp-cursor`. `#fbody` reads
-  `72714.460148 ms from the run's t0`, `request … -measured · 21.586 ms in, of 10.243 s`,
-  `iteration 67 · 0.544 ms in, of 4.753 ms`, `device op kernel: unrolled_elementwise_kernel · running`,
-  `components busy: Locust user, HTTP transport, GPU kernels, model forward`,
-  `20 of 75 threads and streams have an active row`.
-- **Metrics.** Run `$CCV click --role tab --name "Metrics" --exact`. The open group is
-  `…-warmup · 33 metrics` (the cursor's request has none); then `unavailable (2)` and `measures (definitions)`. Its
-  first rows are `client TTFT 1296.14 ms first token event - send …` and `client headers 60.7146 ms …`.
-- **Select a metric input.** Run `$CCV click --css "#fbody details[open] button[data-sel]" --after cc-insp-metric-sel`
-  (the first of 58). `sel` is `8666`, eid `client/sdk/warmup/send#0`. Screenshot:
-  `cc-step4-v3/s4-metric-input-select.png`.
-- **Light a metric's inputs.** Open the run at `t=71200000000&f=3`, choose Metrics, and hover the row
-  `TTFT remainder`: `$CCV hover --text "TTFT remainder" --exact --after cc-insp-light`.
-  `$CCV eval 'CC.control.frame.lit'` returns `[8666, 14396, 8761, 12816]` (send, event: token, arrival_time,
-  first_token_time). Level 3 draws four magenta boxes (`CC.scene.levels[2].litN` is `4`). Press 1: the tiles `sdk`,
-  `executor` and `llm_api` get magenta borders. Press 2: the boxes `send_one` and `OpenAI SDK` do. Both timeline
-  strips mark the four starts. Levels 4 and 5 draw none (`litN` `0`): no input lies in level 4's iteration window,
-  and level 5 holds streams only. No aux metric reads a device op, so levels 6 and 7 cannot be lit from this tab.
-  Hover the tab bar (`$CCV hover --css "#ftabs"`): `lit` is `null`. Evidence from 2026-11-08:
-  `fe-live-rows/light-L1.png`, `light-L2.png`, `light-L3.png`, `light-strip.png`.
-- **Tokens.** Run `$CCV click --role tab --name "Tokens" --exact`. It reads
-  `…-measured · 63 token events · 63 on the wire. Text: When the KV (Key-Value) cache grows, …`.
-- **Kernels.** Run `$CCV click --role tab --name "Kernels" --exact`. It reads `iteration 67 · 310 device ops · 4.753 ms
-  from its scheduler stamp to the end of its device work · 235 with Nsight Compute counters`, then the buttons
-  `Nsight Systems ↗` and `Nsight Compute ↗`, then a table whose row 2 is
-  `kernel: unrolled_elementwise_kernel 1×1×1 × 128×1×1 1.2 …`.
-- **Run.** Run `$CCV click --role tab --name "Run" --exact`. The results row reads
-  `warmup 1296.14 ms 3.474 ms 1515.49 ms 1246.5 ms 3.612 ms 287.893 token/s`, then
-  `2 of 3 requests have no calculated metrics in aux.json.`
-  `$CCV eval 'JSON.stringify([...document.querySelectorAll("#fbody [data-open]")].map(b => [b.textContent, b.dataset.open]))'`
-  returns `Nsight Systems report ↗` with `{"run":"I02A-TRACE-timeline_20261107T172848Z_f2ac52","path":"trace/timeline.nsys-rep"}`.
-- **Raw record.** On Selected with row 8666 selected, run `$CCV click --text "raw record"` and
-  `$CCV click --role button --name "load the raw record" --after cc-insp-raw`.
-  `$CCV eval 'document.querySelector("#fbody [data-raw-out]")?.textContent'` returns `84183357509013`.
-- **Enlarge.** Run `$CCV click --css "#fbig"`. The body class is `dock-bottom fly-big`; the inspector is 989 x 567 and
-  the stage 989 x 568 (normal: 989 x 226 and 989 x 909).
-- **Dock right.** Run `$CCV click --css "#fdock"`. The body class is `insp-right`; the inspector is 503 x 1136 and the
-  stage 485 x 1136; `#fdock` reads `dock ↓ bottom`. With ⤢ as well, the inspector is 780 and the stage 208 wide.
-  Run `$CCV click --css "#fdock"` again to return; `localStorage.getItem("cc.inspector")` reads
-  `{"tab":"selected","dock":"bottom","big":false}` after choosing Selected.
-- **Nsight targets, up to the request.** For the kernel at the cursor,
-  `$CCV eval 'CC.store.detail([CC.control.frame.chain.device.id]).then(([d]) => JSON.stringify(d.open))'` returns
-  `nsys` `{run: I02A-TRACE-timeline_20261107T172848Z_f2ac52, path: trace/timeline.nsys-rep, t: [4607303821, 4607305069]}`
-  and `ncu` `{run: I02A-TRACE-kernels_20261107T173111Z_60d68c, path: trace/kernels.ncu-rep, profile_row: 0}`. The
-  endpoint answers through the proxy:
-  `curl -s -X POST -H 'content-type: application/json' -d '{"run":"I02A-TRACE-timeline_20261107T172848Z_f2ac52","path":"trace/does-not-exist.nsys-rep"}' http://127.0.0.1:7710/runner/open`
-  returns 404 `no file 'trace/does-not-exist.nsys-rep' in run …`.
-- **Proof.** Run `$CCV console`: `errors: 0`.
+- **Selected.** `.b-body` starts `execution · phase` `send` `at 73378.117 ms from the run's t0 · 0.000 ms from its
+  request's send ↦`. Its first links: `51003 measured`, `51004 send`, `host/client client-1 (Locust client)`.
+- **Follow a link, Back, Forward.** `$CCV click --css '.b-body [data-sel]'`: `sel` `51003`, `nav` `{back: 1, fwd: 0}`.
+  `$CCV click --css '.b-hist[aria-label=Back]'`: `51004`, `{back: 0, fwd: 1}`. `Forward`: `51003` again. The keys
+  `[` and `]` do the same.
+- **Raw record.** `$CCV wheel --css '.b-body' --dy 200 --steps 2`, then
+  `$CCV click --css '.b-body details:has([data-raw]) > summary'`, then `$CCV click --css '.b-body [data-raw]'`.
+  `.b-body [data-raw-out]` shows the record: `{ "t0": 2848238637901, "t1": null, "proc": "client", "box":
+  "send_one", "name": "send", "xrid": "I02A-TRACE-timeline_20261109T060522Z_ee2252-measured", …`.
+- **At cursor.** `$CCV click --css '.b-tabs [data-tab=cursor]'`: `73378.117 ms from the run's t0 · everything true at
+  the cursor`, then request `measured`, iteration `iteration 64`, phase `_fetch_new_requests`, layer `layer 24 of
+  iteration 64`, module `–`, kernel `device to host (copy)`.
+- **Metrics.** `[data-tab=metrics]` starts `Metrics as they are calculated at import (aux.json), with the rows each
+  one reads.` Its TTFT split bar (`.segbar .seg[data-m]`) selects a metric per segment; `walkthroughs.sh` clicks all 7.
+- **Tokens.** `[data-tab=tokens]` starts `requests: warmup · measured · closer` `measured · 64 tokens · each read on
+  three clocks`. Its third row reads `3 " KV" iteration 68 27.739 ms 30.304 ms 30.628 ms 3.615 ms 2.565 ms 0.323 ms ↦`;
+  `$CCV click --css '.b-body [data-seek]' --nth 2` moves `t` to `73405855954` and keeps `sel`.
+- **Kernels.** `[data-tab=kernels]` starts `iteration 64 · 310 device rows (266 kernels, 44 copies and memsets) · 0
+  profiled · module missing: no module frames in this run (M2)`. It holds one Nsight button:
+  `$CCV eval '[...document.querySelectorAll("#bar [data-open]")].map((b) => b.textContent.trim() + " " + b.dataset.open)'`
+  gives `Nsight Systems ↗ {"run":"I02A-TRACE-timeline_20261109T060522Z_ee2252","path":"trace/timeline.nsys-rep"}`.
+  Do not click it (see Gotchas).
+- **Run.** `[data-tab=run]` starts `I02A-TRACE-timeline_20261109T060522Z_ee2252 generation 3 · final · trace:
+  timeline · 2026-11-09 06:05`, `requests warmup, measured, closer`, `iterations 192 (3 prefill, 189 decode)`,
+  `length 87.578 s`. An earlier pass the same day read its two buttons: `Nsight Systems ↗` (the run's
+  `trace/timeline.nsys-rep`) and `Nsight Compute ↗` (`I02A-TRACE-kernels_20261109T060737Z_8f4ae7`,
+  `trace/kernels.ncu-rep`). `$CCV click --css '.b-body [data-world=rep]'` opens the Rep world.
+- **Dock.** `$CCV key d`: `dock.pos` `right`, body `dock-right`. `$CCV click --css '.b-pos'`: back to `bottom`.
+  `$CCV click --css '[data-act=big]'`: `dock.big` true. `$CCV click --css '.b-collapse'`: `dock.open` false, body
+  `dock-closed`; again: open.
+- **Transport.** From `sel` `53464` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `53465` at
+  `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
+  `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
+  5456 in view · 91898 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 0.000–88294.364
+  (88.294 s)`. `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
+- **Strips.** `$CCV click --css '.b-over' --frac 0.5,0.5`: `t` `44505584510`, the middle of the run extent
+  `[716805506, 88294363514]`. `$CCV click --css '.b-detail' --frac 0.3,0.5`: a stop lay within 6 px, so `sel` `127`
+  and `t` `22710249081`. `$CCV drag --css '.b-detail' --by 120,0 --steps 6`: `t` `49196581417.85`, `sel` kept.
+- **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas
 
-- Do not click an "↗" button with a real path unless Mike says focus may move now. The runner starts `nsys-ui` or
-  `ncu-ui` on his current workspace and the new window takes his focus. With his go-ahead (2026-11-08) the Kernels tab
-  buttons were clicked with `$CCV click --css '#fbody button[data-open*="nsys-rep"]'` (and `ncu-rep`): `nsys-ui` opened
-  `timeline.nsys-rep` and `ncu-ui` opened `kernels.ncu-rep` (row 0 `unrolled_elementwise_kernel`, 2.18 us). Evidence:
-  `cc3-nsight/window-2.png` (nsys) and `cc3-nsight/window-ncu-ui.png`. `--role button --name "Nsight Systems ↗"` finds
-  nothing: the accessible name is the `aria-label` ("Open the iteration's report in Nsight Systems").
-- The runner resolves runs under the main checkout (`reps/*/results/<run>/`), not this worktree.
-- `$CCV state` reports `dock` null when the inspector is on the right (it looks for `#side`). Read
-  `document.body.className` instead.
-- Only the warmup request has metrics in `aux.json`; for the measured request the Metrics tab opens the warmup group
-  and says the cursor's request has none.
-- The Kernels and Selected tabs fetch detail rows after the first render; wait about a second before reading them.
-- In a half tile, right dock plus ⤢ leaves the stage 208 px wide.
+- Do not click an "↗" button unless Mike says focus may move now: the runner starts `nsys-ui` or `ncu-ui` on his
+  workspace and its window takes his focus. Verify up to the request: read `data-open`.
+- The raw-record button is inside a closed `<details>`. ccv counts it as visible but cannot scroll to it or click
+  it; open the summary first. Scroll the bar body with the wheel when the summary sits below the fold.
+- `.b-over` spans the run extent, which starts at the store's `extent[0]` (716.806 ms on R1), not at 0.
+- A detail click with no stop within 6 px only seeks, so `t` can be fractional.
+- In time pace the bounds play in 8 s at ×1: at ×4 R1's 88 s bounds loop every 2 s.
+- The keys `[` `]` and the Back and Forward buttons walk the page's own history; the browser's Back does not.

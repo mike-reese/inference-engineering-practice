@@ -1,13 +1,13 @@
 ---
 name: verify-command-center
-description: Verify the inference-engineering command center v3 (the three.js side-by-side scene at :7710/static/cc/index.html) the way a user does, in a real headed Chromium driven over CDP by the `ccv` CLI. Use it while building or changing anything under devtools/ (scene, levels, timeline, flyout, inspector, hardware views, backend APIs they read) to prove the change works from the user's seat, with screenshots, accessibility snapshots, app state and console logs as evidence.
+description: Verify the inference-engineering command center (the page at /static/cc/index.html, D13's layout drawn from the v3 store, with four worlds, the inspector bar, the hardware sidebar, Load, Launch and Compare) the way a user does, in a real headed Chromium driven over CDP by the `ccv` CLI. Use it while building or changing anything under devtools/ (worlds, chrome, bar, sidebar, shell, backend APIs they read) to prove the change works from the user's seat, with screenshots, accessibility snapshots, app state and console logs as evidence.
 ---
 
 # Verify the command center as a user
 
-The command center v3 is a web page (`/static/cc/index.html`, what `$CCV open side` opens): a three.js scene of seven native levels side by side (WebGL canvas plus CSS2D labels and a few real buttons), an inspector flyout of tabs docked at the bottom (or right), a hardware sidebar on the right, and a transport bar with the level buttons and the timeline strips at the bottom. It must be verified in a **real, headed Chromium with the real GPU**: headless rendering (SwiftShader) gets WebGL, CSS3D, wheel zoom and frame timing wrong. `ccv` launches our own Chromium on a hidden Hyprland monitor and drives it with real input events over the Chrome DevTools Protocol. Mike keeps working on his own screens; nothing you do may move his focus or cursor. See **Hidden monitor**.
+The command center is a web page (`/static/cc/index.html`, what `$CCV open side` opens) drawn only from the v3 store, the registry and the rep files (COMMAND_CENTER.md section 2). A header holds the four worlds, the three ladders (execution, hardware, architecture) and Load, Launch and Compare. The stage shows one world: Rep (the rep's lessons, moments and results), Stacked (a three.js board with CSS2D labels), Spine (the execution tiers on one time axis) or Architecture (cards, the component map and an execution strip). The inspector bar of six tabs, the transport and the timeline strips sit at the bottom (or right), and the hardware sidebar on the right. It must be verified in a **real, headed Chromium with the real GPU**: headless rendering (SwiftShader) gets WebGL, wheel zoom and frame timing wrong. `ccv` launches our own Chromium on a hidden Hyprland monitor and drives it with real input events over the Chrome DevTools Protocol. Mike keeps working on his own screens; nothing you do may move his focus or cursor. See **Hidden monitor**.
 
-Layout rule (owner, 2026-11-08): verify **only the side-by-side layout**. The page is v3 (`/static/cc/index.html`). The v2 prototype (`/static/prototypes/D5v2/side/index.html`) is legacy until the cutover; open it only for its legacy recipes. Never open the flat, nested or split pages.
+Pages: the production page is `/static/cc/index.html`. D13 (`/static/prototypes/D13/index.html`) stays, frozen, as the parity reference until production and D13 are verified identical in layout and function (owner, 2026-11-08); open it only to compare. The D5v2 prototype (`/static/prototypes/D5v2/side/index.html`) is legacy until M4; open it only for its legacy recipes. Never open the flat, nested or split pages.
 
 CLI: `devtools/verify/ccv` (no dependencies; Node 26 built-in fetch and WebSocket). Every command prints one JSON object, exits 1 with `{"ok": false, "error": ...}` on failure, and appends itself to the session's `actions.jsonl`. `ccv help` lists everything.
 
@@ -17,8 +17,8 @@ CCV=~/Work/Code/Personal/inference-engineering-practice/devtools/verify/ccv
 
 ## Launch
 
-1. The app server: `docker start ie-devtools-v2scene` (port 7710; serves the main checkout, mounted read-only at `/repo`; v3 store read-write, v2 store read-only). For the Run tab, the host runner: `make runner` in `~/Work/Code/Personal/inference-engineering-practice`. A backend change needs `docker restart ie-devtools-v2scene`; a frontend change needs only a reload (`$CCV open side`).
-2. The browser: `export CCV_SESSION=<feature-or-task>`, then `$CCV launch` (half tile, the default and the minimum) or `$CCV launch --size full`. Ready when the output has `"ready": {"scene": true, "ready": true}`: the page set `window.READY` after loading the run from the store and drawing the levels. The output also names the `workspace`, `tile` and `viewport`.
+1. The app server: `docker start ie-devtools-v2scene` (port 7710; serves the main checkout, mounted read-only at `/repo`; v3 store read-write, v2 store read-only). For Launch, the host runner: `make runner` in `~/Work/Code/Personal/inference-engineering-practice`. A backend change needs `docker restart ie-devtools-v2scene`. During M1 the `cc-migration` worktree is served by `ie-devtools-cc` on port 7711 with the store `/mnt/ie-data/cc/store-cc`; set `CCV_APP=http://127.0.0.1:7711` to verify it.
+2. The browser: `export CCV_SESSION=<feature-or-task>`, check that `$CCV sessions` is empty (one ccv browser at a time on this machine), then `$CCV launch --url "<view>"` (half tile, the default and the minimum) or `$CCV launch --size full --url "<view>"`. The page reads its view (run, world, tiers, cursor, selection, dock) from the URL hash once at load; `features/README.md` has the `view` helper. A frontend change needs a new page load with a new query string. Ready when the output has `"ready": {"scene": true, "ready": true}`: the page set `window.READY` on its first frame with the run's store open. The output also names the `workspace`, `tile` and `viewport`.
 
 ## Sessions
 
@@ -57,18 +57,19 @@ Act only through real input: `click`, `hover`, `wheel`, `drag`, `key`, `type`, `
 
 | Handle | Use for | Example |
 | --- | --- | --- |
-| `--role R --name N [--exact]` | buttons, links, selects, inputs, including inside the v1 panels' shadow roots | `$CCV click --role button --name "4 Iteration" --exact` |
-| `--css SEL` | elements with ids or data attributes | v3: `#stage`, `#detail` (timeline strip), `#overview`, `#play`, `#ftabs button[data-t="kernels"]`, `#fdock`, `#fbig`, `#fbody button[data-sel]`, `#hw .hwrow`. Legacy v2: `#tl`, `#next`, `#back`, `#speed`, `#sum`, `#selbox`, `#side`; `button.start[data-rep="I02A-L1"][data-action="off"]` |
-| `--text T --force` | items drawn in the 3D scene, located by their CSS2D label | `$CCV click --text "model forward launched" --force` |
-| `--at x,y` | never in the feature map; ad hoc only (coordinates change with the window size) | |
+| `--css SEL` | elements with ids or data attributes (the full table is in `features/README.md`) | `.ch-nav button[data-w=spine]`, `.b-tabs [data-tab=kernels]`, `[data-act=play]`, `.b-detail`, `#hw .hwrow`, `.sh-pan [data-p=load][data-v=<run>]`, `#stage .arch .cbox[data-box=forward]`, `.sp2 .rl[data-band="5"]`. Legacy D5v2: `#tl`, `#next`, `#back`, `#speed`, `#sum`, `#selbox`, `#side` |
+| `--role R --name N [--exact]` | buttons and inputs without a data attribute | `$CCV click --role button --name "Keys" --exact` |
+| `--text T` | text the user reads, when no attribute names it | `$CCV click --text "Replay ▸" --nth 2` |
+| `--at x,y` | only for the Stacked world's 3D parts, at a point the page reports at run time (`features/cc-stacked.md`); never a hard-coded coordinate | |
 
 - `--frac fx,fy` clicks inside a target at a fraction of its box: `$CCV click --css "#tl" --frac 0.5,0.5` scrubs the timeline to the middle.
-- A target outside the viewport, or scrolled out of a scrolling panel such as the inspector body, is scrolled into view first, as a user scrolls to it; then it must be visible and not covered at its center. `find` reports `in_viewport` and `covered` without scrolling or sending input. Scene labels have `pointer-events: none`, so the canvas under them "covers" them. `--force` sends the click to that point, and the canvas item under the label receives it. That is the user path.
-- `wheel --css "#stage" --dy -240 --steps 6` zooms in (negative dy) or out (positive) at the target's center with MapControls. `drag --css "#stage" --by -400,0` presses at the target's center and moves by dx,dy: left button pans, `--button right` rotates.
-- `back` and `forward` are the browser's Back and Forward buttons (a selection is a history entry).
-- `select --css "#run" --option <value or text>` picks the option whose value equals it, else the one whose trimmed text does; none or two matches is an error. It clicks the select to open its popup, moves inside the popup, presses Enter once, waits for READY (the run picker reloads the page), and fails unless the select then holds that value. A closed select commits on every arrow key, so stepping through it would open the first run passed.
+- A target outside the viewport, or scrolled out of a scrolling panel such as the inspector body, is scrolled into view first, as a user scrolls to it; then it must be visible and not covered at its center. `find` reports `in_viewport` and `covered` without scrolling or sending input. ccv counts an element inside a closed `<details>` as visible (it keeps a box but is not drawn), and scrolling cannot reach it: open the `summary` first (`features/cc-inspector.md`, raw record).
+- The Stacked world's labels have `pointer-events: none` and sit beside their parts, so `--text <label> --force` clicks the floor under the label and selects nothing. Click the part's mesh (`features/cc-stacked.md`).
+- `wheel --css "#stage .spine svg" --dy -240 --steps 3` zooms the spine axis in (negative dy) or out (positive). In the Stacked world the wheel and `drag` (left pans, `--button right` rotates) move the camera.
+- `back` and `forward` are the browser's Back and Forward buttons. This page writes its hash with `history.replaceState`, so they do not walk selections: use `[` `]` or the bar's ← → (`.b-hist`).
+- `select --css ".b-pace" --option time` picks the option whose value equals it, else the one whose trimmed text does; none or two matches is an error. It clicks the select to open its popup, moves inside the popup, presses Enter once, and fails unless the select then holds that value.
 - `wait --text T | --css SEL | --gone-text T | --expr JS` replaces fixed sleeps. Scene rebuilds and v1 panel fetches are asynchronous.
-- `eval JS` is for **read-only** probes (for example `location.hash`, `document.querySelector("#selbox").innerText`). Never call app setters, `window.SNAP`, `window.PLAY` or `set()` to make something happen: that skips the user path and proves nothing.
+- `eval JS` is for **read-only** probes (for example `JSON.stringify(window.__cc)`, `location.hash`, `document.querySelector(".b-body").textContent`). Never call the page's setters (the `control.js` exports such as `select`, `seek`, `setWorld`) to make something happen: that skips the user path and proves nothing. The one exception in the recipes is the Stacked world's hover probe, which dispatches `pointermove` to find a part and changes only the hover box.
 
 ## Evidence
 
@@ -81,9 +82,9 @@ Each session's evidence is in `/mnt/ie-data/cc-v2-verify/evidence/<session>/` (s
 
 Proof standard:
 
-- Drive the real user path and record both the action (`actions.jsonl`, with the `--after` screenshot) and the resulting state (`$CCV state`, a read-only `eval` of the URL or panel text, or `aria`).
-- A screenshot alone is not proof of a state change. Pair it with `state` before and after.
-- Check side effects where they exist: the URL hash (`t=`, `sel=`, `z=`), a runner job (`curl -s 127.0.0.1:7701/runner/jobs?limit=1`), files written in a run folder.
+- Drive the real user path and record both the action (`actions.jsonl`, with the `--after` screenshot) and the resulting state (a read-only `eval` of `window.__cc`, the URL hash or panel text, or `aria`). `$CCV state` still probes the old page's globals (`window.CC`, `#tlabel`, `#ftabs`); on this page only its `url`, `title`, `ready` and `viewport` fields hold.
+- A screenshot alone is not proof of a state change. Pair it with the state before and after.
+- Check side effects where they exist: the URL hash (a JSON view: `world`, `t`, `sel`, `dock`), a runner job (`curl -s "$CCV_APP/runner/jobs?limit=1"`, through the page's proxy), files written in a run folder.
 - Finish with `$CCV console`: zero `pageerror` entries, or report each one.
 - For performance claims, use `$CCV perf`: draw time and input-to-frame latency recorded by the page.
 - Report a path you could not reach with the command that failed and the unmet precondition. Never report it as verified through a different path.
@@ -92,9 +93,9 @@ Proof standard:
 
 `$CCV close` stops only this session's Chromium and watcher (process groups from its record), frees its tile and deletes its profile. Close every session you launched when you finish. Evidence stays in `/mnt/ie-data/cc-v2-verify/evidence/<session>/`. Never kill Chromium by name: Mike's own browser is also Chromium. Leave `ie-devtools-v2scene` and the runner running unless Mike says otherwise; they are his.
 
-Do not click `Start` in the Run tab (it runs a GPU job on the shared machine and writes a run folder) unless the task or Mike asks for a run. See `features/run-launcher.md`.
+Never click `Launch ▸` on a page opened without `?dry_run=1`: it runs a GPU job on the shared machine and writes a run folder. Launch for real only when the task or Mike asks for a run. See `features/cc-launch.md` (and `features/run-launcher.md` for the legacy D5v2 Run tab).
 
-An "open in Nsight Systems / Nsight Compute" button makes the runner start `nsys-ui` or `ncu-ui` on Mike's desktop, and a new window can take his focus, which the owner rule above forbids. Open decision (2026-11-08, for Mike): how to verify these buttons end to end. Until then, verify them up to the request; see `features/cc-inspector.md`.
+An "Nsight Systems ↗ / Nsight Compute ↗" button makes the runner start `nsys-ui` or `ncu-ui` on Mike's desktop, and a new window can take his focus, which the owner rule above forbids. Open decision (2026-11-08, for Mike): how to verify these buttons end to end. Until then, verify them up to the request (read the button's `data-open`); see `features/cc-inspector.md`.
 
 ## Helpers
 
