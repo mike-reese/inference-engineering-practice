@@ -151,20 +151,25 @@ export class Dimensions {
     return row ? row[to] : null;
   }
 
-  /** Load-time aggregates: per component box, the starts of its rows (run count up to t) and the flows it carries. */
+  /** Load-time aggregates: per component box, the starts of its rows (run count up to t), their summed durations
+   *  and the flows it carries. */
   aggregates() {
-    const s = this.s, K = s.things.length, starts = Array.from({ length: K }, () => []);
+    const s = this.s, K = s.things.length, starts = Array.from({ length: K }, () => []), durs = Array.from({ length: K }, () => []);
     this.compFlowMask = new Uint8Array(K);
     for (const id of this.all) {
       const c = s.field("comp", id); if (c === NONE16) continue;
-      starts[c].push(s.startOf[id]);
+      starts[c].push(s.startOf[id]); durs[c].push(s.endOf[id] - s.startOf[id]);
       const f = s.field("flow", id); if (f !== this.FLOW_NONE) this.compFlowMask[c] |= 1 << f;
     }
     this.compStarts = starts.map((a) => Float64Array.from(a));   // (start, id) order: already sorted
+    this.compDurSum = durs.map((a) => { const p = new Float64Array(a.length + 1); a.forEach((d, i) => (p[i + 1] = p[i] + d)); return p; });
   }
 
   /** Rows of component box `comp` that started at or before t. */
   compRuns(comp, t) { return upperT(this.compStarts[comp], t); }
+
+  /** Summed duration (ns) of the rows of component box `comp` that started at or before t. */
+  compTime(comp, t) { return this.compDurSum[comp][this.compRuns(comp, t)]; }
 
   /** The flow names a component box carries over the whole run. */
   compFlows(comp) { return this.flowNames.filter((_, f) => this.compFlowMask[comp] & (1 << f)); }
