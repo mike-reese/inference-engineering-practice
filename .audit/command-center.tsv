@@ -58,3 +58,5 @@ ts	phase	decision	why	evidence	result
 2026-11-09T08:22:33Z	fix	launched follow-up agent on fix-work (:7718): lint complete key, session.js segments, Rep results from the rep's result file, I01-L2 import into store-cc, ccv state	M3 gaps and M1c gap	m3 and m1c reports	running
 2026-11-09T08:37:09Z	fix	accepted fix-work (1549255..0d0688d), merged 700f05e	reran regress, walkthroughs, moments lint, pytest, store-check myself	51/51; 79/79; lint 0 misses (I02A, I02C, I01-L2 checked); 89 passed; storecheck 0	VERIFIED
 2026-11-09T08:37:09Z	fix	I02C compare: client TTFT from client rows, as for latency.json reps	doc 7.4 M1 Compare check names client rows; I02C has them	fix report choice 2	fix2 agent
+2026-11-09T08:44:06Z	fix2	accepted fix2-work (6773f36), merged	reran regress and walkthroughs myself	see next row	VERIFIED
+2026-11-09T08:44:06Z	fix2	Compare should show a run's result values that exist even when the moments request is incomplete (5626f7 hides A's 48.878 ms TTFT)	complete is a moments rule, not a reason to hide real values	fix2 report open question	queued for the parity round
