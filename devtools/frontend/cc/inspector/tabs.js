@@ -98,19 +98,21 @@ function layerUnit(S, id) {
  * The execution units above a row, coarsest first, then the row: its request and iteration (hot req and iter), the
  * rows of an execution tier on the parent chain of the call that launched it (phase, a code run's module frames, the
  * call), its own parent chain (a graphs-on device row's inferred modules, M2) just above that call, and the layer
- * unit of its (iteration, layer). A device row with no module row above it says so (3.1, M2).
+ * unit of its (iteration, layer). A device row with no module row above it says so (3.1, M2). An inferred module
+ * (M2) climbs from the launch call of its first device row, without the call, and sits in the layer of its device
+ * rows that carry one.
  */
 function ladderOf(S, id) {
-  const X = idx(S), L = S.dims.ladders.execution, ex = S.dims.ex, out = [];
+  const X = idx(S), L = S.dims.ladders.execution, ex = S.dims.ex, out = [], inf = S.dims.inferred(id);
   const r = S.field("req", id), it = S.field("iter", id);
   if (r !== NONE16 && X.req.has(r) && X.req.get(r) !== id) out.push([L[0], X.req.get(r), unitText(S, L[0], X.req.get(r))]);
   if (it >= 0 && X.iter.has(it) && X.iter.get(it) !== id) out.push([L[1], X.iter.get(it)]);
   const climb = (x) => { const a = []; for (let n = 0; x >= 0 && n < 400; n++, x = S.field("parent", x)) if (S.dims.side[x] || ex[x] >= 2) a.push([execLabel(S, x), x]); return a.reverse(); };
-  const c = S.field("cause", id), launch = S.dims.side[c] ? climb(c) : [], own = climb(S.field("parent", id));
-  const call = launch.findIndex(([, y]) => S.dims.side[y]), up = call < 0 ? [...launch, ...own] : [...launch.slice(0, call), ...own, ...launch.slice(call)];
+  const launch = climb(S.dims.launchOf(id)), own = climb(S.field("parent", id));
+  const call = launch.findIndex(([, y]) => S.dims.side[y]), up = call < 0 ? [...launch, ...own] : [...launch.slice(0, call), ...own, ...(inf ? [] : launch.slice(call))];
   const inner = up.findIndex(([, y]) => ex[y] > tierIndex(S, "layer") || S.dims.side[y]), at = inner < 0 ? up.length : inner;
-  const extra = [];
-  if (S.field("layer", id) >= 0 && it >= 0) { const lu = layerUnit(S, id); if (lu >= 0) extra.push([L[3], lu, unitText(S, L[3], lu)]); }
+  const extra = [], lr = inf ? S.dims.held(id).find((x) => S.field("layer", x) >= 0) ?? -1 : id;
+  if (lr >= 0 && S.field("layer", lr) >= 0 && it >= 0) { const lu = layerUnit(S, lr); if (lu >= 0) extra.push([L[3], lu, unitText(S, L[3], lu)]); }
   if (isDevice(S, id) && S.dims.moduleOf(id) < 0) extra.push([L[4], null, !hasModules(S) ? "missing: this run has no module frames (M2)"
     : hasInferred(S) ? "none: no inferred module holds this kernel (M2)" : "none: no module frame above this kernel's launch call"]);
   up.splice(at, 0, ...extra);
@@ -120,10 +122,10 @@ function ladderOf(S, id) {
 const infMark = (S, id) => (id != null && S.dims.inferred(id) ? ` ${tag("inferred (M2)")}` : "");
 const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text)}${infMark(S, id)}</li>`).join("")}</ol>`;
 
-/** Where a row runs on the architecture ladder: the container and process of its lane (a device row: of the thread
- *  that launched it), then its component box. */
+/** Where a row runs on the architecture ladder: the container and process of its lane (a row on a stream, a device
+ *  row or an inferred module: of the thread that launched it, dims.launchOf), then its component box. */
 function whereHtml(S, id) {
-  const T = S.things, c = S.field("cause", id), comp = S.field("comp", id), L = S.dims.laneLevel;
+  const T = S.things, c = S.dims.launchOf(id), comp = S.field("comp", id), L = S.dims.laneLevel;
   let lane = S.field("lane", id);
   if (T[lane]?.kind === "stream" && c >= 0) lane = S.field("lane", c);
   const path = [L.container[lane], L.process[lane]].filter((i) => i >= 0);

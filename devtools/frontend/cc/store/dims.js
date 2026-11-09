@@ -179,13 +179,27 @@ export class Dimensions {
   /** The innermost module row (execution / module) above a row, or -1: up its own parents (a graphs-on device row's
    *  inferred modules, M2), then up the parents of the call that launched it (a code run's module frames). */
   moduleOf(id) {
-    const s = this.s, M = this.ladders.execution.indexOf("module"), c = s.field("cause", id);
-    for (let x of [s.field("parent", id), this.side[c] ? c : -1]) for (let n = 0; x >= 0 && n < 400; n++, x = s.field("parent", x)) if (this.ex[x] === M) return x;
+    const s = this.s, M = this.ladders.execution.indexOf("module");
+    for (let x of [s.field("parent", id), this.launchOf(id)]) for (let n = 0; x >= 0 && n < 400; n++, x = s.field("parent", x)) if (this.ex[x] === M) return x;
     return -1;
   }
 
   /** Whether a row is an inferred module (M2): matched to the code run's module frames, not recorded. */
   inferred(id) { return this.s.kinds[this.s.field("kind", id)].name === "inferred module"; }
+
+  /** The device rows an inferred module (M2) holds, in (start, id) order: its descendants that are not modules. */
+  held(id) {
+    const s = this.s, out = [], todo = [id];
+    while (todo.length) for (const c of s.children(todo.pop())) (this.inferred(c) ? todo : out).push(c);
+    return s.sorted(Uint32Array.from(out));
+  }
+
+  /** The call that launched a row, or -1: its cause when that is a launch call. An inferred module (M2) has no
+   *  cause of its own; it takes the launch call of the first device row it holds. */
+  launchOf(id) {
+    const c = this.s.field("cause", this.inferred(id) ? this.held(id)[0] : id);
+    return c >= 0 && this.side[c] ? c : -1;
+  }
 
   /** The hardware thing a row ran on (index into things), or -1: by kind first, else by its lane's kind. A stream
    *  lane sits under its GPU; a thread lane sits under its process, so its CPU is the one under the same host. */
