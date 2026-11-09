@@ -1,0 +1,52 @@
+# Key moments: where in a run each lesson of this rep can be seen. The command center's Rep world lists them in
+# order; "show me" moves the replay to the moment. Fields as in reps/I02A-L1_streamed_latency/moments.toml, except:
+#   result = the run's result file, relative to the run folder: rep.py's analysis/summary.json, read whole. Runs
+#            before its analysis existed have none and are listed as "results not computed"
+#   at, evidence = summary.json paths in ms. They are the run's medians and P50s over its measured requests, not
+#            the shown request's own times. `at` is the ISL 1024 P50 from send; pooled lists ISL 64, 256, 1024 in
+#            that order in every run (the frozen ISLs), so pooled[2] is ISL 1024
+
+# Request 0028 is the first measured ISL 1024 request in the frozen protocol. The pre-freeze short-count run
+# I01L2_20261030T231734Z_9fdad5 numbers its requests differently.
+request = "0028"
+result = "analysis/summary.json"
+
+[[moments]]
+id = "first-result"
+title = "The first result leaves the server after prefill"
+lesson = "Prompt length moves prefill, not decode."
+at = "pooled[2].ttft_ms.p50"
+event = "event (no token)"
+note = "The capture sees the server's first stream event only after prefill. Prefill (launch to first result) is the segment that grows with the prompt."
+evidence = [
+  { label = "prefill median, ISL 64", path = "segments.medians.ttft.64.launch_to_first_result" },
+  { label = "prefill median, ISL 1024", path = "segments.medians.ttft.1024.launch_to_first_result" },
+  { label = "TTFT P50 rise, ISL 1024 - 64", path = "decision.mean_ms" },
+]
+
+[[moments]]
+id = "first-token"
+title = "Server send, network and parsing add under a millisecond each"
+lesson = "Every millisecond has a component and a clock."
+at = "pooled[2].ttft_ms.p50"
+event = "event: token"
+note = "Between the server's first event and the SDK's first content event sit three segments on two clocks: server log to capture, capture to client, client parsing."
+evidence = [
+  { label = "server send (log to capture)", path = "segments.medians.ttft.1024.server_send" },
+  { label = "network to client (capture to client)", path = "segments.medians.ttft.1024.network_to_client" },
+  { label = "client parse", path = "segments.medians.ttft.1024.client_parse" },
+]
+
+[[moments]]
+id = "done"
+title = "Decode barely moves with the prompt"
+lesson = "Prompt length moves prefill, not decode."
+at = "pooled[2].e2e_ms.p50"
+event = "protocol complete"
+note = "Every request decodes exactly 32 tokens, so decode is nearly the same at every ISL. The end-to-end change between prompt lengths is mostly prefill."
+evidence = [
+  { label = "decode median, ISL 64", path = "segments.medians.e2e.64.decode" },
+  { label = "decode median, ISL 1024", path = "segments.medians.e2e.1024.decode" },
+  { label = "end-to-end P50, ISL 1024", path = "pooled[2].e2e_ms.p50" },
+]
+

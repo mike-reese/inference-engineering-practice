@@ -1,0 +1,17 @@
+# What the devtools runner (scripts/runner.py) may run for this rep. It runs only these commands, from the repo root,
+# with these arguments: nothing typed in the browser reaches a shell. "{rep}" is this folder, relative to the repo.
+id = "I02C-L1"
+title = "One slot, queued requests"
+spec = "README.md"
+# The runner refuses to start while a container of this project exists (a run from the terminal, a stuck stack).
+compose_projects = ["ie-i02c-l1"]
+
+# rep.py has one run level (TRACE=off) and no --progress json, so the runner learns no run id while it runs.
+[[actions]]
+id = "run"
+group = "run"
+label = "Pair run (A, then B on A's first content)"
+description = "Correctness smoke, then requests A and B on one engine slot (--max_batch_size 1): B is sent on A's first content and waits for A. Perf metrics and iteration stats on; no profiler; labeled not measured."
+measured = false
+minutes = 2
+command = ["uv", "run", "--no-sync", "python", "{rep}/rep.py"]
