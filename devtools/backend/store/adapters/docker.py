@@ -26,8 +26,9 @@ class DockerEvents:
             if not name or not d.get("action"):
                 ctx.count(self.source, "events with no container or action")
                 continue
-            lane = ctx.thing(f"host/{name}", "host", "container", name, {"project": d.get("project")},
-                             "Observed: Docker Engine API")
+            lane = ctx.docker_container(name, d.get("project"))
+            if lane is None:
+                continue
             action = d["action"]
             out.add(start=d["mono_ns"], end=d["mono_ns"], lane=lane, kind="container event", name=action,
                     eid=ctx.eid("docker/{name}/{action}#{n}", name=name, action=action.split(":")[0]),

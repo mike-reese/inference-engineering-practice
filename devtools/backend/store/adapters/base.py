@@ -16,12 +16,13 @@ from pathlib import Path
 from typing import NamedTuple
 
 SLUG = re.compile(r"[^A-Za-z0-9_.:+-]+")
+DEVTOOLS_COMPOSE = Path(__file__).resolve().parents[4] / "deploy/devtools.yaml"
 FIELDS = ("start", "end", "lane", "kind", "name", "req", "iter", "bytes", "box", "eid", "what", "args", "term",
           "source", "evidence", "raw_file", "raw_ptr", "span_id", "corr", "quirk", "parent", "parent_rule",
-          "code_origin", "code_where", "demangled", "contain")
+          "code_origin", "code_where", "full_name", "contain")
 DEFAULTS = {"req": None, "iter": -1, "bytes": math.nan, "box": "", "args": None, "raw_file": None, "raw_ptr": None,
             "span_id": None, "corr": None, "quirk": None, "parent": -1, "parent_rule": None, "code_origin": None,
-            "code_where": None, "demangled": None, "contain": True}
+            "code_where": None, "full_name": None, "contain": True}
 
 
 def slug(s, n: int = 72) -> str:
@@ -85,6 +86,7 @@ class Ctx:
         self.ordinal: dict[str, int] = {}
         self.lane_rules = [x for src in registry.sources.values() for x in src.get("lanes", [])]
         self.stats: dict[str, dict] = {}
+        self._projects: set[str] | None = None
 
     def thing(self, key: str, parent: str | None, kind: str, name: str, attrs: dict | None = None,
               evidence: str = "") -> str:
@@ -117,6 +119,40 @@ class Ctx:
             raise KeyError(f"no lane rule (registry 'lanes') for process {process!r}")
         return self.thing(f"host/{rule['container']}", "host", "container" if rule["container"] != "network"
                           else "network", rule["container_name"], {}, "Observed: topology.json (docker inspect)")
+
+    @property
+    def projects(self) -> set[str]:
+        """The Compose projects whose containers belong to this run: the run's own (topology.json), the rep's
+        (rep.toml compose_projects) and the devtools' (deploy/devtools.yaml name)."""
+        if self._projects is None:
+            out, d = set(), self.dir
+            if d is not None and (d / "topology.json").is_file():
+                out.add(json.loads((d / "topology.json").read_bytes()).get("project"))
+            if d is not None and (d.parent.parent / "rep.toml").is_file():
+                import tomllib
+                out |= set(tomllib.loads((d.parent.parent / "rep.toml").read_text()).get("compose_projects", []))
+            m = re.search(r'^name: "?([\w-]+)"?', DEVTOOLS_COMPOSE.read_text(), re.M) if DEVTOOLS_COMPOSE.is_file() else None
+            if m:
+                out.add(m[1])
+            self._projects = out - {None}
+        return self._projects
+
+    def docker_container(self, name: str, project: str | None = None) -> str | None:
+        """The container thing of a Docker container name (Docker events and stats), or None when it belongs to no
+        project of this run (dropped, counted). Compose names <project>-<service>-<n> of the run's own services
+        merge into the container the lane rules name (host/server), so one container is one thing."""
+        proj = project or next((p for p in sorted(self.projects, key=len, reverse=True)
+                                if name.startswith(p + "-")), None)
+        if proj not in self.projects:
+            self.count("docker", f"containers of other projects dropped: {name} ({proj})")
+            return None
+        m = re.fullmatch(re.escape(proj) + r"-(.+)-\d+", name)
+        rule = next((x for x in self.lane_rules if m and x["container"] == m[1]), None)
+        if rule is None:
+            return self.thing(f"host/{name}", "host", "container", name, {"project": proj}, "Observed: Docker Engine API")
+        key = self.container(rule["process_prefix"])
+        self.things[key][3].update({"docker": name, "project": proj})
+        return key
 
     def stream_lane(self, device: int, stream: int, name: str | None = None, attrs: dict | None = None) -> str:
         return self.thing(f"gpu{device}/stream {stream}", f"gpu{device}", "stream", name or f"stream {stream}",

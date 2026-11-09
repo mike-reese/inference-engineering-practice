@@ -281,6 +281,8 @@ class RunWriter:
         start = (start_abs - self.t0).astype(np.float64)
         end = (np.maximum(end_abs, start_abs) - self.t0).astype(np.float64)
         lane_keys, kinds, names_s, reqs = pick("lane"), pick("kind"), pick("name"), pick("req")
+        names_s = [derive.kernel_short_name(f or x) if kd == "kernel" else x
+                   for x, kd, f in zip(names_s, kinds, pick("full_name"))]
         lane = np.array([self.thing_ix[x] for x in lane_keys], np.uint16)
         kind = np.array([self.kind_code[x] for x in kinds], np.uint8)
         name = np.array([self._code(self.names, self.name_ix, x) for x in names_s], np.uint32)
@@ -295,7 +297,7 @@ class RunWriter:
                 "kind": kind, "tier": self.base_tier[kind], "depth": depth, "req": req,
                 "iter": np.array(pick("iter"), np.int32), "parent": np.full(k, -1, np.int32),
                 "cause": np.full(k, -1, np.int32), "name": name, "bytes": np.array(pick("bytes"), np.float64),
-                "layer": np.full(k, -1, np.int16)}
+                "layer": np.full(k, -1, np.int16), "flow": np.full(k, derive.FLOW_NONE, np.uint8)}
         for col in HOT:
             self.hot[col.name].extend(cols[col.name])
         self.own_parent.extend(np.array([at.get(p, -1) if p >= 0 else -1 for p in pick("parent")], np.int64))
@@ -414,7 +416,9 @@ class RunWriter:
         self.append(self.docker.feed([{**rec, "line": line}]))
 
     def docker_stats(self, name: str, mono_ns: int, values: dict) -> None:
-        thing = self.ctx.thing(f"host/{name}", "host", "container", name, {}, "Observed: Docker Engine API")
+        thing = self.ctx.docker_container(name)
+        if thing is None:
+            return
         self.sync_things()
         c = self.sample_clock(f"docker-{name}", self.metric_order["docker"], thing, {}, DOCKER_EVIDENCE)
         self.add_samples(c, mono_ns, values, {"mono_ns": mono_ns, "container": name, **values}, "docker-stats")
@@ -645,8 +649,7 @@ class RunWriter:
         return Manifest(
             run=self.run, generation=LIVE_GEN, status=status, t0_ns=self.t0,
             head_ns=float(time.monotonic_ns() - self.t0), tiers=list(TIERS),
-            kinds=[{"code": k.code, "name": k.kind, "tier": k.tier, "nest_bump": k.nest_bump, "derived": k.derived,
-                    "color": k.color, "label": k.label, "home": k.home} for k in self.reg.kinds],
+            kinds=[k.manifest() for k in self.reg.kinds],
             link_kinds=[{"code": k.code, "name": k.kind, "cause": k.cause, "label": k.label}
                         for k in self.reg.link_kinds],
             things=self.things_json(), names=list(self.names), requests=list(self.requests), metrics=self.catalog,
@@ -665,7 +668,9 @@ class RunWriter:
                                    "samples": {c.name: {"held": len(c.ts), "dropped": c.dropped}
                                                for c in self.clocks.values()},
                                    **self.notes,
-                                   **({"ended": self.ended} if self.ended else {})}})
+                                   "flow": "none (255) until the final import computes it",
+                                   **({"ended": self.ended} if self.ended else {})}},
+            dimensions={"ladders": self.reg.ladders, **self.reg.dimensions})
 
     def write_manifest(self) -> None:
         write_atomic(self.root / "manifest.json", self.manifest().to_json())
@@ -708,7 +713,7 @@ class RunWriter:
                 "depth": g["depth"], "bytes": None if math.isnan(g["bytes"]) else g["bytes"], "what": c["what"],
                 "args": json.loads(c["args"]) if c["args"] else None, "evidence": c["evidence"], "term": c["term"],
                 "source": c["source"], "corr": c["corr"], "quirk": c["quirk"], "parent_rule": c["parent_rule"],
-                "layer": None, "code": None,
+                "layer": None, "full_name": c["full_name"], "code": None,
                 "raw": {"file": c["raw_file"], "pointer": c["raw_ptr"]} if c["raw_file"] else None,
                 "parents": chain, "cause": brief(g["cause"]) if g["cause"] >= 0 else None,
                 "links": [{"from": a, "to": b, "kind": k, "weight": None, "rule": derive.MESSAGE_RULE,

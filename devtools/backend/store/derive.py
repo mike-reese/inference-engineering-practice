@@ -5,6 +5,7 @@ Arrays are indexed by row id unless a name says otherwise; rows are in (start, i
 from __future__ import annotations
 
 import heapq
+import re
 import sys
 from pathlib import Path
 
@@ -14,10 +15,11 @@ from .schema import NONE16
 
 SRC = Path(__file__).resolve().parents[3] / "src"
 
-ITERATION_RULE = ("Calculated: from the scheduler stamp of iteration N to the end of its own work, the later of its "
-                  "last component stamp with a loop counter of its own and the end of the device work it launched; "
-                  "never past the next scheduler stamp, so an iteration does not span the idle time before the next "
-                  "request. kv_cache stamps carry no loop counter (the newest one seen is filled in) and place no end")
+ITERATION_RULE = ("Calculated: from the scheduler stamp of iteration N to where its last own row ends (choice 5): "
+                  "its component stamps with a loop counter of their own, the device work it launched, and the NVTX "
+                  "ranges the profiler tied to it (the forward step). The idle gap before the next request belongs to "
+                  "no iteration. kv_cache stamps carry no loop counter (the newest one seen is filled in) and place no "
+                  "end")
 WINDOW_RULE = ("Calculated: a row on the executor loop thread (the lane of the forward-step NVTX ranges) belongs to "
                "the derived iteration whose window holds its start")
 
@@ -139,8 +141,8 @@ def depths(lane: np.ndarray, start: np.ndarray, end: np.ndarray, parent: np.ndar
 def derived_iterations(stamp_iter: np.ndarray, stamp_start: np.ndarray, row_iter: np.ndarray,
                        row_end: np.ndarray) -> np.ndarray:
     """One iteration per scheduler stamp (stamps in start order), per ITERATION_RULE. Returns the end of each.
-    row_iter/row_end: the iteration and end of the rows that are an iteration's own work (component stamps and
-    device ops); other rows, such as a blocking OS call on the loop thread, never extend an iteration."""
+    row_iter/row_end: the iteration and end of the rows that are an iteration's own work; other rows, such as a
+    blocking OS call on the loop thread, never extend an iteration."""
     its, counts = np.unique(stamp_iter, return_counts=True)
     if (counts > 1).any():
         raise ValueError(f"iteration {int(its[counts > 1][0])} has {int(counts.max())} scheduler stamps; "
@@ -148,9 +150,13 @@ def derived_iterations(stamp_iter: np.ndarray, stamp_start: np.ndarray, row_iter
     last = np.full(len(its), -np.inf)
     has = np.isin(row_iter, its)
     np.maximum.at(last, np.searchsorted(its, row_iter[has]), row_end[has])
-    own = last[np.searchsorted(its, stamp_iter)]
-    nxt = np.append(stamp_start[1:], np.inf)
-    return np.maximum(stamp_start, np.minimum(own, nxt))
+    return np.maximum(stamp_start, last[np.searchsorted(its, stamp_iter)])
+
+
+def iteration_windows(stamp_start: np.ndarray, end: np.ndarray) -> np.ndarray:
+    """The window WINDOW_RULE fills from: each derived iteration cut at the next scheduler stamp, so windows never
+    overlap (an iteration's device work can end after the next stamp)."""
+    return np.maximum(stamp_start, np.minimum(end, np.append(stamp_start[1:], np.inf)))
 
 
 def iterations(source_iter: np.ndarray, start: np.ndarray, on_loop_thread: np.ndarray, it_start: np.ndarray,
@@ -270,6 +276,115 @@ def layers(is_kernel: np.ndarray, it: np.ndarray, name_of_row: np.ndarray) -> np
         r = rows[its == v]
         out[r] = [-1 if x is None else x for x in layer_of(name_of_row[r].tolist())]
     return out
+
+
+FLOW_NONE = 255
+FLOW_RULE = "Calculated: registry kinds.json dimensions.flow"
+
+
+def iteration_flows(sched_iter: list[int], sched_stamp: list[dict], engine_names: list[str], prefill_rx: str,
+                    decode_rx: str, names: list[str]) -> dict[int, int]:
+    """Iteration -> flow code (names: the flow names). The scheduler's 'batch scheduled' stamp first: prefill when it
+    lists context requests or context tokens, else decode. An engine timestamp names the rest: 'prefill (iteration N)',
+    'decode (iterations a-b)'."""
+    prefill, decode = names.index("prefill"), names.index("decode")
+    out = {}
+    for it, st in zip(sched_iter, sched_stamp):
+        out[int(it)] = prefill if st.get("context") or (st.get("num_ctx_tokens") or 0) > 0 else decode
+    pre, dec = re.compile(prefill_rx), re.compile(decode_rx)
+    for x in engine_names:
+        if m := pre.match(x):
+            out.setdefault(int(m[1]), prefill)
+        elif m := dec.match(x):
+            for v in range(int(m[1]), int(m[2]) + 1):
+                out.setdefault(v, decode)
+    return out
+
+
+def flows(names: list[str], it: np.ndarray, it_flow: dict[int, int], named: np.ndarray, stream_box: np.ndarray,
+          request_tier: np.ndarray, req: np.ndarray, start: np.ndarray) -> np.ndarray:
+    """flow column (kinds.json dimensions.flow). named: a flow code from the row's own name (engine timestamps),
+    FLOW_NONE if none; stream_box: the row sits in a stream-out box; request_tier: the row is placed at execution
+    request (it spans every flow)."""
+    request_in, prefill, stream_out = names.index("request in"), names.index("prefill"), names.index("stream out")
+    out = np.full(len(it), FLOW_NONE, np.uint8)
+    for v in np.unique(it[it >= 0]).tolist():
+        if v in it_flow:
+            out[it == v] = it_flow[v]
+    out[named != FLOW_NONE] = named[named != FLOW_NONE]
+    out[stream_box] = stream_out
+    rest = (out == FLOW_NONE) & (req != NONE16)
+    pre = np.flatnonzero((out == prefill) & (req != NONE16))
+    turn = {}
+    for r, t in zip(req[pre].tolist(), start[pre].tolist()):
+        turn[r] = min(turn.get(r, t), t)
+    for i in np.flatnonzero(rest).tolist():
+        t = turn.get(int(req[i]))
+        if t is not None:
+            out[i] = request_in if start[i] < t else stream_out
+    out[request_tier] = FLOW_NONE
+    return out
+
+
+GENERIC_KERNELS = ("kernel", "Kernel", "Kernel2", "device_kernel")
+BUILTIN_TYPES = {"void", "bool", "char", "short", "int", "long", "unsigned", "signed", "float", "double", "half",
+                 "__half", "__nv_bfloat16", "size_t", "int8_t", "int16_t", "int32_t", "int64_t", "uint8_t", "uint16_t",
+                 "uint32_t", "uint64_t", "true", "false"}
+SHORT_NAME_RULE = ("Calculated (choice 7): the demangled function's base name; a generic base (kernel, Kernel, Kernel2, "
+                   "device_kernel) takes the leaf identifier of its first template argument as base<leaf>, or, when "
+                   "that argument is a builtin type, its namespace's leaf as ns::base. The full name is in full_name")
+
+
+def _top_level(s: str, sep: str) -> list[str]:
+    out, depth, cur = [], 0, []
+    for ch in s:
+        depth += {"<": 1, ">": -1, "(": 1, ")": -1}.get(ch, 0)
+        if ch == sep and depth == 0:
+            out.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+    return out + ["".join(cur)]
+
+
+def kernel_short_name(full: str) -> str:
+    """SHORT_NAME_RULE. cutlass::Kernel2<cutlass_80_wmma_..._align8>(..) -> Kernel2<cutlass_80_wmma_..._align8>;
+    std::enable_if<..>::type internal::gemvx::kernel<int, ..>(..) -> gemvx::kernel; void ns::FooKernel<8u>(..) ->
+    FooKernel; a plain name stays as it is."""
+    parts = kernel_base_name(full).split("::")
+    base = parts[-1]
+    if base not in GENERIC_KERNELS:
+        return base
+    s, depth, cut = full.strip(), 0, None
+    for i, ch in enumerate(s):
+        depth += {"<": 1, ">": -1, "(": 1, ")": -1}.get(ch, 0)
+        if ch == "(" and depth == 1:
+            cut = i
+    head = (s[:cut] if cut is not None else s).rstrip()
+    leaf = None
+    if head.endswith(">"):
+        depth = 0
+        for i in range(len(head) - 1, -1, -1):
+            depth += {">": 1, "<": -1}.get(head[i], 0)
+            if depth == 0:
+                first = _top_level(head[i + 1:-1], ",")[0]
+                flat = "".join(ch for d, ch in _depths(first) if d == 0)
+                ids = re.findall(r"[A-Za-z_]\w*", flat)
+                leaf = ids[-1] if ids else None
+                break
+    if leaf and leaf not in BUILTIN_TYPES:
+        return f"{base}<{leaf}>"
+    return f"{parts[-2]}::{base}" if len(parts) > 1 else base
+
+
+def _depths(s: str):
+    depth = 0
+    for ch in s:
+        if ch == "<":
+            depth += 1
+        yield depth, ch
+        if ch == ">":
+            depth -= 1
 
 
 def kernel_base_name(demangled: str) -> str:

@@ -9,7 +9,7 @@ export const COLUMNS = {
   events: [
     ["id", "<u4"], ["start", "<f8"], ["end", "<f8"], ["lane", "<u2"], ["comp", "<u2"], ["kind", "|u1"], ["tier", "|u1"],
     ["depth", "<u2"], ["req", "<u2"], ["iter", "<i4"], ["parent", "<i4"], ["cause", "<i4"], ["name", "<u4"], ["bytes", "<f8"],
-    ["layer", "<i2"],
+    ["layer", "<i2"], ["flow", "|u1"],
   ],
   links: [["from", "<u4"], ["to", "<u4"], ["kind", "|u1"], ["weight", "<f4"]],
   samples: [["ts", "<f8"]],   // then m0..mk ("<f4"), one per catalog code in the block header's `metrics`

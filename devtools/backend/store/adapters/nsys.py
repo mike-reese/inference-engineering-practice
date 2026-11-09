@@ -28,7 +28,7 @@ from .base import Ctx, Rows, request_short, slug
 EVIDENCE = "Observed: Nsight Systems on the run clock (CLOCK_MONOTONIC)"
 MEMCPY_KIND = {1: "host to device", 2: "device to host", 8: "device to device", 10: "peer to peer"}
 NO_STREAM = 4294967295           # CUPTI_SYNCHRONIZATION_INVALID_VALUE: a sync record with no stream
-NO_STREAM_THING = ("no stream (event and context syncs)",
+NO_STREAM_THING = ("no stream",
                    "Observed: CUPTI streamId 0xFFFFFFFF (CUPTI_SYNCHRONIZATION_INVALID_VALUE) means the sync record "
                    "has no stream; cupti_activity.h: not valid for cuCtxSynchronize, cuEventSynchronize")
 FORWARD_STEP = ("executor forward step (NVTX range)", "The executor runs one forward step: {name}.")
@@ -200,7 +200,7 @@ class Nsys:
                         what=what, args=r["args"] or None, term=term, source=self.source, evidence=EVIDENCE,
                         corr=r["corr"], quirk=",".join(quirk) or None,
                         bytes=float(r["bytes"]) if r["bytes"] is not None else float("nan"),
-                        demangled=r["args"].get("demangled") if r["source"] == "kernel" else None,
+                        full_name=r["args"].get("demangled") if r["source"] == "kernel" else None,
                         contain=r["stream"] is None)
             if r["corr"] is not None:
                 by_corr.setdefault(r["corr"], {}).setdefault("launch" if r["source"] == "cuda_runtime" else "work",

@@ -56,6 +56,8 @@ COLUMNS: dict[str, tuple[Column, ...]] = {
         Column("name", "<u4", "string index (manifest.names)"),
         Column("bytes", "<f8", "bytes moved, NaN if none"),
         Column("layer", "<i2", "decoder layer of a kernel (RMSNorm heuristic of nsys.py layer_of), -1 if none"),
+        Column("flow", "|u1", "the row's flow (kinds.json dimensions.flow names: request in, prefill, decode, stream "
+                              "out), 255 if none"),
     ),
     "links": (
         Column("from", "<u4", "row id"),
@@ -74,6 +76,7 @@ COLD: tuple[tuple[str, str], ...] = (
     ("eid", "VARCHAR"), ("what", "VARCHAR"), ("args", "VARCHAR"), ("evidence", "VARCHAR"), ("term", "VARCHAR"),
     ("source", "VARCHAR"), ("corr", "BIGINT"), ("quirk", "VARCHAR"), ("parent_rule", "VARCHAR"),
     ("raw_file", "VARCHAR"), ("raw_ptr", "VARCHAR"), ("code_origin", "VARCHAR"), ("code_where", "VARCHAR"),
+    ("full_name", "VARCHAR"),
 )
 
 
@@ -86,7 +89,7 @@ class Manifest:
     t0_ns: int
     head_ns: float
     tiers: list
-    kinds: list               # [{code, name, tier, nest_bump, derived, color, label, home}]
+    kinds: list               # [{code, name, tier, nest_bump, derived, color, label, home, place}]
     link_kinds: list          # [{code, name, cause, label}]
     things: list              # [{i, key, parent, kind, name, pre, post, attrs, evidence}]
     names: list
@@ -99,6 +102,7 @@ class Manifest:
     tools: dict               # {nsys?: {run, path, session_start_ns, evidence}, ncu?: {run, path, ...}}: open in Nsight
     inputs_sig: str
     import_stats: dict = field(default_factory=dict)
+    dimensions: dict = field(default_factory=dict)   # registry kinds.json ladders and dimensions, as imported
     schema: str = SCHEMA
 
     def to_json(self) -> bytes:

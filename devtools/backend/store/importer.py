@@ -89,7 +89,6 @@ ENGINE_EVIDENCE = ("Observed: the engine's /prometheus/metrics, scraped once a s
                    "collector, CLOCK_MONOTONIC at receipt; series summed over their label sets")
 ENGINE_PROCESS = "server"     # the engine's samples sit on its container (registry lanes: process prefix "server")
 GPU_GROUP = re.sub(r"[^A-Za-z0-9]+", "-", GPU_TRACK).strip("-")   # gpu.csv samples: group samples-gpu0-nvidia-smi
-GENERIC_KERNEL = "kernel"     # the nsys short name of templated cuBLAS kernels; the demangled base name replaces it
 SUPERSEDED = ("nsys/", "torch/", "ncu/")
 ROW_GROUP = 4096
 
@@ -325,8 +324,10 @@ def read_captures(root: Path, ctx: Ctx) -> tuple[dict, dict]:
             tail = LineTail(root / rel)
             caps[rel] = tail.read(final=True)
             stats[rel] = {"records": len(caps[rel]), "unreadable lines": tail.bad}
-    for name in sorted({r["container"] for r in caps.get(DOCKER_STATS, [])}):
-        ctx.thing(f"host/{name}", "host", "container", name, {}, "Observed: Docker Engine API")
+    keep = {name: ctx.docker_container(name) for name in sorted({r["container"] for r in caps.get(DOCKER_STATS, [])})}
+    if DOCKER_STATS in caps:
+        caps[DOCKER_STATS] = [r for r in caps[DOCKER_STATS] if keep[r["container"]]]
+        caps["docker things"] = {k: v for k, v in keep.items() if v}
     if caps.get(ENGINE_CAPTURE):
         caps["engine thing"] = ctx.container(ENGINE_PROCESS)
     return caps, stats
@@ -365,7 +366,7 @@ def capture_groups(caps: dict, stats: dict, reg: Registry, pos_of: dict, catalog
         for r in read(DOCKER_STATS):
             by.setdefault(r["container"], []).append((int(r["mono_ns"]), r))
         for name in sorted(by):
-            group(f"docker-{name}", by[name], order["docker"], f"host/{name}", DOCKER_EVIDENCE)
+            group(f"docker-{name}", by[name], order["docker"], caps["docker things"][name], DOCKER_EVIDENCE)
     if ENGINE_CAPTURE in caps:
         sr = engine_series(reg.metric_rules)
         recs, dropped = [], 0
@@ -533,15 +534,20 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     term = col("term")
     loop_lanes = set(lane[(term == FORWARD_STEP[0])].tolist())
     on_loop = is_src & np.isin(lane, list(loop_lanes))
-    it, it_stats = derive.iterations(src_iter, start_abs, on_loop, start_abs[d_rows], end_abs[d_rows],
+    window = derive.iteration_windows(start_abs[d_rows], end_abs[d_rows]) if len(d_rows) else end_abs[d_rows]
+    it, it_stats = derive.iterations(src_iter, start_abs, on_loop, start_abs[d_rows], window,
                                      src_iter[d_rows], cause, base[kind] == DEVICE_TIER)
     box_s = col("box")
     if len(d_rows):
-        own = is_src & np.isin(kinds_s, own_kinds) & (box_s != INFERRED_ITERATION_BOX)
+        own = is_src & ((np.isin(kinds_s, own_kinds) & (box_s != INFERRED_ITERATION_BOX))
+                        | ((kinds_s == "nvtx range") & (src_iter >= 0)))
         before = end_abs[d_rows].copy()
         end_abs[d_rows] = derive.derived_iterations(src_iter[d_rows], start_abs[d_rows].astype(np.float64), it[own],
                                                     end_abs[own].astype(np.float64)).astype(np.int64)
-        it_stats["derived iteration ends moved by the launching-call iteration"] = int((before != end_abs[d_rows]).sum())
+        it_stats["derived iteration ends moved by the launching-call iteration and forward-step ranges"] = int(
+            (before != end_abs[d_rows]).sum())
+        it_stats["derived iterations ending after the next scheduler stamp"] = int(
+            (end_abs[d_rows][:-1] > start_abs[d_rows][1:]).sum())
     it_req: dict[int, str] = {}                              # ie-run/2: request of an iteration, from run.json rows
     for i in np.flatnonzero(np.isin(source_s, list(MESSAGE_SOURCES)) & (src_iter >= 0)).tolist():
         if req_own[i]:
@@ -565,10 +571,11 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     # Names, component boxes, depth, kernel layers
     name_s = name0.copy()
     layer = derive.layers(kind == reg.kind("kernel").code, it, name_s)
-    demangled = col("demangled")
-    generic = np.flatnonzero((kinds_s == "kernel") & (name_s == GENERIC_KERNEL) & (demangled != None))  # noqa: E711
-    base_of = {d: derive.kernel_base_name(d) for d in set(demangled[generic].tolist())}
-    name_s[generic] = [base_of[d] for d in demangled[generic].tolist()]
+    full_name = col("full_name")
+    krows = np.flatnonzero(kinds_s == "kernel")
+    full_name[krows] = [f or x for f, x in zip(full_name[krows].tolist(), name_s[krows].tolist())]
+    short_of = {f: derive.kernel_short_name(f) for f in set(full_name[krows].tolist())}
+    name_s[krows] = [short_of[f] for f in full_name[krows].tolist()]
     names = sorted(set(name_s.tolist()))
     name_index = {x: k for k, x in enumerate(names)}
     name_code = np.fromiter((name_index[x] for x in name_s.tolist()), np.uint32, n)
@@ -578,6 +585,23 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     except derive.RowError as e:
         raise ImportStop(f"{run}: {e.what}: row {describe(e.row)}") from None
     comp_ix = np.array([NONE16 if b is None else pos_of[box_key[b]] for b in box.tolist()], np.uint16)
+    fr = reg.dimensions["flow"]
+    flow_names = fr["names"]
+    sched_i = np.flatnonzero(is_src & (kinds_s == "component stamp") & (name_s == fr["stamp"]) & (src_iter >= 0))
+    args_s = col("args")
+    eng = np.flatnonzero(kinds_s == "engine timestamp")
+    it_flow = derive.iteration_flows(src_iter[sched_i].tolist(),
+                                     [(json.loads(a) if a else {}).get("stamp") or {} for a in args_s[sched_i].tolist()],
+                                     name_s[eng].tolist(), fr["engine_names"]["prefill"], fr["engine_names"]["decode"],
+                                     flow_names)
+    named = np.full(n, derive.FLOW_NONE, np.uint8)
+    for which in ("prefill", "decode"):
+        rx = re.compile(fr["engine_names"][which])
+        named[eng[[bool(rx.match(x)) for x in name_s[eng].tolist()]]] = flow_names.index(which)
+    roles = process_roles(run, things, pos_of, lane, comp_ix)
+    stream_box = np.array([b in fr["stream_out_boxes"] for b in box.tolist()], bool)
+    flow = derive.flows(flow_names, it, it_flow, named, stream_box,
+                        np.isin(kinds_s, reg.execution_kinds("request")), req, start_abs)
     t0 = clk["t0_ns"] if clk["t0_ns"] is not None else old.t0_ns if old else int(start_abs.min())
     t0_rule = (clk["rule"] if clk["t0_ns"] is not None else "the previous generation's t0" if old
                else "the earliest row's start (first import)")
@@ -649,11 +673,11 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     # Write: event blocks (CCVB + Parquet), links, samples, profiles, aux
     hot = {"id": ids, "start": start, "end": end, "lane": lane, "comp": comp_ix, "kind": kind, "tier": tier,
            "depth": depth, "req": req, "iter": it.astype(np.int32), "parent": parent, "cause": cause,
-           "name": name_code, "bytes": nbytes, "layer": layer}
+           "name": name_code, "bytes": nbytes, "layer": layer, "flow": flow}
     cold = {"eid": eid, "what": col("what"), "args": col("args"), "evidence": col("evidence"), "term": term,
             "source": source_s, "corr": col("corr"), "quirk": col("quirk"), "parent_rule": parent_rule,
             "raw_file": col("raw_file"), "raw_ptr": col("raw_ptr"), "code_origin": col("code_origin"),
-            "code_where": col("code_where")}
+            "code_where": col("code_where"), "full_name": full_name}
     del src, c
     con = duckdb.connect(config={"threads": 2})
     blocks = write_events(con, out, gen, hot, cold)
@@ -678,7 +702,8 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
                                       "export minus the run's UTC - CLOCK_MONOTONIC offset; every nsys row's run-clock "
                                       "time is this plus its export time"}
     if "ncu" in tools and ncu_meta:
-        tools["ncu"] |= {"kernels": ncu_meta, "counters": list(reg.ncu_headline)}
+        tools["ncu"] |= {"kernels": ncu_meta, "counters": list(reg.ncu_headline),
+                         "event_ids": sorted({r["event_id"] for r in profile_rows if r["event_id"] is not None})}
 
     kind_counts = {reg.kinds[k].kind: int(v) for k, v in enumerate(np.bincount(kind, minlength=len(reg.kinds))) if v}
     stats = {
@@ -689,9 +714,11 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
         "iterations": it_stats, "request of an iteration filled (ie-run/2 rule)": filled,
         "parents": {"rows with a parent": int((parent >= 0).sum()), "crossing (not nested)": crossing},
         "causes": int((cause >= 0).sum()),
-        "kernel names": {"rule": f"rows named {GENERIC_KERNEL!r} take the base name of the demangled name",
-                         "renamed": len(generic), "names": sorted(set(base_of.values()))},
-        "layers": {"kernels with a layer": int((layer >= 0).sum())},
+        "kernel names": {"rule": derive.SHORT_NAME_RULE, "rows": len(krows), "full names": len(short_of),
+                         "short names": len(set(short_of.values()))},
+        "flow": {"rule": derive.FLOW_RULE, **{nm: int((flow == c).sum()) for c, nm in enumerate(flow_names)},
+                 "none": int((flow == derive.FLOW_NONE).sum())},
+        "layers": {"kernels with a layer": int((layer >= 0).sum())}, "process roles": roles,
         "links": {k: int(v) for k, v in zip(*np.unique([x[2] for x in links], return_counts=True))} if links else {},
         "raw pointers": {"rows": int(sum(x is not None for x in cold["raw_file"]))},
         "metrics": {"rows": len(metrics), "unresolved inputs": unresolved_inputs},
@@ -702,15 +729,14 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     }
     return Manifest(
         run=run, generation=gen, status="final", t0_ns=int(t0), head_ns=float(end.max()), tiers=list(TIERS),
-        kinds=[{"code": k.code, "name": k.kind, "tier": k.tier, "nest_bump": k.nest_bump, "derived": k.derived,
-                "color": k.color, "label": k.label, "home": k.home} for k in reg.kinds],
+        kinds=[k.manifest() for k in reg.kinds],
         link_kinds=[{"code": k.code, "name": k.kind, "cause": k.cause, "label": k.label} for k in reg.link_kinds],
         things=[{"i": i, "key": t[0], "parent": parent_pos[i], "kind": t[2], "name": t[3], "pre": i, "post": post[i],
                  "attrs": t[4], "evidence": t[5]} for i, t in enumerate(things)],
         names=names, requests=requests, metrics=catalog, blocks=blocks,
         aux={"name": "aux.json", "bytes": len(aux_bytes), "etag": etag(aux_bytes)},
         source={"run_dir": str(run_dir.relative_to(repo)), "importer": "store.importer"}, tools=tools,
-        inputs_sig=sig, import_stats=stats)
+        inputs_sig=sig, import_stats=stats, dimensions={"ladders": reg.ladders, **reg.dimensions})
 
 
 def _objects(values: list) -> np.ndarray:
@@ -878,6 +904,38 @@ def write_profiles(con, out: Path, rows: list[dict]) -> None:
     con.execute(f"""COPY (SELECT {sel} FROM prof ORDER BY event_id, profile_row, metric)
         TO '{out}/profiles.parquet' (FORMAT parquet, COMPRESSION zstd)""")
     con.unregister("prof")
+
+
+ROLE_RULE = ("Calculated: a process boundary of the component map (components.json) is the process whose lanes carry "
+             "the rows of its boxes; processes with no pid recorded take no role")
+
+
+def process_roles(run: str, things: list[tuple], pos_of: dict, lane: np.ndarray, comp: np.ndarray) -> dict:
+    """attrs.role of each process thing: {boundary, name, rule}. Returns process key -> boundary key."""
+    kind_of, parent_of = {t[0]: t[2] for t in things}, {t[0]: t[1] for t in things}
+
+    def process_of(key):
+        while key is not None and kind_of.get(key) != "process":
+            key = parent_of.get(key)
+        return key
+    seen: dict[str, set] = {}
+    for ln, cx in set(zip(lane.tolist(), comp.tolist())):
+        if cx == NONE16:
+            continue
+        bound = things[cx][1]
+        proc = process_of(things[ln][0])
+        if things[pos_of[bound]][4].get("kind") != "process" or proc is None or \
+                things[pos_of[proc]][4].get("pid") is None:
+            continue
+        seen.setdefault(proc, set()).add(bound)
+    out = {}
+    for proc, bounds in sorted(seen.items()):
+        if len(bounds) > 1:
+            raise ImportStop(f"{run}: process {proc} carries the rows of two process boundaries {sorted(bounds)}")
+        b = bounds.pop()
+        things[pos_of[proc]][4]["role"] = {"boundary": b, "name": things[pos_of[b]][3], "rule": ROLE_RULE}
+        out[proc] = b
+    return out
 
 
 def component_things(reg: Registry) -> tuple[list[tuple], dict]:

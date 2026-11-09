@@ -21,6 +21,12 @@ class KindRule:
     color: str
     label: str
     home: str
+    place: dict                   # {execution, hardware, architecture}: the kind's place per dimension
+
+    def manifest(self) -> dict:
+        return {"code": self.code, "name": self.kind, "tier": self.tier, "nest_bump": self.nest_bump,
+                "derived": self.derived, "color": self.color, "label": self.label, "home": self.home,
+                "place": self.place}
 
 
 @dataclass(frozen=True)
@@ -44,6 +50,13 @@ class Registry:
     ncu_units: dict               # headline counter -> (unit, {report display unit: factor to that unit})
     digest: str                   # hash of every registry file: part of a run's inputs signature
     sources: dict                 # source name (run_json, nsys, torch_profiler, ncu, inventory) -> its registry file
+    ladders: dict                 # dimension -> its tiers, coarse to fine (kinds.json ladders)
+    dimensions: dict              # kinds.json dimensions: align, storage, stops, walk, handoff, ran_on, kernel_class, flow
+
+    def execution_kinds(self, tier: str) -> list[str]:
+        """The kinds placed at an execution tier without a rule (e.g. "request": client request)."""
+        return [k.kind for k in self.kinds if isinstance(k.place.get("execution"), str)
+                and k.place["execution"].split(" (")[0] == tier]
 
     @classmethod
     def load(cls, root: Path = REGISTRY_DIR) -> "Registry":
@@ -58,7 +71,7 @@ class Registry:
             if not 0 <= e["tier"] < len(TIERS) or e["home"] not in levels:
                 raise ValueError(f"kinds.json: {e['kind']!r} has tier {e['tier']} or home {e['home']!r} out of range")
             kinds.append(KindRule(i, e["kind"], e["tier"], e.get("nest_bump", False), e.get("derived", False),
-                                  e["color"], e["label"], e["home"]))
+                                  e["color"], e["label"], e["home"], e["place"]))
         links = tuple(LinkKind(i, e["kind"], e["cause"], e["label"]) for i, e in enumerate(k["link_kinds"]))
         for names, what in (([x.kind for x in kinds], "kind"), ([x.kind for x in links], "link kind"),
                             ([b["key"] for b in c["boxes"]], "box"), ([b["key"] for b in c["bounds"]], "bound")):
@@ -87,7 +100,7 @@ class Registry:
             raise ValueError(f"ncu.json: headline counters {unknown} need a keep_metrics unit that has a scale table")
         units = {x: (keep[x]["unit"], scale[keep[x]["unit"]]) for x in headline}
         return cls(tuple(kinds), links, levels, {m["metric"]: m for m in k["metrics"]}, c, tracks, measures, headline,
-                   units, digest, {src["source"]: src for src in sources})
+                   units, digest, {src["source"]: src for src in sources}, k["ladders"], k["dimensions"])
 
     def event_rule(self, source: str, kind: str, **match) -> dict:
         """The event_kinds entry of a source registry for a kind (and match fields, e.g. thread="sdk")."""

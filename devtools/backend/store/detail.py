@@ -165,6 +165,7 @@ class Generation:
                 "what": r["what"], "args": json.loads(r["args"]) if r["args"] else None, "evidence": r["evidence"],
                 "term": r["term"], "source": r["source"], "corr": r["corr"], "quirk": r["quirk"],
                 "parent_rule": r["parent_rule"], "layer": r["layer"] if r["layer"] >= 0 else None,
+                "full_name": r["full_name"],
                 "code": {"origin": r["code_origin"], "where": r["code_where"]} if r["code_origin"] else None,
                 "raw": {"file": r["raw_file"], "pointer": r["raw_ptr"]} if r["raw_file"] else None,
                 "parents": [self._brief(rows[p]) for p in chains[i]],
