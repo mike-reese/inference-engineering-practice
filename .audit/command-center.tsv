@@ -19,3 +19,9 @@ ts	phase	decision	why	evidence	result
 2026-11-09T03:00:30Z	M1a	keymap follows 2.4 (12 keys); section 9 rows saying unchanged get corrected	2.4 is the spec and D13 matches it	M1a report choice 8	doc edit in M1b-store
 2026-11-09T03:00:30Z	M1a	default: I02C wire frames before the first client body read count as request in	routine rule detail; owner may say wire frames are excluded	M1a report choice 2	default applied, reported
 2026-11-09T03:02:00Z	M1b	launched 4 parallel agents: spine (m1b-spine :7712), arch+stacked (m1b-arch :7713), bar+inspector (m1b-bar :7714), store+sidebar+checks (m1b-store :7715)	separate worktrees, servers, ccv sessions; store-cc mounted read-only so no agent shares writable state	scratchpad/m1b-brief.md	running
+2026-11-09T05:01:10Z	M1b	accepted m1b-store (6c63b73..5f6c455), merged into cc-migration	reran pytest and store-check (store-cc) myself after merge; regress deferred to after all M1b merges	87 passed; storecheck 0	VERIFIED partial; regress after merges
+2026-11-09T05:01:10Z	M1b	dropped the registry load check m1b-store added	owner rule: no validation rules beyond the approved change	memory feedback-approved-scope-only	removed
+2026-11-09T05:01:10Z	M1b	accepted the metric hardware tiers as placed (system, device, unit per doc 3.2)	doc is the reference for data meaning; D13 put GPU % at device, doc 3.2 at system	m1b-store report	default; owner may move power, temperature, clocks, MC util, NVMe busy
+2026-11-09T05:01:10Z	M1b	the three uncovered 7.4 live items go into live.sh	they are named 7.4 M1 checks, so approved scope	m1b-store report gap 3	M1c
+2026-11-09T05:01:10Z	restart	machine restarted; resumed spine, arch, bar agents; restarted runner :7702 and :7711	agents hold uncommitted worktree edits	docker Exited (255)	running
+2026-11-09T05:01:10Z	directive	GPU free; coordinator alone runs GPU work: re-record R1 kernels, run live.sh and the GPU rep test	owner message; one GPU, no contention	owner message	in progress
