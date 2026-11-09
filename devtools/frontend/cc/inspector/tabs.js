@@ -97,20 +97,21 @@ function layerUnit(S, id) {
  * The execution units above a row, coarsest first, then the row: its request and iteration (hot req and iter), the
  * rows of an execution tier on the parent chain of the call that launched it (phase, a code run's module frames, the
  * call), its own parent chain (a graphs-on device row's inferred modules, M2) just above that call, and the layer
- * unit of its (iteration, layer). A device row with no module row above it says so (3.1, M2). An inferred module
- * (M2) climbs from the launch call of its first device row, without the call, and sits in the layer of its device
- * rows that carry one.
+ * unit of its (iteration, layer). A device row with no module row above it says so (3.1, M2). A module takes its
+ * request and iteration from the first device row it holds (dims.held) and sits in the layer of its device rows that
+ * carry one; an inferred module (M2) also climbs from that row's launch call, without the call.
  */
 function ladderOf(S, id) {
   const X = idx(S), L = S.dims.ladders.execution, ex = S.dims.ex, out = [], inf = S.dims.inferred(id);
-  const r = S.field("req", id), it = S.field("iter", id);
+  const held = ex[id] === tierIndex(S, "module") ? S.dims.held(id) : null, via = held?.[0] ?? id;
+  const r = S.field("req", via), it = S.field("iter", via);
   if (r !== NONE16 && X.req.has(r) && X.req.get(r) !== id) out.push([L[0], X.req.get(r), unitText(S, L[0], X.req.get(r))]);
   if (it >= 0 && X.iter.has(it) && X.iter.get(it) !== id) out.push([L[1], X.iter.get(it)]);
   const climb = (x) => { const a = []; for (let n = 0; x >= 0 && n < 400; n++, x = S.field("parent", x)) if (S.dims.side[x] || ex[x] >= 2) a.push([execLabel(S, x), x]); return a.reverse(); };
   const launch = climb(S.dims.launchOf(id)), own = climb(S.field("parent", id));
   const call = launch.findIndex(([, y]) => S.dims.side[y]), up = call < 0 ? [...launch, ...own] : [...launch.slice(0, call), ...own, ...(inf ? [] : launch.slice(call))];
   const inner = up.findIndex(([, y]) => ex[y] > tierIndex(S, "layer") || S.dims.side[y]), at = inner < 0 ? up.length : inner;
-  const extra = [], lr = inf ? S.dims.held(id).find((x) => S.field("layer", x) >= 0) ?? -1 : id;
+  const extra = [], lr = held ? held.find((x) => S.field("layer", x) >= 0) ?? -1 : id;
   if (lr >= 0 && S.field("layer", lr) >= 0 && it >= 0) { const lu = layerUnit(S, lr); if (lu >= 0) extra.push([L[3], lu, unitText(S, L[3], lu)]); }
   if (isDevice(S, id) && S.dims.moduleOf(id) < 0) extra.push([L[4], null, !hasModules(S) ? "missing: this run has no module frames (M2)"
     : hasInferred(S) ? "none: no inferred module holds this kernel (M2)" : "none: no module frame above this kernel's launch call"]);

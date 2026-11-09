@@ -187,10 +187,12 @@ export class Dimensions {
   /** Whether a row is an inferred module (M2): matched to the code run's module frames, not recorded. */
   inferred(id) { return this.s.kinds[this.s.field("kind", id)].name === "inferred module"; }
 
-  /** The device rows an inferred module (M2) holds, in (start, id) order: its descendants that are not modules. */
+  /** The device rows a module holds, in (start, id) order: an inferred module's (M2) descendants that are not
+   *  modules; a measured module's (a code run's frame) rows launched by the launch calls under it. */
   held(id) {
     const s = this.s, out = [], todo = [id];
-    while (todo.length) for (const c of s.children(todo.pop())) (this.inferred(c) ? todo : out).push(c);
+    if (this.inferred(id)) while (todo.length) for (const c of s.children(todo.pop())) (this.inferred(c) ? todo : out).push(c);
+    else while (todo.length) for (const c of s.children(todo.pop())) { todo.push(c); if (this.side[c]) out.push(...s.caused(c)); }
     return s.sorted(Uint32Array.from(out));
   }
 

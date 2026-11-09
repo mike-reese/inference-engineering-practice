@@ -432,12 +432,15 @@ export class RunStore {
     return [this.startOf[list[a]], end];
   }
 
+  /** Rows whose cause is `id` (a launch call's device rows), by id. */
+  caused(id) { return valuesOf(this.causes, id); }
+
   /** Links touching a row (zmq, network, serves) plus its cause and the rows it caused. */
   linksOf(id) {
     const out = [], L = this.links;
     if (L) for (const s of [this.linkFrom, this.linkTo]) for (const i of valuesOf(s, id)) out.push({ from: L.from[i], to: L.to[i], kind: this.linkKinds[L.kind[i]]?.name ?? `link ${L.kind[i]}` });
     const c = this.field("cause", id); if (c >= 0) out.push({ from: c, to: id, kind: "cause" });
-    for (const x of valuesOf(this.causes, id)) out.push({ from: id, to: x, kind: "cause" });
+    for (const x of this.caused(id)) out.push({ from: id, to: x, kind: "cause" });
     return out;
   }
 
