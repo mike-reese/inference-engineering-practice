@@ -89,7 +89,11 @@ def check_run(con, run: str) -> tuple[list[str], dict]:
         data = (g / f"{b['name']}.ccvb").read_bytes()
         if len(data) != b["bytes"] or etag(data) != b["etag"]:
             bad.append(f"{b['name']}: bytes or etag differ from the manifest")
-        header, cols = decode(data)
+        try:
+            header, cols = decode(data)
+        except ValueError as e:
+            bad.append(f"{b['name']}: {e}")
+            continue
         again = encode({k: v for k, v in header.items() if k not in ("schema", "columns")},
                        [(c["name"], c["type"], cols[c["name"]]) for c in header["columns"]])
         if again != data:
