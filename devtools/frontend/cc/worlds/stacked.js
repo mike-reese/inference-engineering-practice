@@ -459,7 +459,7 @@ export function mount(el) {
     perf.sample("stacked_tick", performance.now() - c0);   // main-thread time of this frame's animation and draw calls
     raf = requestAnimationFrame(tick);
   }
-  const unsub = subscribe((s, ch) => { if (ch.rev || store() !== S) refresh(); apply(s); });
+  const unsub = subscribe((s, ch) => { const t0 = performance.now(); if (ch.rev || store() !== S) refresh(); apply(s); perf.sample("stacked_apply", performance.now() - t0); });
   refresh(); apply(state);
   raf = requestAnimationFrame(tick);
 

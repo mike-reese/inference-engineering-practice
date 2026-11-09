@@ -6,6 +6,7 @@
 import { state, subscribe, select, now, store, units, metricInputs, FLOW_COLOR } from "./control/control.js";
 import { fmtValue, sourceOf, periodOf } from "./sidebar/samples.js";
 import { NONE16 } from "./store/columns.js";
+import { perf } from "./perf.js";
 
 // ---------------- v1 style.css rules, scoped under .v1arch
 const V1_CSS = `
@@ -549,7 +550,7 @@ export function mountArch(el, { size = "lens" } = {}) {
     if (v.cards.length || v.nets.length) updateInfra(ctx);
   }
 
-  const unsub = subscribe(() => { build(); update(); });
+  const unsub = subscribe(() => { const t0 = performance.now(); build(); update(); perf.sample("arch_update", performance.now() - t0); });
   let rf = 0;
   const ro = new ResizeObserver(() => { cancelAnimationFrame(rf); rf = requestAnimationFrame(() => { fitMap(); drawLinks(); }); });
   ro.observe(el);
