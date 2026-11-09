@@ -1,7 +1,9 @@
 """/api/v3: the ie-run/3 store over HTTP (COMMAND_CENTER.md 6.4).
 
 GET /api/v3/runs                              {runs: [...]}, newest run first
-GET /api/v3/runs/{run}/manifest               manifest.json; ETag, no-cache (revalidate: a new generation replaces it)
+GET /api/v3/runs/{run}/manifest               manifest.json plus metric_places, every registry metric's place (its
+                                              hardware tier), joined here so a registry change needs no import; ETag,
+                                              no-cache (revalidate: a new generation replaces it)
 GET /api/v3/runs/{run}/blocks/{gen}/{name}    a CCVB block, or aux.json; immutable, ETag = the manifest's etag
 GET /api/v3/runs/{run}/detail?ids=1,2         {rows: [...]}, at most 256 ids; ?eids=<eid> (one eid per parameter,
                                               eids are free text) resolves stable eids to rows
@@ -15,6 +17,7 @@ A live run's detail, resolve and raw are answered by its writer (every row is in
 from __future__ import annotations
 
 import asyncio
+import functools
 import json
 import os
 import re
@@ -24,13 +27,19 @@ from aiohttp import web
 
 import runs
 from . import detail, reps
+from .registry import Registry
 from .schema import etag
 
 CC_STORE = Path(os.environ.get("CC_STORE", "/mnt/ie-data/cc/store"))
 REPO = Path(os.environ.get("REPO", "/repo"))
 SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STAMP = re.compile(r"(\d{8}T\d{6}Z)")
-_manifests: dict[str, tuple[tuple, bytes, str, dict]] = {}   # run -> (stat key, bytes, etag, parsed)
+_manifests: dict[str, tuple[tuple, bytes, str, dict]] = {}   # run -> (stat key, served bytes, their etag, parsed)
+
+
+@functools.cache
+def _metric_places() -> dict:
+    return Registry.load().metric_places()
 
 
 def _manifest(run: str) -> tuple[bytes, str, dict]:
@@ -44,8 +53,9 @@ def _manifest(run: str) -> tuple[bytes, str, dict]:
     key = (st.st_mtime_ns, st.st_size)
     hit = _manifests.get(run)
     if not hit or hit[0] != key:
-        data = path.read_bytes()
-        hit = _manifests[run] = (key, data, etag(data), json.loads(data))
+        m = json.loads(path.read_bytes())
+        data = json.dumps(m | {"metric_places": _metric_places()}, separators=(",", ":")).encode()
+        hit = _manifests[run] = (key, data, etag(data), m)
     return hit[1], hit[2], hit[3]
 
 

@@ -3,7 +3,8 @@
 # output and reads its state from window.__cc. Expected values come from the store (/api/v3/runs), the run's
 # latency.json, the rep's moments.toml and rep.toml, registry/components.json and COMMAND_CENTER.md, never literals.
 # A page that reads a snapshot instead of the store (D13's session-data.json beside its index.html) narrows the run
-# and rep choices to what both hold. Launch uses the runner's dry_run, so nothing starts.
+# and rep choices to what both hold, and its moments are the snapshot's. Launch uses the runner's dry_run, so nothing
+# starts; the checks that need a real recording (the head moves, follow holds the head, the mask) are in live.sh.
 # Usage: devtools/verify/regress.sh, or CC_URL=http://127.0.0.1:7710/static/prototypes/D13/index.html for D13.
 # RUNNER_URL (default: the page's origin, which proxies /runner) picks the runner. Exits 1 on any failed check.
 set -u
@@ -72,8 +73,6 @@ folders = {rep_id(f.parent): f.parent for f in sorted(Path("reps").glob("*/READM
 folder = folders[rep]
 moments = tomllib.loads((folder / "moments.toml").read_text())
 out["MOMENTS"] = len(moments["moments"])
-show = next(m for m in moments["moments"] if m["id"] == "prefill")
-out["SHOW_ID"], out["SHOW_EVENT"] = show["id"], show["event"]
 
 def ttft(r):  # the measured request's client TTFT in latency.json, or None when not computed
     lat = folders_of.get(r, Path("-")) / "results" / r / "latency.json"
@@ -96,6 +95,10 @@ no_runs = [i for i in sorted(folders) if not any(f == folders[i] for f in folder
            and (snap is None or (any(x["id"] == i for x in snap["reps"]) and not any(x["rep"] == i for x in snap["runs"])))]
 out["NO_RUNS_REP"] = no_runs[0] if no_runs else ""
 out["SNAPSHOT"] = snap_url if snap is not None else "none (store)"
+# "Show me" selects the event the page's own moment names: the snapshot's, else the served catalog's (moments.toml)
+page_reps = snap["reps"] if snap is not None else get(f"{app}/api/v3/reps")["reps"]
+show = next(m for m in next(r for r in page_reps if r["id"] == rep)["moments"]["moments"] if m["id"] == "prefill")
+out["SHOW_ID"], out["SHOW_EVENT"] = show["id"], show["event"]
 
 actions = tomllib.loads((folder / "rep.toml").read_text())["actions"]
 out["LAUNCH"] = actions[0]["id"]
@@ -229,15 +232,6 @@ else job="runner at $RUNNER has no dry_run (restart it: make runner-down && make
 check "launch: runner dry run returns the $LAUNCH job and starts nothing" "$job" "True $LAUNCH None"
 $C click --css ".sh-pan [data-p=launch][data-v=$LAUNCH]" >/dev/null; sleep 2
 check "launch: live mode" "$(ev '__cc.session.mode')" "live"
-h1=$(ev '__cc.head'); sleep 0.5
-check "launch: head moves" "$(real "$h1" && ev "__cc.head > $h1 && $h1 > 0")" "True"
-check "launch: follow keeps cursor at head" "$(ev 'Math.abs(__cc.t-__cc.head) <= __cc.head*0.2')" "True"
-# The mask is 0 while the view glides (220 ms) to new bounds and the head is still right of it: poll for up to 1 s.
-for _ in 1 2 3 4 5 6 7 8 9 10; do
-  mask=$(ev "+document.querySelector('#stage .sp2 svg rect[fill=\"#0b0f16\"]').getAttribute('width') > 0")
-  [ "$mask" = True ] && break; sleep 0.1
-done
-check "launch: spine masks the future" "$mask" "True"
 $C shot regress-live >/dev/null
 $C click --css ".ch-nav [data-sh=follow]" >/dev/null; sleep 0.3
 check "launch: follow off" "$(ev '__cc.follow')" "False"
