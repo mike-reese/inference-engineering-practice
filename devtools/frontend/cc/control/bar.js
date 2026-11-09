@@ -6,7 +6,7 @@
 // Chromium drew nothing but x = 0 in a viewBox that wide, so times map onto 0..VW in float64 first.
 import { state, subscribe, store, setDock, select, seek, step, selectMetric, goBack, goForward, now, tierName, stops, units, eventsIn,
   togglePlay, setPace, setRate, metricInputs, setWorld, loadRun, DIM_COLOR } from "./control.js";
-import { TABS } from "../inspector/tabs.js";
+import { TABS, unitText } from "../inspector/tabs.js";
 import { openInNsight } from "../inspector/nsight.js";
 import { roleOf, fmtSpan } from "../sidebar/samples.js";
 import { runOf, esc } from "../session.js";
@@ -19,6 +19,7 @@ const OLD_TAB = { selection: "selected", control: "run" };
 const COPY_KINDS = new Set(["memcpy", "memset"]);
 const TITLED = 1500;   // up to this many units in the window draw one rect each, with its name on hover; more merge per pixel
 const OVER_PX = 600;   // overview sample columns
+const PAD_MIN = 1000;  // ns: the least the detail strip shows on each side of the bounds
 const VW = 10000;      // strip width in viewBox units
 
 const CSS = `
@@ -196,8 +197,10 @@ export function mountBar(el) {
   });
   over.addEventListener("click", (e) => { if (store()) seek(tAt(over, e, ext)); });
 
-  function windowOf(s, S) {
-    const [b0, b1] = s.bounds, pad = Math.max((b1 - b0) * 0.1, (S.extent[1] - S.extent[0]) / 2000, 1);
+  /** The detail strip's window: the bounds and 10% of them on each side, at least PAD_MIN. (D13's floor, 1/2000 of
+   *  its 3.4 ms timeline, is 46 ms on R1's 93 s and hid every layer and kernel.) */
+  function windowOf(s) {
+    const [b0, b1] = s.bounds, pad = Math.max((b1 - b0) * 0.1, PAD_MIN);
     return [b0 - pad, b1 + pad];
   }
   /** x on a strip: [a, b] in ns maps onto 0..VW. */
@@ -227,11 +230,11 @@ export function mountBar(el) {
       <line class="cur" x1="${O(s.t)}" x2="${O(s.t)}" y1="0" y2="14" stroke="#fff" stroke-width="1"/>
       <rect class="fut" x="${O(s.head)}" width="${Math.max(0, VW - O(s.head))}" y="0" height="14" fill="#0b0f16" opacity=".85"/>`;
 
-    win = windowOf(s, S);
+    win = windowOf(s);
     const [a, b] = win, X = xOf(win), W = Math.max(200, Math.round(detail.getBoundingClientRect().width) || 1000);
     // units of every execution tier inside the window (copies on the last row): one rect each with its name, or
     // merged per pixel when there are more than TITLED
-    const hits = [], L = S.dims.ladders.execution, K = L.indexOf("kernel"), G = L.indexOf("layer");
+    const hits = [], L = S.dims.ladders.execution, K = L.indexOf("kernel");
     for (let e = 0; e < L.length; e++) {
       const u = units(e), hit = (k) => hits.push(u.ids[k], u.start[k], u.end[k], e === K && COPY_KINDS.has(S.kinds[S.field("kind", u.ids[k])]?.name) ? 6 : e);
       for (let k = lowerT(u.start, a - u.reach); k < u.start.length && u.start[k] <= b; k++) if (u.end[k] >= a) hit(k);
@@ -241,7 +244,7 @@ export function mountBar(el) {
     if (hits.length / 4 <= TITLED) {
       for (let h = 0; h < hits.length; h += 4) {
         const id = hits[h], x0 = X(Math.max(a, hits[h + 1])), r = hits[h + 3];
-        const title = r === G ? `layer ${S.field("layer", id)} of iteration ${S.field("iter", id)}` : S.nameText(S.field("name", id));
+        const title = unitText(S, L[Math.min(r, K)], id);
         rows += `<rect x="${x0}" width="${Math.max(VW / 800, X(Math.min(b, hits[h + 2])) - x0)}" y="${rowY(r)}" height="3.5" fill="${TIER_COLOR[r]}" opacity=".85"><title>${esc(title)}</title></rect>`;
       }
     } else {

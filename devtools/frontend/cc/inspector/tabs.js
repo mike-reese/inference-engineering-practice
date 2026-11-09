@@ -77,7 +77,7 @@ function execLabel(S, id) { if (S.dims.side[id]) return "kernel (CPU side)"; con
 
 /** A unit's label at its execution tier: a request by its name, a layer unit (keyed by its first kernel row) by its
  *  layer and iteration, a copy on the kernel tier marked as one. */
-function unitText(S, tier, id) {
+export function unitText(S, tier, id) {
   const r = S.field("req", id);
   if (tier === "request" && r !== NONE16 && S.requests[r]) return short(S, S.requests[r]);
   if (tier === "layer") return `layer ${S.field("layer", id)} of iteration ${S.field("iter", id)}`;
@@ -110,7 +110,7 @@ function ladderOf(S, id) {
   if (S.field("layer", id) >= 0 && it >= 0) { const lu = layerUnit(S, id); if (lu >= 0) extra.push([L[3], lu, unitText(S, L[3], lu)]); }
   if (isDevice(S, id) && !hasModules(S)) extra.push([L[4], null, "missing: this run has no module frames (M2)"]);
   up.splice(at, 0, ...extra);
-  return [...out, ...up, [execLabel(S, id), id]];
+  return [...out, ...up, [execLabel(S, id), id, unitText(S, execLabel(S, id), id)]];
 }
 const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text)}</li>`).join("")}</ol>`;
 
@@ -173,7 +173,7 @@ function card(S, ci, t, again) {
   const gpu = S.things.filter((p) => p.kind === "process" && p.pre >= c.pre && p.post <= c.post)
     .map((p) => [p, at("gpu.app.memory.used", p.i)]).filter(([, m]) => !Number.isNaN(m));
   return `<div class="card"><div class="title">${thingLink(S, ci)}<span class="state">${esc(life.state ?? "no lifecycle event yet")}${life.health ? ` · ${esc(life.health)}` : ""}</span></div>
-    <div class="image">${esc(ins?.Config?.Image ?? (auxes.has(S) ? "image not in topology.json" : "…"))} · ${esc(c.attrs?.project ?? "")}</div>
+    <div class="image">${[esc(ins?.Config?.Image ?? (auxes.has(S) ? "image not in topology.json" : "…")), esc(c.attrs?.project ?? "")].filter(Boolean).join(" · ")}</div>
     <div>cpu ${Number.isNaN(cpu) ? "–" : cpu.toFixed(1)}% · mem ${mib(at("docker.mem_bytes"))}${limit} MiB${Number.isNaN(rx) ? "" : ` · rx ${rx.toFixed(0)} tx ${Number.isNaN(tx) ? "–" : tx.toFixed(0)} B/s`}</div>
     ${gpu.map(([p, m]) => `<div style="color:#9fc3ff">GPU held: ${m.toFixed(0)} MiB · ${esc(p.attrs?.role?.name ?? p.name)} pid ${esc(p.attrs?.pid ?? "–")}</div>`).join("")}</div>`;
 }
@@ -212,7 +212,8 @@ function rowView(S, s, again) {
   const t0 = S.startOf[id], t1 = S.endOf[id], r = S.field("req", id), send = r !== NONE16 && idx(S).req.has(r) ? S.startOf[idx(S).req.get(r)] : null;
   const flow = S.dims.flowOf(id), hw = S.dims.ranOn(id);
   const when = `<div>at <b>${ms(t0)} ms</b> from the run's t0${send != null ? ` · ${ms(t0 - send)} ms from its request's send` : ""}${t1 > t0 ? `, lasts <b>${ms(t1 - t0)} ms</b> (${fmtSpan(t1 - t0)})` : ""} ${seekLink(t0)}</div>`;
-  const left = [`<div class="label" style="color:${DIM_COLOR.execution}">execution · ${esc(execLabel(S, id))}</div><h3>${esc(nm(S, id))}</h3>${when}`];
+  const tier = execLabel(S, id), title = tier === "request" ? `${nm(S, id)} ${unitText(S, tier, id)}` : nm(S, id);
+  const left = [`<div class="label" style="color:${DIM_COLOR.execution}">execution · ${esc(tier)}</div><h3>${esc(title)}</h3>${when}`];
   if (isDevice(S, id) && !isCopy(S, id)) left.push(`<div class="label">kernel</div>${kernelHtml(S, id, d)}`);
   if (isCopy(S, id)) {
     const c = S.field("cause", id);
@@ -368,11 +369,18 @@ function segbar(title, segs, ttft) {
       style="width:${(100 * Math.max(0, x.value)) / total}%;background:${x.color}" title="${esc(x.name)} = ${esc(x.formula)}: ${(+x.value).toFixed(3)} ms">${(+x.value).toFixed(3)} ms</span>`).join("")}</div>
     <div class="dim">${ttft ? `client TTFT ${(+ttft.value).toFixed(3)} ms (aux.json); ` : ""}the ${segs.length} segments above sum to ${total.toFixed(3)} ms (click one)</div>`;
 }
-function metricRows(S, s, list) {
+/** The input rows of metrics that the store holds, each once. */
+const inputRows = (S, list) => [...new Set(list.flatMap((m) => (m.inputs?.rows ?? []).filter((id) => id < S.N)))];
+/** Where a metric's inputs come from: the recorded source of each input row (row detail) and each sample block. */
+const sourcesOf = (S, m, get) => [...new Set([...inputRows(S, [m]).map((id) => get?.(id)?.source), ...(m.inputs?.samples ?? []).map((x) => x[0])].filter(Boolean))];
+/** The metric table, with each metric's inputs and their sources. */
+function metricRows(S, s, list, again) {
+  const get = withDetail(S, inputRows(S, list), again);
   const inputs = (m) => [...(m.inputs?.rows ?? []).map((id) => (id < S.N ? link(S, id, nm(S, id).slice(0, 28)) : `row ${id}`)),
     ...(m.inputs?.samples?.length ? [tag(`${m.inputs.samples.length} samples`)] : []), ...(m.inputs?.unresolved ?? []).map((u) => tag(`unresolved ${u}`))].join("<br>");
-  return `<table class="metrics"><tr><th>metric</th><th>formula</th><th>value</th><th>inputs (click)</th></tr>${list.map((m) => `<tr data-m="${esc(mid(m))}" class="${s.metric === mid(m) ? "on" : ""}">
-    <td>${esc(m.name)}</td><td><code>${esc(m.formula)}</code></td><td>${valueText(m)}</td><td class="inp">${inputs(m) || "–"}</td></tr>`).join("")}</table>`;
+  const source = (m) => (get || !inputRows(S, [m]).length ? sourcesOf(S, m, get).join(" · ") || "–" : "…");
+  return `<table class="metrics"><tr><th>metric</th><th>formula</th><th>value</th><th>inputs (click)</th><th>source</th></tr>${list.map((m) => `<tr data-m="${esc(mid(m))}" class="${s.metric === mid(m) ? "on" : ""}">
+    <td>${esc(m.name)}</td><td><code>${esc(m.formula)}</code></td><td>${valueText(m)}</td><td class="inp">${inputs(m) || "–"}</td><td class="dim">${esc(source(m))}</td></tr>`).join("")}</table>`;
 }
 const metricsTab = {
   key: "metrics", label: "Metrics",
@@ -387,10 +395,10 @@ const metricsTab = {
     el.innerHTML = `<p class="muted">Metrics as they are calculated at import (aux.json), with the rows each one reads. Click a metric or a split segment: its inputs light on the timeline and in the world.
       The run's results, lessons and key moments: <a class="go" data-world="rep">Rep world ▸</a></p>
       <p>${S.requests.length ? reqPicker(S, r) : "no requests in this run"}</p>
-      ${segs.length ? `<div class="cols"><div>${segbar(`TTFT split · <span style='color:#3fb950'>measured</span> (this run, ${esc(short(S, rid))})`, segs, ttft)}</div></div>
+      ${segs.length ? `<div class="cols"><div>${segbar(`TTFT split · <span style='color:#3fb950'>measured</span> (run ${esc(S.run)})`, segs, ttft)}</div></div>
         <div class="segleg">${segs.map((x) => `<span><i style="background:${x.color}"></i>${esc(x.name)} = ${esc(x.formula)}</span>`).join("")}</div>` : ""}
-      ${list.length ? metricRows(S, s, list) : `<p class="muted">aux.json has no metrics for ${esc(short(S, rid) || "this run's requests")}.</p>`}
-      ${runLevel.length ? `<div class="label">run-level (no request)</div>${metricRows(S, s, runLevel)}` : ""}
+      ${list.length ? metricRows(S, s, list, again) : `<p class="muted">aux.json has no metrics for ${esc(short(S, rid) || "this run's requests")}.</p>`}
+      ${runLevel.length ? `<div class="label">run-level (no request)</div>${metricRows(S, s, runLevel, again)}` : ""}
       ${gone.length ? `<div class="label">not calculated</div><ul>${gone.map((u) => `<li>${esc(short(S, u.what))}: ${esc(u.why)}</li>`).join("")}</ul>` : ""}`;
   },
 };
@@ -588,7 +596,10 @@ const kernelsTab = {
 };
 
 // ---------------------------------------------------------------- Run
-const RESULTS = ["client TTFT", "client mean ITL", "client end-to-end", "engine TTFT", "engine mean ITL", "perceived TPS"];
+/** D13's reference rows, as aux.json names them: TTFT on each clock, the queue, the prefill forward (the split segment
+ *  from first_scheduled_time to first_token_time, which is engine TTFT minus the queue), mean ITL and end-to-end. */
+const RESULTS = [["client TTFT"], ["wire TTFT"], ["engine TTFT"], ["engine queue"], ["prefill forward", (n) => n.endsWith(": first_scheduled_time → first_token_time")],
+  ["client mean ITL"], ["client end-to-end"]];
 function sessionHtml(s) {
   const ss = s.session, rep = repOf(ss.rep);
   const run = (id, label) => { const r = runOf(id); return `<tr><td>${label}</td><td><code>${esc(id)}</code> ${r ? `${esc(runKind(r))} · ${whenOf(r)}${r.result ? "" : " · results not computed"}` : ""}</td></tr>`; };
@@ -612,7 +623,8 @@ const runTab = {
     const copies = ["memcpy", "memset"].reduce((a, n) => a + (K.has(n) ? S.dims.byKind[K.get(n)].length : 0), 0);
     const samples = S.sampleGroups.reduce((a, g) => a + g.n, 0), labels = r?.labels ?? {};
     const reqs = aux ? [...new Set(aux.metrics.map((m) => m.request_id).filter(Boolean))] : [];
-    const val = (q, n) => aux.metrics.find((m) => m.request_id === q && m.name === n);
+    const found = RESULTS.map(([label, test]) => [label, reqs.map((q) => aux.metrics.find((m) => m.request_id === q && (test ? test(m.name) : m.name === label)))]).filter(([, per]) => per.some(Boolean));
+    const get = found.length ? withDetail(S, inputRows(S, found.flatMap(([, per]) => per.filter(Boolean))), again) : null;
     const basis = aux?.facts?.basis?.value, gpu = basis?.gpu ?? basis?.gpu_start;
     el.innerHTML = `<div class="cols"><div>
         <h3>${esc(S.run)} <span class="muted">generation ${S.generation} · ${esc(S.status)}${r ? ` · ${esc(runKind(r))} · ${whenOf(r)}` : ""}</span></h3>
@@ -628,9 +640,10 @@ const runTab = {
           <tr><td>reports</td><td>${openBtn(S.tools.nsys, "Nsight Systems ↗", "Open the run's report in Nsight Systems") || (S.tools.ncu ? "" : "–")} ${openBtn(S.tools.ncu, "Nsight Compute ↗", "Open the run's Nsight Compute report")}</td></tr></table>
       </div><div>
         <h3>results <span class="muted">aux.json, calculated at import</span></h3>
-        ${!aux ? `<p class="muted">loading aux.json…</p>` : reqs.length ? `<table class="rows"><tr><th>request</th>${RESULTS.map((n) => `<th class="num">${esc(n)}</th>`).join("")}</tr>
-          ${reqs.map((q) => `<tr><td>${esc(short(S, q))}</td>${RESULTS.map((n) => { const m = val(q, n); return `<td class="num">${m ? `${num(+(+m.value).toFixed(3))} ${esc(m.unit)}` : "–"}</td>`; }).join("")}</tr>`).join("")}</table>`
-          : `<p class="muted">aux.json has no per-request metrics for this run${aux.metrics.length ? ` (${aux.metrics.length} run-level ones: see Metrics)` : ""}.</p>`}
+        ${!aux ? `<p class="muted">loading aux.json…</p>` : found.length ? `<table class="rows"><tr><th>metric</th>${reqs.map((q) => `<th class="num">${esc(short(S, q))}</th>`).join("")}<th>source</th></tr>
+          ${found.map(([label, per]) => `<tr><td>${esc(label)}</td>${per.map((m) => `<td class="num">${m ? `${num(+(+m.value).toFixed(3))} ${esc(m.unit)}` : "–"}</td>`).join("")}
+            <td>${get ? [...new Set(per.filter(Boolean).flatMap((m) => sourcesOf(S, m, get)))].map(tag).join(" ") : "…"}</td></tr>`).join("")}</table>`
+          : `<p class="muted">${reqs.length ? `aux.json has none of ${RESULTS.map(([label]) => label).join(", ")} for this run's requests (see Metrics)` : `aux.json has no per-request metrics for this run${aux.metrics.length ? ` (${aux.metrics.length} run-level ones: see Metrics)` : ""}`}.</p>`}
         ${aux?.facts?.config?.value ? `<details><summary>config ${tag(aux.facts.config.source ?? "")}</summary><pre class="json">${esc(aux.facts.config.value)}</pre></details>` : ""}
       </div></div>${tail}`;
   },
