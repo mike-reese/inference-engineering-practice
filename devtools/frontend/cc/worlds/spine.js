@@ -52,7 +52,7 @@ const CSS = `
 .sp2 .rl { position:absolute; left:4px; width:${GL - 10}px; display:flex; align-items:center; padding:0 6px; cursor:pointer; border-radius:4px;
   font:11.5px ui-monospace, monospace; text-transform:uppercase; letter-spacing:.3px; border-left:3px solid currentColor; background:#070a10; white-space:nowrap; overflow:hidden; }
 .sp2 .rl:hover { background:#1a2333; } .sp2 .rl.on { font-weight:700; color:#fff !important; background:#ffffff1a; }
-.sp2 .hl { position:absolute; left:${GL}px; right:${GR}px; height:${HEAD}px; display:flex; gap:12px; align-items:center; overflow:hidden;
+.sp2 .hl { position:absolute; top:0; left:${GL}px; right:${GR}px; height:${HEAD}px; display:flex; gap:12px; align-items:center; overflow:hidden;
   white-space:nowrap; font-size:11.5px; color:#a9b8cc; pointer-events:none; }
 .sp2 .hl b { color:#fff; background:#ffffff14; padding:0 6px; border-radius:3px; }
 .sp2 .axl { fill:#8a90a0; font:10.5px ui-monospace, monospace; dominant-baseline:central; }
@@ -200,7 +200,6 @@ export function mount(el) {
     set(clipRect, { x: GL, y: 0, width: size.w - GL - GR, height: size.h });
     L.rows.forEach((r, i) => Object.assign(rowLabels[i].style, { top: `${r.y}px`, height: `${r.h}px` }));
     Object.assign(sampleLbl.style, { top: `${sTop}px`, height: `${sH}px` }); Object.assign(xferLbl.style, { top: `${xTop}px`, height: `${XFER}px` });
-    hl.style.top = "0px";
   }
 
   // ---------------- painting: the canvas and the marks, at most once per frame unless a state frame asks now

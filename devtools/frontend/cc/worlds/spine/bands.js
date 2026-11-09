@@ -95,10 +95,8 @@ export class Bands {
     return c;
   }
 
-  /**
-   * Paint tracks, the sample strip, copies, units and labels for the window [f.a, f.b]. Returns the units drawn, for
-   * the caller's frame budget notes. @param {CanvasRenderingContext2D} g @param {Layout} L @param {Frame} f
-   */
+  /** Paint tracks, the sample strip, copies, units and labels for the window [f.a, f.b].
+   *  @param {CanvasRenderingContext2D} g @param {Layout} L @param {Frame} f */
   paint(g, L, f) {
     const S = this.S, x0 = L.gl, xw = L.w - L.gl - L.gr, X = (t) => x0 + ((t - f.a) / (f.b - f.a)) * xw;
     const cx = (x) => Math.max(x0 - 20, Math.min(L.w + 20, x));
@@ -106,20 +104,18 @@ export class Bands {
     g.beginPath(); g.rect(x0, 0, xw, L.h); g.clip();
     L.rows.forEach((r, i) => { g.fillStyle = i === f.tier ? "#ffffff14" : "#ffffff08"; g.fillRect(x0, r.y, xw, r.h); });
     if (S) this.samples(g, L, f, X, cx);
-    let drawn = 0;
     this.litDrawn = new Set();
     if (S) {
       const clip = [x0, x0 + xw];
-      drawn += this.spans(g, f, X, cx, clip, this.copies, null, { y: L.xTop, h: L.xferH }, COPY_MIN_PX, null);
+      this.spans(g, f, X, cx, clip, this.copies, null, { y: L.xTop, h: L.xferH }, COPY_MIN_PX, null);
       this.bands.forEach((band, i) => {
         const r = L.rows[i];
         if (!band.u.ids.length) { this.note(g, x0 + 8, r.y + r.h / 2, `missing: this run has no ${band.name} rows`); return; }
-        drawn += this.spans(g, f, X, cx, clip, band.u, band, r, 1, (id) => unitLabel(S, band.name, id));
+        this.spans(g, f, X, cx, clip, band.u, band, r, 1, (id) => unitLabel(S, band.name, id));
       });
       if (f.metric) this.instants(g, L, f, X);
     }
     g.restore();
-    return drawn;
   }
 
   /** Metric inputs that are no unit of any band (instants such as arrival_time) light as a tick across the bands. */
@@ -142,9 +138,7 @@ export class Bands {
   spans(g, f, X, cx, [xmin, xmax], L, band, R, minW, label) {
     const base = f.metric ? 0.22 : band && band.i === f.tier ? 0.85 : 0.5;
     const runs = new Map(), raised = [], labels = [];
-    let n = 0;
     eachVisible(L, f.a, f.b, (k) => {
-      n++;
       const s = L.start[k], e = L.end[k], id = L.ids[k], xa = cx(X(s)), w = Math.max(minW, cx(X(e)) - xa);
       const half = band?.low ? (band.low[k] ? 2 : 1) : 0;
       const on = band != null && s <= f.t && f.t < e, sel = id === f.sel, pe = id === f.pe, hov = id === f.hover, lit = f.lit.has(id);
@@ -190,7 +184,6 @@ export class Bands {
         g.fillText(s, c, y + h / 2);
       }
     }
-    return n;
   }
 
   /** The sample strip: fill = SMs active, line = DRAM read + write (or GPM DRAM), each as a min-max per pixel column
