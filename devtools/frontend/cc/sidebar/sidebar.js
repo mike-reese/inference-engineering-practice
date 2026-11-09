@@ -2,8 +2,10 @@
 // run's catalog (manifest `metrics`, sidebar: true), grouped by clock: one source, one sampling period. Each row shows
 // its value at the cursor, a min-max sparkline over state.bounds (it zooms with the execution tier), and its source
 // and measured period. A row with no fresh sample at the cursor is greyed with the reason; a value its unit cannot
-// hold is shown as recorded and flagged. A click focuses hardware and selects the thing the metric is sampled on.
-import { state, subscribe, select, focus, store, tierName } from "../control/control.js";
+// hold is shown as recorded and flagged. Each metric sits at a hardware tier (its registry place, RunStore.metricTier):
+// a click sets that tier, which focuses hardware, and selects the thing the metric is sampled on; while hardware is
+// focused, the rows of its tier are marked.
+import { state, subscribe, select, focus, setTier, store, tierName } from "../control/control.js";
 import { evidence, fmtValue, implausible, why, sourceOf, periodOf } from "./samples.js";
 
 const SPARK_W = 240, SPARK_H = 20;
@@ -49,18 +51,18 @@ export function mountHardwareSide(el) {
       sec.innerHTML = `<h3></h3>`;
       sec.querySelector("h3").textContent = `${[...new Set(list.map(({ m }) => sourceOf(m)))].join(" + ")} · ${periodOf(S, list[0].i)}`;
       for (const { m, i } of list) {
-        const thing = S.things[m.thing];
+        const thing = S.things[m.thing], tier = S.metricTier(i), place = tier >= 0 ? tierName("hardware", tier) : "no hardware tier";
         const row = document.createElement("div");
         row.className = "hwrow"; row.setAttribute("role", "button");
-        row.title = `${m.label} · ${m.metric} · on ${thing?.name ?? "no thing"}`;
+        row.title = `${m.label} · ${m.metric} · on ${thing?.name ?? "no thing"} · tier: ${place}`;
         row.innerHTML = `<span class="nm"></span><span class="val"></span><div class="sp"><canvas aria-hidden="true"></canvas><div class="cur"></div></div>
           <span class="ev"></span><span class="why"></span>`;
         row.querySelector(".nm").textContent = m.label;
-        row.querySelector(".ev").textContent = evidence(S, i);
-        row.addEventListener("click", () => { focus("hardware"); if (thing) select(thing.key); });
+        row.querySelector(".ev").textContent = `${evidence(S, i)} · ${place}`;
+        row.addEventListener("click", () => { if (tier >= 0) setTier("hardware", tier); else focus("hardware"); if (thing) select(thing.key); });
         const cv = row.querySelector("canvas");
         cv.width = SPARK_W * devicePixelRatio; cv.height = SPARK_H * devicePixelRatio;
-        const r = { m, i, key: thing?.key ?? null, row, val: row.querySelector(".val"), why: row.querySelector(".why"), cur: row.querySelector(".cur"),
+        const r = { m, i, tier, key: thing?.key ?? null, row, val: row.querySelector(".val"), why: row.querySelector(".why"), cur: row.querySelector(".cur"),
           sp: row.querySelector(".sp"), g: cv.getContext("2d"), lo: 0, hi: 100, spark: null };
         // sparkline scale: 0-100 for percents, else the metric's range over the run, widened by every spark drawn later
         if (!isPct(m.unit)) { r.lo = Infinity; r.hi = -Infinity; widen(r, S.series(i, S.extent, 256)); }
@@ -78,6 +80,7 @@ export function mountHardwareSide(el) {
       for (const r of ROWS) { r.spark = S.series(r.i, [a, b], SPARK_W); widen(r, r.spark); draw(r, a, b); }
     }
     if (ch.sel || ch.rev || ch.session) for (const r of ROWS) r.row.classList.toggle("sel", r.key != null && r.key === s.sel);
+    if (ch.focus || ch.tiers || ch.rev || ch.session) for (const r of ROWS) r.row.classList.toggle("tier", s.focus === "hardware" && r.tier === s.tiers.hardware);
     if (ch.t || ch.bounds || ch.rev || ch.session) {
       const x = Math.max(0, Math.min(1, (s.t - a) / (b - a || 1)));
       for (const r of ROWS) r.cur.style.transform = `translateX(${x * (r.sp.clientWidth - 1)}px)`;
