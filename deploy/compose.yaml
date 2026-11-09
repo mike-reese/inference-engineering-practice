@@ -25,7 +25,7 @@ services:
       HF_HUB_OFFLINE: "1"
       TRANSFORMERS_OFFLINE: "1"
     volumes:
-      - "${HOME}/.local/share/inference-engineering/models/Qwen2.5-0.5B-Instruct/7ae557604adf67be50417f59c2c2f167def9a775:/model:ro"
+      - "${MODEL_DIR:-${HOME}/.local/share/inference-engineering/models/Qwen2.5-0.5B-Instruct/7ae557604adf67be50417f59c2c2f167def9a775}:/model:ro"
       - "${RESULTS_DIR:?}/${RUN_ID:?}:/config:ro"
     gpus: "all"
     mem_limit: 8g

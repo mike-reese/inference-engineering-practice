@@ -188,6 +188,16 @@ class ComponentsCollector:
     def history(self, run_id: str | None = None) -> dict:
         return {rid: list(t.stamps) for rid, t in self.runs.items() if run_id in (None, rid)}
 
+    def saved(self, run_id: str) -> dict:
+        """A saved run's stamps read from its folder, whether or not it was live while this collector ran (v2 scene)."""
+        if run_id in self.runs:
+            return self.history(run_id)
+        for labels in REPO.glob(f"*/*/results/{run_id}/labels.json"):
+            tail = RunTail(labels.parent)
+            tail.read()
+            return {run_id: list(tail.stamps)}
+        return {}
+
     async def run(self) -> None:
         tick = 0
         while True:

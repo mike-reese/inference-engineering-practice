@@ -8,6 +8,9 @@ manifest's arguments; the browser sends a rep id and an action id, never a comma
 Progress: a rep run with `--progress json` prints `@@progress {...}` lines (rep.py `progress()`); the rest of its
 output is kept as the job's log.
 
+Dry run: POST /runner/jobs with "dry_run": true validates the action and options and returns the job it would queue;
+nothing is queued, saved or started. /runner/health says "dry_run": true, so a client can refuse an older runner.
+
 Options: an action's [[actions.options]] are the only values the browser may set. Each value must be one of the
 option's `choices` or fully match its `pattern` (at most 32 characters); the runner appends `arg value` to the command.
 Queue: jobs run one at a time in the order they were sent. A queued job waits while its rep's Compose projects have
@@ -284,7 +287,7 @@ def find(request: web.Request) -> Job:
 
 
 async def health(request: web.Request) -> web.Response:
-    return web.json_response({"ok": True, "repo": str(REPO), "pid": os.getpid()})
+    return web.json_response({"ok": True, "repo": str(REPO), "pid": os.getpid(), "dry_run": True})
 
 
 async def reps(request: web.Request) -> web.Response:
@@ -308,7 +311,8 @@ async def job(request: web.Request) -> web.Response:
 
 
 async def start(request: web.Request) -> web.Response:
-    """Queue a job: {"rep": <id>, "action": <id>, "options": {<option id>: <value>}}."""
+    """Queue a job: {"rep": <id>, "action": <id>, "options": {<option id>: <value>}, "dry_run": false}.
+    dry_run: validate the action and options and return the job; nothing is queued, saved or started."""
     body = await request.json()
     runner = request.app["runner"]
     rep = (await asyncio.to_thread(manifests)).get(body.get("rep"))
@@ -322,6 +326,10 @@ async def start(request: web.Request) -> web.Response:
         options, args = resolve_options(action, given)
     except ValueError as error:
         raise web.HTTPBadRequest(text=str(error))
+    if body.get("dry_run"):
+        job = Job(None, rep, action, options, args)
+        job.queued_ns, job.state = None, "dry run"
+        return web.json_response({**job.summary(), "dry_run": True})
     if runner.current() is None and not runner.queued():
         busy = await asyncio.to_thread(busy_projects, rep.get("compose_projects", []))
         if busy:

@@ -105,7 +105,8 @@ class RecordsCollector:
             dirty = True
             for rid, entry in entries.items():
                 self.publish_request(run_id, rep, rid, {"engine": engine_summary(entry)})
-        for name in ("labels.json", "basis.json", "latency.json", "run.json", "frames.tsv", "perf_metrics.json"):
+        for name in ("labels.json", "basis.json", "latency.json", "run.json", "frames.tsv", "perf_metrics.json",
+                     "native_records.json"):
             dirty |= self.changed(run / name)
         if dirty or run_id not in self.published:
             self.publish_run(run_id, rep, run)
@@ -123,7 +124,8 @@ class RecordsCollector:
         self.bus.publish("run", {
             "run_id": run_id, "rep": rep, "path": str(run.relative_to(REPO)), "mtime": run.stat().st_mtime,
             "labels": load(run / "labels.json") or {"trace": "off"},
-            "basis": {"gpu": basis.get("gpu"), "version": basis.get("version"), "images": basis.get("images")},
+            "basis": {"gpu": basis.get("gpu"), "version": basis.get("version"), "images": basis.get("images"),
+                      "model": basis.get("model")},  # rep.py's saved model facts (Requests view)
             "config": (run / "config.yaml").read_text(), "files": files[:400], "file_count": len(files),
             "steps": len(list((run / "control").glob("step_*.json"))),
             "done": len(list((run / "client").glob("step_*.done.json"))),

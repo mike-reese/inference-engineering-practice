@@ -1,0 +1,11 @@
+dtype: bfloat16
+max_num_tokens: 1024
+return_perf_metrics: true
+perf_metrics_max_requests: 100
+enable_iter_perf_stats: true
+iter_stats_max_iterations: 1000
+kv_cache_config:
+  enable_block_reuse: false
+  free_gpu_memory_fraction: 0.1
+  max_tokens: 2048
+  dtype: auto

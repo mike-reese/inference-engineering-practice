@@ -1,0 +1,46 @@
+{
+ "source": "ncu",
+ "title": "Nsight Compute report (--page raw CSV): replayed kernel counters, off the run clock",
+ "order": 40,
+ "evidence": "Observed: Nsight Compute replay (each kernel replayed in isolation, caches flushed, base clocks); not on the run clock",
+ "tie": {
+  "run": "the kernels-level run (labels.json trace kernels, a profile_range) whose latest earlier timeline-level run of the same rep is this run, with an equal prompt.json",
+  "rule": "same request prompt and engine iteration; k-th profiled kernel (ncu ID order = launch order) <-> k-th kernel of that iteration on the timeline run, by launch start; accepted only when the kernel short names match",
+  "evidence": "Inferred: two runs of the same request; launch order and names matched, timing not shared"
+ },
+ "keep_metrics": {
+  "gpu__time_duration.sum": {"measure": "duration (replay)", "unit": "ns"},
+  "dram__bytes_op_read.sum": {"measure": "DRAM read", "unit": "byte"},
+  "dram__bytes_op_write.sum": {"measure": "DRAM write", "unit": "byte"},
+  "lts__t_bytes.sum": {"measure": "L2 traffic", "unit": "byte"},
+  "l1tex__t_bytes.sum": {"measure": "L1 traffic", "unit": "byte"},
+  "sm__throughput.avg.pct_of_peak_sustained_elapsed": {"measure": "SM throughput", "unit": "%"},
+  "dram__throughput.avg.pct_of_peak_sustained_elapsed": {"measure": "DRAM throughput", "unit": "%"},
+  "gpu__compute_memory_throughput.avg.pct_of_peak_sustained_elapsed": {"measure": "memory throughput", "unit": "%"},
+  "sm__warps_active.avg.pct_of_peak_sustained_active": {"measure": "achieved occupancy", "unit": "%"},
+  "launch__grid_size": {"measure": "grid size", "unit": "blocks"},
+  "launch__block_size": {"measure": "block size", "unit": "threads"},
+  "launch__registers_per_thread": {"measure": "registers per thread", "unit": "registers"},
+  "sm__inst_executed_pipe_tensor.sum": {"measure": "tensor instructions", "unit": "instructions"},
+  "smsp__sass_thread_inst_executed_op_ffma_pred_on.sum": {"measure": "FP32 FMA thread instructions", "unit": "instructions"}
+ },
+ "keep_all_numeric": true,
+ "_sections_doc": "trace/kernels.csv (ncu --page raw, written by rep.py) lacks some headline counters; the importer reads those from trace/sections.csv (ncu --page details) by [Section Name, Metric Name]. The details page rounds to two decimals.",
+ "sections": {
+  "sm__warps_active.avg.pct_of_peak_sustained_active": ["Occupancy", "Achieved Occupancy"],
+  "gpu__compute_memory_throughput.avg.pct_of_peak_sustained_elapsed": ["GPU Speed Of Light Throughput", "Memory Throughput"]
+ },
+ "_headline_doc": "ie-run/3 keeps only these counters per kernel (owner ruling 2026-11-08: ncu is link-only; L6 shows headline counters and opens the report in ncu-ui). keep_metrics and keep_all_numeric serve the ie-run/2 prototype importer only.",
+ "headline": ["gpu__time_duration.sum", "sm__warps_active.avg.pct_of_peak_sustained_active", "dram__bytes_op_read.sum",
+              "dram__bytes_op_write.sum", "lts__t_bytes.sum", "sm__throughput.avg.pct_of_peak_sustained_elapsed",
+              "gpu__compute_memory_throughput.avg.pct_of_peak_sustained_elapsed"],
+ "_scale_doc": "ncu --page raw CSV prints each column in a display unit (row 2), e.g. us or Mbyte; ie-run/3 scales headline values to the keep_metrics unit. ncu byte prefixes are decimal (L2 bytes in Mbyte times 1e6 are whole 32-byte sectors). The ie-run/2 store kept the display values under the keep_metrics unit.",
+ "scale": {
+  "ns": {"ns": 1, "us": 1e3, "ms": 1e6, "s": 1e9},
+  "byte": {"byte": 1, "Kbyte": 1e3, "Mbyte": 1e6, "Gbyte": 1e9},
+  "%": {"%": 1}
+ },
+ "measures": [
+  {"measure": "arithmetic intensity (DRAM)", "formula": "FLOPs / (DRAM read + DRAM write) per kernel", "unit": "FLOP/byte", "additivity": "non-additive", "evidence": "Calculated from Observed replay counters"}
+ ]
+}

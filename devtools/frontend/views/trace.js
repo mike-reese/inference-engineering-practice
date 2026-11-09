@@ -2,7 +2,9 @@
 // Level 0 architecture (the map), 0b components (each container's components and the data between them, from the
 // component stamps), 1 network (frames), 2a client, 2b server, 3 hardware and code (kernels, copies).
 // One step control drives every level; the lanes show the same time window; metrics light their input spans.
-import { escape, getJSON, json, ms, openInTool } from "./util.js";
+// Request "*" (all clients) puts every measured client on one time scale, one lane each. Unpaired native records and
+// Prometheus scrapes (request_id none, no client join) sit in their own neutral lane, in either mode.
+import { escape, getJSON, json, ms, openInTool, router } from "./util.js";
 import { BOX, boxOf, dataForm, inspect, light, mapSVG, packet } from "./components_map.js";
 
 const W = 1200;
@@ -17,7 +19,12 @@ const LANES = [ // [label, test(span)]
   ["server: executor", (s) => s.level === "server" && s.component === "executor"],
   ["GPU kernels", (s) => s.level === "hardware" && s.component === "gpu" && s.name !== "sample"],
   ["PCIe copies", (s) => s.level === "hardware" && s.component === "pcie"],
+  ["server: native records, unpaired (no client join)", (s) => UNPAIRED(s) && s.component !== "iterations"],
+  ["engine iterations (/metrics, saved reads; orange = generation + queued)", (s) => s.component === "iterations"],
 ];
+const ALL = "*"; // the request selector's value for every client on one time scale
+const UNPAIRED = (s) => s.request_id == null && ["native", "prometheus", "iterations"].includes(s.component);
+const GEN_QUEUED = (s) => s.component === "iterations" && s.attrs.generation >= 1 && s.attrs.queued >= 1; // check 1
 const LEVELS = {
   "0 architecture": (s) => MILESTONES.some((m) => m(s)),
   "0b components": (s) => s.level !== "hardware" && !!boxOf(s) && !(s.level === "network" && s.name === "ACK")
@@ -78,7 +85,8 @@ export class TraceView {
     this.dirty = true; this.redraw();
   }
 
-  defaultRequest() { // the measured request: not the warm-up
+  defaultRequest() { // the measured request: not the warm-up; every client when the run has unpaired native records
+    if (this.run.spans.some(UNPAIRED)) return ALL;
     const req = this.run.spans.filter((s) => s.name === "request" && s.level === "client");
     return (req.find((s) => s.attrs.phase !== "warmup") ?? req[0])?.request_id ?? this.run.requests[0];
   }
@@ -89,12 +97,24 @@ export class TraceView {
     this.window = req ? [req.start_ns - 0.5e6, (req.end_ns ?? req.start_ns) + 1e6] : null;
   }
 
-  requestSpan() { return this.run?.spans.find((s) => s.request_id === this.request && s.name === "request" && s.level === "client"); }
+  clients() { // the measured client requests in send order (all of them if every one is a warm-up)
+    const req = this.run.spans.filter((s) => s.name === "request" && s.level === "client").sort((x, y) => x.start_ns - y.start_ns);
+    const measured = req.filter((s) => s.attrs.phase !== "warmup");
+    return (measured.length ? measured : req).map((s) => s.request_id);
+  }
 
-  spans() { // this request's spans, plus unattributed hardware and executor spans inside its window
+  requestSpan() { // the selected request; for ALL, one span covering every client's request
+    if (this.request !== ALL) return this.run?.spans.find((s) => s.request_id === this.request && s.name === "request" && s.level === "client");
+    const req = this.run?.spans.filter((s) => s.name === "request" && s.level === "client" && this.clients().includes(s.request_id)) ?? [];
+    if (!req.length) return null;
+    return { start_ns: Math.min(...req.map((s) => s.start_ns)), end_ns: Math.max(...req.map((s) => s.end_ns ?? s.start_ns)) };
+  }
+
+  spans() { // this request's spans (every client's for ALL), unattributed spans inside its window, unpaired native evidence
     const req = this.requestSpan();
     const [a, b] = req ? [req.start_ns, req.end_ns ?? req.start_ns] : [-Infinity, Infinity];
-    return this.run.spans.filter((s) => s.request_id === this.request
+    const mine = this.request === ALL ? new Set(this.clients()) : new Set([this.request]);
+    return this.run.spans.filter((s) => mine.has(s.request_id) || UNPAIRED(s)
       || (s.request_id == null && s.start_ns >= a - 1e6 && s.start_ns <= b + 1e6));
   }
 
@@ -164,21 +184,24 @@ export class TraceView {
   lanes(spans, current) {
     const [a, b] = this.window;
     const x = (ns) => ((ns - a) / (b - a)) * W;
-    const rows = LANES.map(([label, test], i) => {
+    const lanes = this.request !== ALL ? LANES.map(([label, test]) => [label, test, ""]) : [ // one lane per client
+      ...this.clients().map((rid, i) => [`client ${String.fromCharCode(65 + i)}: ${rid}`, (s) => s.level === "client" && s.request_id === rid, `client${i % 4}`]),
+      ...LANES.filter(([label]) => !label.startsWith("client:")).map(([label, test]) => [label, test, ""])];
+    const rows = lanes.map(([label, test, color], i) => {
       const y = 20 + i * 26;
       const marks = spans.filter((s) => test(s) && (s.end_ns ?? s.start_ns) >= a && s.start_ns <= b).map((s) => {
-        const cls = `${s.id === current?.id ? "cur" : ""} ${this.lit.has(s.id) ? "lit" : ""}`;
+        const cls = `${color} ${UNPAIRED(s) ? "native" : ""} ${GEN_QUEUED(s) ? "genqueued" : ""} ${s.id === current?.id ? "cur" : ""} ${this.lit.has(s.id) ? "lit" : ""}`;
         if (s.end_ns == null) return `<line class="mark ${cls}" data-id="${escape(s.id)}" x1="${x(s.start_ns)}" x2="${x(s.start_ns)}" y1="${y}" y2="${y + 18}"><title>${escape(s.name)}</title></line>`;
         const x0 = Math.max(0, x(s.start_ns)), x1 = Math.min(W, x(s.end_ns));
         return `<rect class="span ${cls}" data-id="${escape(s.id)}" x="${x0}" y="${y + 3}" width="${Math.max(1, x1 - x0)}" height="12"><title>${escape(s.name)} ${ms((s.end_ns - s.start_ns) / 1e6, 3)} ms</title></rect>`;
       }).join("");
-      return `<text class="lanelabel" x="4" y="${y + 13}">${label}</text>${marks}`;
+      return `${marks}<text class="lanelabel" x="4" y="${y + 13}">${escape(label)}</text>`; // label over the spans
     }).join("");
     const samples = this.run.spans.filter((s) => s.name === "sample" && s.start_ns >= a && s.start_ns <= b);
-    const yg = 20 + LANES.length * 26;
+    const yg = 20 + lanes.length * 26;
     const line = samples.map((s) => `${x(s.start_ns).toFixed(1)},${(yg + 24 - 0.24 * (s.attrs["utilization.gpu"] ?? 0)).toFixed(1)}`).join(" ");
     const cursor = current ? `<line class="cursor" x1="${x(current.start_ns)}" x2="${x(current.start_ns)}" y1="0" y2="${yg + 30}"/>` : "";
-    const send = this.requestSpan()?.start_ns ?? a;
+    const send = this.requestSpan()?.start_ns ?? a; // ALL: the first client's send
     const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => `<text class="tick" x="${f * W - (f === 1 ? 60 : 0)}" y="12">${ms((a + f * (b - a) - send) / 1e6, 3)} ms</text>`).join("");
     return `<svg class="tracelanes" viewBox="0 0 ${W} ${yg + 32}" preserveAspectRatio="none">${ticks}${rows}
       <text class="lanelabel" x="4" y="${yg + 13}">GPU utilization (nvidia-smi, 0–100 %)</text><polyline class="gpuline" points="${line}"/>${cursor}</svg>`;
@@ -197,7 +220,12 @@ export class TraceView {
   detail(s) {
     if (!s) return "<p>No step at this level for this request.</p>";
     const send = this.requestSpan()?.start_ns ?? s.start_ns;
-    const own = s.level === "server" && s.attrs.seconds != null ? `engine steady clock ${s.attrs.seconds} s`
+    const own = s.component === "iterations" ? (s.end_ns === s.start_ns
+        ? `engine UTC timestamp ${s.attrs.timestamp} (the step's start), moved to CLOCK_MONOTONIC with its read's wall/monotonic pair · reader order ${s.attrs.reader_seq}.${s.attrs.index} · its counts can be recorded later than this time (overlap scheduler): place it by iter, not by time`
+        : "devtools collector's read of /metrics (CLOCK_MONOTONIC)")
+      : s.component === "native" ? `engine steady clock (CLOCK_MONOTONIC s) · native request ${s.attrs.native_request_id}, ${s.attrs.join}`
+      : s.component === "prometheus" ? "read time of the saved scrape (rep's CLOCK_MONOTONIC); value from its text line"
+      : s.level === "server" && s.attrs.seconds != null ? `engine steady clock ${s.attrs.seconds} s`
       : s.level === "network" ? `capture clock (UTC) converted with the client's anchor pair`
         : s.level === "hardware" ? "Nsight/PyTorch profiler clock, joined to CLOCK_MONOTONIC"
           : s.attrs.box ? `server CLOCK_MONOTONIC ${s.start_ns} ns (component stamp)` : `client CLOCK_MONOTONIC ${s.start_ns} ns`;
@@ -206,7 +234,7 @@ export class TraceView {
     const attrs = Object.fromEntries(Object.entries(s.attrs).filter(([k]) => !["text", "stack"].includes(k)));
     return `<div class="label">${escape(s.level)} · ${escape(s.component)}</div>
       <h3>${escape(s.name)}</h3>
-      <div>at <b>${ms((s.start_ns - send) / 1e6, 3)} ms</b> from send${s.end_ns != null ? `, lasts ${ms((s.end_ns - s.start_ns) / 1e6, 3)} ms` : ""}
+      <div>at <b>${ms((s.start_ns - send) / 1e6, 3)} ms</b> from ${this.request === ALL ? "the first client's send" : "send"}${s.end_ns != null ? `, lasts ${ms((s.end_ns - s.start_ns) / 1e6, 3)} ms` : ""}
         · ${escape(own)}</div>
       ${s.attrs.what ? `<div>what: ${escape(s.attrs.what)} · set at <code>${escape(s.attrs.source)}</code></div>` : ""}
       ${s.attrs.data ? `<div>the request is now: ${escape(s.attrs.data)}</div>` : ""}
@@ -223,21 +251,52 @@ export class TraceView {
         }).join("\n")}</pre>` : json(this.source)) : ""}`;
   }
 
-  metrics() {
-    const list = this.run.metrics.filter((m) => m.request_id === this.request);
-    const segments = list.filter((m) => m.name.startsWith("segment "));
+  metrics() { // data-m is the metric's index in run.metrics (names repeat across requests)
+    const all = this.run.metrics.map((m, i) => ({ ...m, i }));
+    const list = all.filter((m) => this.request === ALL ? this.clients().includes(m.request_id) : m.request_id === this.request);
+    const segments = this.request === ALL ? [] : list.filter((m) => m.name.startsWith("segment "));
     const ttft = segments.filter((m) => !m.name.includes("[DONE]")), total = ttft.reduce((t, m) => t + (m.value ?? 0), 0);
     const colors = ["#58a6ff", "#3fb950", "#d29922", "#bc8cff", "#f778ba", "#39c5cf", "#e3b341", "#8b949e"];
-    const bar = total ? `<div class="segbar">${ttft.map((m, i) => `<span class="seg" data-m="${escape(m.name)}"
+    const bar = total ? `<div class="segbar">${ttft.map((m, i) => `<span class="seg" data-m="${m.i}"
         style="width:${(100 * m.value) / total}%;background:${colors[i]}" title="${escape(m.name)} ${ms(m.value, 3)} ms">${ms(m.value, 2)}</span>`).join("")}</div>
       <div class="dim">client TTFT ${ms(total, 3)} ms = the ${ttft.length} segments above, each named by its two clocks (click one)</div>` : "";
-    const rows = list.map((m) => `<tr data-m="${escape(m.name)}" class="${this.metric === m.name ? "on" : ""}"><td>${escape(m.name)}</td>
-      <td><code>${escape(m.formula)}</code></td><td>${m.value == null ? "Unavailable" : ms(m.value, 3)}</td><td>${escape(m.unit)}</td>
+    const value = (m) => (m.value == null ? "Unavailable" : m.unit === "s" ? String(m.value) : ms(m.value, 3));
+    const rows = list.map((m) => `<tr data-m="${m.i}" class="${this.metric === m.i ? "on" : ""}">${this.request === ALL ? `<td>${escape(m.request_id)}</td>` : ""}<td>${escape(m.name)}</td>
+      <td><code>${escape(m.formula)}</code></td><td>${value(m)}</td><td>${escape(m.unit)}</td>
       <td>${m.inputs.length}</td></tr>`).join("");
-    return `${bar}<table class="metrics"><tr><th>metric</th><th>formula</th><th>value</th><th>unit</th><th>inputs</th></tr>${rows}</table>`;
+    const pooled = all.filter((m) => m.request_id == null);
+    const aggregate = pooled.length ? `<div class="label">aggregate over the unpaired native set · request_id none · not any one client's value</div>
+      <table class="metrics"><tr><th>metric</th><th>value</th><th>unit</th><th>formula</th><th>inputs (span ids)</th></tr>${pooled.map((m) =>
+        `<tr data-m="${m.i}" class="${this.metric === m.i ? "on" : ""}"><td>${escape(m.name)}</td><td>${value(m)}</td><td>${escape(m.unit)}</td>
+        <td><code>${escape(m.formula)}</code></td><td>${m.inputs.map(escape).join("<br>") || "–"}</td></tr>`).join("")}</table>` : "";
+    const client = rows ? `<table class="metrics"><tr>${this.request === ALL ? "<th>request</th>" : ""}<th>metric</th><th>formula</th><th>value</th><th>unit</th><th>inputs</th></tr>${rows}</table>`
+      : "<p class=dim>No per-client metrics saved for this selection.</p>";
+    return `${bar}${client}${aggregate}`;
+  }
+
+  genQueued() { // saved iteration entries with generation and queued input together, in reader order (click one)
+    const its = this.run.spans.filter((s) => s.component === "iterations" && s.end_ns === s.start_ns);
+    if (!its.length) return "";
+    const hits = its.filter(GEN_QUEUED);
+    const rows = hits.map((s) => `<tr class="itrow" data-span="${escape(s.id)}"><td>${s.attrs.reader_seq}.${s.attrs.index}</td><td>${s.attrs.iter}</td>
+      <td>${s.attrs.generation}</td><td>${s.attrs.scheduled}</td><td>${s.attrs.queued}</td><td>${s.attrs.active}</td><td>${escape(s.attrs.timestamp)}</td></tr>`).join("");
+    const reads = this.run.spans.filter((s) => s.component === "iterations" && s.end_ns !== s.start_ns);
+    return `<details open><summary>engine iterations: generation and queued input together (${hits.length} of ${its.length} saved entries)</summary>
+      <div class="dim">${reads.length} saved /metrics reads (${reads.filter((r) => r.attrs.empty).length} empty, ${reads.filter((r) => r.attrs.error || r.attrs.status !== 200).length} failed or not 200) ·
+        reader order, not deduplicated by iter · request_id none: counts, not a client join ·
+        newActiveRequestsQueueLatencyMS is a raw seconds accumulator, not a duration · lane position = the step's start timestamp;
+        counts can be recorded later, so compare with native records by iter range, not by time</div>
+      <table class="metrics"><tr><th>read.entry</th><th>iter</th><th>generation</th><th>scheduled</th><th>queued</th><th>active</th><th>engine timestamp (UTC)</th></tr>${rows}</table></details>`;
+  }
+
+  jump(id) { // go to a span, switching to a level that shows it
+    let i = this.steps().findIndex((s) => s.id === id);
+    if (i < 0) { this.level = Object.keys(LEVELS).find((l) => LEVELS[l](this.run.spans.find((s) => s.id === id))) ?? this.level; i = this.steps().findIndex((s) => s.id === id); }
+    this.go(i);
   }
 
   tokens() {
+    if (this.request === ALL) return "<p class=dim>Pick one client in the request selector for its token table.</p>";
     const spans = this.spans();
     const client = spans.filter((s) => s.name === "event: token").sort((a, b) => a.start_ns - b.start_ns);
     const wire = [];
@@ -386,7 +445,8 @@ ${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))
       ${traced ? `<div class="banner">TRACE=${escape(labels.trace)} run: ${labels.profiler === false ? "no profiler" : `profiled, iterations ${escape(labels.profile_range)}`}, CUDA graphs ${labels.graphs ? "on" : "off"}. Not a measured run.</div>` : ""}
       <div class="controls">
         <select class="run">${runs.map((r) => `<option ${r.run_id === this.runId ? "selected" : ""}>${escape(r.run_id)}</option>`).join("")}</select>
-        <select class="request">${this.run.requests.map((r) => `<option ${r === this.request ? "selected" : ""}>${escape(r)}</option>`).join("")}</select>
+        <select class="request"><option value="${ALL}" ${this.request === ALL ? "selected" : ""}>all clients (one time scale)</option>
+          ${this.run.requests.map((r) => `<option ${r === this.request ? "selected" : ""}>${escape(r)}</option>`).join("")}</select>
         level <select class="level">${Object.keys(LEVELS).map((l) => `<option ${l === this.level ? "selected" : ""}>${l}</option>`).join("")}</select>
         ${iterations.length ? `iteration <select class="iteration"><option>all</option>${iterations.map((i) => `<option ${String(i) === this.iteration ? "selected" : ""}>${i}</option>`).join("")}</select>` : ""}
         <button class="first">⏮</button><button class="back">◀</button><button class="playb">${this.playing ? "⏸" : "▶ play"}</button>
@@ -401,6 +461,7 @@ ${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))
       <div class="tracebody"><section class="detail">${this.detail(current)}</section>
         <section class="side">
           <details open><summary>metrics as they are calculated</summary>${this.metrics()}</details>
+          ${this.genQueued()}
           <details><summary>tokens: client events, records, wire frames</summary>${this.tokens()}</details>
           <details ${this.run.profiles?.ncu ? "open" : ""}><summary>kernels (Nsight Compute)</summary>${this.kernels()}</details>
           <details><summary>Unavailable (${this.run.unavailable.length})</summary>${json(this.run.unavailable)}</details>
@@ -456,8 +517,8 @@ ${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))
 
   bind(steps) {
     const $ = (q) => this.root.querySelector(q);
-    $(".run").onchange = (e) => { location.hash = `trace/${encodeURIComponent(e.target.value)}`; };
-    $(".request").onchange = (e) => { location.hash = `trace/${encodeURIComponent(this.runId)}/${encodeURIComponent(e.target.value)}`; };
+    $(".run").onchange = (e) => { router.go(`trace/${encodeURIComponent(e.target.value)}`); };
+    $(".request").onchange = (e) => { router.go(`trace/${encodeURIComponent(this.runId)}/${encodeURIComponent(e.target.value)}`); };
     $(".level").onchange = (e) => { this.level = e.target.value; this.go(0); };
     if ($(".iteration")) $(".iteration").onchange = (e) => { this.iteration = e.target.value; this.go(0); };
     $(".speed").onchange = (e) => { this.speed = +e.target.value; if (this.playing) { this.play(); this.play(); } };
@@ -477,12 +538,13 @@ ${escape(k.top_finding.name)}: ${escape(k.top_finding.description.slice(0, 160))
       this.go(i);
     }));
     this.root.querySelectorAll("[data-m]").forEach((el) => (el.onclick = () => {
-      const m = this.run.metrics.find((x) => x.name === el.dataset.m && x.request_id === this.request);
-      this.metric = m.name; this.lit = new Set(m.inputs);
+      const m = this.run.metrics[+el.dataset.m];
+      this.metric = +el.dataset.m; this.lit = new Set(m.inputs);
       this.level = "all but hardware";
       const all = this.steps(), i = all.findIndex((s) => this.lit.has(s.id));
       this.go(i < 0 ? this.step : i);
     }));
+    this.root.querySelectorAll("tr.itrow").forEach((tr) => (tr.onclick = () => this.jump(tr.dataset.span)));
     this.root.querySelectorAll("tr[data-k]").forEach((tr) => (tr.onclick = () => this.showKernel(+tr.dataset.k)));
     this.root.querySelectorAll("[data-kernel]").forEach((g) => (g.onclick = () => this.showKernel(+g.dataset.kernel)));
     this.root.querySelectorAll("button.opentool").forEach((b) => (b.onclick = () => this.openReport(b.dataset.path)));

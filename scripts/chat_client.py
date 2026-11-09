@@ -7,6 +7,7 @@ from openai import DefaultHttpxClient, OpenAI
 import openai
 import base64
 from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram, ProcessCollector, start_http_server
+from collections.abc import Callable
 
 SERVER_BASE_URL = os.environ["SERVER_BASE_URL"]
 METRICS_PORT = 9410
@@ -86,7 +87,7 @@ class ObservedBody(httpx2.SyncByteStream):
 class ObservedTransport(httpx2.BaseTransport):
     def __init__(self):
         self.inner = httpx2.HTTPTransport(
-            limits=httpx2.Limits(max_connections=1, max_keepalive_connections=1, keepalive_expiry=30.0),
+            limits=httpx2.Limits(max_connections=64, max_keepalive_connections=64, keepalive_expiry=30.0),
             retries=0,
             trust_env=False
         )
@@ -125,11 +126,14 @@ def make_client() -> tuple[OpenAI, ObservedTransport]:
 
 def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, messages: list[dict], max_tokens: int,
              diagnostic: bool = False, detail: bool = True, timeout_s: float | None = None,
-             skip_special_tokens: bool | None = False) -> dict:
+             skip_special_tokens: bool | None = False,
+             on_first_content: Callable[[int], None] | None = None,
+             chat_template_kwargs: dict | None = None) -> dict:
     record = {
         "request_id": request_id,
         "headers_ns": None,
         "first_content_ns": None,
+        "release_ns": None,
         "protocol_complete_ns": None,
         "close_ns": None,
         "status": None,
@@ -161,8 +165,9 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
             stream_options={"include_usage": True},
             **token_options,
             # skip_special_tokens None: leave the engine's default (True), for the K4 demonstration only.
-            extra_body={"ignore_eos": True, **({} if skip_special_tokens is None
-                                                else {"skip_special_tokens": skip_special_tokens})},
+            extra_body={"ignore_eos": True,
+                        **({} if skip_special_tokens is None else {"skip_special_tokens": skip_special_tokens}),
+                        **({"chat_template_kwargs": chat_template_kwargs} if chat_template_kwargs else {})},
             extra_headers={"X-Request-ID": request_id},
         ) as response:
             record["headers_ns"] = time.perf_counter_ns()
@@ -174,10 +179,14 @@ def send_one(client: OpenAI, transport: ObservedTransport, request_id: str, mess
                     record["events"].append({"ns": now, "event": chunk.model_dump()})
                 stamp("sdk", "SSE event parsed", request_id, now, event=chunk.model_dump())
 
-                if chunk.choices: 
+                if chunk.choices:
                     choice = chunk.choices[0]
                     if choice.delta.content and record["first_content_ns"] is None:
                         record["first_content_ns"] = now
+                        if on_first_content is not None:
+                            record["release_ns"] = time.perf_counter_ns()
+                            stamp("send_one", "first content: release", request_id, record["release_ns"])
+                            on_first_content(now)
                     if choice.finish_reason is not None:
                         record["finish_reason"] = choice.finish_reason
                 if chunk.usage is not None:

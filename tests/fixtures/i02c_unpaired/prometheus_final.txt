@@ -1,0 +1,6 @@
+trtllm_request_queue_time_seconds_sum{engine_type="undefined",model_name="undefined"} 2.7516629999990982
+trtllm_request_queue_time_seconds_count{engine_type="undefined",model_name="undefined"} 3.0
+# HELP trtllm_request_success_total Count of successfully processed requests.
+# TYPE trtllm_request_success_total counter
+trtllm_request_success_total{engine_type="undefined",finished_reason="stop",model_name="undefined"} 1.0
+trtllm_request_success_total{engine_type="undefined",finished_reason="length",model_name="undefined"} 2.0

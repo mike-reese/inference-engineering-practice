@@ -1,0 +1,36 @@
+{
+  "first": [
+    {
+      "request_id": 3,
+      "perf_metrics": {
+        "first_iter": 34,
+        "last_iter": 161,
+        "timing_metrics": {
+          "server_arrival_time": 86699.415675,
+          "arrival_time": 86699.416223,
+          "first_scheduled_time": 86699.419531,
+          "first_token_time": 86699.458167,
+          "server_first_token_time": 86699.46096,
+          "last_token_time": 86702.271921
+        },
+        "kv_cache_metrics": {
+          "num_total_allocated_blocks": 2,
+          "num_new_allocated_blocks": 2,
+          "num_reused_blocks": 0,
+          "num_missed_blocks": 0
+        }
+      }
+    }
+  ],
+  "second": [],
+  "prometheus_reads": {
+    "baseline": {
+      "start_ns": 86699386674847,
+      "end_ns": 86699394050308
+    },
+    "final": {
+      "start_ns": 86706797636593,
+      "end_ns": 86706807936175
+    }
+  }
+}

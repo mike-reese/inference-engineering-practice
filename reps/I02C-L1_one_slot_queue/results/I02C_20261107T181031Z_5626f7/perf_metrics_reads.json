@@ -1,0 +1,107 @@
+{
+  "warmup": [
+    {
+      "start_ns": 86699380995921,
+      "end_ns": 86699386670857,
+      "entries": [
+        {
+          "request_id": 2,
+          "perf_metrics": {
+            "first_iter": 1,
+            "last_iter": 32,
+            "timing_metrics": {
+              "server_arrival_time": 86698.555721,
+              "arrival_time": 86698.589059,
+              "first_scheduled_time": 86698.59712,
+              "first_token_time": 86698.633752,
+              "server_first_token_time": 86698.719047,
+              "last_token_time": 86699.325749
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 1,
+              "num_new_allocated_blocks": 1,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "pair": [
+    {
+      "start_ns": 86702287715110,
+      "end_ns": 86702294065954,
+      "entries": [
+        {
+          "request_id": 3,
+          "perf_metrics": {
+            "first_iter": 34,
+            "last_iter": 161,
+            "timing_metrics": {
+              "server_arrival_time": 86699.415675,
+              "arrival_time": 86699.416223,
+              "first_scheduled_time": 86699.419531,
+              "first_token_time": 86699.458167,
+              "server_first_token_time": 86699.46096,
+              "last_token_time": 86702.271921
+            },
+            "kv_cache_metrics": {
+              "num_total_allocated_blocks": 2,
+              "num_new_allocated_blocks": 2,
+              "num_reused_blocks": 0,
+              "num_missed_blocks": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "start_ns": 86702344130184,
+      "end_ns": 86702349871744,
+      "entries": []
+    },
+    {
+      "start_ns": 86702399934505,
+      "end_ns": 86702405254683,
+      "entries": []
+    },
+    {
+      "start_ns": 86702455342295,
+      "end_ns": 86702460652338,
+      "entries": []
+    },
+    {
+      "start_ns": 86702510743897,
+      "end_ns": 86702519503151,
+      "entries": []
+    },
+    {
+      "start_ns": 86702569567655,
+      "end_ns": 86702575154474,
+      "entries": []
+    },
+    {
+      "start_ns": 86702625218238,
+      "end_ns": 86702630672555,
+      "entries": []
+    },
+    {
+      "start_ns": 86702680778322,
+      "end_ns": 86702686267764,
+      "entries": []
+    },
+    {
+      "start_ns": 86702736327231,
+      "end_ns": 86704762465700,
+      "entries": []
+    }
+  ],
+  "second": [
+    {
+      "start_ns": 86704762471328,
+      "end_ns": 86706797632144,
+      "entries": []
+    }
+  ]
+}

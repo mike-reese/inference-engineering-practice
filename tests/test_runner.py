@@ -164,3 +164,40 @@ def test_register_writes_a_manifest_the_runner_reads(repo):
 def test_register_refuses_what_it_cannot_run_safely(repo, change):
     with pytest.raises(ValueError):
         runner.manifest_text(BODY | change)
+
+
+# --- dry run (command center P1) ------------------------------------------------------------------------------------
+def test_dry_run_validates_and_returns_the_job_but_starts_nothing(tmp_path, monkeypatch):
+    from aiohttp.test_utils import TestClient, TestServer
+    folder = tmp_path / "reps" / "X1_dry"
+    folder.mkdir(parents=True)
+    marker = tmp_path / "started"
+    (folder / "rep.toml").write_text(f"""id = "X1"
+compose_projects = []
+[[actions]]
+id = "go"
+label = "go"
+command = ["{sys.executable}", "-c", "open({str(marker)!r}, 'w')"]
+[[actions.options]]
+id = "range"
+arg = "--range"
+pattern = '^\\d{{1,3}}-\\d{{1,3}}$'
+default = "1-2"
+""")
+    monkeypatch.setattr(runner, "REPO", tmp_path)
+    monkeypatch.setattr(runner, "STATE", tmp_path / "state")
+
+    async def scenario():
+        async with TestClient(TestServer(runner.make_app())) as client:
+            post = lambda options: client.post("/runner/jobs", json={"rep": "X1", "action": "go", "options": options,
+                                                                     "dry_run": True})
+            ok, bad = await post({"range": "66-129"}), await post({"range": "x"})
+            await asyncio.sleep(0.5)
+            listed, health = await client.get("/runner/jobs"), await client.get("/runner/health")
+            return ok.status, await ok.json(), bad.status, await listed.json(), await health.json()
+
+    status, job, bad, listed, health = asyncio.run(scenario())
+    assert status == 200 and job["dry_run"] is True and job["state"] == "dry run" and job["started_ns"] is None
+    assert job["argv"][-2:] == ["--range", "66-129"]
+    assert bad == 400 and listed == [] and not marker.exists()
+    assert health["dry_run"] is True

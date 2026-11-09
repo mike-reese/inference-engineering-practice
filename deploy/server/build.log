@@ -16,17 +16,16 @@
 #4 CACHED
 
 #5 [2/2] RUN echo "0619e389b2d6941abd369d7466b5c0f254ad23a4fa040d0e8baf68bd0e33661c  /usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py" | sha256sum --check -  && sed -i       -e 's/^import copy$/import copy\nfrom ctypes import byref/'       -e 's/pynvml\.nvmlSystemGetConfComputeSettings(cc_settings)/pynvml.nvmlSystemGetConfComputeSettings(byref(cc_settings))/'       "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py"  && echo "85570e359efb2e36263e032a6ef7a4c55705c621cbe8143f880a21a53856207e  /usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py" | sha256sum --check -
-#5 0.130 /usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py: OK
-#5 0.133 /usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py: OK
-#5 DONE 0.2s
+#5 0.100 /usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py: OK
+#5 0.102 /usr/local/lib/python3.12/dist-packages/tensorrt_llm/_utils.py: OK
+#5 DONE 0.1s
 
 #6 exporting to image
-#6 exporting layers 0.1s done
-#6 exporting manifest sha256:2fa5d77dd3c6c9c1cd5449e4116e4f0e2d982cf417b6354c66b9cc4ff08f20c6 0.0s done
-#6 exporting config sha256:669912a33068b12fb4fda84110f826a9cab74f221b22f749694dcad86e8a910d 0.0s done
-#6 exporting attestation manifest sha256:4beca612a2dc5d26b350e52431b7ccd7a69745e8467a937d0a8c3bd7b6e29c78 0.0s done
-#6 exporting manifest list sha256:4c484c8a671f53620ffacf722614fdfc8e45e8022cf16196a9f84bcaa7262fb7 0.0s done
+#6 exporting layers 0.0s done
+#6 exporting manifest sha256:99c301bb65145922aaaa6bcf705bfde8453ca73373013ed8df542a39ac20f4b5 done
+#6 exporting config sha256:4e0200d1001d0ccc8278edc216d47e817ac16653437f04171d939bee3554e067 done
+#6 exporting attestation manifest sha256:a9a0ebe60b419e5de3eca9d86fec9d87c1f2d0cbefe35c20663fcc88419076f9 done
+#6 exporting manifest list sha256:47969fb2bc7750d13e1a87dee9215fd36b041b0f37073910aa46cf16c33c0692 done
 #6 naming to docker.io/library/ie-tensorrt-llm:1.2.1-nvml-byref done
-#6 unpacking to docker.io/library/ie-tensorrt-llm:1.2.1-nvml-byref
-#6 unpacking to docker.io/library/ie-tensorrt-llm:1.2.1-nvml-byref 0.0s done
-#6 DONE 0.3s
+#6 unpacking to docker.io/library/ie-tensorrt-llm:1.2.1-nvml-byref done
+#6 DONE 0.1s

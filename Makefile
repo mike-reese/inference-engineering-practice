@@ -3,7 +3,7 @@ IECTL := $(PY) scripts/iectl.py
 TRACE ?= off
 
 .PHONY: doctor images devtools devtools-up-quiet devtools-down devtools-restart runner runner-down rep profile k4 source test-unit check \
-	snapshot tabs overhead status lifecycle
+	snapshot tabs overhead status lifecycle store-check
 
 doctor:
 	$(IECTL) doctor
@@ -42,11 +42,6 @@ runner-down:  ## a running job keeps running (own session); restart with make ru
 devtools-restart:  ## after a backend change (the code runs from the mounted repo)
 	REPO_HOST=$(CURDIR) docker compose -f deploy/devtools.yaml restart devtools
 
-# Steps 1-8: one run. TRACE=timeline|code|kernels makes a labeled, profiled run instead (never measured);
-# TRACE=components a labeled run with component stamps, live in the Components tab (deploy/compose.stamps.yaml).
-rep:
-	TRACE=$(TRACE) $(PY) reps/I02A-L1_streamed_latency/rep.py
-
 profile:
 	$(IECTL) profile $(TRACE)
 
@@ -58,9 +53,6 @@ source:  ## walkthrough addition 2: where each engine time is stamped (K18)
 
 test-unit:
 	uv run --no-sync pytest -q tests
-
-check:  ## step 9: the five pass checks on a fresh stack
-	uv run --no-sync pytest -q reps/I02A-L1_streamed_latency/test_i02a_l1.py
 
 snapshot:  ## make snapshot VIEW=trace/<run>
 	$(IECTL) snapshot "$(VIEW)" --out devtools.png
@@ -76,3 +68,19 @@ status:
 
 lifecycle:
 	$(IECTL) lifecycle
+
+# Steps 1-8: one run. TRACE=timeline|code|kernels makes a labeled, profiled run instead (never measured);
+# TRACE=components a labeled run with component stamps, live in the Components tab (deploy/compose.stamps.yaml).
+rep:  ## make rep REP=<folder under reps/>; TRACE=timeline|code|kernels where the rep supports it
+	@test -n "$(REP)" || { echo "set REP=<folder under reps/>, e.g. make rep REP=I02C-L1_one_slot_queue"; exit 2; }
+	TRACE=$(TRACE) $(PY) reps/$(REP)/rep.py
+
+check:  ## make check REP=<folder under reps/>: that rep's pass checks
+	@test -n "$(REP)" || { echo "set REP=<folder under reps/>, e.g. make check REP=I02C-L1_one_slot_queue"; exit 2; }
+	uv run --no-sync pytest -q reps/$(REP)
+
+# Command center v3 store (ie-run/3 under CC_STORE): every ie-run/2 run converted, CCVB round trip, tier invariant,
+# unique eids, schema.py == frontend/cc/store/columns.js. DuckDB and numpy only (the bulk data venv on the data drive).
+CC_PY ?= /mnt/ie-data/venvs/cc-v2-proto/bin/python
+store-check:
+	cd devtools/backend && PYTHONDONTWRITEBYTECODE=1 $(CC_PY) -m store.check

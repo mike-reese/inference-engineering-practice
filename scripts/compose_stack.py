@@ -145,7 +145,7 @@ def sh(*cmd: str, capture: bool = True, check: bool = True) -> str:
 
 
 class Stack:
-    def __init__(self, project: str, results_dir: Path, run_id: str, trace: str = "off", options: dict | None = None):
+    def __init__(self, project: str, results_dir: Path, run_id: str, trace: str = "off", options: dict | None = None, model_dir: Path | None = None):        
         if trace not in TRACE_LEVELS:
             raise ValueError(f"TRACE={trace}: use one of {list(TRACE_LEVELS)}")
         self.project = project
@@ -153,6 +153,7 @@ class Stack:
         self.run_id = run_id
         self.run_dir = results_dir / run_id
         self.trace = trace
+        self.model_dir = model_dir
         self.settings = trace_settings(trace, options)  # ValueError before anything starts
         self.server_start = 0
         self.next_step = 0
@@ -162,7 +163,8 @@ class Stack:
         return {**os.environ, "RESULTS_DIR": str(self.results_dir), "RUN_ID": self.run_id,
                 "SERVER_START": str(self.server_start), "TRACE_PREFIX": self.settings["prefix"],
                 "PROFILE_RANGE": profiler_range(self.settings["profile_range"] or ""),
-                "TORCH_TRACE": level.get("torch_trace", "")}
+                "TORCH_TRACE": level.get("torch_trace", ""),
+                **({"MODEL_DIR": str(self.model_dir)} if self.model_dir else {})}
 
     def compose(self, *args: str, capture: bool = False, check: bool = True) -> subprocess.CompletedProcess:
         files = ["-f", str(COMPOSE_FILE)] + (["-f", str(PROFILE_FILE)] if has_profiler(self.trace) else []) \

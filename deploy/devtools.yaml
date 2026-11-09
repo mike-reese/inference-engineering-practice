@@ -10,19 +10,31 @@ services:
     network_mode: host
     gpus: "all"   # nvidia-smi inside the container
     pid: "host"   # host /proc: maps a GPU process to its container
+    # The host user, so the store's files belong to it; the docker socket's group (stat -c %g /var/run/docker.sock,
+    # 967 on this host) for the Docker API. NVML, GPM and nvidia-smi -q work as uid 1000 (checked 2026-11-08).
+    user: "1000:1000"
+    group_add: ["${DOCKER_GID:-967}"]
     environment:
       DEVTOOLS_HOST: "127.0.0.1"
       DEVTOOLS_PORT: "7700"
       REPO: "/repo"
       PYTHONDONTWRITEBYTECODE: "1"
+      STORE_V2: "/store_v2"
+      CC_STORE: "/cc_store"   # command center v3 store (ie-run/3), written by the backend
       REPO_HOST: "${REPO_HOST:-}"   # the repo's host path (make devtools sets it): maps mounts to /repo
+      HOME: "/tmp"   # uid 1000 has no home in the image; DuckDB needs a writable one to start
     # Run the code from the mounted repo, so a change needs a restart (make devtools-restart), not a rebuild.
     command: ["python", "-u", "/repo/devtools/backend/app.py"]
     volumes:
       # Read-only mount, but the Docker API is still root-equivalent: local machine only; read endpoints only.
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "..:/repo:ro"   # run folders and the trace adapters (src/inference_analysis/trace)
-    mem_limit: 1g
+      # command center v2 store (ie-run/2 on Parquet), on the data drive; read-only
+      - "/mnt/ie-data/cc-v2-proto/store_v2:/store_v2:ro"
+      # command center v3 store (ie-run/3): written by the backend's importer and live writer
+      - "/mnt/ie-data/cc/store:/cc_store"
+    # 3g: store.importer on a code-level run (1.1M events) peaks at 1.44 GB RSS in its own process (2026-11-08)
+    mem_limit: 3g
   prometheus:
     image: "prom/prometheus:v3.13.5@sha256:aafa9d694e6a883c02db516d9f6e5b84e14195f49a2a6456a4cca815edda72b9"
     network_mode: host

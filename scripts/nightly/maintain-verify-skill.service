@@ -1,0 +1,8 @@
+[Unit]
+Description=Nightly /pstack:maintain-verification-skill on verify-command-center
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/Work/Code/Personal/inference-engineering-practice/scripts/nightly/maintain-verify-skill.sh
+TimeoutStartSec=4h
