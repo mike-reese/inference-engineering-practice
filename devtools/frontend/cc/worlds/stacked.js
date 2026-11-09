@@ -5,7 +5,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
-import { state, subscribe, setTier, select, now, store, units, metricInputs, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
+import { state, subscribe, setTier, select, now, archName, store, units, metricInputs, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { fmtValue, fmtBytes } from "../sidebar/samples.js";
 import { NONE16 } from "../store/columns.js";
 import { perf } from "../perf.js";
@@ -54,7 +54,7 @@ function boardOf(S) {
   if (P >= 0) for (const id of units(P).ids) { const p = L.process[S.field("lane", id)]; if (p >= 0 && !seen.has(p)) seen.set(p, id); }
   const plates = [...seen].map(([p, id]) => {
     const proc = T[p], on = S.dims.ranOn(id), container = proc.parent >= 0 ? T[proc.parent] : null;
-    const role = proc.attrs?.role?.name, name = role ? role.split(/ \(|:/)[0] : container?.kind === "network" ? container.name : stripName(proc.name);
+    const name = proc.attrs?.role ? archName(S, p) : container?.kind === "network" ? container.name : stripName(proc.name);
     return { proc, on: on >= 0 ? T[on] : null, label: `${name} [${tail(container?.key ?? "")}]` };
   }).sort((a, b) => (a.on?.kind === "network") - (b.on?.kind === "network") || (a.proc.parent - b.proc.parent) || ((a.proc.attrs?.pid ?? 0) - (b.proc.attrs?.pid ?? 0)));
   // a phase whose box drives the box that runs the kernels sits on the GPU (D13: model forward, sampler)

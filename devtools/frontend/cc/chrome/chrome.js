@@ -1,7 +1,7 @@
 // Header in D10's style and sizing (D10/model.js nav, D10/spine/index.html #hud), rebuilt here, not imported.
 // One thin tab bar for the worlds, then one row: title, compact ladders, what is true now.
 import { sessionBlock, liveText, mountShell } from "./shell.js";
-import { state, subscribe, setTier, focus, setPaired, setWorld, tierName, stops, now, store, ladders as tierLadders, WORLDS, DIM_COLOR, FLOW_COLOR, DIMS, aligned } from "../control/control.js";
+import { state, subscribe, setTier, focus, setPaired, setWorld, tierName, stops, now, archName, store, ladders as tierLadders, WORLDS, DIM_COLOR, FLOW_COLOR, DIMS, aligned } from "../control/control.js";
 import { KEYS } from "../control/keys.js";
 import { roleOf, fmtValue } from "../sidebar/samples.js";
 
@@ -108,7 +108,7 @@ export function mountChrome(el) {
     const hw = !S ? "" : [...["sm_active", "dram_read", "pcie_rx", "gpu_util"].map(val).filter(Boolean),
       n.kernel ? esc(name(n.kernel.id)) : kernels ? "no kernel at the cursor" : "no kernel rows in this run",
       ...(n.transfers.length ? [`copy: ${esc(name(n.transfers[0].id))}`] : [])].join(" · ");
-    const ar = !S ? "" : n.archPath.slice(1).map((i) => esc(S.things[i]?.name)).join(" › ");
+    const ar = !S ? "" : n.archPath.slice(1).map((i) => esc(archName(S, i))).join(" › ");
     const nowHtml = [["execution", exec], ["hardware", hw], ["architecture", ar]]
       .map(([d, v]) => `<span class="k" style="color:${DIM_COLOR[d]}">${d}</span><span class="v">${v}</span>`).join("");
     if (force || pos !== lastPos) { el.querySelector(".pos").innerHTML = pos; lastPos = pos; }

@@ -17,6 +17,7 @@
 // | stops(dim, tier) | {ids: Uint32Array, t: Float64Array}: stop rows of (dimension, tier) and their times, by (t, id) |
 // | units(tier) | {ids, start, end, reach, long}: units of an execution tier by start (layer: one per (iter, layer) group, id = its first kernel); reach: the longest duration outside the longest 1%; long: the indexes of those longer units (a query at t reads the starts in [t - reach, t] and long) |
 // | now(t) | {exec[6], kernel, phases, flow, flows, comp, process, archPath, sample, sampleIndex, transfers, hwActive} |
+// | archName(S, i) | a thing's name on the architecture ladder: a process by its component-map role |
 // | boundsAt(t), eventsIn(b) | playback bounds at t; Uint32Array of every row starting in [b0, b1), by (start, id) |
 // | metrics(), metricInputs() | aux.json metrics [{id, name, value, unit, request, rows}]; Set of row ids the selected one reads |
 // | actions | setTier, fly, focus, setPaired, setWorld, setDock, step, walkRow, seek, select, selectMetric, goBack, goForward, togglePlay, setPace, setRate, loadRun, launch, compareRuns, setSide, setFollow |
@@ -25,8 +26,8 @@
 // now(t): exec[i] is the unit of execution tier i holding t, else the last one started before t, as {id, t0, t1} or
 // null; kernel the kernel-tier unit holding t; phases every phase holding t; flow the flow name of exec[phase] and
 // flows those of phases; comp the component thing of exec[phase] (else of the request), -1 when none; archPath the
-// thing indexes from the host down to the lane of exec[phase], then the phase's own component (never the request's:
-// that one runs in another process); process the process thing on it, or -1; sample is
+// architecture ladder at exec[phase], from the host down: its lane's container and process, then the phase's own
+// component (never the request's: that one runs in another process); process the process thing on it, or -1; sample is
 // RunStore.samplesAt(t) (aligned with store().metrics; NaN = no fresh sample) and sampleIndex changes exactly when
 // one of those samples does; transfers (memcpy and memset units holding t) and hwActive (the hardware things the
 // rows at t ran on, with their ancestors) are computed when read.
@@ -345,6 +346,8 @@ function deepest(S, t) { for (let e = S.dims.ladders.execution.length - 1; e >= 
 let nowKey = "", nowVal = null;
 const EMPTY_NOW = { exec: [null, null, null, null, null, null], kernel: null, phases: [], flow: null, flows: new Set(), comp: -1, process: -1,
   archPath: [], sample: new Float64Array(0), sampleIndex: 0, transfers: [], hwActive: new Set() };
+/** A thing's name on the architecture ladder: a process by its role in the component map, else its recorded name. */
+export const archName = (S, i) => { const x = S.things[i], role = x?.attrs?.role?.name; return role ? role.split(/ \(|:/)[0] : x?.name ?? ""; };
 /** What is true at the cursor in every dimension, at every tier (contract in the table above). */
 export function now(t = state.t) {
   const S = store(), key = `${S?.run}|${state.rev}|${t}`;
@@ -362,8 +365,12 @@ function nowOf(S, t) {
   const compOf = (x) => { const c = x ? S.field("comp", x.id) : NONE16; return c === NONE16 ? -1 : c; };
   const own = compOf(exec[P]), comp = own >= 0 ? own : compOf(exec[0]);
   const archPath = [];
-  if (exec[P]) for (let x = S.things[S.field("lane", exec[P].id)]; x; x = x.parent >= 0 ? S.things[x.parent] : null) archPath.unshift(x.i);
-  if (own >= 0) archPath.push(own);
+  if (exec[P]) {
+    const lane = S.field("lane", exec[P].id), L = S.dims.laneLevel;
+    for (let x = S.things[L.container[lane]]; x; x = x.parent >= 0 ? S.things[x.parent] : null) archPath.unshift(x.i);
+    if (L.process[lane] >= 0) archPath.push(L.process[lane]);
+    if (own >= 0) archPath.push(own);
+  }
   const process = archPath.find((i) => S.things[i].kind === "process") ?? -1;
   let sampleIndex = 0;
   for (const g of S.sampleGroups) { let lo = 0, hi = g.n; while (lo < hi) { const k = (lo + hi) >>> 1; if (g.ts[k] <= t) lo = k + 1; else hi = k; } sampleIndex += lo; }

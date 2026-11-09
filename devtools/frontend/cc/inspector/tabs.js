@@ -6,7 +6,7 @@
 // Links are data attributes the bar handles in one place: data-sel (a row id or a thing key), data-seek (a time),
 // data-m (a metric id), data-world, data-run (load a run of the rep), data-open (a Nsight report), data-raw (a row's
 // raw record).
-import { state, store, storeError, now, units, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
+import { state, store, storeError, now, archName, units, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { NONE16 } from "../store/columns.js";
 import { roleOf, fmtValue, fmtBytes, fmtSpan, periodOf, why } from "../sidebar/samples.js";
 import { repOf, runOf, kindOf as runKind, whenOf, esc } from "../session.js";
@@ -114,14 +114,14 @@ function ladderOf(S, id) {
 }
 const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text)}</li>`).join("")}</ol>`;
 
-/** Where a row runs in the architecture: the container, process and thread of its lane (a device row: of the thread
+/** Where a row runs on the architecture ladder: the container and process of its lane (a device row: of the thread
  *  that launched it), then its component box. */
 function whereHtml(S, id) {
-  const T = S.things, c = S.field("cause", id), comp = S.field("comp", id);
+  const T = S.things, c = S.field("cause", id), comp = S.field("comp", id), L = S.dims.laneLevel;
   let lane = S.field("lane", id);
   if (T[lane]?.kind === "stream" && c >= 0) lane = S.field("lane", c);
-  const path = []; for (let x = T[lane]; x && x.parent >= 0; x = T[x.parent]) path.unshift(x.i);
-  return `<ol class="path">${path.map((i) => `<li><span class="dim">${esc(T[i].kind)}</span> ${thingLink(S, i)}</li>`).join("")}${comp !== NONE16 && T[comp] ? `<li><span class="dim">component</span> ${thingLink(S, comp)}</li>` : ""}</ol>`;
+  const path = [L.container[lane], L.process[lane]].filter((i) => i >= 0);
+  return `<ol class="path">${path.map((i) => `<li><span class="dim">${esc(T[i].kind)}</span> ${thingLink(S, i, archName(S, i))}</li>`).join("")}${comp !== NONE16 && T[comp] ? `<li><span class="dim">component</span> ${thingLink(S, comp)}</li>` : ""}</ol>`;
 }
 
 /** A payload drawn as D13 drew it: token ids as chips, texts and bodies as text, SSE events as text, lists of records
@@ -322,7 +322,7 @@ const atCursor = {
         <div class="label">flows running now</div><div>${n.phases.slice(0, 24).map((u) => { const f = S.dims.flowOf(u.id);
           return `<div><span class="pdot" style="background:${FLOW_COLOR[f] ?? "#8a90a0"}"></span>${link(S, u.id)} <span class="dim">${esc(f ?? "no flow")}</span></div>`; }).join("") || "–"}${n.phases.length > 24 ? `<div class="dim">+${n.phases.length - 24} more</div>` : ""}</div>
         <div class="label" style="color:${DIM_COLOR.architecture}">architecture</div>
-        <ol class="path">${n.archPath.map((i) => `<li><span class="dim">${esc(S.things[i].kind)}</span> ${thingLink(S, i)}</li>`).join("")}</ol>
+        <ol class="path">${n.archPath.map((i) => `<li><span class="dim">${esc(S.things[i].kind)}</span> ${thingLink(S, i, archName(S, i))}</li>`).join("")}</ol>
       </div><div>
         <table class="kv"><tr><td>kernel</td><td>${n.kernel ? link(S, n.kernel.id) : "none running"}</td></tr>
           <tr><td>transfer</td><td>${n.transfers.map((x) => link(S, x.id, `${nm(S, x.id)}, ${fmtBytes(S.field("bytes", x.id))}`)).join("<br>") || "none in flight"}</td></tr></table>
