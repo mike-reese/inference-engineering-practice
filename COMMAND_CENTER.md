@@ -592,24 +592,18 @@ marks an open choice.
 | panel | sidebar | hardware / system, persistent in every view |
 | panel | inspector | detail of the selection in any dimension; holds every detail row |
 | panel | bar | the timeline strip: ticks are the stops of the focused (dimension, tier) |
-| control | next event at the grain | next stop at the focused (dimension, tier) |
-| control | previous event at the grain | previous stop at the focused (dimension, tier) |
-| control | next event one tier coarser | next stop one tier coarser in the same dimension |
-| control | previous event one tier coarser | previous stop one tier coarser in the same dimension |
-| control | next row of any tier (every row) | kept (owner): walk every row of the focused tier in time order, or only the rows of the selected process or object |
-| control | previous row of any tier | kept (owner): same two modes as the forward walk |
-| control | focus the next coarser level | fly one tier coarser in the focused dimension |
-| control | focus the next finer level | fly one tier finer in the focused dimension |
-| control | play / pause | unchanged: plays stops of the focused (dimension, tier) |
-| control | zoom the window in around the cursor | unchanged |
-| control | zoom the window out around the cursor | unchanged |
-| control | natural window of the focused level | natural window of the focused (dimension, tier) |
-| control | first event at the grain | first stop at the focused (dimension, tier) |
-| control | last event at the grain | last stop at the focused (dimension, tier) |
-| control | follow the live head (live runs only) | unchanged |
-| control | close this help, else clear the selection | unchanged |
-| control | show or hide this help | unchanged |
-| control | focus <level> (keys 1-7) | fly to tier n of the focused dimension; a separate key picks the dimension (fly model, section 3.4) |
+| control | previous / next stop of the focused tier | unchanged (section 2.4): the previous or next stop of the focused (dimension, tier), section 3.4 |
+| control | stop one tier coarser | unchanged (section 2.4): a step at the next coarser tier of the same dimension |
+| control | fly one tier coarser / finer | unchanged (section 2.4): fly one tier coarser or finer in the focused dimension; the cursor stays |
+| control | focus execution / hardware / architecture | unchanged (section 2.4): pick the focused dimension; when paired, its tier comes from the alignment table |
+| control | tier n of the focused dimension | unchanged (section 2.4): fly to tier n of the focused dimension |
+| control | paired / independent tiers | unchanged (section 2.4): paired tiers follow the alignment table of section 3.4 |
+| control | next world | unchanged (section 2.4): cycle the four worlds of section 2.2 |
+| control | dock bottom / right | unchanged (section 2.4): move the dock |
+| control | play every event in the bounds, looping | unchanged (section 2.4): play the bounds, the execution unit at the cursor (section 2.3) |
+| control | pace: events / time | unchanged (section 2.4): the playback pace |
+| control | previous / next row of the focused tier (walk every row, section 3.4) | unchanged (section 2.4): the first walk mode of section 3.4; the second mode (rows of the selected process or object, owner) has no key yet |
+| control | back / forward through selections (choice 4) | unchanged (section 2.4): selection history, section 8 choice 4 |
 <!-- /gen:surfaces -->
 
 ## 10. Stop counts per run

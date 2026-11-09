@@ -5,8 +5,7 @@
 //   host runner to open a Nsight report; data-raw="<id>" loads a row's raw record; data-light="<id>,<id>" lights those
 //   rows on every level while hovered.
 // ctx.memo holds a tab's scans of the rows (cleared when live rows arrive); cold detail is the store's one cache.
-import { fmtSpan } from "../control/bar.js";
-import { fmtBytes, fmtValue } from "../scene/samples.js";
+import { fmtSpan, fmtBytes, fmtValue } from "../sidebar/samples.js";
 import { nsysWhere } from "./nsight.js";
 
 /**

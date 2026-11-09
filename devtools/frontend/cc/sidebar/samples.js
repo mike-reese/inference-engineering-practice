@@ -1,10 +1,12 @@
-// Sampled metrics as the levels and the hardware sidebar read them. The store decides what counts at t
+// Sampled metrics as the header, the worlds and the hardware sidebar read them. The store decides what counts at t
 // (RunStore.samplesAt: the last sample while fresh); this file names roles and words the evidence. Roles name one
 // meaning that different sources fill: replay reads Nsight Systems GPU metrics, live reads NVML GPM (design: Render,
 // Live and replay are one path). Every function reads the store's current catalog, so a live group added later counts.
-import { fmtSpan } from "../control/bar.js";
 
-/** role -> catalog metric names, first match wins. A role fills a part of L1 or L7. */
+/** A span of ns in s, ms or µs. */
+export const fmtSpan = (ns) => (ns >= 1e9 ? `${(ns / 1e9).toFixed(3)} s` : ns >= 1e6 ? `${(ns / 1e6).toFixed(3)} ms` : `${(ns / 1e3).toFixed(1)} µs`);
+
+/** role -> catalog metric names, first match wins. */
 export const ROLES = {
   sm_active: ["SMs Active [Throughput %]", "nvml.gpm.sm_util"],
   tensor: ["Tensor Active [Throughput %]", "nvml.gpm.tensor_util"],
@@ -14,6 +16,7 @@ export const ROLES = {
   pcie_tx: ["PCIe TX Throughput [Throughput %]", "nvml.pcie.tx"],
   sm_clock: ["GPC Clock Frequency [MHz]", "nvml.clocks.sm", "clocks.sm"],
   mem_used: ["nvml.memory.used", "memory.used"],
+  gpu_util: ["utilization.gpu"],
 };
 
 /** @typedef {import("../store/run.js").RunStore} RunStore */
@@ -30,12 +33,15 @@ export function why(s, i) {
   return c ? `no sample at the cursor; samples cover ${(c[0] / 1e9).toFixed(2)}–${(c[1] / 1e9).toFixed(2)} s` : "no samples in this run";
 }
 
-/** "Nsight Systems GPU metrics · 10 kHz": the source and its sampling period, as evidence. @param {RunStore} s */
-export function evidence(s, i) {
-  const m = s.metrics[i], ms = m.period_ms ?? s.samplePeriod(i) / 1e6;
-  const rate = ms < 1 ? `${+(1 / ms).toFixed(1)} kHz` : ms < 1000 ? `${+ms.toFixed(0)} ms` : fmtSpan(ms * 1e6);
-  return `${m.source.replace(/^Observed: /, "")} · ${rate}`;
-}
+/** The source a catalog metric is read from: "Nsight Systems GPU metrics". */
+export const sourceOf = (m) => m.source.replace(/^Observed: /, "");
+
+/** "every 100.0 µs (measured)": the period this run sampled metric i at (its median gap), else the registry's.
+ *  @param {RunStore} s */
+export const periodOf = (s, i) => `every ${fmtSpan(s.samplePeriod(i))} (${s.metrics[i].period_ns_measured != null ? "measured" : "registry"})`;
+
+/** "Nsight Systems GPU metrics · every 100.0 µs (measured)". @param {RunStore} s */
+export function evidence(s, i) { return `${sourceOf(s.metrics[i])} · ${periodOf(s, i)}`; }
 
 const NON_NEGATIVE = new Set(["%", "Throughput %", "MHz", "W", "MiB"]);
 

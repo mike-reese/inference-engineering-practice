@@ -1,54 +1,38 @@
-// The one keymap and the page's only keydown listener. The help overlay (?) renders this same table, so the keys and
-// their help cannot drift. Each row names its intent for the input-to-frame marks.
+// The one keymap (COMMAND_CENTER.md 2.4) and the page's only keydown listener for it. The header's ? help renders
+// KEYS, built from the same rows, so the keys and their help cannot drift. Everything here is also clickable.
+import { state, step, walkRow, fly, focus, setTier, setPaired, setWorld, setDock, togglePlay, setPace, goBack, goForward, WORLDS } from "./control.js";
 import { perf } from "../perf.js";
 
-/** @typedef {import("./control.js").Control} Control */
-/** @typedef {{keys: string[], label?: string, does: string, intent?: string, run: (c: Control) => void}} KeyRow */
+const arrow = (e) => (e.key === "ArrowRight" ? +1 : e.key === "ArrowLeft" ? -1 : 0);
+const letter = (e, c) => e.key.length === 1 && e.key.toLowerCase() === c;
+const FOCUS = { e: "execution", h: "hardware", a: "architecture" };
 
-/** @param {{name: string}[]} levels @returns {KeyRow[]} */
-export function keymap(levels) {
-  return [
-    { keys: ["ArrowRight"], label: "→", does: "next event at the grain", intent: "step", run: (c) => c.step(+1) },
-    { keys: ["ArrowLeft"], label: "←", does: "previous event at the grain", intent: "step", run: (c) => c.step(-1) },
-    { keys: ["Shift+ArrowRight"], label: "Shift →", does: "next event one tier coarser", intent: "step", run: (c) => c.step(+1, "coarser") },
-    { keys: ["Shift+ArrowLeft"], label: "Shift ←", does: "previous event one tier coarser", intent: "step", run: (c) => c.step(-1, "coarser") },
-    { keys: ["Alt+ArrowRight"], label: "Alt →", does: "next row of any tier (every row)", intent: "step", run: (c) => c.step(+1, "finest") },
-    { keys: ["Alt+ArrowLeft"], label: "Alt ←", does: "previous row of any tier", intent: "step", run: (c) => c.step(-1, "finest") },
-    { keys: ["ArrowUp"], label: "↑", does: "focus the next coarser level", intent: "focus", run: (c) => c.focusStep(-1) },
-    { keys: ["ArrowDown"], label: "↓", does: "focus the next finer level", intent: "focus", run: (c) => c.focusStep(+1) },
-    ...levels.map((l, i) => ({ keys: [String(i + 1)], does: `focus ${l.name}, natural window at the cursor`, intent: "focus", run: (c) => c.focusLevel(i) })),
-    { keys: [" "], label: "Space", does: "play / pause", intent: "play", run: (c) => c.togglePlay() },
-    { keys: ["+", "="], label: "+", does: "zoom the window in around the cursor", intent: "zoom", run: (c) => c.zoom(0.5) },
-    { keys: ["-"], label: "−", does: "zoom the window out around the cursor", intent: "zoom", run: (c) => c.zoom(2) },
-    { keys: ["0"], does: "natural window of the focused level", intent: "zoom", run: (c) => c.naturalWindow() },
-    { keys: ["Home"], does: "first event at the grain", intent: "step", run: (c) => c.home() },
-    { keys: ["End"], does: "last event at the grain", intent: "step", run: (c) => c.end() },
-    { keys: ["l"], label: "L", does: "follow the live head (live runs only)", intent: "live", run: (c) => c.toggleFollow() },
-    { keys: ["Escape"], label: "Esc", does: "close this help, else clear the selection", intent: "select", run: (c) => (help.hidden ? c.clear() : (help.hidden = true)) },
-    { keys: ["?"], does: "show or hide this help", run: () => (help.hidden = !help.hidden) },
-  ];
-}
+/** label and does are the help's two columns; intent names the input for perf's input-to-frame marks. */
+const ROWS = [
+  { label: "← →", does: "previous / next stop of the focused tier", intent: "step", match: (e) => arrow(e) && !e.shiftKey && !e.altKey, run: (e) => step(arrow(e)) },
+  { label: "Shift ← →", does: "stop one tier coarser", intent: "step", match: (e) => arrow(e) && e.shiftKey && !e.altKey, run: (e) => step(arrow(e), true) },
+  { label: "↑ ↓", does: "fly one tier coarser / finer", intent: "focus", match: (e) => e.key === "ArrowUp" || e.key === "ArrowDown", run: (e) => fly(e.key === "ArrowUp" ? -1 : +1) },
+  { label: "E H A", does: "focus execution / hardware / architecture", intent: "focus", match: (e) => e.key.length === 1 && e.key.toLowerCase() in FOCUS, run: (e) => focus(FOCUS[e.key.toLowerCase()]) },
+  { label: "1-6", does: "tier n of the focused dimension", intent: "focus", match: (e) => e.key.length === 1 && e.key >= "1" && e.key <= "6", run: (e) => setTier(state.focus, Number(e.key) - 1) },
+  { label: "P", does: "paired / independent tiers", intent: "focus", match: (e) => letter(e, "p"), run: () => setPaired(!state.paired) },
+  { label: "W", does: "next world", intent: "world", match: (e) => letter(e, "w"), run: () => setWorld(WORLDS[(WORLDS.findIndex(([id]) => id === state.world) + 1) % WORLDS.length][0]) },
+  { label: "D", does: "dock bottom / right", intent: "dock", match: (e) => letter(e, "d"), run: () => setDock({ pos: state.dock.pos === "bottom" ? "right" : "bottom" }) },
+  { label: "Space", does: "play every event in the bounds, looping", intent: "play", match: (e) => e.key === " ", run: () => togglePlay() },
+  { label: "T", does: "pace: events / time", intent: "play", match: (e) => letter(e, "t"), run: () => setPace(state.pace === "time" ? "events" : "time") },
+  { label: "Alt ← →", does: "previous / next row of the focused tier (walk every row, section 3.4)", intent: "step", match: (e) => arrow(e) && e.altKey, run: (e) => walkRow(arrow(e)) },
+  { label: "[ ]", does: "back / forward through selections (choice 4)", intent: "select", match: (e) => e.key === "[" || e.key === "]", run: (e) => (e.key === "[" ? goBack() : goForward()) },
+];
 
-let help = /** @type {HTMLElement} */ ({ hidden: true });
+/** [keys, what they do] per row, for the help. */
+export const KEYS = ROWS.map((r) => [r.label, r.does]);
 
-const combo = (e) => {
-  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-  return (e.altKey ? "Alt+" : "") + (e.shiftKey && k.startsWith("Arrow") ? "Shift+" : "") + k;
-};
-
-/** @param {Window} target @param {Control} control @param {{name: string}[]} levels */
-export function bindKeys(target, control, levels) {
-  const rows = keymap(levels), by = new Map(rows.flatMap((r) => r.keys.map((k) => [k, r])));
-  help = document.createElement("div"); help.id = "help"; help.hidden = true; help.setAttribute("role", "dialog"); help.setAttribute("aria-label", "Keys");
-  help.innerHTML = `<h2>Keys</h2><table>${rows.map((r) => `<tr><th>${r.label ?? r.keys[0]}</th><td>${r.does}</td></tr>`).join("")}</table>`;
-  document.body.append(help);
+export function bindKeys(target) {
   target.addEventListener("keydown", (e) => {
-    if (e.ctrlKey || e.metaKey || /** @type {HTMLElement} */ (e.target).closest?.("input, select, textarea")) return;
-    const row = by.get(combo(e));
+    if (e.ctrlKey || e.metaKey || e.target.closest?.("input, textarea, select")) return;
+    const row = ROWS.find((r) => r.match(e));
     if (!row) return;
     e.preventDefault();
-    if (row.intent) perf.input(row.intent, e.timeStamp);
-    row.run(control);
+    perf.input(row.intent, e.timeStamp);
+    row.run(e);
   });
-  return { toggleHelp: () => (help.hidden = !help.hidden) };
 }

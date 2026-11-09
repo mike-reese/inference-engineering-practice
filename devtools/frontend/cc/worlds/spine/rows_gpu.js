@@ -44,7 +44,7 @@ void main() { gl_FragColor = vec4(vSel > 0.5 ? vec3(1.0) : vColor, 1.0); }`;
 /** @typedef {{material: THREE.ShaderMaterial, group: THREE.Group}} RowsView  one level's rows: one Mesh per block in group */
 
 export class GpuRows {
-  /** @param {import("../store/run.js").RunStore} store */
+  /** @param {import("../../store/run.js").RunStore} store */
   constructor(store) {
     /** @type {THREE.InstancedBufferGeometry[]} */
     this.geoms = []; /** @type {RowsView[]} */ this.views = []; this.geoOf = new Map();

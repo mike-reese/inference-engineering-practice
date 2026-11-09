@@ -1,115 +1,42 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Command Center</title><link rel="icon" href="data:,">
-<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }</script>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command center</title>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }</script>
 <style>
-:root { --bg: #15171b; --panel: #1b1e24; --line: #2c313b; --text: #e6e9ef; --muted: #8a93a3; --accent: #ffd36b; }
-* { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 13px/1.35 system-ui, sans-serif; }
-body { display: grid; grid-template-rows: 32px minmax(0, 1fr) auto; overflow: hidden; }
-header { display: flex; align-items: center; gap: 12px; padding: 0 12px; border-bottom: 1px solid var(--line); }
-header h1 { font-size: 14px; margin: 0; font-weight: 600; }
-header #runname { color: var(--muted); font-family: ui-monospace, monospace; font-size: 12px; }
-/* main: the stage, the inspector (bottom by default, or right; normal or big, as in the D5v2 flyout) and the hardware sidebar */
-main { display: grid; min-height: 0; grid-template-columns: minmax(0, 1fr) 270px; grid-template-rows: minmax(0, 1fr) 20%; grid-template-areas: "stage hw" "insp hw"; }
-body.fly-big main { grid-template-rows: minmax(0, 1fr) 50%; }
-body.insp-right main { grid-template-columns: minmax(0, 1fr) max(380px, 40%) 270px; grid-template-rows: minmax(0, 1fr); grid-template-areas: "stage insp hw"; }
-body.insp-right.fly-big main { grid-template-columns: minmax(0, 1fr) 62% 270px; }
-@media (max-width: 760px) { main, body.insp-right main, body.fly-big main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 35vh auto; grid-template-areas: "stage" "insp" "hw"; } }
-#stage { grid-area: stage; position: relative; overflow: hidden; min-width: 0; }
-#stage canvas { display: block; width: 100%; height: 100%; }
-#stage .labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.lab { font-size: 12px; line-height: 1.2; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 0 3px #000, 0 0 2px #000; pointer-events: none; }
-.lab.title { font-size: 13px; font-weight: 600; }
-.lab.group { font-size: 11px; color: #a9bddb; font-weight: 600; }
-.lab.lane { font-size: 11px; color: #c5ccd6; }
-.lab.row { font-size: 11px; color: #fff; }
-.lab.band { font-size: 10px; color: #b8bfd0; }
-.lab.note { font-size: 10px; color: var(--muted); }
-.lab.stub { font-size: 15px; color: var(--muted); }
-.lab.box { font-size: 12px; color: #fff; font-weight: 600; }
-.lab.tile { font-size: 11px; color: #fff; }
-.lab.big { font-size: 15px; color: #fff; font-weight: 600; }
-.lab.packet { font-size: 12px; color: #15171b; background: var(--accent); padding: 1px 6px; border-radius: 9px; text-shadow: none; font-weight: 600; }
-.lab-btn { pointer-events: auto; cursor: pointer; font: 12px system-ui, sans-serif; color: var(--text); background: #2b4a7a; border: 1px solid #5e81ac; border-radius: 5px; padding: 2px 9px; white-space: nowrap; }
-.lab-btn:hover { background: #3a6099; }
-.fatal { color: #ff8a8a; padding: 16px; white-space: pre-wrap; }
-/* hardware sidebar */
-#hw { grid-area: hw; border-left: 1px solid var(--line); padding: 8px 10px; overflow: auto; min-height: 0; }
-#hw h2 { font-size: 13px; color: var(--text); margin: 0 0 2px; }
-#hw .hint, #hw .muted { color: var(--muted); font-size: 11px; margin: 0 0 6px; }
-#hw h3 { font-size: 11px; font-weight: 600; color: #a9bddb; margin: 10px 0 4px; }
-.hwrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nm val" "spark spark" "ev ev" "why why"; column-gap: 6px; padding: 3px 0 5px; border-bottom: 1px solid var(--line); }
-.hwrow .nm { grid-area: nm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hwrow .val { grid-area: val; font-family: ui-monospace, monospace; font-size: 12px; color: var(--accent); }
-.hwrow canvas { grid-area: spark; width: 100% !important; margin-top: 2px; }
-.hwrow .ev { grid-area: ev; font-size: 10px; color: var(--muted); }
-.hwrow .why { grid-area: why; font-size: 10px; color: #c9a26b; }
-.hwrow.stale .nm, .hwrow.stale .val { color: var(--muted); }
-.hwrow.stale canvas { opacity: 0.5; }
-#bar { border-top: 1px solid var(--line); padding: 4px 8px 6px; display: grid; gap: 4px; }
-#bar .transport { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-#bar button, #bar select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; font: inherit; }
-#bar button.on { border-color: var(--accent); color: var(--accent); }
-#bar #run { max-width: 300px; }
-#bar #levels { display: inline-flex; gap: 3px; }
-#bar #grain { color: #9fc3ff; margin-left: 6px; }
-#bar #tlabel { font-family: ui-monospace, monospace; font-size: 12px; margin-left: auto; }
-#bar .dot { width: 9px; height: 9px; border-radius: 50%; background: #555; display: inline-block; }
-#bar canvas { width: 100%; display: block; border-radius: 3px; }
-#overview { height: 20px; cursor: grab; }
-#detail { height: 40px; cursor: crosshair; touch-action: none; }
-/* inspector flyout */
-#inspector { grid-area: insp; display: flex; flex-direction: column; min-height: 0; min-width: 0; border-top: 1px solid var(--line); background: var(--bg); font-size: 12px; }
-body.insp-right #inspector { border-top: 0; border-left: 1px solid var(--line); }
-#ftabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 8px; border-bottom: 1px solid var(--line); align-items: center; }
-#ftabs button { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 1px 9px; font: inherit; cursor: pointer; }
-#ftabs button.on { border-color: #5e81ac; background: #5e81ac; color: #fff; }
-#ftabs .fsp { flex: 1; }
-#fstatus { color: var(--muted); font-size: 11px; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#fstatus.bad { color: #ff8a8a; }
-#fbody { flex: 1; overflow: auto; min-height: 0; padding: 6px 12px 10px; }
-#fbody h3 { font-size: 13px; margin: 2px 0 6px; }
-#fbody p { margin: 4px 0; }
-#fbody .muted, #fbody .muted * { color: var(--muted); }
-#fbody .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 4px 20px; }
-#fbody table { border-collapse: collapse; }
-#fbody table.kv th { text-align: left; color: var(--muted); font-weight: 500; padding: 1px 12px 1px 0; vertical-align: top; white-space: nowrap; }
-#fbody table.kv td { padding: 1px 0; }
-#fbody table.rows { width: 100%; }
-#fbody table.rows th { text-align: left; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--line); padding: 2px 8px 2px 0; position: sticky; top: -6px; background: var(--bg); }
-#fbody table.rows td { border-bottom: 1px solid #22262e; padding: 1px 8px 1px 0; vertical-align: top; }
-#fbody table.rows tr.grp th { color: #a9bddb; position: static; border: 0; padding-top: 6px; }
-#fbody tr.on td { background: #3a3220; }
-#fbody tr.sel td { box-shadow: inset 0 0 0 1px #fff; }
-#fbody tr.past td { color: #c5ccd6; }
-#fbody td.num { text-align: right; font-family: ui-monospace, monospace; white-space: nowrap; }
-#fbody code, #fbody pre { font-family: ui-monospace, monospace; font-size: 11px; }
-#fbody pre.json { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; margin: 4px 0; max-height: 260px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
-#fbody details { margin: 4px 0; } #fbody summary { cursor: pointer; }
-#fbody .tag { font-size: 10px; padding: 0 5px; border-radius: 8px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
-#fbody button { font: inherit; cursor: pointer; }
-#fbody button.link { background: none; border: 0; padding: 0; color: #9fc3ff; text-align: left; }
-#fbody button.link:hover { text-decoration: underline; }
-#fbody button.go { color: var(--accent); margin-left: 3px; }
-#fbody button.open, #fbody button[data-raw] { background: #2b4a7a; color: var(--text); border: 1px solid #5e81ac; border-radius: 5px; padding: 1px 8px; }
-#fbody .answer span.on { background: var(--accent); color: #15171b; }
-#help { position: fixed; top: 48px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 16px; z-index: 10; box-shadow: 0 8px 30px #000a; }
-#help h2 { font-size: 14px; margin: 0 0 6px; }
-#help th { text-align: left; padding: 1px 14px 1px 0; color: var(--accent); font-weight: 500; white-space: nowrap; }
-#help[hidden] { display: none; }
-</style>
-</head>
-<body>
-<header><h1>Command center</h1><span id="runname"></span></header>
-<main>
-  <div id="stage" aria-label="Scene"></div>
-  <section id="inspector" aria-label="Inspector"></section>
-  <aside id="hw" aria-label="Hardware"></aside>
-</main>
-<footer id="bar" aria-label="Timeline"></footer>
-<script type="module" src="./app.js"></script>
-</body>
-</html>
+  /* v1 tokens (devtools/frontend/style.css), copied, not imported. Mixed styles are allowed. */
+  :root { --bg:#0f1115; --panel:#171a21; --line:#2a2f3a; --text:#d7dae0; --dim:#8a90a0;
+    --up:#3fb950; --starting:#d29922; --down:#f85149; --accent:#58a6ff;
+    --exec:#7cc4ff; --hw:#f5a623; --arch:#b58cff; --bar-h:380px; --bar-w:440px; --hw-w:270px; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; margin:0; }
+  body { background:var(--bg); color:var(--text); font:13px/1.4 ui-monospace, monospace; display:grid; overflow:hidden; }
+  /* v2 side layout: stage, hardware cutout on the right, bar at the bottom (or right). */
+  body.dock-bottom { grid-template: "chrome chrome" auto "stage hw" 1fr "bar bar" var(--bar-h) / 1fr var(--hw-w); }
+  body.dock-right { grid-template: "chrome chrome chrome" auto "stage bar hw" 1fr / 1fr var(--bar-w) var(--hw-w); }
+  body.dock-closed.dock-bottom { grid-template-rows: auto 1fr 64px; }
+  body.dock-closed.dock-right { grid-template-columns: 1fr 34px var(--hw-w); }
+  #chrome { grid-area:chrome; border-bottom:1px solid var(--line); }
+  #stage { grid-area:stage; position:relative; min-width:0; min-height:0; overflow:hidden; }
+  #hw { grid-area:hw; border-left:1px solid var(--line); min-height:0; overflow:auto; background:var(--panel); }
+  #bar { grid-area:bar; border-top:1px solid var(--line); min-height:0; overflow:hidden; background:var(--panel); }
+  body.dock-right #bar { border-top:0; border-left:1px solid var(--line); }
+</style></head>
+<body class="dock-bottom">
+  <div id="chrome"></div><div id="stage"></div><div id="hw"></div><div id="bar"></div>
+<script type="module">
+  import { state, subscribe } from "./control/control.js";
+  import { bindKeys } from "./control/keys.js";
+  import { mountChrome } from "./chrome/chrome.js";
+  import { mountBar } from "./control/bar.js";
+  import { mountHardwareSide } from "./sidebar/sidebar.js";
+  import { mountStage } from "./worlds/stage.js";
+  mountChrome(document.getElementById("chrome"));
+  mountBar(document.getElementById("bar"));
+  mountHardwareSide(document.getElementById("hw"));
+  mountStage(document.getElementById("stage"));
+  bindKeys(window);
+  subscribe((s) => { document.body.className = `dock-${s.dock.pos}${s.dock.open ? "" : " dock-closed"}`; });
+  window.__cc = state; // for ccv checks (devtools/verify/regress.sh)
+</script>
+</body></html>
