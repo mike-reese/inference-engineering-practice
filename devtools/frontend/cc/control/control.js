@@ -295,9 +295,15 @@ export const metricInputs = () => new Set(metrics().find((x) => x.id === state.m
 export function boundsAt(t) {
   const S = store(); if (!S) return [0, 0];
   for (let e = state.tiers.execution; e > 0; e--) { const k = U(S).at(e, t); if (k >= 0) { const u = U(S).of(e); return [u.start[k], u.end[k]]; } }
-  return [0, Math.max(S.extent[1], 1)];
+  return wholeRun(S);
 }
-const rebound = () => { if (state.t < state.bounds[0] || state.t >= state.bounds[1]) state.bounds = boundsAt(state.t); };
+const wholeRun = (S) => [0, Math.max(S.extent[1], 1)];
+/** Recompute the bounds when t leaves them, or while they are the whole-run fallback: a run opens at t0, before any
+ *  unit, so the first seek or selection must find its unit. */
+const rebound = () => {
+  const S = store(), [b0, b1] = state.bounds, whole = S && b0 === 0 && b1 === wholeRun(S)[1];
+  if (whole || state.t < b0 || state.t >= b1) state.bounds = boundsAt(state.t);
+};
 /** Every row starting inside the bounds, by (start, id). */
 export const eventsIn = (b = state.bounds) => { const S = store(); return S ? U(S).rowsIn(b) : new Uint32Array(0); };
 let prevNow = 0, glide = null;
