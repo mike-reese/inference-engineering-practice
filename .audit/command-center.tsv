@@ -60,3 +60,6 @@ ts	phase	decision	why	evidence	result
 2026-11-09T08:37:09Z	fix	I02C compare: client TTFT from client rows, as for latency.json reps	doc 7.4 M1 Compare check names client rows; I02C has them	fix report choice 2	fix2 agent
 2026-11-09T08:44:06Z	fix2	accepted fix2-work (6773f36), merged	reran regress and walkthroughs myself	see next row	VERIFIED
 2026-11-09T08:44:06Z	fix2	Compare should show a run's result values that exist even when the moments request is incomplete (5626f7 hides A's 48.878 ms TTFT)	complete is a moments rule, not a reason to hide real values	fix2 report open question	queued for the parity round
+2026-11-09T09:02:04Z	parity	audit 1: 71 checks, 40 identical, 11 data-driven, 19 gap rows = 8 fixes (G1-G8) + 3 spec-required differences; live not covered (live.sh passed earlier)	read-only verifier, both pages, every recipe	evidence/parity/	not at parity yet
+2026-11-09T09:02:04Z	parity	G4 default: show a run's existing result values even when the moments request is incomplete, flagged; hiding was the M3 agent's comment, not an owner rule	parity on real I02C data; real values should not be hidden	audit G4	owner may keep them hidden
+2026-11-09T09:02:04Z	parity	fix round on fix3-work: G1 bounds fallback, G2-G3 now path, G4-G5 incomplete runs, G6 heading tier, G7 pulse label, G8 role lines, cc-load recipe drift	audit gaps	audit report	launched
