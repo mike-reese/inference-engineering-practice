@@ -129,6 +129,8 @@ Load, Launch and Compare open one panel with three tabs and the reps on the left
 (measured, trace: X) with a result marker. Launch lists the rep's `rep.toml` actions with their options; an option
 that fails its pattern is refused. A rep without `rep.toml` is replay only. Load and Compare open on the Rep world;
 Launch opens on the spine. A run without results says "results not computed"; it never shows a made-up value.
+The result marker and the Rep world's Results table read the run's result file (2.6) and name it; they show only the
+values that file holds (I02C `readout.json`: per client; I01-L2 `summary.json`: P50 and P95 per ISL).
 
 ### 2.6 Key moments (`moments.toml`, one per rep)
 

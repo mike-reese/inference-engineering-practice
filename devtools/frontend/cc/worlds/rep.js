@@ -1,7 +1,7 @@
 // Rep world: the run's overview. What the rep does and teaches, what came out (one run, or two side by side in
 // compare), and its key moments: each one jumps the replay to where the lesson can be seen.
 import { state, subscribe, select, setTier, setWorld, store, openedStore } from "../control/control.js";
-import { repOf, runOf, kindOf, whenOf, valueAt, ttftSegments, fmtMs, esc, md, lessonsOf } from "../session.js";
+import { repOf, runOf, kindOf, whenOf, valueAt, ttftSegments, resultFile, resultTable, fmtMs, esc, md, lessonsOf } from "../session.js";
 
 /** The first row, in time order, of the moments' request (moments.toml `request`, a request id suffix) whose name
  *  starts with the moment's `event`: the moments lint's rule (store/reps.py). -1 when the run has none. */
@@ -20,12 +20,6 @@ function clientTtft(S, suffix) {
   const send = req < 0 ? null : at("send"), token = send == null ? null : at("event: token");
   return token == null ? null : (token - send) / 1e6;
 }
-const CLOCKS = [["client", "#7cc4ff"], ["wire", "#58d68d"], ["engine", "#f5a623"]];
-const ROWS = [
-  ["TTFT", { client: "client.ttft_ms", wire: "wire.ttft_ms", engine: "engine.ttft_ms" }],
-  ["Mean ITL", { client: "client.mean_itl_ms", wire: "wire.mean_itl_ms", engine: "engine.mean_itl_ms" }],
-  ["End-to-end", { client: "client.e2e_ms", wire: "wire.done_ms", engine: "engine.e2e_ms" }],
-];
 const SEG_COL = { "client → pcap": "#7cc4ff", "pcap → engine": "#58d68d", engine: "#f5a623", "engine → pcap": "#58d68d", "pcap → client": "#7cc4ff" };
 
 const CSS = `
@@ -51,6 +45,7 @@ const CSS = `
 .rw table.res { border-collapse:collapse; width:100%; font:13px ui-monospace, monospace; }
 .rw table.res th, .rw table.res td { padding:5px 8px; text-align:right; border-bottom:1px solid #1d2635; white-space:nowrap; }
 .rw table.res th:first-child, .rw table.res td:first-child { text-align:left; } .rw table.res th { color:#8fa3bd; font-weight:600; }
+.rw .src { font-size:12px; margin:6px 0 0; } .rw h3 { margin:10px 0 4px; font-size:13px; color:#d2b8ff; }
 .rw .up { color:#ff7b72; } .rw .down { color:#58d68d; }
 .rw .seg { display:flex; height:30px; border-radius:5px; overflow:hidden; margin:6px 0 2px; }
 .rw .seg div { min-width:2px; border-right:1px solid #070a10; color:#061018; font:11px ui-monospace, monospace; display:flex; align-items:center; justify-content:center; overflow:hidden; white-space:nowrap; }
@@ -78,19 +73,31 @@ export function mount(el) {
     setTier("execution", 2); select(id); setWorld("spine");
   });
 
-  function results(a, b) {
-    const ra = a?.result, rb = b?.result;
-    if (!ra && !rb) return state.session.live ? `<p class="none">Results arrive when the run finishes and latency.json is written.</p>`
-      : `<p class="none">Results not computed for this run (no latency.json in its folder).</p>`;
-    if (!b) return `<table class="res"><tr><th></th>${CLOCKS.map(([c, col]) => `<th style="color:${col}">${c}</th>`).join("")}</tr>
-      ${ROWS.map(([name, p]) => `<tr><td>${name}</td>${CLOCKS.map(([c]) => `<td>${fmtMs(valueAt(ra, p[c]))}</td>`).join("")}</tr>`).join("")}</table>`;
+  const colHead = (c) => `<span${c.color ? ` style="color:${c.color}"` : ""}>${esc(c.name)}</span>`;
+  const notComputed = (rep) => `Results not computed for this run (no ${esc(resultFile(rep))} result in its folder${rep.moments?.complete ? `, or ${esc(rep.moments.complete)} is false` : ""}).`;
+  /** One run's Results table from its rep's result file; tag names the run when A and B have different files. */
+  function table(rep, run, tag) {
+    const head = tag ? `<h3>${tag}</h3>` : "", t = resultTable(rep, [run?.result]);
+    if (!run?.result) return `${head}<p class="none">${notComputed(rep)}</p>`;
+    if (!t.rows.length) return `${head}<p class="none">The command center has no Results layout for ${esc(t.file)}.</p>`;
+    return `${head}<table class="res"><tr><th></th>${t.cols.map((c) => `<th>${colHead(c)}</th>`).join("")}</tr>
+      ${t.rows.map((r) => `<tr><td>${esc(r.label)}</td>${t.cols.map((c) => `<td>${fmtMs(valueAt(run.result, r.path[c.name]))}</td>`).join("")}</tr>`).join("")}</table>
+      <p class="muted src">Values from the run's ${esc(t.file)}.</p>`;
+  }
+  function results(rep, a, b) {
+    const ra = a?.result, rb = b?.result, repB = b && repOf(b.rep);
+    if (!ra && !rb) return state.session.live ? `<p class="none">Results arrive when the run finishes and ${esc(resultFile(rep))} is written.</p>`
+      : `<p class="none">${notComputed(rep)}</p>`;
+    if (!b) return table(rep, a);
+    if (repB && resultFile(repB) !== resultFile(rep)) return table(rep, a, "A") + table(repB, b, "B");
     // client TTFT comes from each run's client rows in the store (7.4), filled in once both stores are open
-    const rows = ROWS.flatMap(([name, p]) => CLOCKS.map(([c, col]) => {
-      const fromRows = name === "TTFT" && c === "client";
-      return `<tr${fromRows ? ` data-rows="ttft"` : ""}><td>${name} <span style="color:${col}">${c}</span></td>${fromRows ? delta(null, null) : delta(valueAt(ra, p[c]), valueAt(rb, p[c]))}</tr>`;
+    const t = resultTable(rep, [ra, rb]);
+    const rows = t.rows.flatMap((r) => t.cols.map((c) => {
+      const fromRows = t.fromRows?.[0] === r.label && t.fromRows?.[1] === c.name;
+      return `<tr${fromRows ? ` data-rows="ttft"` : ""}><td>${esc(r.label)} ${colHead(c)}</td>${fromRows ? delta(null, null) : delta(valueAt(ra, r.path[c.name]), valueAt(rb, r.path[c.name]))}</tr>`;
     })).join("");
     return `<table class="res"><tr><th></th><th>A</th><th>B</th><th>B − A</th><th>%</th></tr>${rows}</table>
-      <p class="muted" style="font-size:12px;margin:6px 0 0">TTFT client: recomputed from each run's client rows in the store (first token event − send). Other rows: latency.json.</p>`;
+      <p class="muted src">${t.fromRows ? `${t.fromRows.join(" ")}: recomputed from each run's client rows in the store (first token event − send). Other rows: the runs' ${esc(t.file)}.` : `Values from the runs' ${esc(t.file)}.`}</p>`;
   }
   function delta(va, vb) {
     const d = va != null && vb != null ? vb - va : null, cls = d > 0 ? "up" : d < 0 ? "down" : "";
@@ -144,8 +151,8 @@ export function mount(el) {
         <section><details><summary>What we did (Task)</summary>${md(rep.sections.Task)}</details></section>
       </div>
       <div class="col">
-        <section><h2>Results ${b ? "· A against B" : ""}</h2>${results(a, b)}</section>
-        ${result || b?.result ? `<section><h2>Where client TTFT goes · ${[a, b].filter((r) => r?.result).map((r, i, rs) => `${rs.length > 1 ? (r === a ? "A " : "B ") : ""}${ttftSegments(r.result).length}`).join(" · ")} segments, 3 clocks</h2>${segments(a, scale, b ? "A" : "")}${b ? segments(b, scale, "B") : ""}${segLegend(a, b ? "A" : "")}${b ? segLegend(b, "B") : ""}</section>` : ""}
+        <section><h2>Results ${b ? "· A against B" : ""}</h2>${results(rep, a, b)}</section>
+        ${ttftSegments(result).length || ttftSegments(b?.result).length ? `<section><h2>Where client TTFT goes · ${[a, b].filter((r) => ttftSegments(r?.result).length).map((r, i, rs) => `${rs.length > 1 ? (r === a ? "A " : "B ") : ""}${ttftSegments(r.result).length}`).join(" · ")} segments, 3 clocks</h2>${segments(a, scale, b ? "A" : "")}${b ? segments(b, scale, "B") : ""}${segLegend(a, b ? "A" : "")}${b ? segLegend(b, "B") : ""}</section>` : ""}
         <section><details open><summary>Results notes (README)</summary>${md(rep.sections.Results) || '<p class="none">No Results section.</p>'}</details></section>
         <section><details><summary>Pass checks</summary>${md(rep.sections["Pass Check"])}</details></section>
       </div>`;
