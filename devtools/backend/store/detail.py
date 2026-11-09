@@ -137,6 +137,8 @@ class Generation:
         if len(ids) > MAX_IDS:
             raise ValueError(f"{len(ids)} ids; at most {MAX_IDS} per request")
         self._check(ids)
+        if not ids:   # every eid asked for was unknown (resolve drops those): nothing to read
+            return []
         chains = {i: self.chain(i) for i in ids}
         need = set(ids) | {p for c in chains.values() for p in c} | {int(self.cause[i]) for i in ids if self.cause[i] >= 0}
         rows = self._rows(sorted(need))
