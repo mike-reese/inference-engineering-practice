@@ -73,6 +73,12 @@ const ms = (v, digits = 2) => (v == null ? "–" : `${Number(v).toFixed(digits)}
 const center = (b) => [b.x + b.w / 2, b.y + b.h / 2];
 const statText = (n, ns) => (!n ? "" : ns > 0 ? `${n}× · ${ms(ns / 1e6, 3)} ms in all` : `${n}× (instants)`);
 const setText = (el, s) => { if (el && el.textContent !== s) el.textContent = s; };
+/** Condense an SVG text line to at most w user units, so a long owner or stat stays inside its box. */
+const fitText = (t, w) => {
+  t.removeAttribute("textLength");
+  if (t.textContent && t.getComputedTextLength() > w) { t.setAttribute("textLength", w); t.setAttribute("lengthAdjust", "spacingAndGlyphs"); }
+};
+const BOX_PAD = 10;
 const upper = (a, x) => { let lo = 0, hi = a.length; while (lo < hi) { const k = (lo + hi) >>> 1; if (a[k] <= x) lo = k + 1; else hi = k; } return lo; };
 const under = (t, a) => t.pre >= a.pre && t.post <= a.post;
 const FLOW_LABEL = { "request in": "request in: client to the engine queue", prefill: "prefill: build the KV cache, first token",
@@ -418,6 +424,7 @@ export function mountArch(el, { size = "lens" } = {}) {
       layers: q("[data-layer]").map((n) => ({ n, now: n.querySelector(".nowis") })),
       gpu: el.querySelector("#gpu"), si: -1 };
     shown = null;
+    for (const { g, b } of v.boxes.values()) for (const t of g.querySelectorAll(".cl, .co")) fitText(t, b.w - BOX_PAD);
     fitMap(); drawLinks();
     return true;
   }
@@ -453,7 +460,8 @@ export function mountArch(el, { size = "lens" } = {}) {
       g.classList.toggle("seen", n > 0);
       g.classList.toggle("driven", ctx.driven.has(id));
       g.classList.toggle("lit", ctx.lit.has(id));
-      setText(stat, statText(n, n ? S.dims.compTime(b.i, t) : 0));
+      const st = statText(n, n ? S.dims.compTime(b.i, t) : 0);
+      if (stat.textContent !== st) { stat.textContent = st; fitText(stat, b.w - BOX_PAD); }
       const show = f && b.flows.length ? "" : "none";
       if (fon.style.display !== show) fon.style.display = show;
       if (f && fon.style.fill !== FLOW_COLOR[f]) fon.style.fill = FLOW_COLOR[f];

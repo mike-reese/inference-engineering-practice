@@ -167,12 +167,14 @@ export function mount(stage) {
     const tg = targetEl();
     if (!tg || !phaseRect || !phaseRect.isConnected) { beam.style.visibility = "hidden"; return; }
     const av = main.getBoundingClientRect();
-    let b = tg.getBoundingClientRect();
-    if (b.top < av.top || b.bottom > av.bottom) { tg.scrollIntoView({ block: "nearest", inline: "nearest" }); b = tg.getBoundingClientRect(); }
+    const box = tg.matches(".cbox") ? tg.querySelector("rect") : null, edge = box ?? tg;
+    let b = edge.getBoundingClientRect();
+    if (b.top < av.top || b.bottom > av.bottom) { tg.scrollIntoView({ block: "nearest", inline: "nearest" }); b = edge.getBoundingClientRect(); }
     beam.style.visibility = "";
     const o = root.getBoundingClientRect(), p = phaseRect.getBoundingClientRect();
     const px = p.left + p.width / 2 - o.left, py = p.top - o.top;
     const bx = b.left + b.width / 2 - o.left, by = Math.min(b.bottom, av.bottom) - o.top;
+    bRect.style.display = box ? "none" : "";   // a component box draws its own yellow .on outline
     bRect.setAttribute("x", b.left - o.left - 2); bRect.setAttribute("y", b.top - o.top - 2);
     bRect.setAttribute("width", b.width + 4); bRect.setAttribute("height", b.height + 4);
     bPath.setAttribute("d", `M${px},${py} C${px},${py - 60} ${bx},${by + 60} ${bx},${by}`);
