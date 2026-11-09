@@ -32,7 +32,7 @@ Preconditions:
 
 - **Lit boxes.** `$CCV eval '[...document.querySelectorAll("#stage .arch .cbox.on")].map((g) => g.dataset.box)'`
   gives `transport,asgi`; no box is driven. `.ch-focus .t` reads `architecture › component`. The beam has a path.
-- **Click a box.** `$CCV click --css '#stage .arch .cbox[data-box="forward"]' --after arch-forward`: `sel` `51131`
+- **Click a box.** `$CCV click --css '#stage .arch .cbox[data-box="forward"]' --after arch-forward`: `sel` `62251`
   (`component stamp: model forward launched`), `t` `73382016397`. The bar reads `at 73382.016 ms from the run's t0 ·
   3.900 ms from its request's send, lasts 14.278 ms`. Lit boxes: `transport,forward`; driven: `gpu`.
 - **Processes.** `$CCV key 4`: `architecture › process`. The `.nowis` lines read

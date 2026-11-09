@@ -15,7 +15,7 @@ bottom (or right) and the hardware sidebar on the right. The D5v2 prototype reci
   `CCV_APP` to the server you verify.
 - `$CCV sessions` is empty before you launch. Run one ccv browser at a time on this machine: on 2026-11-08 several
   WebGL browsers next to a GPU engine crashed it. Close yours (`$CCV close`) after each recipe.
-- R1 is `I02A-TRACE-timeline_20261109T060522Z_ee2252` (generation 3, final): the I02A timeline run that
+- R1 is `I02A-TRACE-timeline_20261109T060522Z_ee2252` (generation 4, final): the I02A timeline run that
   COMMAND_CENTER.md section 5 walks. Row ids below are R1's in that generation. A new import renumbers them.
 - Recipes launch `--size full` (2534 x 1301). Pixel-dependent results (axis ticks, strip clicks) assume that size.
 

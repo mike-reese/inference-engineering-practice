@@ -36,7 +36,7 @@ Preconditions:
 - **TTFT split.** 7 segments. The first is `send → request's last byte on the wire · 1.677 ms · client → pcap`; the
   fourth is `first_scheduled_time → first_token_time · 19.162 ms · engine`.
 - **Show me.** Run `$CCV click --css '#stage .rw [data-go="first-read-role"]' --after rep-show-me`. The Spine world
-  opens at execution › phase: `__cc.sel` is `52847`, `__cc.t` is `73402194561`, and the bar's Selected tab starts
+  opens at execution › phase: `__cc.sel` is `64361`, `__cc.t` is `73402194561`, and the bar's Selected tab starts
   `execution · phase` `body read` `at 73402.195 ms from the run's t0 · 24.078 ms from its request's send`.
   `__cc.bounds` is that phase unit, `[73401789686, 73402650050]`, not the whole run.
 - **Back to the Rep world.** Run `$CCV click --css '.ch-nav button[data-w=rep]'`. `sel` and `t` are kept.

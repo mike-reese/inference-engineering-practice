@@ -35,9 +35,9 @@ Preconditions:
   then `$CCV wait --expr 'typeof __cc.sel === "number"'`.
 
 - **Selected.** `.b-body` starts `execution · phase` `send` `at 73378.117 ms from the run's t0 · 0.000 ms from its
-  request's send ↦`. Its first links: `51003 measured`, `51004 send`, `host/client client-1 (Locust client)`.
-- **Follow a link, Back, Forward.** `$CCV click --css '.b-body [data-sel]'`: `sel` `51003`, `nav` `{back: 1, fwd: 0}`.
-  `$CCV click --css '.b-hist[aria-label=Back]'`: `51004`, `{back: 0, fwd: 1}`. `Forward`: `51003` again. The keys
+  request's send ↦`. Its first links: `62123 measured`, `62124 send`, `host/client client-1 (Locust client)`.
+- **Follow a link, Back, Forward.** `$CCV click --css '.b-body [data-sel]'`: `sel` `62123`, `nav` `{back: 1, fwd: 0}`.
+  `$CCV click --css '.b-hist[aria-label=Back]'`: `62124`, `{back: 0, fwd: 1}`. `Forward`: `62123` again. The keys
   `[` and `]` do the same.
 - **Raw record.** `$CCV wheel --css '.b-body' --dy 200 --steps 2`, then
   `$CCV click --css '.b-body details:has([data-raw]) > summary'`, then `$CCV click --css '.b-body [data-raw]'`.
@@ -65,7 +65,7 @@ Preconditions:
   `$CCV eval '[...document.querySelectorAll("#bar [data-open]")].map((b) => b.textContent.trim() + " " + b.dataset.open)'`
   gives `Nsight Systems ↗ {"run":"I02A-TRACE-timeline_20261109T060522Z_ee2252","path":"trace/timeline.nsys-rep"}`.
   Do not click it (see Gotchas).
-- **Run.** `[data-tab=run]` starts `I02A-TRACE-timeline_20261109T060522Z_ee2252 generation 3 · final · trace:
+- **Run.** `[data-tab=run]` starts `I02A-TRACE-timeline_20261109T060522Z_ee2252 generation 4 · final · trace:
   timeline · 2026-11-09 06:05`, `requests warmup, measured, closer`, `iterations 192 (3 prefill, 189 decode)`,
   `length 87.578 s`. An earlier pass the same day read its two buttons: `Nsight Systems ↗` (the run's
   `trace/timeline.nsys-rep`) and `Nsight Compute ↗` (`I02A-TRACE-kernels_20261109T060737Z_8f4ae7`,
@@ -73,7 +73,7 @@ Preconditions:
 - **Dock.** `$CCV key d`: `dock.pos` `right`, body `dock-right`. `$CCV click --css '.b-pos'`: back to `bottom`.
   `$CCV click --css '[data-act=big]'`: `dock.big` true. `$CCV click --css '.b-collapse'`: `dock.open` false, body
   `dock-closed`; again: open.
-- **Transport.** From `sel` `53464` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `53465` at
+- **Transport.** From `sel` `65151` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `65152` at
   `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
   `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
   5456 in view · 91898 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 0.000–88294.364
