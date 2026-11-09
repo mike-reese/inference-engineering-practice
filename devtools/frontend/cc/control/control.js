@@ -27,11 +27,12 @@
 // null; kernel the kernel-tier unit holding t; phases every phase holding t; flow the flow name of exec[phase] and
 // flows those of phases; comp the component thing of the first phase at t in exec[phase]'s process that has one
 // (exec[phase] first: an NVTX range has none, a component stamp holding it does), else of the request, -1 when none;
-// archPath the architecture ladder at exec[phase], from the host down: its lane's container and process, then that
-// phase component (never the request's: that one runs in another process); software, while a kernel unit holds t
-// whose launch call sits under exec[phase] (the GPU runs behind the CPU, so a kernel at t may belong to an earlier
-// phase), the finest architecture tier its kind is placed at (kinds.json), as {tier, name, id: the kernel}, else null; process
-// the process thing on archPath, or -1; sample is
+// archPath the architecture ladder from the host down. While a kernel unit holds t and has a launch call, it is that
+// kernel's lineage (D13): the container and process of its launch call's lane, then the component of the phase
+// holding that call (launchComponentOf), so it stays true when the CPU has moved on (the GPU runs behind it). Else
+// it is exec[phase]'s: its lane's container and process, then that phase component (never the request's: that one
+// runs in another process). software, with the kernel's lineage, the finest architecture tier its kind is placed at
+// (kinds.json), as {tier, name, id: the kernel}, else null; process the process of exec[phase]'s lane, or -1; sample is
 // RunStore.samplesAt(t) (aligned with store().metrics; NaN = no fresh sample) and sampleIndex changes exactly when
 // one of those samples does; transfers (memcpy and memset units holding t) and hwActive (the hardware things the
 // rows at t ran on, with their ancestors) are computed when read.
@@ -354,9 +355,9 @@ const EMPTY_NOW = { exec: [null, null, null, null, null, null], kernel: null, ph
 export const archName = (S, i) => { const x = S.things[i], role = x?.attrs?.role?.name; return role ? role.split(/ \(|:/)[0] : x?.name ?? ""; };
 /** The component a row runs under when the store records none for it (a module or layer row): of the first phase
  *  holding its launch call (dims.launchOf) in that call's process, the rule nowOf uses at the cursor; -1 when none. */
-export function launchComponentOf(id) {
-  const S = store(); if (!S) return -1;
-  const c = S.dims.launchOf(id); if (c < 0) return -1;
+export function launchComponentOf(id) { const S = store(); return S ? callComponent(S, S.dims.launchOf(id)) : -1; }
+function callComponent(S, c) {
+  if (c < 0) return -1;
   const P = S.dims.ladders.execution.indexOf("phase"), u = U(S), proc = S.dims.laneLevel.process;
   const mine = proc[S.field("lane", c)], ids = u.of(P).ids;
   for (const k of u.holding(P, S.startOf[c])) {
@@ -383,17 +384,17 @@ function nowOf(S, t) {
   const procOf = (x) => S.dims.laneLevel.process[S.field("lane", x.id)];
   const own = !exec[P] ? -1 : [exec[P], ...phases].filter((x) => procOf(x) === procOf(exec[P])).map(compOf).find((c) => c >= 0) ?? -1;
   const comp = own >= 0 ? own : compOf(exec[0]);
-  const launchedHere = (k) => { for (let x = S.dims.launchOf(k), n = 0; x >= 0 && n < 400; n++, x = S.field("parent", x)) if (x === exec[P].id) return true; return false; };
-  const A = S.dims.ladders.architecture, place = kernel && exec[P] && launchedHere(kernel.id) ? S.kinds[S.field("kind", kernel.id)].place.architecture : "";
+  const call = kernel ? S.dims.launchOf(kernel.id) : -1, from = call >= 0 ? call : exec[P]?.id ?? -1, L = S.dims.laneLevel;
+  const A = S.dims.ladders.architecture, place = call >= 0 ? S.kinds[S.field("kind", kernel.id)].place.architecture : "";
   const layer = /^(.*) \((.*)\)$/.exec(place), software = layer?.[1] === A[A.length - 1] ? { tier: layer[1], name: layer[2], id: kernel.id } : null;
   const archPath = [];
-  if (exec[P]) {
-    const lane = S.field("lane", exec[P].id), L = S.dims.laneLevel;
+  if (from >= 0) {
+    const lane = S.field("lane", from), c = call >= 0 ? callComponent(S, call) : own;
     for (let x = S.things[L.container[lane]]; x; x = x.parent >= 0 ? S.things[x.parent] : null) archPath.unshift(x.i);
     if (L.process[lane] >= 0) archPath.push(L.process[lane]);
-    if (own >= 0) archPath.push(own);
+    if (c >= 0) archPath.push(c);
   }
-  const process = archPath.find((i) => S.things[i].kind === "process") ?? -1;
+  const process = exec[P] ? L.process[S.field("lane", exec[P].id)] : -1;
   let sampleIndex = 0;
   for (const g of S.sampleGroups) { let lo = 0, hi = g.n; while (lo < hi) { const k = (lo + hi) >>> 1; if (g.ts[k] <= t) lo = k + 1; else hi = k; } sampleIndex += lo; }
   let transfers, hwActive;
