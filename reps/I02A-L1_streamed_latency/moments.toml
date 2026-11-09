@@ -6,7 +6,9 @@
 #   at       = the moment's time, a latency.json path for the measured request (ms from send, client clock)
 #   evidence = latency.json paths shown beside the moment, with a label each. A segment is picked by the start of its
 #              name, segments[first_scheduled_time].ms, never by index: older runs have one more segment
-#   event    = what happens there, in the vocabulary of the execution spine (phase or kernel name)
+#   event    = the row the moment shows: the first row of the measured request whose name starts with this text
+#              (a stored row name of the run, e.g. a component stamp, client event or engine timestamp); the
+#              moments lint (python -m store.reps --lint) checks it in every run of the rep
 
 request = "measured"
 
@@ -15,7 +17,7 @@ id = "headers-early"
 title = "Headers leave before any token exists"
 lesson = "TTFT is a client time that must hold a token."
 at = "wire.headers_ms"
-event = "ASGI sends the response headers"
+event = "response headers"
 note = "TensorRT-LLM answers 200 OK before prefill has started. A load test that times the headers reports a TTFT shorter than prefill."
 evidence = [
   { label = "headers on the wire", path = "wire.headers_ms" },
@@ -28,7 +30,7 @@ id = "first-read-role"
 title = "The first body read holds only the role event"
 lesson = "TTFT is a client time that must hold a token."
 at = "client.first_body_read_ms"
-event = "HTTP transport: body read"
+event = "body read"
 note = "The first bytes the SDK reads are the role event, not a token. Only the first token event counts as TTFT."
 evidence = [
   { label = "first body read", path = "client.first_body_read_ms" },
@@ -40,7 +42,7 @@ id = "prefill"
 title = "Prefill owns most of TTFT"
 lesson = "Every latency has an owner."
 at = "engine.queue_ms"
-event = "model forward (prefill)"
+event = "prefill (iteration"
 note = "The 7 TTFT segments split client TTFT across three clocks; prefill is the one that matters here."
 evidence = [
   { label = "queue", path = "engine.queue_ms" },
@@ -53,7 +55,7 @@ id = "first-token"
 title = "One first token, three clocks"
 lesson = "Every latency has an owner."
 at = "client.ttft_ms"
-event = "SDK yields the token"
+event = "event: token"
 note = "The engine has the token first, the wire sees it next, the client last. The gaps are the owners of the remainder."
 evidence = [
   { label = "engine", path = "engine.ttft_ms" },
@@ -66,7 +68,7 @@ id = "decode"
 title = "Steady decode: the wire agrees with the client"
 lesson = "The wire is the referee."
 at = "client.ttft_ms"
-event = "model forward (decode)"
+event = "decode (iterations"
 note = "Mean ITL on the wire matches the client to a few microseconds, so client-side parsing is not where latency hides."
 evidence = [
   { label = "client mean ITL", path = "client.mean_itl_ms" },
@@ -79,7 +81,7 @@ id = "done"
 title = "[DONE] closes the stream"
 lesson = "Every latency has an owner."
 at = "client.e2e_ms"
-event = "send_one: protocol complete"
+event = "protocol complete"
 note = "End-to-end on each clock. The engine stops stamping at the last token; delivery adds the rest."
 evidence = [
   { label = "engine", path = "engine.e2e_ms" },

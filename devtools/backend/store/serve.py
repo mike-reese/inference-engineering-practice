@@ -6,6 +6,8 @@ GET /api/v3/runs/{run}/blocks/{gen}/{name}    a CCVB block, or aux.json; immutab
 GET /api/v3/runs/{run}/detail?ids=1,2         {rows: [...]}, at most 256 ids; ?eids=<eid> (one eid per parameter,
                                               eids are free text) resolves stable eids to rows
 GET /api/v3/runs/{run}/raw?id=                the row's raw record from the run folder
+GET /api/v3/reps                              {reps, runs}: the rep catalog, D13's session-data.json shape
+                                              (store/reps.py)
 WS  /api/v3/stream?run=&have=                 live frames (store/stream.py)
 
 A live run's detail, resolve and raw are answered by its writer (every row is in its memory, sealed or not).
@@ -21,7 +23,7 @@ from pathlib import Path
 from aiohttp import web
 
 import runs
-from . import detail
+from . import detail, reps
 from .schema import etag
 
 CC_STORE = Path(os.environ.get("CC_STORE", "/mnt/ie-data/cc/store"))
@@ -178,7 +180,12 @@ async def raw(request: web.Request) -> web.Response:
     return web.json_response(out, dumps=lambda o: json.dumps(o, default=str))
 
 
+async def rep_catalog(request: web.Request) -> web.Response:
+    return web.json_response(await asyncio.to_thread(reps.catalog, REPO, CC_STORE))
+
+
 def add_routes(router) -> None:
+    router.add_get("/api/v3/reps", rep_catalog)
     router.add_get("/api/v3/runs", run_list)
     router.add_get("/api/v3/runs/{run}/manifest", manifest)
     router.add_get("/api/v3/runs/{run}/blocks/{gen}/{name}", block)

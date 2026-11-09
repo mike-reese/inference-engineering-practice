@@ -3,7 +3,7 @@ IECTL := $(PY) scripts/iectl.py
 TRACE ?= off
 
 .PHONY: doctor images devtools devtools-up-quiet devtools-down devtools-restart runner runner-down rep profile k4 source test-unit check \
-	snapshot tabs overhead status lifecycle store-check
+	snapshot tabs overhead status lifecycle store-check moments-lint
 
 doctor:
 	$(IECTL) doctor
@@ -84,3 +84,7 @@ check:  ## make check REP=<folder under reps/>: that rep's pass checks
 CC_PY ?= /mnt/ie-data/venvs/cc-v2-proto/bin/python
 store-check:
 	cd devtools/backend && PYTHONDONTWRITEBYTECODE=1 $(CC_PY) -m store.check
+
+# Every moment of a rep's moments.toml resolves in every store run of that rep with results (REPS= narrows it).
+moments-lint:
+	cd devtools/backend && REPO=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 $(CC_PY) -m store.reps --lint $(REPS)
