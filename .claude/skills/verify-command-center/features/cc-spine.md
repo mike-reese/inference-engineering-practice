@@ -56,3 +56,7 @@ Preconditions:
   starts with Back empty, so `[` does nothing there.
 - A double-click is two clicks: each selects the row under it or seeks. Expect the selection to move.
 - In time pace the bounds play in 8 s at ×1, looping. A long bound wraps fast at ×4.
+- After any change to how the bands place units, run `devtools/verify/overlap_check.py` (about 2 s, half tile, the
+  I02C code run): no two units open at the same time share y, and each stream (the boxes of one colour key, the
+  8th field of each box) keeps its lanes. It reads `window.__spineLayout()` at the fitted view only; a page without
+  that contract fails.

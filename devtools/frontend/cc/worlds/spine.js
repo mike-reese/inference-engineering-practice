@@ -15,7 +15,7 @@ const NS = "http://www.w3.org/2000/svg";
 const ms = (ns) => `${(ns / 1e6).toFixed(3)} ms`;
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const HWC = DIM_COLOR.hardware, ARC = DIM_COLOR.architecture;
-const GL = 118, GR = 10, HEAD = 20, AXIS = 20, XFER = 12;
+const GL = 172, GR = 10, HEAD = 20, AXIS = 20;
 const MIN_VIEW_NS = 3000;   // D13's narrowest window (3 µs)
 const MODES = [["arch", "Architecture"], ["hw", "Hardware"], ["split", "Split"]];
 
@@ -23,7 +23,7 @@ const CSS = `
 .sp2 { position:absolute; inset:0; display:flex; flex-direction:column; background:#0b0e14; font:12px system-ui, sans-serif; }
 .sp2 .lens { flex:none; display:flex; flex-direction:column; min-height:0; border-bottom:1px solid var(--line); background:var(--panel); }
 .sp2 .lhead { display:flex; align-items:center; gap:8px; padding:3px 8px; border-bottom:1px solid var(--line); font:12px ui-monospace, monospace; }
-.sp2 .lhead button { background:none; border:1px solid var(--line); color:var(--dim); font:inherit; padding:2px 10px; border-radius:4px; cursor:pointer; }
+.sp2 .lhead button { white-space:nowrap; background:none; border:1px solid var(--line); color:var(--dim); font:inherit; padding:2px 10px; border-radius:4px; cursor:pointer; }
 .sp2 .lhead button:hover { color:var(--text); }
 .sp2 .lhead button.on { color:var(--text); background:#ffffff14; border-color:var(--dim); }
 .sp2 .lhead .ctx { color:var(--dim); margin-left:6px; } .sp2 .lhead .note { margin-left:auto; color:#e3b341; }
@@ -53,14 +53,17 @@ const CSS = `
 .sp2 .rl { position:absolute; left:4px; width:${GL - 10}px; display:flex; align-items:center; padding:0 6px; cursor:pointer; border-radius:4px;
   font:11.5px ui-monospace, monospace; text-transform:uppercase; letter-spacing:.3px; border-left:3px solid currentColor; background:#070a10; white-space:nowrap; overflow:hidden; }
 .sp2 .rl:hover { background:#1a2333; } .sp2 .rl.on { font-weight:700; color:#fff !important; background:#ffffff1a; }
-.sp2 .rl.inf { flex-direction:column; align-items:flex-start; justify-content:center; }
-.sp2 .rl small { font-size:9.5px; text-transform:none; letter-spacing:0; opacity:.85; }
+.sp2 .rl small { margin-left:auto; padding-left:6px; font:9.5px system-ui, sans-serif; text-transform:none; letter-spacing:0; opacity:.85; }
+.sp2 .gut { position:absolute; left:0; width:${GL}px; overflow:hidden; }
+.sp2 .vbar { position:absolute; right:1px; width:${GR - 3}px; background:#ffffff10; border-radius:3px; }
+.sp2 .vbar i { position:absolute; left:0; right:0; background:#8a90a0; border-radius:3px; cursor:grab; }
 .sp2 .hl { position:absolute; top:0; left:${GL}px; right:${GR}px; height:${HEAD}px; display:flex; gap:12px; align-items:center; overflow:hidden;
   white-space:nowrap; font-size:11.5px; color:#a9b8cc; pointer-events:none; }
 .sp2 .hl b { color:#fff; background:#ffffff14; padding:0 6px; border-radius:3px; }
 .sp2 .axl { fill:#8a90a0; font:10.5px ui-monospace, monospace; dominant-baseline:central; }
-.sp2 .legend { position:absolute; right:${GR}px; bottom:2px; font-size:11px; color:#a9b8cc; pointer-events:none; background:#0b0e14; padding:0 4px; }
+.sp2 .legend { flex:none; height:18px; display:flex; align-items:center; justify-content:flex-end; padding:0 ${GR}px 0 8px; font-size:11px; color:#a9b8cc; white-space:nowrap; overflow:hidden; }
 .sp2 .legend span { margin-left:8px; font-weight:700; }
+.sp2 .legend .fit { margin:0 auto 0 0; color:#e3b341; font-weight:400; }
 .sp2 .hl .hint { margin-left:auto; color:#5d6575; }
 `;
 
@@ -106,15 +109,17 @@ export function mount(el) {
   const key = (k) => `cc.spine.lens.${k}`;
   const root = document.createElement("div"); root.className = "sp2";
   root.innerHTML = `<style>${CSS}</style>
-    <div class="lens"><div class="lhead">${MODES.map(([id, n]) => `<button data-mode="${id}">${n}</button>`).join("")}<span class="ctx"></span><span class="note"></span></div>
+    <div class="lens"><div class="lhead">${MODES.map(([id, n]) => `<button data-mode="${id}">${n}</button>`).join("")}<span class="ctx" style="margin-left:14px">request lanes</span><button data-lanes="request" title="one lane per request; when they do not fit, a lane is reused once its request ends">one per request</button><button data-lanes="packed" title="a lane is reused once its request ends: lanes = requests open at once">reuse when free</button><span class="ctx"></span><span class="note"></span></div>
       <div class="lbody"></div></div>
     <div class="hdiv" title="drag to resize the lens"></div>
-    <div class="spine"><canvas></canvas><svg><title></title></svg><div class="hl"></div><div class="legend">colour = flow:${Object.entries(FLOW_COLOR)
-      .map(([f, c]) => `<span style="color:${c}">${esc(f)}</span>`).join("")}</div></div>`;
+    <div class="spine"><canvas></canvas><svg><title></title></svg><div class="gut"></div><div class="vbar"><i></i></div><div class="hl"></div></div>
+    <div class="legend"><span class="fit"></span>colour = flow:${Object.entries(FLOW_COLOR)
+      .map(([f, c]) => `<span style="color:${c}">${esc(f)}</span>`).join("")}<span style="color:#c9d3e0">▨ queued</span><span style="color:#8a90a0">┄ missing rows</span></div>`;
   el.append(root);
-  const lensEl = root.querySelector(".lens"), lbody = root.querySelector(".lbody"), ctxEl = root.querySelector(".ctx");
+  const lensEl = root.querySelector(".lens"), lbody = root.querySelector(".lbody"), ctxEl = root.querySelectorAll(".ctx")[1];
   const spineEl = root.querySelector(".spine"), canvas = spineEl.querySelector("canvas"), g = canvas.getContext("2d");
   const svg = spineEl.querySelector("svg"), tip = svg.querySelector("title"), hl = spineEl.querySelector(".hl");
+  const gut = spineEl.querySelector(".gut"), vbar = spineEl.querySelector(".vbar"), thumb = vbar.firstChild, fitNote = root.querySelector(".legend .fit");
 
   // ---------------- lens window (D13): Architecture | Hardware | Split, each pane with its own zoom
   let lensMode = ls.get(key("tab"), "split"); if (!MODES.some(([m]) => m === lensMode)) lensMode = "split";
@@ -140,7 +145,7 @@ export function mount(el) {
   function buildLens() {
     archDispose?.(); archDispose = null; hw = null; lbody.replaceChildren();
     zooms.forEach((z) => z.dispose()); zooms = [];
-    root.querySelectorAll(".lhead button").forEach((b) => b.classList.toggle("on", b.dataset.mode === lensMode));
+    root.querySelectorAll(".lhead button[data-mode]").forEach((b) => b.classList.toggle("on", b.dataset.mode === lensMode));
     const pane = (title, color) => {
       const p = document.createElement("div"); p.className = "pane";
       p.innerHTML = `<div class="ptitle" style="color:${color}">${title}</div><div class="pbody"></div>`;
@@ -181,9 +186,14 @@ export function mount(el) {
     const r = root.getBoundingClientRect(); lensFrac = Math.max(0.12, Math.min(0.8, (e.clientY - r.top) / r.height)); applyFrac();
   }, () => ls.set(key("frac"), lensFrac));
   buildLens();
+  root.querySelector(".lhead").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-lanes]"); if (!b) return;
+    bands.setLaneMode(b.dataset.lanes); ls.set("cc.spine.lanes", bands.laneMode); measure(); onStructure(); paint();
+  });
 
   // ---------------- spine: the canvas holds the bands, the SVG the marks over them; both follow one view [a, b] (ns)
-  const bands = new Bands(), size = { w: 1, h: 1 }, view = { a: 0, b: 1 };
+  const bands = new Bands(); bands.laneMode = ls.get("cc.spine.lanes", "request") === "packed" ? "packed" : "request";
+  const size = { w: 1, h: 1 }, view = { a: 0, b: 1 };
   const clip = svgEl("clipPath", { id: `spclip${Math.random().toString(36).slice(2, 8)}` }, svgEl("defs", {}, svg));
   const clipRect = svgEl("rect", {}, clip);
   const gClip = svgEl("g", { "clip-path": `url(#${clip.id})` }, svg);
@@ -200,31 +210,78 @@ export function mount(el) {
   const axisG = svgEl("g", {}, svg);
   const rowLabels = BAND_COL.map((c, i) => {
     const d = document.createElement("div"); d.className = "rl"; d.style.color = c; d.dataset.band = i;
-    d.onclick = () => setTier("execution", i); spineEl.append(d); return d;
+    d.onclick = () => setTier("execution", i); gut.append(d); return d;
   });
   const sampleLbl = document.createElement("div"); sampleLbl.className = "rl"; sampleLbl.style.cssText = `color:${HWC};cursor:default;font-size:10.5px;text-transform:none`;
   sampleLbl.textContent = "samples"; spineEl.append(sampleLbl);
   const xferLbl = document.createElement("div"); xferLbl.className = "rl"; xferLbl.style.cssText = "color:#58d68d;cursor:default;font-size:10px;text-transform:none";
-  xferLbl.textContent = "copies"; xferLbl.title = "copies: the run's memcpy and memset rows (hardware device stops)"; spineEl.append(xferLbl);
+  xferLbl.title = "copies: the run's memcpy and memset rows (hardware device stops)"; gut.append(xferLbl);
+  const boxLabels = [xferLbl, ...rowLabels];   // in Bands.rows() order
 
   /** @type {import("./spine/bands.js").Layout} */
-  let L = { w: 1, h: 1, gl: GL, gr: GR, axis: AXIS, rows: [], sTop: HEAD, sH: 22, xTop: HEAD + 24, xferH: XFER };
+  let L = { w: 1, h: 1, gl: GL, gr: GR, axis: AXIS, sTop: HEAD, sH: 22, clipTop: HEAD + 24, clipBot: HEAD + 25, rows: [] };
   const X = (t) => GL + ((t - view.a) / (view.b - view.a)) * (size.w - GL - GR);
   const T = (x) => view.a + ((x - GL) / (size.w - GL - GR)) * (view.b - view.a);
   const cx = (x) => Math.max(GL - 20, Math.min(size.w + 20, x));
 
+  // The rows (copies, then the bands) stack inside the area between the sample strip and the axis. When their lanes
+  // do not fit, the area scrolls: `boxes` are the rows' places from the area's top, `scrollY` how far they are moved up.
+  /** @type {import("./spine/bands.js").Box[]} */
+  let boxes = [], scrollY = 0;
+  const area = { top: 0, h: 1 };
+  const contentH = () => (boxes.length ? boxes.at(-1).top + boxes.at(-1).h : 0);
+
   function measure() {
     size.w = Math.max(200, spineEl.clientWidth); size.h = Math.max(120, spineEl.clientHeight);
-    const sH = Math.max(22, Math.round(size.h * 0.14)), sTop = HEAD, xTop = sTop + sH + 2;
-    const bandTop = xTop + XFER + 3, bandH = (size.h - bandTop - AXIS) / 6;
-    L = { w: size.w, h: size.h, gl: GL, gr: GR, axis: AXIS, sTop, sH, xTop, xferH: XFER,
-      rows: BAND_COL.map((_, i) => ({ y: bandTop + i * bandH + 1.5, h: Math.max(6, bandH - 3) })) };
+    const sH = Math.max(22, Math.round(size.h * 0.14)), sTop = HEAD, S = store();
+    area.top = sTop + sH + 2; area.h = size.h - area.top - AXIS;
+    bands.sync(S, S ? S.dims.ladders.execution : []);
+    boxes = bands.layout(area.h);
+    L = { w: size.w, h: size.h, gl: GL, gr: GR, axis: AXIS, sTop, sH, clipTop: area.top, clipBot: area.top + area.h, rows: [] };
+    root.querySelectorAll(".lhead button[data-lanes]").forEach((b) => b.classList.toggle("on", b.dataset.lanes === bands.laneMode));
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.round(size.w * dpr); canvas.height = Math.round(size.h * dpr);
     set(clipRect, { x: GL, y: 0, width: size.w - GL - GR, height: size.h });
-    L.rows.forEach((r, i) => Object.assign(rowLabels[i].style, { top: `${r.y}px`, height: `${r.h}px` }));
-    Object.assign(sampleLbl.style, { top: `${sTop}px`, height: `${sH}px` }); Object.assign(xferLbl.style, { top: `${xTop}px`, height: `${XFER}px` });
+    Object.assign(sampleLbl.style, { top: `${sTop}px`, height: `${sH}px` });
+    Object.assign(gut.style, { top: `${area.top}px`, height: `${area.h}px` }); Object.assign(vbar.style, { top: `${area.top}px`, height: `${area.h}px` });
+    place();
   }
+  /** Put the rows, their gutter labels and the scroll bar at scrollY. */
+  function place() {
+    const over = Math.max(0, contentH() - area.h), rows = bands.rows();
+    scrollY = Math.max(0, Math.min(over, scrollY));
+    L.rows = boxes.map((R) => ({ ...R, top: R.top + area.top - scrollY, y: R.y + area.top - scrollY }));
+    boxLabels.forEach((d, j) => {
+      // a label covers the part of its row that is in view, so its text stays on screen while a tall row scrolls
+      const R = boxes[j], top = R ? Math.max(0, R.y - scrollY) : 0, bottom = R ? Math.min(area.h, R.top + R.h - scrollY) : 0;
+      d.style.display = bottom - top >= 10 ? "" : "none";
+      Object.assign(d.style, { top: `${top}px`, height: `${bottom - top}px` });
+    });
+    vbar.style.display = over ? "" : "none";
+    Object.assign(thumb.style, { top: `${(scrollY / contentH()) * 100}%`, height: `${(area.h / contentH()) * 100}%` });
+    const lanes = rows.reduce((n, b) => n + Math.max(1, b.lanes), 0);
+    fitNote.textContent = over ? `${lanes} lanes do not fit: wheel over the tier names, or shift + wheel, scrolls the bands` : "";
+  }
+  // y is from the top of the unscrolled content, in the svg's frame; view.scrollTop says how far the pane is scrolled
+  window.__spineLayout = () => ({ view: { scrollTop: scrollY },
+    bands: bands.report(L, frame(), boxes.map((R) => ({ ...R, top: R.top + area.top, y: R.y + area.top }))) });
+  function scrollTo(y) { scrollY = y; place(); requestPaint(); }
+  /** Scroll just enough to show the lane of unit `id`. */
+  function reveal(id) {
+    const at = bands.find(id), R = at && boxes[at.row]; if (!R) return;
+    const y = R.y + at.lane * R.lh;
+    if (y < scrollY) scrollTo(y); else if (y + R.lh > scrollY + area.h) scrollTo(y + R.lh - area.h);
+  }
+  spineEl.addEventListener("wheel", (e) => {
+    if (!(e.shiftKey || e.target.closest(".gut")) || contentH() <= area.h) return;
+    e.preventDefault(); e.stopPropagation(); scrollTo(scrollY + (e.deltaY || e.deltaX));
+  }, { capture: true, passive: false });
+  thumb.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); thumb.setPointerCapture(e.pointerId);
+    const y0 = e.clientY, s0 = scrollY, mv = (ev) => scrollTo(s0 + ((ev.clientY - y0) / area.h) * contentH());
+    const up = () => { thumb.removeEventListener("pointermove", mv); thumb.removeEventListener("pointerup", up); };
+    thumb.addEventListener("pointermove", mv); thumb.addEventListener("pointerup", up);
+  });
 
   // ---------------- painting: the canvas and the marks, at most once per frame unless a state frame asks now
   let hover = -1, lit = new Set(), raf = 0, inputs = [];
@@ -254,7 +311,7 @@ export function mount(el) {
     const span = metricSpan();
     brFill.style.display = brPath.style.display = span ? "" : "none";
     if (span) {
-      const x0 = cx(X(span[0])), x1 = cx(X(span[1])), y = L.rows[0].y - 2;
+      const x0 = cx(X(span[0])), x1 = cx(X(span[1])), y = L.clipTop - 2;
       set(brFill, { x: x0, width: Math.max(1, x1 - x0), y, height: size.h - AXIS - y });
       brPath.setAttribute("d", `M${x0},${y + 8}V${y}H${x1}V${y + 8}`);
     }
@@ -262,7 +319,7 @@ export function mount(el) {
     if (open) {
       const step = tickStep(view.b - view.a, size.w - GL - GR);
       for (let k = Math.ceil(view.a / step); k * step <= view.b; k++) {
-        const t = k * step, x = X(t); if (x < GL || x > size.w - GR - 470) continue;
+        const t = k * step, x = X(t); if (x < GL || x > size.w - GR - 60) continue;
         svgEl("line", { x1: x, x2: x, y1: size.h - AXIS, y2: size.h - AXIS + 4, stroke: "#5d6575" }, axisG);
         svgEl("text", { x: x + 3, y: size.h - AXIS / 2 + 1, class: "axl" }, axisG).textContent = tickLabel(t, step);
       }
@@ -317,9 +374,11 @@ export function mount(el) {
   function onStructure() {
     const S = store(), L_ = ladders(), et = state.tiers.execution;
     lit = metricInputs();
+    const laneText = (b) => (b ? `${b.lanes} lane${b.lanes === 1 ? "" : "s"}` : "");
+    xferLbl.innerHTML = `copies<small>${laneText(bands.copies)}</small>`;
     rowLabels.forEach((d, i) => {
       const n = L_?.execution?.[i] ?? "", inf = n === "module" && S ? inferred(S) : null;
-      d.innerHTML = `${i + 1} ${esc(n)}${inf ? "<small>inferred</small>" : ""}`; d.classList.toggle("inf", !!inf);
+      d.innerHTML = `${i + 1} ${esc(n)}<small>${laneText(bands.bands[i])}${inf ? " · inferred" : ""}</small>`;
       d.title = `zoom the bands to execution tier ${i + 1}${n ? ` (${n})` : ""}${inf ? `. ${inf.modules.toLocaleString()} module rows are `
         + "inferred (M2): matched to the code run's module frames by their kernels; the headline counts the kernel stops of the "
         + "cursor's iteration that no module holds" : ""}`;
@@ -376,7 +435,7 @@ export function mount(el) {
       return;
     }
     const [x, y] = at(e), h = store() ? bands.hit(L, frame(), x, y) : null, id = h ? h.id : -1;
-    if (id === hover) return;
+    if (id === hover && (h ? h.title : "") === tip.textContent) return;
     hover = id; tip.textContent = h ? h.title : ""; svg.style.cursor = h ? "pointer" : ""; requestPaint();
   });
   svg.addEventListener("pointerleave", () => { if (hover < 0) return; hover = -1; tip.textContent = ""; svg.style.cursor = ""; requestPaint(); });
@@ -399,10 +458,12 @@ export function mount(el) {
     // A metric from the URL is known before aux.json arrives; the view fits its span once the span exists.
     const span = metricSpan(), spanKey = span ? `${span[0]}:${span[1]}` : "", spanNew = !!span && spanKey !== lastSpan; lastSpan = spanKey;
     let dirty = false;
+    if (opened || ch.rev) measure();
     if (opened || ch.rev || ch.sel || ch.metric || ch.tiers || ch.paired || ch.playEvent || ch.bounds || ch.world || ch.session) { onStructure(); dirty = true; }
     if (opened || ch.rev || ch.tiers || ch.sel) drawHw(true);
     if (S && (opened || tierMoved || ch.bounds || (ch.metric && s.metric) || spanNew)) { fitTo(target(), !ch.world && !opened); dirty = true; }
     else if (ch.metric) dirty = true;
+    if (ch.sel && selRow() != null) reveal(selRow());
     if (ch.t) { headline(); drawHw(false); dirty = true; } else if (ch.head) placeCursor();
     if (dirty) paint();
   });
