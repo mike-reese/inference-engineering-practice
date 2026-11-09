@@ -2,7 +2,7 @@
 
 Finds the storage tiers, kinds and each kind's place (registry/kinds.json), the D13 worlds (prototypes/D13/model.js),
 the v1 views (frontend/index.html), the cc panels (cc/sidebar, cc/inspector, cc/control/bar.js) and controls
-(cc/control/keys.js) from the source, and looks each one up in proposal.json. Exits 1 when a surface has no entry, an
+(cc/control/keys.js) from the source, and looks each one up in surfaces.json. Exits 1 when a surface has no entry, an
 entry matches no surface, or a new place names a tier missing from the ladders ("execution / phase") or a world D13
 does not draw ("Rep world"). Run: python3 design/dimensions/map_surfaces.py [--write]
 """
@@ -11,7 +11,7 @@ import re
 import sys
 from pathlib import Path
 
-from places import check_places, load, text
+from places import check_dimensions, check_places, load, text
 
 HERE = Path(__file__).parent
 REPO = HERE.parent.parent
@@ -60,11 +60,11 @@ def unknown_names(place: str, ladders: dict, world_names: list[str]) -> list[str
 
 def main():
     reg = load()
-    surf = json.loads((HERE / "proposal.json").read_text())["surfaces"]
+    surf = {k: v for k, v in json.loads((HERE / "surfaces.json").read_text()).items() if k != "_doc"}
     place = {k["kind"]: k["place"] for k in reg["kinds"] if k.get("place")}
     world_names = worlds()
     found = current(reg)
-    rows, missing, wrong = [], [], [f"kinds.json: {b}" for b in check_places(reg)]
+    rows, missing, wrong = [], [], [f"kinds.json: {b}" for b in check_places(reg) + check_dimensions(reg)]
     for typ, name in found:
         if typ == "kind":
             p = place.get(name)

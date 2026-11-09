@@ -5,6 +5,48 @@
   "ladders": {"execution": ["request", "iteration", "phase", "layer", "module", "kernel"],
               "hardware": ["system", "node", "device", "unit", "kernel traffic", "SM internals"],
               "architecture": ["fleet", "node", "container", "process", "component", "software layer"]},
+  "dimensions": {
+    "_doc": "How the command center places, steps and joins rows per dimension (COMMAND_CENTER.md section 3.4). The importer copies this block into each run's manifest; design/dimensions/stop_counts.py and the browser's RunStore apply it. align: the alignment table of D13, one row per execution tier; crossing dimensions in Paired takes the row of the focused tier (the doc's 'unit or kernel traffic' for kernel is kernel traffic, as in D13). storage: per storage tier, the execution tiers a kind of that tier may be placed at (section 9); detail and - are always allowed, and stop_counts.py fails a run when a kind is placed elsewhere. stops: what a step visits per (dimension, tier). {place} the rows whose execution place is that tier; a kernel stop's launch call is its CPU side, the same stop. {group, of} one stop per run of consecutive rows of that execution tier with the same group columns (rows with a negative group value take no part), at its first row. {kinds, if} the rows of those kinds, with the place rule if given. {as} the stops of another dimension/tier. {handoff} the hand-offs at that level. at launch: the stop's time is its launch call's start. walk: the rows the every-row walk visits where they differ from the stops (all phase rows at the hand-off tiers, as D13). handoff: per request, the rows placed at execution phase in (start, id) order; a row whose container, process or component differs from the request's previous row at that level is a hand-off. container and process are the ancestors of the row's lane in the things tree with one of the listed thing kinds, component is the comp column; rows with no request, or no thing at that level, take no part. ran_on: the hardware thing a row ran on, by kind first, else by the kind of its lane (thread: the host cpu; stream: the GPU above the stream). kernel_class: first match wins, by kind or by a regular expression on the short name. flow: see flow._doc.",
+    "align": [
+      {"execution": "request",   "hardware": "system",         "architecture": "container"},
+      {"execution": "iteration", "hardware": "device",         "architecture": "process"},
+      {"execution": "phase",     "hardware": "device",         "architecture": "component"},
+      {"execution": "layer",     "hardware": "unit",           "architecture": "component"},
+      {"execution": "module",    "hardware": "unit",           "architecture": "component"},
+      {"execution": "kernel",    "hardware": "kernel traffic", "architecture": "software layer"}
+    ],
+    "storage": {"request": ["request"], "iteration": ["iteration"], "stage": ["phase"], "op": ["module"],
+                "call": ["module", "kernel"], "device": ["kernel"], "os": []},
+    "stops": {
+      "execution": {"request": {"place": "request"}, "iteration": {"place": "iteration"}, "phase": {"place": "phase"},
+                    "layer": {"group": ["iter", "layer"], "of": "kernel"}, "module": {"place": "module"},
+                    "kernel": {"place": "kernel"}},
+      "hardware": {"system": {"as": "execution/request"}, "node": {"as": "execution/iteration"},
+                   "device": {"kinds": ["memcpy", "memset"]}, "unit": {"kinds": ["kernel"]},
+                   "kernel traffic": {"kinds": ["kernel"], "if": "profiled"}, "SM internals": {"as": "hardware/kernel traffic"}},
+      "architecture": {"fleet": {"as": "execution/request"}, "node": {"as": "execution/request"},
+                       "container": {"handoff": "container"}, "process": {"handoff": "process"},
+                       "component": {"handoff": "component"}, "software layer": {"as": "execution/kernel", "at": "launch"}}
+    },
+    "walk": {"architecture": {"container": "execution/phase", "process": "execution/phase", "component": "execution/phase"}},
+    "handoff": {"rows": "phase", "container": ["container", "network"], "process": ["process"], "component": "comp"},
+    "ran_on": {"kinds": {"network frame": "network"}, "lanes": {"thread": "cpu", "stream": "gpu"}},
+    "kernel_class": [
+      {"class": "memory",    "kinds": ["memcpy", "memset"]},
+      {"class": "gemm",      "match": "gemm|gemv|cublas|cutlass|splitKreduce|nvjet|matmul"},
+      {"class": "attention", "match": "mha|[Aa]ttention|xqa"},
+      {"class": "memory",    "match": "[Nn]orm|silu|elementwise|[Cc]opy|fill|index|gather|scatter|KVCache"},
+      {"class": "other"}
+    ],
+    "flow": {
+      "_doc": "The hot flow column: which logical job of its request a row does (D13 flows). Codes are positions in names; none (255) is no flow. Rows placed at execution request span every flow: none. A row in a stream-out box is stream out. An engine timestamp named by prefill or decode takes it. A row with an iteration takes the iteration's flow: prefill when its 'batch scheduled' stamp lists context requests (stamp.context) or num_ctx_tokens > 0, or an engine timestamp names it 'prefill (iteration N)'; decode when that stamp lists none, or an engine timestamp 'decode (iterations a-b)' covers it. Any other row of a request: request in when it starts before the request's turn (the start of its first prefill row), else stream out. A request with no prefill row, and a row with no request and no iteration flow, have none.",
+      "names": ["request in", "prefill", "decode", "stream out"],
+      "none": 255,
+      "stream_out_boxes": ["responses", "ipc_rsp", "detokenize", "postprocess"],
+      "engine_names": {"prefill": "^prefill \\(iteration (\\d+)\\)$", "decode": "^decode \\(iterations (\\d+)-(\\d+)\\)$"},
+      "stamp": "batch scheduled"
+    }
+  },
   "kinds": [
     {"kind": "client request",       "tier": 0, "color": "#d08770", "label": "request",          "home": "Trace",
      "place": {"execution": "request", "hardware": "-", "architecture": "component (client boxes)"}},
