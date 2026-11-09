@@ -34,6 +34,9 @@ const FLOW_TEXT = { "request in": "request in: client to the engine queue", pref
 const SEG_COLORS = ["#58a6ff", "#3fb950", "#d29922", "#bc8cff", "#f778ba"];   // D13's split colours, by position
 /** Thing kinds of the architecture dimension; every other thing is hardware (the registry has no tier per thing kind). */
 const ARCH_KINDS = new Set(["container", "process", "thread", "network", "component map", "boundary", "component"]);
+/** The hardware tier of a hardware thing kind, for the Selected heading: D13's tiers (data.js) for the same parts. */
+const HW_TIER = { host: "node", board: "node", cpu: "device", gpu: "device", VRAM: "device", "host memory": "device", nvme: "device",
+  chipset: "device", "bus link": "device", SM: "unit", "copy engine": "unit", "L2 cache": "unit", "memory controller": "unit" };
 const MAX_LIST = 200;
 
 // ---------------------------------------------------------------- per-store lookups, rebuilt when rows change
@@ -257,7 +260,7 @@ function thingView(S, s) {
   const dim = ARCH_KINDS.has(x.kind) ? "architecture" : "hardware", T = S.things;
   const up = []; for (let p = x.parent; p != null && p >= 0; p = T[p].parent) up.unshift(p);
   const attrs = Object.entries(x.attrs ?? {}).filter(([key]) => !["x", "y", "w", "h", "edges", "size"].includes(key));
-  const left = [`<div class="label" style="color:${DIM_COLOR[dim]}">${dim} · ${esc(x.kind)}</div><h3>${esc(x.name)}</h3>`, `<div class="dim">${esc(x.evidence ?? "")}</div>`];
+  const left = [`<div class="label" style="color:${DIM_COLOR[dim]}">${dim} · ${esc(dim === "hardware" ? HW_TIER[x.kind] ?? x.kind : x.kind)}</div><h3>${esc(x.name)}</h3>`, `<div class="dim">${esc(x.evidence ?? "")}</div>`];
   if (attrs.length) left.push(`<table class="kv">${attrs.map(([key, v]) => `<tr><td>${esc(key)}</td><td class="wrap">${v && typeof v === "object" ? esc(v.name ?? JSON.stringify(v)) : esc(v ?? "–")}</td></tr>`).join("")}</table>`);
   if (up.length) left.push(`<div class="label">parents</div><ol class="path">${up.map((p) => `<li><span class="dim">${esc(T[p].kind)}</span> ${thingLink(S, p)}</li>`).join("")}</ol>`);
   const right = [];
