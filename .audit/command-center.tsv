@@ -1,3 +1,7 @@
 ts	phase	decision	why	evidence	result
 2026-11-08T23:15:24Z	frame	baseline: D13 regress.sh on the prototype	capture the reference before any change	D13/regress.sh	50 of 50 pass
 2026-11-08T23:15:24Z	frame	owner approves v2 store deletion at M4; D13 kept until parity verified with verify-command-center	owner message mid-run	COMMAND_CENTER.md decision log	recorded
+2026-11-09T00:00:31Z	start	new run segment after P1 agent; rows before this were written by this coordinator	show-me-your-work run rule	coordinator session	ok
+2026-11-09T00:00:31Z	P1	accepted P1: merge 46738d4 plus 7 commits on main	reran every acceptance check myself	regress exit 1 at first check on cc; self-test 1; stops 0; surfaces 0; store-check ok	VERIFIED
+2026-11-09T00:00:31Z	setup	fresh worktree cc-migration with own store copy, server :7711, runner :7702	owner asked for a fresh worktree; separate shared state so re-imports never touch :7710	commit 28ab336	up
+2026-11-09T00:00:31Z	doc	added 7 approved 7.2 rows, corrected 7.1, moved live checks to live.sh	change the design first, then code	COMMAND_CENTER.md	written

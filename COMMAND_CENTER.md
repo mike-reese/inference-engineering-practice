@@ -446,7 +446,7 @@ where it is (`.claude/skills/verify-command-center`); M1 rewrites its recipes fo
 | `bar.js` | `control/bar.js`, `inspector/` | tab list already matches `inspector/tabs.js`; keep `nsight.js` links |
 | `zoom.js` | `zoom.js` | as built |
 | `regress.sh` | `devtools/verify/regress.sh` (P1) | page from `CC_URL`; expectations from the store and rep files |
-| (none) | `levels/*`, `scene/*` (3D side-by-side levels) | deleted in M1; the Stacked world keeps the `scene/` helpers it uses, moved under `worlds/stacked/` |
+| (none) | `levels/*`, `scene/*` (3D side-by-side levels) | deleted in M1. The Stacked world uses no `scene/` helper. `scene/rows_gpu.js` (the only way to draw 93K to 1.14M rows) moves to `worlds/spine/`; `scene/samples.js` (imported by the sidebar and inspector) moves to `sidebar/` |
 
 ### 7.2 Where each scratch value comes from
 
@@ -473,6 +473,13 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 | rep catalog, runs, result summaries | `GET /api/v3/reps` (P3) | P3 |
 | key moments | `moments.toml` per rep; `event` resolved against the run's names (P3 lint) | I02A file exists |
 | live head and mask | `head_ns` and stream frames | measured |
+| hardware each unit ran on | the kind's hardware place in `registry/kinds.json` (section 9), refined by lane (thread: CPU, stream: GPU) | inferred, P3 |
+| process role (HTTP process, executor worker) | each component boundary maps to the pid whose lanes carry its stamps | inferred, P3 |
+| GPU memory held per process and container | `nvidia-smi --query-compute-apps` at 500 ms, group `gpu-apps` | measured, P2 |
+| kernel class (gemm, attention, memory, other) | name rule in `registry/kinds.json` | inferred, P3 |
+| SMs used by a kernel | min(36, grid blocks) from cold `args` | inferred, labelled |
+| containers shown | compose and docker names merged into one thing; only the rep's and devtools' projects kept | P3 importer fix |
+| box run counts and flow stripes | one load-time aggregate over `comp` and `flow` in `RunStore` | P3 |
 
 ### 7.3 Runs to record (owner approved, 2026-11-08)
 
@@ -921,3 +928,6 @@ Reading the counts:
 | 2026-11-08 | Open choices 1 to 11 resolved as in section 8; merge into main moves before P1, replacing "later" | owner (agent recommendation) |
 | 2026-11-08 | Plan re-sequenced after review: P1 checks, P2 trackers and runs, P3 data, M1 cutover, M2 modules, M3 rep files, M4 retire | owner |
 | 2026-11-08 | M4 may delete the v2 store (29 GB). D13 stays until production and D13 are both verified with the verify-command-center skill as identical in layout and function; then D13 is deleted | owner |
+| 2026-11-08 | Seven sources added to 7.2 (hardware per unit, process role, GPU memory per process, kernel class, SMs used, container merge, box aggregates), each labelled measured or inferred | owner (agent proposal) |
+| 2026-11-08 | Migration continues in worktree `inference-engineering-practice-cc` (branch `cc-migration`) with its own store copy (`/mnt/ie-data/cc/store-cc`), dev server (:7711) and runner (:7702); the owner's :7710 and :7701 are untouched | owner (agent setup) |
+| 2026-11-08 | The live checks (live mode, head, follow, mask) move out of `regress.sh` into `devtools/verify/live.sh`, which launches one real I02A `off` run (7.3); `regress.sh` keeps the dry-run checks | agent |
