@@ -6,7 +6,7 @@
 // Links are data attributes the bar handles in one place: data-sel (a row id or a thing key), data-seek (a time),
 // data-m (a metric id), data-world, data-run (load a run of the rep), data-open (a Nsight report), data-raw (a row's
 // raw record).
-import { state, store, storeError, now, archName, launchComponentOf, units, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
+import { state, store, storeError, now, archName, launchComponentOf, units, selRow, selKey, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { NONE16 } from "../store/columns.js";
 import { roleOf, fmtValue, fmtBytes, fmtSpan, periodOf, why } from "../sidebar/samples.js";
 import { repOf, runOf, kindOf as runKind, whenOf, incompleteText, esc } from "../session.js";
@@ -20,7 +20,7 @@ const num = (v) => (typeof v === "number" ? (Math.abs(v) >= 1e6 ? v.toExponentia
 const nm = (S, id) => S.nameText(S.field("name", id));
 const short = (S, name) => String(name ?? "").replace(`${S.run}-`, "");
 const seekLink = (t) => `<a class="seek" data-seek="${t}" title="move the cursor here">↦</a>`;
-const link = (S, id, text) => `<a class="go ${id === state.sel ? "on" : ""}" data-sel="${id}">${esc(text ?? nm(S, id))}</a>`;
+const link = (S, id, text, sel = id) => `<a class="go ${selKey(sel) === selKey(state.sel) ? "on" : ""}" data-sel="${selKey(sel)}">${esc(text ?? nm(S, id))}</a>`;
 const thingLink = (S, i, text) => { const x = S.things[i]; return `<a class="go ${x.key === state.sel ? "on" : ""}" data-sel="${esc(x.key)}">${esc(text ?? x.name)}</a>`; };
 const openBtn = (o, label, aria) => (o ? `<button class="b-open" data-open="${esc(JSON.stringify({ run: o.run, path: o.path }))}" aria-label="${esc(aria)}" title="asks the runner to open the report on the desktop">${esc(label)}</button>` : "");
 const meter = (v, unit) => `<span class="meter"><span style="width:${Math.max(0, Math.min(100, v))}%"></span></span> ${fmtValue(v, unit)}`;
@@ -120,7 +120,7 @@ function ladderOf(S, id) {
 }
 /** The mark an inferred module row (M2) carries wherever the inspector names it. */
 const infMark = (S, id) => (id != null && S.dims.inferred(id) ? ` ${tag("inferred (M2)")}` : "");
-const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text)}${infMark(S, id)}</li>`).join("")}</ol>`;
+const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text, tier === "layer" ? { layer: id } : id)}${infMark(S, id)}</li>`).join("")}</ol>`;
 
 /** Where a row runs on the architecture ladder: the container and process of its lane (a row on a stream, a device
  *  row or an inferred module: of the thread that launched it, dims.launchOf), then its component box. */
@@ -213,11 +213,9 @@ const opens = (d) => [d?.open?.nsys && `${openBtn(d.open.nsys, "Nsight Systems �
 
 function rowView(S, s, again) {
   const id = s.sel, get = withDetail(S, [id], again), d = get ? get(id) : null, k = S.kinds[S.field("kind", id)];
-  const t0 = S.startOf[id], t1 = S.endOf[id], r = S.field("req", id), send = r !== NONE16 && idx(S).req.has(r) ? S.startOf[idx(S).req.get(r)] : null;
   const flow = S.dims.flowOf(id), hw = S.dims.ranOn(id);
-  const when = `<div>at <b>${ms(t0)} ms</b> from the run's t0${send != null ? ` · ${ms(t0 - send)} ms from its request's send` : ""}${t1 > t0 ? `, lasts <b>${ms(t1 - t0)} ms</b> (${fmtSpan(t1 - t0)})` : ""} ${seekLink(t0)}</div>`;
   const tier = execLabel(S, id), title = tier === "request" ? `${nm(S, id)} ${unitText(S, tier, id)}` : nm(S, id);
-  const left = [`<div class="label" style="color:${DIM_COLOR.execution}">execution · ${esc(tier)}</div><h3>${esc(title)}</h3>${when}`];
+  const left = [`<div class="label" style="color:${DIM_COLOR.execution}">execution · ${esc(tier)}</div><h3>${esc(title)}</h3>${whenHtml(S, id, S.startOf[id], S.endOf[id])}`];
   if (isDevice(S, id) && !isCopy(S, id)) left.push(`<div class="label">kernel</div>${kernelHtml(S, id, d)}`);
   if (isCopy(S, id)) {
     const c = S.field("cause", id);
@@ -260,6 +258,28 @@ function rowView(S, s, again) {
   return `<div class="cols"><div>${left.join("")}</div><div>${right.join("")}</div></div>`;
 }
 
+/** When a row or unit runs: from the run's t0 and from its request's send, and how long. */
+function whenHtml(S, id, t0, t1) {
+  const r = S.field("req", id), send = r !== NONE16 && idx(S).req.has(r) ? S.startOf[idx(S).req.get(r)] : null;
+  return `<div>at <b>${ms(t0)} ms</b> from the run's t0${send != null ? ` · ${ms(t0 - send)} ms from its request's send` : ""}${t1 > t0 ? `, lasts <b>${ms(t1 - t0)} ms</b> (${fmtSpan(t1 - t0)})` : ""} ${seekLink(t0)}</div>`;
+}
+
+/** A layer unit (D13): one (iteration, layer) group of kernel stops with no row of its own, keyed by its first
+ *  kernel. Its span from units(layer), the ladder above it cut at the layer, and its first kernel's flow, place and
+ *  hardware. */
+function layerView(S, s) {
+  const id = s.sel.layer, u = units(tierIndex(S, "layer"));
+  let k = upper(u.start, S.startOf[id]) - 1;
+  while (k >= 0 && u.ids[k] !== id && u.start[k] === S.startOf[id]) k--;
+  if (k < 0 || u.ids[k] !== id) return `<p class="muted">Row ${id} starts no layer unit of this run.</p>`;
+  const lad = ladderOf(S, id), cut = lad.findIndex(([tier, x]) => tier === "layer" && x === id), flow = S.dims.flowOf(id), hw = S.dims.ranOn(id);
+  return `<div class="cols"><div><div class="label" style="color:${DIM_COLOR.execution}">execution · layer</div><h3>${esc(unitText(S, "layer", id))}</h3>${whenHtml(S, id, u.start[k], u.end[k])}
+    <div class="label">up the execution ladder</div>${pathHtml(S, lad.slice(0, cut + 1))}
+    ${flow ? `<div class="label">flow</div><div><span class="pdot" style="background:${FLOW_COLOR[flow] ?? "#8a90a0"}"></span>${esc(FLOW_TEXT[flow] ?? flow)}</div>` : ""}
+    <div class="label">architecture: where it runs</div>${whereHtml(S, id)}
+    <div class="label">hardware it ran on</div><div>${hw >= 0 ? thingLink(S, hw) : "–"}</div></div></div>`;
+}
+
 function thingView(S, s) {
   const i = S.things.findIndex((x) => x.key === s.sel), x = S.things[i];
   if (!x) return `<p class="muted">${esc(s.sel)} is not a thing of this run.</p>`;
@@ -293,7 +313,7 @@ const selected = {
     const S = store();
     if (s.sel == null) { el.innerHTML = `<p class="muted">Nothing selected. Step with ← →, click a stop on the timeline, a tier, or a thing in the world.</p>`; return; }
     if (!S) { el.innerHTML = noRun(); return; }
-    el.innerHTML = typeof s.sel === "number" ? rowView(S, s, again) : thingView(S, s);
+    el.innerHTML = typeof s.sel === "number" ? rowView(S, s, again) : s.sel.layer != null ? layerView(S, s) : thingView(S, s);
   },
 };
 
@@ -324,7 +344,7 @@ const atCursor = {
   render(el, s) {
     const S = store(); if (!S) { el.innerHTML = noRun(); return; }
     const n = now(), L = S.dims.ladders.execution;
-    const exec = n.exec.map((u, i) => `<tr><td>${esc(L[i])}</td><td>${u ? link(S, u.id, unitText(S, L[i], u.id)) + infMark(S, u.id) : "–"}</td></tr>`).join("");
+    const exec = n.exec.map((u, i) => `<tr><td>${esc(L[i])}</td><td>${u ? link(S, u.id, unitText(S, L[i], u.id), L[i] === "layer" ? { layer: u.id } : u.id) + infMark(S, u.id) : "–"}</td></tr>`).join("");
     el.innerHTML = `<div class="cols"><div>
         <h3><span class="ac-t">${ms(s.t)}</span> ms <span class="muted">from the run's t0 · everything true at the cursor</span></h3>
         <div class="label" style="color:${DIM_COLOR.execution}">execution</div><table class="kv">${exec}</table>
@@ -482,7 +502,7 @@ const tokensTab = {
  *  stamps (the code run), the iter of the last device row at or before the cursor; else null. */
 function shownIter(S, s) {
   if (!S) return null;
-  if (typeof s.sel === "number" && s.sel < S.N) { const it = S.field("iter", s.sel); if (it >= 0) return it; }
+  if (selRow(s.sel) != null && selRow(s.sel) < S.N) { const it = S.field("iter", selRow(s.sel)); if (it >= 0) return it; }
   if (S.iterRows.length) return S.chain(s.t).iteration?.iter ?? null;
   const st = S.dims.stops("execution", "kernel"), k = upper(st.t, s.t) - 1;
   return k >= 0 && lastIter(S)[k] >= 0 ? lastIter(S)[k] : null;

@@ -93,7 +93,9 @@ Selection, cursor and tiers carry over when the world changes.
   tier bounds; flying to a tier already sets that tier's window (choice 2).
 - **History.** Back / forward in the bottom bar walk selections. Each step restores the selection, cursor and tab.
 - **State in the URL.** Session, world, tiers, cursor, selection and dock live in the hash, written at most every
-  150 ms, so a reload or a link keeps the view. A live session reloads as a replay.
+  150 ms, so a reload or a link keeps the view. A live session reloads as a replay. The hash's `sel` is a row
+  (`{eid}`, or `{id, generation}` until its eid is fetched), a thing key, or a layer unit, as D13 selects one: a layer
+  has no row of its own, so it is its first kernel's `{eid}` or `{id, generation}` with `"unit": "layer"`.
 
 ### 2.4 Keys
 

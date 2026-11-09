@@ -32,7 +32,7 @@ const upperT = (a, x) => { let lo = 0, hi = a.length; while (lo < hi) { const k 
  *   col: palette index per unit; low: 1 where a phase unit is stream out (D13 draws those in the lower half)
  * @typedef {{w: number, h: number, gl: number, gr: number, axis: number, rows: {y: number, h: number}[],
  *   sTop: number, sH: number, xTop: number, xferH: number}} Layout
- * @typedef {{a: number, b: number, t: number, tier: number, sel: any, pe: any, hover: number, lit: Set<number>,
+ * @typedef {{a: number, b: number, t: number, tier: number, sel: number, selLayer: boolean, pe: any, hover: number, lit: Set<number>,
  *   metric: boolean, head: number, live: boolean}} Frame
  */
 
@@ -141,7 +141,7 @@ export class Bands {
     eachVisible(L, f.a, f.b, (k) => {
       const s = L.start[k], e = L.end[k], id = L.ids[k], xa = cx(X(s)), w = Math.max(minW, cx(X(e)) - xa);
       const half = band?.low ? (band.low[k] ? 2 : 1) : 0;
-      const on = band != null && s <= f.t && f.t < e, sel = id === f.sel, pe = id === f.pe, hov = id === f.hover, lit = f.lit.has(id);
+      const on = band != null && s <= f.t && f.t < e, sel = id === f.sel && (band?.name === "layer") === f.selLayer, pe = id === f.pe, hov = id === f.hover, lit = f.lit.has(id);
       const c = band ? band.col[k] : pal(COPY), shaded = band != null && w >= 2 && (k & 1) === 1;
       if (lit) this.litDrawn.add(id);
       if (on || sel || pe || hov || lit) raised.push([k, xa, w, half, c, shaded, on, sel, pe, hov, lit]);
@@ -236,14 +236,14 @@ export class Bands {
       });
       return best;
     };
-    if (y >= L.xTop && y < L.xTop + L.xferH) { const k = find(this.copies, COPY_MIN_PX, () => true); return k < 0 ? null : { id: this.copies.ids[k], title: copyLabel(S, this.copies.ids[k]) }; }
+    if (y >= L.xTop && y < L.xTop + L.xferH) { const k = find(this.copies, COPY_MIN_PX, () => true); return k < 0 ? null : { id: this.copies.ids[k], band: -1, title: copyLabel(S, this.copies.ids[k]) }; }
     const i = L.rows.findIndex((r) => y >= r.y && y < r.y + r.h), band = this.bands[i];
     if (!band) return null;
     const r = L.rows[i], lower = y >= r.y + r.h / 2;
     const k = find(band.u, 1, (j) => !band.low || (band.low[j] === 1) === lower);
     if (k < 0) return null;
     const id = band.u.ids[k], kind = S.kinds.find((c) => c.code === S.field("kind", id));
-    return { id, title: `${unitLabel(S, band.name, id)}${kind?.name === "inferred module" ? " (inferred, M2)" : ""}` };
+    return { id, band: i, title: `${unitLabel(S, band.name, id)}${kind?.name === "inferred module" ? " (inferred, M2)" : ""}` };
   }
 }
 

@@ -5,7 +5,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
-import { state, subscribe, setTier, select, now, archName, store, units, metricInputs, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
+import { state, subscribe, setTier, select, now, archName, store, units, metricInputs, unitSel, selKey, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { fmtValue, fmtBytes } from "../sidebar/samples.js";
 import { NONE16 } from "../store/columns.js";
 import { perf } from "../perf.js";
@@ -344,7 +344,7 @@ export function mount(el) {
     stream.forEach((p) => p.m.material.color.copy(col)); packet.material.color.copy(col);
     pulseEl.style.setProperty("--pc", `#${col.getHexString()}`);
     pulseEl.textContent = u ? stripName(unitLabel(S, E[s.tiers.execution], u.id)) : `before the first ${E[s.tiers.execution]}`;
-    pulseEl.classList.toggle("sel", !!u && s.sel === u.id);
+    pulseEl.classList.toggle("sel", !!u && selKey(s.sel) === selKey(unitSel("execution", s.tiers.execution, u.id)));
 
     for (const L of LBL) L.o.visible = !!L.show(hwT);
     const vramGiB = B.gpu?.attrs?.vram_bytes ? (B.gpu.attrs.vram_bytes / 2 ** 30).toFixed(2) : "–";
@@ -413,7 +413,7 @@ export function mount(el) {
     const p = pickAt(e); if (!p) return;
     if (p.kind === "hw") { select(p.key); setTier("hardware", parts.get(p.key).tier); }
     else if (p.kind === "proc") select(p.key);
-    else if (p.kind === "exec") select(curUnit.id);
+    else if (p.kind === "exec") select(unitSel("execution", state.tiers.execution, curUnit.id));
     else if (p.kind === "kernel") select(curKernel.id);
     else if (p.kind === "transfer") select(cur.transfers[0].id);
     else if (p.kind === "unit") select(p.id);

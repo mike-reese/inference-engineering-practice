@@ -6,7 +6,8 @@
 // | export | contract (times are ns from the shown run's t0; a tier is an index into ladders()[dim]) |
 // | --- | --- |
 // | state | world, focus, tiers {dim: tier}, paired, t, sel, metric, playing, pace, rate, bounds [a, b], playEvent, dock {pos, tab, open}, nav {back, fwd}, session, head, follow, rev |
-// | state.sel | null, a row id of store() (number), or a thing key (string: manifest things[].key) |
+// | state.sel | null, a row id of store() (number), a layer unit {layer: the row id of its first kernel} (it has no row of its own), or a thing key (string: manifest things[].key) |
+// | selRow(sel), selKey(sel), unitSel(dim, tier, id) | the row a selection names (a layer unit's first kernel), null for a thing; the selection as text for data-sel ("layer:" + id for a layer unit), which select() reads back; the selection naming unit id of (dim, tier) |
 // | state.session | {mode: "replay" or "live" or "compare", rep, run, runB, side: "A" or "B", live: null or {action, options, job, dry_run, state, note, done}} |
 // | state.playEvent | the row id playback is at, or null |
 // | state.rev | bumps when the shown store opens or changes (A/B side, live merge, aux.json) |
@@ -20,7 +21,7 @@
 // | archName(S, i) | a thing's name on the architecture ladder: a process by its component-map role |
 // | boundsAt(t), eventsIn(b) | playback bounds at t; Uint32Array of every row starting in [b0, b1), by (start, id) |
 // | metrics(), metricInputs() | aux.json metrics [{id, name, value, unit, request, rows}]; Set of row ids the selected one reads |
-// | actions | setTier, fly, focus, setPaired, setWorld, setDock, step, walkRow, seek, select, selectMetric, goBack, goForward, togglePlay, setPace, setRate, loadRun, launch, compareRuns, setSide, setFollow |
+// | actions | setTier, fly, focus, setPaired, setWorld, setDock, step, walkRow, seek, select (a selection or its selKey text), selectMetric, goBack, goForward, togglePlay, setPace, setRate, loadRun, launch, compareRuns, setSide, setFollow |
 // | constants | DIMS, WORLDS, DIM_COLOR, FLOW_COLOR; KEYS and bindKeys come from keys.js |
 //
 // now(t): exec[i] is the unit of execution tier i holding t, else the last one started before t, as {id, t0, t1} or
@@ -129,12 +130,12 @@ function adopt(S) {
   openError = null;
   state.head = S.head();
   state.t = Math.max(S.extent[0], Math.min(state.head, state.t));
-  if (typeof state.sel === "number" && !(state.sel < S.N)) state.sel = null;
+  if (selRow() != null && !(selRow() < S.N)) state.sel = null;
   if (typeof state.sel === "string" && !S.things.some((x) => x.key === state.sel)) state.sel = null;
   if (pendingSel) {   // from the hash or a final reload: an eid resolves in any generation, a row id only in its own
     const p = pendingSel; pendingSel = null;
     // a selection from the URL also moves the cursor to its row, as select() does; a final reload keeps t (6.5)
-    const take = (id) => { state.sel = id; if (p.seek) state.t = S.startOf[id]; };
+    const take = (id) => { state.sel = p.unit === "layer" ? { layer: id } : id; if (p.seek) state.t = S.startOf[id]; };
     if (p.eid) S.resolve(p.eid).then((id) => { if (id != null && store() === S && state.sel == null) { take(id); rebound(); emit(); } }, (err) => console.error(err));
     else if (p.generation === S.generation && p.id < S.N) take(p.id);
   }
@@ -143,12 +144,12 @@ function adopt(S) {
 }
 /** The final import wrote the next generation (6.5): reload it as a replay, keeping t, the world and the selection. */
 function finalRun(run) {
-  const S = cache.get(run)?.s, sel = typeof state.sel === "number" ? S?.detailCached(state.sel)?.eid : null;
-  if (sel) pendingSel = { eid: sel };
+  const S = cache.get(run)?.s, row = selRow(), eid = row != null ? S?.detailCached(row)?.eid : null;
+  if (eid) pendingSel = { eid, unit: state.sel.layer != null ? "layer" : undefined };
   if (state.session.run === run && state.session.mode === "live") state.session = { ...state.session, mode: "replay", live: { ...state.session.live, done: true } };
   reloadSession().then(() => reopen(run), (err) => { console.error(err); reopen(run); });
 }
-function reopen(run) { const e = cache.get(run); e?.s?.live?.ws?.close(); cache.delete(run); if (typeof state.sel === "number") state.sel = null; openSession(); emit(); }
+function reopen(run) { const e = cache.get(run); e?.s?.live?.ws?.close(); cache.delete(run); if (selRow() != null) state.sel = null; openSession(); emit(); }
 
 // ---------------- tiers, focus, worlds, dock
 let lad = null, align = null;   // the manifest's ladders and alignment table (every run carries the registry's)
@@ -180,18 +181,18 @@ export function setDock(patch) { Object.assign(state.dock, patch); emit(); }
 export function stops(dim = state.focus, tier = state.tiers[dim]) { const S = store(); return S ? S.dims.stops(dim, S.dims.ladders[dim][tier]) : NO_STOPS; }
 export function units(tier) { const S = store(); return S ? U(S).of(tier) : { ids: new Uint32Array(0), start: new Float64Array(0), end: new Float64Array(0), reach: 0, long: new Uint32Array(0) }; }
 /** The cursor for RunStore.step / walk: the selected row breaks ties at t, else the step leaves t (3.4). */
-const cursor = (S, dir) => ({ t: state.t, id: typeof state.sel === "number" && S.startOf[state.sel] === state.t ? state.sel : dir > 0 ? 0xffffffff : -1 });
+const cursor = (S, dir) => { const r = selRow(); return { t: state.t, id: r != null && S.startOf[r] === state.t ? r : dir > 0 ? 0xffffffff : -1 }; };
 export function step(dir, coarser = false) {
   const S = store(); if (!S) return;
   const tier = coarser ? Math.max(0, tierOf() - 1) : tierOf();
   const r = S.step(state.focus, S.dims.ladders[state.focus][tier], cursor(S, dir), dir);
-  if (r && r.t <= state.head) { state.t = r.t; state.sel = r.id; rebound(); emit(); }
+  if (r && r.t <= state.head) { state.t = r.t; state.sel = unitSel(state.focus, tier, r.id); rebound(); emit(); }
 }
 /** Alt ← →: the previous / next row of the focused tier, every row in time order across every process. */
 export function walkRow(dir) {
   const S = store(); if (!S) return;
   const r = S.walk(state.focus, S.dims.ladders[state.focus][tierOf()], cursor(S, dir), dir);
-  if (r && r.t <= state.head) { state.t = r.t; state.sel = r.id; rebound(); emit(); }
+  if (r && r.t <= state.head) { state.t = r.t; state.sel = unitSel(state.focus, tierOf(), r.id); rebound(); emit(); }
 }
 export function seek(t) {
   const S = store();
@@ -216,7 +217,7 @@ export function compareRuns(rep, run, runB) {
 /** Compare: which run the replay worlds show. A row selection belongs to one run; a thing key carries over. */
 export function setSide(side) {
   state.session = { ...state.session, side };
-  if (typeof state.sel === "number") state.sel = null;
+  if (selRow() != null) state.sel = null;
   const S = store(); if (S) adopt(S); else need(shownRun());
   emit();
 }
@@ -268,20 +269,27 @@ function walk(from, to) {
   if (!from.length) return;
   to.push(here());
   const { tab, run, ...at } = from.pop();
-  if (run !== shownRun() && typeof at.sel === "number") at.sel = null;   // a row id of the other compare side
+  if (run !== shownRun() && selRow(at.sel) != null) at.sel = null;   // a row id of the other compare side
   Object.assign(state, at); state.dock = { ...state.dock, tab, open: true };
   countNav(); rebound(); emit();
 }
 export const goBack = () => walk(trail.back, trail.fwd);
 export const goForward = () => walk(trail.fwd, trail.back);
 
-/** Select a row (id; a digit string from a data attribute counts) or a thing (key). A row moves the cursor to it. */
+/** The row a selection names: a row id, or a layer unit's first kernel; null for a thing or none. */
+export const selRow = (sel = state.sel) => (typeof sel === "number" ? sel : sel?.layer ?? null);
+/** A selection as text (data-sel attributes, comparisons): a row id, "layer:" and a layer unit's id, or a thing key. */
+export const selKey = (sel) => (sel?.layer != null ? `layer:${sel.layer}` : String(sel ?? ""));
+/** The selection naming unit `id` of (dim, tier): a layer unit has no row of its own, so it is {layer: id}. */
+export const unitSel = (dim, tier, id) => (dim === "execution" && ladders()?.execution[tier] === "layer" ? { layer: id } : id);
+/** Select a row, a layer unit or a thing, or its selKey text (from a data attribute). A row or unit moves the cursor to it. */
 export function select(ref) {
-  if (typeof ref === "string" && /^\d+$/.test(ref)) ref = Number(ref);
-  if (ref !== state.sel || state.metric) remember();
+  const m = typeof ref === "string" ? /^(layer:)?(\d+)$/.exec(ref) : null;
+  if (m) ref = m[1] ? { layer: Number(m[2]) } : Number(m[2]);
+  if (selKey(ref) !== selKey(state.sel) || state.metric) remember();
   state.sel = ref ?? null; state.metric = null;
-  const S = store();
-  if (typeof ref === "number" && S && ref < S.N) { state.t = S.startOf[ref]; S.detail([ref]).catch((e) => console.error(e)); }   // the eid, for the URL
+  const S = store(), row = selRow(ref);
+  if (row != null && S && row < S.N) { state.t = S.startOf[row]; S.detail([row]).catch((e) => console.error(e)); }   // the eid, for the URL
   rebound(); emit();
 }
 /** Select a metric: its input rows light up and the cursor goes to the first input. */
@@ -419,9 +427,10 @@ function nowOf(S, t) {
 // ---------------- the view lives in the URL hash, so a reload or a pasted link keeps the position (2.3)
 function saveHash() {
   const { world, focus: f, tiers, paired, t, sel, metric, dock, pace, rate, session } = state;
-  // a row by its eid once its detail is fetched; until then by id, valid only in the generation it came from
-  const S = store(), eid = typeof sel === "number" ? S?.detailCached(sel)?.eid : null;
-  writeHash({ session, world, focus: f, tiers, paired, t, sel: eid ? { eid } : typeof sel === "number" ? { id: sel, generation: S?.generation } : sel, metric, dock, pace, rate });
+  // a row by its eid once its detail is fetched; until then by id, valid only in the generation it came from; a layer
+  // unit as its first kernel's, with unit "layer"
+  const S = store(), row = selRow(sel), eid = row != null ? S?.detailCached(row)?.eid : null, unit = sel?.layer != null ? { unit: "layer" } : {};
+  writeHash({ session, world, focus: f, tiers, paired, t, sel: eid ? { eid, ...unit } : row != null ? { id: row, generation: S?.generation, ...unit } : sel, metric, dock, pace, rate });
 }
 /** Bytes of every ArrayBuffer reachable from x through objects, arrays, maps and sets, each buffer counted once. */
 function reachableTyped(x) {

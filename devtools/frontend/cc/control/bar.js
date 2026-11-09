@@ -4,7 +4,7 @@
 // of every execution tier, copies on the last row, the focused tier's stops, the selected metric's input rows, the
 // play event, the cursor). Strips draw on a fixed width of VW units: ns from the run's t0 reach about 1e11, and
 // Chromium drew nothing but x = 0 in a viewBox that wide, so times map onto 0..VW in float64 first.
-import { state, subscribe, store, setDock, select, seek, step, selectMetric, goBack, goForward, now, tierName, stops, units, eventsIn,
+import { state, subscribe, store, setDock, select, seek, step, selectMetric, selRow, unitSel, goBack, goForward, now, tierName, stops, units, eventsIn,
   togglePlay, setPace, setRate, metricInputs, setWorld, loadRun, DIM_COLOR } from "./control.js";
 import { TABS, unitText } from "../inspector/tabs.js";
 import { openInNsight } from "../inspector/nsight.js";
@@ -92,7 +92,7 @@ table.metrics tr.on td.inp a { color:#f778ba; }
 `;
 
 const tabOf = (s) => TABS.find((t) => t.key === (OLD_TAB[s.dock.tab] ?? s.dock.tab)) ?? TABS[0];
-const nameOf = (S, sel) => (typeof sel === "number" ? (sel < S.N ? S.nameText(S.field("name", sel)) : null) : S.things.find((x) => x.key === sel)?.name ?? null);
+const nameOf = (S, sel) => (sel?.layer != null ? (sel.layer < S.N ? unitText(S, "layer", sel.layer) : null) : typeof sel === "number" ? (sel < S.N ? S.nameText(S.field("name", sel)) : null) : S.things.find((x) => x.key === sel)?.name ?? null);
 
 export function mountBar(el) {
   const css = document.createElement("style"); css.textContent = CSS; document.head.append(css);
@@ -193,7 +193,7 @@ export function mountBar(el) {
     const t = tAt(detail, e, win), r = detail.getBoundingClientRect(), pxPerNs = r.width / (win[1] - win[0]), st = stops();
     let best = -1;
     for (let k = Math.max(0, lowerT(st.t, t) - 1); k < st.t.length && k <= lowerT(st.t, t); k++) if (best < 0 || Math.abs(st.t[k] - t) < Math.abs(st.t[best] - t)) best = k;
-    if (best >= 0 && st.t[best] >= win[0] && st.t[best] <= win[1] && Math.abs(st.t[best] - t) * pxPerNs <= 6) { select(st.ids[best]); seek(st.t[best]); } else seek(t);
+    if (best >= 0 && st.t[best] >= win[0] && st.t[best] <= win[1] && Math.abs(st.t[best] - t) * pxPerNs <= 6) { select(unitSel(state.focus, state.tiers[state.focus], st.ids[best])); seek(st.t[best]); } else seek(t);
   });
   over.addEventListener("click", (e) => { if (store()) seek(tAt(over, e, ext)); });
 
@@ -262,7 +262,7 @@ export function mountBar(el) {
     let lines = "";
     if (n <= 4 * W) for (let k = k0; k < k1; k++) lines += `<line x1="${X(st.t[k])}" x2="${X(st.t[k])}" y1="0" y2="40" stroke="${col}" stroke-width="${n > 200 ? 1 : 2}" opacity=".9"/>`;
     else { let last = -1; for (let k = k0; k < k1; k++) { const p = Math.floor((X(st.t[k]) / VW) * W); if (p !== last) { last = p; lines += `<line x1="${(p / W) * VW}" x2="${(p / W) * VW}" y1="0" y2="40" stroke="${col}" stroke-width="1" opacity=".9"/>`; } } }
-    const sel = typeof s.sel === "number" && s.sel < S.N ? S.startOf[s.sel] : null;
+    const sel = selRow(s.sel) != null && selRow(s.sel) < S.N ? S.startOf[selRow(s.sel)] : null;
     detail.setAttribute("viewBox", `0 0 ${VW} 40`);
     detail.innerHTML = `<rect x="${X(b0)}" width="${X(b1) - X(b0)}" y="0" height="40" fill="#ffd36b" opacity=".08"/>
       <line x1="${X(b0)}" x2="${X(b0)}" y1="0" y2="40" stroke="#ffd36b" stroke-width="1.5"/><line x1="${X(b1)}" x2="${X(b1)}" y1="0" y2="40" stroke="#ffd36b" stroke-width="1.5"/>

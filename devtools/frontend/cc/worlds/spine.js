@@ -3,7 +3,7 @@
 // paint on one canvas (spine/bands.js; a run has tens of thousands of units); the play bounds, metric bracket, cursor,
 // live mask and axis sit on an SVG above it, which takes the input. Wheel zooms time around the mouse, drag pans,
 // double-click fits the play bounds. Each pane (architecture, hardware, the bands) zooms on its own.
-import { state, subscribe, setTier, select, seek, now, store, storeError, metrics, metricInputs, ladders, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
+import { state, subscribe, setTier, select, seek, now, store, storeError, metrics, metricInputs, ladders, selRow, unitSel, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { mountArch } from "../arch.js";
 import { panZoom } from "../zoom.js";
 import { perf } from "../perf.js";
@@ -227,7 +227,7 @@ export function mount(el) {
 
   // ---------------- painting: the canvas and the marks, at most once per frame unless a state frame asks now
   let hover = -1, lit = new Set(), raf = 0, inputs = [];
-  const frame = () => ({ a: view.a, b: view.b, t: state.t, tier: state.tiers.execution, sel: typeof state.sel === "number" ? state.sel : -1,
+  const frame = () => ({ a: view.a, b: view.b, t: state.t, tier: state.tiers.execution, sel: selRow() ?? -1, selLayer: state.sel?.layer != null,
     pe: state.playEvent ?? -1, hover, lit, metric: lit.size > 0, head: state.head, live: isLive(store()) });
   function paint() {
     if (raf) { cancelAnimationFrame(raf); raf = 0; }
@@ -385,7 +385,7 @@ export function mount(el) {
     const [x, y] = at(e);
     if (x < GL) return;
     const h = bands.hit(L, frame(), x, y);
-    if (h) select(h.id); else seek(T(x));
+    if (h) select(h.band >= 0 ? unitSel("execution", h.band, h.id) : h.id); else seek(T(x));
   });
   svg.addEventListener("dblclick", () => { if (store()) fitTo(target()); });
 
