@@ -42,7 +42,7 @@ class Registry:
     kinds: tuple[KindRule, ...]
     link_kinds: tuple[LinkKind, ...]
     levels: tuple[str, ...]
-    metric_rules: dict            # metric name -> {sidebar, label}
+    metric_rules: dict            # metric name -> its kinds.json metrics entry (sidebar, label, place, ...)
     components: dict              # components.json
     sample_tracks: dict           # sample evidence -> source track (registry "samples" rules)
     measures: dict                # measure name -> definition, from the source registries
@@ -52,6 +52,10 @@ class Registry:
     sources: dict                 # source name (run_json, nsys, torch_profiler, ncu, inventory) -> its registry file
     ladders: dict                 # dimension -> its tiers, coarse to fine (kinds.json ladders)
     dimensions: dict              # kinds.json dimensions: align, storage, stops, walk, handoff, ran_on, kernel_class, flow
+
+    def metric_places(self) -> dict:
+        """Every metric's place ({"hardware": a hardware tier or "-"}), served with each manifest (store/serve.py)."""
+        return {name: m["place"] for name, m in self.metric_rules.items()}
 
     def execution_kinds(self, tier: str) -> list[str]:
         """The kinds placed at an execution tier without a rule (e.g. "request": client request)."""
@@ -73,6 +77,10 @@ class Registry:
             kinds.append(KindRule(i, e["kind"], e["tier"], e.get("nest_bump", False), e.get("derived", False),
                                   e["color"], e["label"], e["home"], e["place"]))
         links = tuple(LinkKind(i, e["kind"], e["cause"], e["label"]) for i, e in enumerate(k["link_kinds"]))
+        hardware = set(k["ladders"]["hardware"]) | {"-"}
+        unplaced = [m["metric"] for m in k["metrics"] if m.get("place", {}).get("hardware") not in hardware]
+        if unplaced:
+            raise ValueError(f"kinds.json: metrics {unplaced} need place.hardware, a hardware ladder tier or '-'")
         for names, what in (([x.kind for x in kinds], "kind"), ([x.kind for x in links], "link kind"),
                             ([b["key"] for b in c["boxes"]], "box"), ([b["key"] for b in c["bounds"]], "bound")):
             if len(set(names)) != len(names):

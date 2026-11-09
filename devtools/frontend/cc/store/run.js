@@ -66,6 +66,7 @@ function parseManifest(m) {
   need(Array.isArray(m.things) && m.things.every((t, i) => t.i === i && Number.isInteger(t.pre) && Number.isInteger(t.post)), "things: [{i, key, parent, kind, name, pre, post}] in index order");
   need(Array.isArray(m.names) && Array.isArray(m.requests) && Array.isArray(m.blocks), "names, requests and blocks lists");
   need(m.blocks.every((b) => typeof b.name === "string" && Number.isInteger(b.rows)), "blocks: [{name, rows, ...}]");
+  need(m.metric_places && typeof m.metric_places === "object", "metric_places: each registry metric's place, which GET manifest adds");
   return m;
 }
 
@@ -81,6 +82,7 @@ export class RunStore {
     this.linkKinds = m.link_kinds ?? [];
     this.metrics = [];   // the manifest's catalog entries in sample-column order: {code, metric, label, unit, thing, sidebar, ...}
     this.catalog = m.metrics ?? [];
+    this.metricPlaces = m.metric_places;   // registry metric name -> {hardware: tier name or "-"}
     // manifest `tools` ({nsys: {run, path, ...}, ncu: {run, path, kernels, ...}}) and `source` ({run_dir, importer, live?}), as written
     this.tools = m.tools ?? {}; this.source = m.source ?? null; this.auxEntry = m.aux ?? null;
     this.listeners = new Set(); this.details = new Map(); this.inflight = new Map(); this.events = new Map();
@@ -316,6 +318,10 @@ export class RunStore {
     for (const b of this.blocks) { const { id, cause: c } = b.cols; for (let i = 0; i < b.n; i++) if (c[i] >= 0) { cause[0].push(c[i]); cause[1].push(id[i]); } }
     this.linkFrom = pairs(...from); this.linkTo = pairs(...to); this.causes = pairs(...cause);
   }
+
+  /** The hardware tier of metric i (an index into the hardware ladder) from the registry's place for it; -1 when the
+   *  registry places it at no hardware tier ("-") or does not list it. */
+  metricTier(i) { return this.dims.ladders.hardware.indexOf(this.metricPlaces[this.metrics[i]?.metric]?.hardware); }
 
   /** One hot column value of one row. */
   field(name, id) { const k = this.ids.blk[id]; return this.blocks[k].cols[name][this.ids.row[id]]; }
@@ -581,4 +587,4 @@ function pairs(keys, values) {
 }
 
 /** The values of one key, in increasing order. */
-function valuesOf(p, key) { return p.value.subarray(first(p.key.length, (k) => p.key[k] < key), first(p.key.length, (k) => p.key[k] <= key)); }
+function valuesOf(p, key) { return p.value.subarray(lowerArr(p.key, key), upperArr(p.key, key)); }
