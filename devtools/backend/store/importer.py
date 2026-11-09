@@ -17,6 +17,7 @@ the live path wrote has the same eid in the final generation:
                                                         (adapters/trackers.py)
   the kernels-level run's trace/kernels.csv, sections.csv        Nsight Compute headline counters (adapters/ncu.py)
   $CC_STORE/probe/inventory.json                        host and GPU things (store/probe.py, probed once)
+  the reference run's rows in the store                 inferred module rows (store/modules.py, registry modules.json)
 Then the derivations of derive.py: containment parents, cause links, tiers, derived iterations, iterations, requests,
 component boxes, depth, decoder layers.
 
@@ -29,7 +30,8 @@ UTC - CLOCK_MONOTONIC offset it recorded at open (capture/clock.json); any other
 generation, or the earliest row's start on a first import. The offset for UTC sources (pcap, nsys, PyTorch) is the
 live writer's, else the anchor pair of the first client record (sorted by name), as src clock_offset.
 
-Idempotent: a run whose inputs signature (its files, capture/ files, the probe, registry and code) matches its
+Idempotent: a run whose inputs signature (its files, capture/ files, the probe, registry and code, and the store
+generation of a run it reads: the timeline run of a kernels-level run, the reference of module inference) matches its
 manifest is skipped. The run's lock (live.run_lock) is held while importing. Generation g+1 is written to
 g<n>.tmp/, renamed to g<n>/, and the manifest is replaced last. The previous generation stays and older ones are
 deleted, so a live run's g0 stays beside its first final generation (store-check compares their eids).
@@ -53,8 +55,8 @@ from pathlib import Path
 import duckdb
 import numpy as np
 
-from . import derive, probe
-from .adapters.base import Ctx, LineTail, Rows
+from . import derive, modules, probe
+from .adapters.base import Ctx, LineTail, Rows, slug
 from .adapters.client import STAMPS_FILE, ClientRecords, ClientStamps
 from .adapters.docker import CAPTURE as DOCKER_CAPTURE, DockerEvents
 from .adapters.engine import ITER_CAPTURE, ITER_FILE, EngineIterations, EngineRecords, engine_series, engine_values
@@ -73,8 +75,8 @@ from .schema import (BLOCK_ROWS, COLD, COLUMNS, DEVICE_TIER, METRIC_DTYPE, NONE1
 
 CC_STORE = Path(os.environ.get("CC_STORE", "/mnt/ie-data/cc/store"))
 HERE = Path(__file__).resolve().parent
-CODE = ["schema.py", "registry.py", "derive.py", "importer.py", "probe.py", *(f"adapters/{p.name}" for p in
-                                                                            sorted((HERE / "adapters").glob("*.py")))]
+CODE = ["schema.py", "registry.py", "derive.py", "importer.py", "modules.py", "probe.py",
+        *(f"adapters/{p.name}" for p in sorted((HERE / "adapters").glob("*.py")))]
 SRC_CODE = ["schema.py", *(f"adapters/{x}.py" for x in ("client", "common", "components", "engine", "gpu", "wire"))]
 FACT_FILES = ("labels.json", "config.yaml", "basis.json", "topology.json", "latency.json", "perf_metrics.json",
               "efficiency.json")
@@ -129,7 +131,8 @@ def clock(run_dir: Path, root: Path) -> dict:
 
 
 # ---------------------------------------------------------------------- signature, generations
-def inputs_signature(run_dir: Path, root: Path, reg: Registry, profile_run: Path | None, tie: dict | None) -> str:
+def inputs_signature(run_dir: Path, root: Path, reg: Registry, profile_run: Path | None, tie: dict | None,
+                     reference: dict | None) -> str:
     h = hashlib.sha256()
     paths = [p for p in sorted(run_dir.rglob("*")) if p.is_file() and p.suffix != ".log"]
     paths += sorted((root / "capture").glob("*")) if (root / "capture").is_dir() else []
@@ -139,6 +142,8 @@ def inputs_signature(run_dir: Path, root: Path, reg: Registry, profile_run: Path
         h.update(profile_run.name.encode())
     if tie is not None:
         h.update(f"{tie['run']}\0{tie['generation']}".encode())
+    if reference is not None:
+        h.update(f"modules\0{reference['run']}\0{reference['generation']}".encode())
     for p in paths:
         if p.is_file():
             st = p.stat()
@@ -181,10 +186,119 @@ def timeline_tie(run_dir: Path, runs: Path) -> dict | None:
     return {"run": t.name, "generation": m["generation"], "kernels": ncu["kernels"], "event_eids": [e for (e,) in eids]}
 
 
+def module_reference(run_dir: Path, runs: Path, reg: Registry) -> dict | None:
+    """The run whose module frames give this run its inferred modules (registry modules.json, by rep folder), as the
+    store holds it: {run, generation}, generation None while it is not in the store. None for the reference itself
+    and for a rep with no reference."""
+    ref = reg.sources["modules"]["reference"].get(run_dir.parent.parent.name)
+    if ref is None or ref == run_dir.name:
+        return None
+    mp = runs / ref / "manifest.json"
+    return {"run": ref, "generation": json.loads(mp.read_bytes())["generation"] if mp.is_file() else None}
+
+
+def load_references(root: Path, reg: Registry) -> list[modules.Reference]:
+    """The reference run's distinct forward steps from its store generation: per device row with an iteration, in
+    start order, its match key and the module forward() frames above its launch call (the python call place rule
+    'module forward' of kinds.json)."""
+    m = json.loads((root / "manifest.json").read_bytes())
+    events = f"{root}/g{m['generation']}/events-*.parquet"
+    t = duckdb.sql(f"SELECT kind, iter, parent, cause, name FROM read_parquet('{events}') ORDER BY id").fetchnumpy()
+    names, kind_of = m["names"], {k["code"]: k["name"] for k in m["kinds"]}
+    code = {v: k for k, v in kind_of.items()}
+    rx = re.compile(reg.kind("python call").place["execution"]["match"])
+    is_frame = (t["kind"] == code["python call"]) & np.array([bool(rx.match(x)) for x in names], bool)[t["name"]]
+    device = [code[k.kind] for k in reg.kinds if k.tier == DEVICE_TIER]
+    parent, cause = t["parent"], t["cause"]
+    steps: dict[int, list] = {}
+    for x in np.flatnonzero(np.isin(t["kind"], device) & (t["iter"] >= 0)).tolist():
+        chain, p = [], parent[cause[x]] if cause[x] >= 0 else -1
+        while p >= 0:
+            if is_frame[p]:
+                chain.append(int(p))
+            p = parent[p]
+        key = modules.match_key(kind_of[int(t["kind"][x])], names[t["name"][x]])
+        steps.setdefault(int(t["iter"][x]), []).append((key, chain[::-1]))
+    ids = sorted({f for rows in steps.values() for _, chain in rows for f in chain})
+    eid = dict(duckdb.execute(f"SELECT id, eid FROM read_parquet('{events}') WHERE id IN (SELECT unnest(?))",
+                              [ids]).fetchall())
+    return modules.references(sorted(steps.items()), {f: (names[t["name"][f]], eid[f]) for f in ids})
+
+
+def add_modules(src: Rows, ctx: Ctx, reg: Registry, reference: dict, runs: Path) -> tuple[list[int], dict]:
+    """Inferred module rows (store/modules.py RULE) for the device rows of each forward step (their source
+    iteration, as the reference's). Appends the rows to src and makes each the parent of the device rows it holds.
+    Returns (per new row, its first device row) and the import stats."""
+    c = src.cols
+    device = {k.kind for k in reg.kinds if k.tier == DEVICE_TIER}
+    steps: dict[int, list[int]] = {}
+    for i, (k, it) in enumerate(zip(c["kind"], c["iter"])):
+        if k in device and it >= 0:
+            steps.setdefault(it, []).append(i)
+    stats = {"rule": modules.EVIDENCE, "reference": reference, "rows": 0, "forward steps": len(steps)}
+    if not steps:
+        return [], stats
+    if reference["generation"] is None:
+        return [], stats | {"not inferred": f"the reference run {reference['run']} is not in the store; import it, "
+                                            "then this run"}
+    refs = load_references(runs / reference["run"], reg)
+    if not refs:
+        raise ImportStop(f"{ctx.run}: the module reference {reference['run']} has no forward step with device rows")
+    short: dict[str, str] = {}
+
+    def key(i: int) -> str:
+        name = c["name"][i]
+        if c["kind"][i] == "kernel":
+            f = c["full_name"][i] or name
+            name = short[f] if f in short else short.setdefault(f, derive.kernel_short_name(f))
+        return modules.match_key(c["kind"][i], name)
+
+    matches: dict[tuple, modules.Match] = {}
+    first, shapes, held_rows = [], {}, 0
+    for it, rows in sorted(steps.items()):
+        rows.sort(key=lambda i: (c["start"][i], i))
+        keys, lanes = tuple(key(i) for i in rows), tuple(c["lane"][i] for i in rows)
+        m = matches.get((keys, lanes))
+        if m is None:
+            m = matches[keys, lanes] = modules.infer(refs, keys, lanes)
+        row_of: dict[int, int] = {}
+        for f, pos in m.frames:
+            frame, held = m.reference.frames[f], [rows[p] for p in pos]
+            up = frame.parent
+            while up >= 0 and up not in row_of:
+                up = m.reference.frames[up].parent
+            base = frame.name.rsplit("/", 1)[-1].split(":")[0]
+            row_of[f] = src.add(
+                start=c["start"][held[0]], end=max(c["end"][i] for i in held), lane=c["lane"][held[0]],
+                kind="inferred module", name=frame.name, req=c["req"][held[0]], iter=it,
+                eid=ctx.eid("module/inferred/i{it}/{base}", it=it, base=slug(base)),
+                what=f"The GPU runs {base} ({len(held)} device {'row' if len(held) == 1 else 'rows'}), matched to the "
+                     "code run's module.",
+                args={"reference": {"run": reference["run"], "iteration": m.reference.iteration, "eid": frame.eid},
+                      "device rows": len(held)},
+                term="module forward (inferred)", source="derived", evidence=modules.EVIDENCE,
+                parent=row_of[up] if up >= 0 else -1, parent_rule=modules.PARENT_RULE if up >= 0 else None,
+                contain=False)
+            first.append(held[0])
+            for i in held:
+                c["parent"][i], c["parent_rule"][i] = row_of[f], modules.PARENT_RULE
+        n_held = len({p for _, pos in m.frames for p in pos})
+        held_rows += n_held
+        shape = (m.reference.iteration, len(rows), m.pairs, len(m.frames), len(rows) - n_held)
+        shapes[shape] = shapes.get(shape, 0) + 1
+    return first, stats | {
+        "rows": len(first), "device rows in forward steps": sum(len(r) for r in steps.values()),
+        "device rows in a module": held_rows,
+        "forward steps by shape": [{"reference iteration": a, "device rows": b, "pairs": p, "modules": q,
+                                    "device rows in no module": u, "steps": k}
+                                   for (a, b, p, q, u), k in sorted(shapes.items())]}
+
+
 def _import(run_dir: Path, root: Path, reg: Registry, repo: Path, force: bool) -> Manifest | None:
     profile_run = profile_run_for(run_dir)
     tie = timeline_tie(run_dir, root.parent)
-    sig = inputs_signature(run_dir, root, reg, profile_run, tie)
+    reference = module_reference(run_dir, root.parent, reg)
+    sig = inputs_signature(run_dir, root, reg, profile_run, tie, reference)
     old = Manifest.load(root / "manifest.json") if (root / "manifest.json").is_file() else None
     if old and old.inputs_sig == sig and not force:
         return None
@@ -194,7 +308,7 @@ def _import(run_dir: Path, root: Path, reg: Registry, repo: Path, force: bool) -
     tmp = root / f"g{gen}.tmp"
     tmp.mkdir(parents=True)
     try:
-        manifest = _build(run_dir, root, reg, repo, tmp, gen, sig, old, profile_run, tie)
+        manifest = _build(run_dir, root, reg, repo, tmp, gen, sig, old, profile_run, tie, reference)
         os.replace(tmp, root / f"g{gen}")
     except BaseException:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -427,7 +541,7 @@ def column_groups(clocks: dict, samples: list, reg: Registry, pos_of: dict, cata
 
 # ---------------------------------------------------------------------- the generation
 def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen: int, sig: str, old: Manifest | None,
-           profile_run: Path | None, tie: dict | None) -> Manifest:
+           profile_run: Path | None, tie: dict | None, reference: dict | None) -> Manifest:
     t_start = time.perf_counter()
     run = run_dir.name
     labels = read_labels(run_dir)
@@ -469,10 +583,15 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     for k, i in enumerate(sched.tolist()):
         v = int(it_num[k])
         add_iteration(src, ctx, v, int(it_start[k]), int(it_end[k]), c["lane"][i], c["req"][i], derive.ITERATION_RULE)
+    m1 = len(src)
+
+    # Inferred modules (store/modules.py RULE): each sorts just before the first device row it holds
+    first_held, module_stats = add_modules(src, ctx, reg, reference, root.parent) if reference else ([], None)
     n = len(src)
     is_src = np.arange(n) < m0
-    order_key = np.concatenate([2 * np.arange(m0) + 1, 2 * sched])
-    start_abs = np.concatenate([start0, it_start])
+    is_iteration = (np.arange(n) >= m0) & (np.arange(n) < m1)
+    order_key = np.concatenate([2 * np.arange(m0) + 1, 2 * sched, 2 * np.array(first_held, np.int64)])
+    start_abs = np.array(c["start"], np.int64)
     perm = np.lexsort((order_key, start_abs))
     inv = np.empty(n, np.int64)
     inv[perm] = np.arange(n)
@@ -483,7 +602,7 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
 
     start_abs = start_abs[perm]
     end_abs = np.array(c["end"], np.int64)[perm]
-    is_src = is_src[perm]
+    is_src, is_iteration = is_src[perm], is_iteration[perm]
     kinds_s = col("kind")
     eid = col("eid")
     dup = len(eid) - len(set(eid.tolist()))
@@ -554,8 +673,7 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
 
     # Iterations and requests
     src_iter = np.array(c["iter"], np.int64)[perm]
-    is_derived = ~is_src
-    d_rows = np.flatnonzero(is_derived)                      # in start order
+    d_rows = np.flatnonzero(is_iteration)                    # in start order
     term = col("term")
     loop_lanes = set(lane[(term == FORWARD_STEP[0])].tolist())
     on_loop = is_src & np.isin(lane, list(loop_lanes))
@@ -742,6 +860,7 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
         "sources": {k: int(v) for k, v in zip(*np.unique(source_s.astype(str), return_counts=True))},
         "adapters": ctx.stats, "notes": notes, "guard": guard,
         "derived iterations": {"rows": len(d_rows), "rule": derive.ITERATION_RULE},
+        **({"modules": module_stats} if module_stats else {}),
         "iterations": it_stats, "request of an iteration filled (ie-run/2 rule)": filled,
         "parents": {"rows with a parent": int((parent >= 0).sum()), "crossing (not nested)": crossing},
         "causes": int((cause >= 0).sum()),
@@ -1002,8 +1121,10 @@ def main() -> None:
     repo, reg = Path(os.environ.get("REPO", "/repo")), Registry.load()
     runs = sorted(p.name for p in (CC_STORE / "runs").iterdir() if (p / "manifest.json").is_file()
                   and p.name != "host") if a.all else a.runs
-    # a kernels-level run reads its timeline run's tie from the store, so it imports after the timeline runs
-    runs.sort(key=lambda r: any(read_labels(d).get("trace") == "kernels" for d in repo.glob(f"reps/*/results/{r}")))
+    # a module reference imports first and a kernels-level run last: the runs that tie to them read them from the store
+    refs = set(reg.sources["modules"]["reference"].values())
+    runs.sort(key=lambda r: (r not in refs, any(read_labels(d).get("trace") == "kernels"
+                                                for d in repo.glob(f"reps/*/results/{r}"))))
     failed = []
     for run in runs:
         t = time.perf_counter()

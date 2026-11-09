@@ -165,16 +165,24 @@ today). Counts per iteration come from section 10.
 | iteration | one scheduler step: which requests run, prefill or decode | scheduler stamps (derived span) | 3.4 ms median | measured |
 | phase | executor phases (`_fetch_new_requests`, `_schedule`, `_sample_async`, `_handle_responses`), request hops | NVTX top-level ranges, component stamps | 13 to 26 per iteration | measured |
 | layer | one decoder layer | `layer` column (RMSNorm rule in `trace/adapters/nsys.py`) | 25 per iteration (24 layers + final norm) | inferred |
-| module | attention, MLP, linear, norm, with their ops | module `forward()` frames (code run) | 269 per iteration | measured in the code run only; graphs-on runs say "missing" until M2 |
+| module | attention, MLP, linear, norm, with their ops | module `forward()` frames (code run); in graphs-on runs, those frames matched to each forward step's kernels (M2) | 269 per iteration (code run); 173 per decode and 221 per prefill step (R1) | measured in the code run; inferred in graphs-on runs |
 | kernel | one kernel, copy or memset, with the CPU call that launched it | nsys or PyTorch profiler | 2.3 µs median kernel | measured |
 
 - Everything finer than a module is **detail**: built-ins, nn plumbing, nested aten ops, CUDA queries, syncs, OS
   calls and profiler rows. They stay in the store and open in the inspector. They are never stops.
 - A launch call and its kernel are one stop, seen from the CPU and the GPU. The code run's 18,309 launch calls match
   its 18,309 device rows by correlation id (measured).
-- Module is the gap. Graphs-on runs replay a captured graph, so they have no module frames. A module there must be
-  inferred by matching the kernel sequence learned from the code run (rule written in M2). The match is not 1:1: the
-  code run has 286 kernels per iteration, graphs-on runs 207 (measured).
+- Graphs-on runs replay a captured graph, so they have no module frames. Their modules are inferred (M2,
+  `store/modules.py`). Each forward step's device rows are aligned with the code run's by a longest common
+  subsequence of kernel short names, copy directions and memsets. A code-run module becomes a row (kind
+  `inferred module`, evidence "Inferred" with the rule) only when every device row it launched pairs and the pairs
+  are consecutive on one stream. The match is not 1:1. The 286 and 207 kernels per iteration are run averages; per
+  forward step the code run has 242 device rows in decode and 311 in prefill, R1 has 267 and 311, and each R1 decode
+  iteration also holds 43 sampling rows (measured). Decode attention runs different kernels (code run: masked MHA,
+  one kernel; graphs on: XQA, two), so attention and its backend are not inferred in decode. On R1, 101 of 310
+  kernel stops per decode iteration stay unmatched (48 XQA kernels, 10 other rows of the forward stream, 43 sampling
+  rows), 49 of 354 per prefill (6 copies of the forward stream, 43 sampling rows), all measured. The spine's module
+  row says "inferred", and its headline shows the unmatched count of the cursor's iteration.
 
 ### 3.2 Hardware
 
@@ -406,7 +414,7 @@ blocks, CCVB, the socket, dictionaries, indexes, the id map and generations.
   or cause and its kind's base tier.
 - Live only: client records and stamps, server stamps, derived iterations, network frames, NVML, docker events and
   stats, engine scrape and iteration stats, inventory. Final import only: nsys, PyTorch profiler and ncu rows, engine
-  records, run.json metrics and facts, `serves` links, layers.
+  records, run.json metrics and facts, `serves` links, layers, inferred modules (M2).
 - A rolling `host` run (30 min) holds machine samples and docker events between reps.
 - Live GPU: NVML GPM (SM utilization, SM occupancy, tensor utilization, DRAM bandwidth) at 100 ms; faster reads mostly
   return empty windows (195 of 244 at 20 ms), so a zero or shorter-than-50-ms window is dropped and counted in
@@ -473,6 +481,7 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 | D13 scratch value | production source | status |
 | --- | --- | --- |
 | execution units (request, iteration, phase, layer, module, kernel) | store rows, placed per dimension by `kinds.json` (P3) | rows measured; placement P3 |
+| module units of graphs-on runs | kind `inferred module`: the code run's module frames matched to each forward step's device rows (`store/modules.py`; the code run per rep in `registry/modules.json`) | inferred, M2 |
 | kernel grid, block, registers, shared memory | cold `args` of each kernel row (nsys) | measured |
 | kernel DRAM and L2 bytes, occupancy, throughput | `profiles.parquet` (ncu), profiled iteration only; other kernels say "not profiled" | measured (f2ac52; R1) |
 | transfers (hardware / device stops) | memcpy and memset rows with bytes | measured |
@@ -590,6 +599,7 @@ marks an open choice.
 | kind | profiler overhead | execution: detail; hardware: device (CPU); architecture: process (profiler) |
 | kind | profiler message | execution: detail; hardware: -; architecture: process (profiler) |
 | kind | process start | execution: detail; hardware: -; architecture: process (lifecycle stop) |
+| kind | inferred module | execution: module; hardware: device (GPU); architecture: software layer (toolkit) |
 | D13 world | Rep | the session's front page, outside the dimensions: moments put the cursor on stops in any dimension |
 | D13 world | Stacked world | all three dimensions in 3D: architecture standing on its hardware (the board as floor), execution as a moving pulse |
 | D13 world | Execution spine | execution / request to kernel as bands, with a lens on architecture and hardware |
@@ -659,12 +669,12 @@ Execution stops (own tier), per iteration in brackets. `layer` groups kernel row
 | I02A-TRACE-kernels_20261109T055145Z_5b77fc | 8,480 | 192 | 3 (0) | 192 (1) | 7,995 (42) | 0 (0) | 0 (0) | 0 (0) | 290 (2) |
 | I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | 8,418 | 192 | 3 (0) | 192 (1) | 7,925 (41) | 0 (0) | 0 (0) | 0 (0) | 298 (2) |
 | I02A-TRACE-live_20261103T185532Z_1c1629 | 1,471 | 0 | 2 | 0 | 1,447 | 0 | 0 | 0 | 22 |
-| I02A-TRACE-timeline_20261103T185837Z_e08b8b | 90,952 | 128 | 3 (0) | 0 (0) | 3,508 (27) | 3,200 (25) | 0 (0) | 39,768 (311) | 40,161 (314) |
-| I02A-TRACE-timeline_20261107T172848Z_f2ac52 | 93,163 | 192 | 3 (0) | 192 (1) | 6,224 (32) | 3,200 (17) | 0 (0) | 39,768 (207) | 39,464 (206) |
-| I02A-TRACE-timeline_20261108T200246Z_764014 | 101,881 | 192 | 3 (0) | 192 (1) | 6,158 (32) | 3,200 (17) | 0 (0) | 39,768 (207) | 48,248 (251) |
-| I02A-TRACE-timeline_20261108T213113Z_1d82c9 | 91,620 | 192 | 3 (0) | 192 (1) | 6,063 (32) | 3,200 (17) | 0 (0) | 39,768 (207) | 38,082 (198) |
-| I02A-TRACE-timeline_20261109T013347Z_69c1bb | 95,783 | 192 | 3 (0) | 192 (1) | 5,482 (29) | 3,200 (17) | 0 (0) | 39,768 (207) | 42,826 (223) |
-| I02A-TRACE-timeline_20261109T060522Z_ee2252 | 91,899 | 192 | 3 (0) | 192 (1) | 5,456 (28) | 3,200 (17) | 0 (0) | 39,768 (207) | 38,968 (203) |
+| I02A-TRACE-timeline_20261103T185837Z_e08b8b | 113,192 | 128 | 3 (0) | 0 (0) | 3,508 (27) | 3,200 (25) | 22,240 (174) | 39,768 (311) | 40,161 (314) |
+| I02A-TRACE-timeline_20261107T172848Z_f2ac52 | 115,403 | 192 | 3 (0) | 192 (1) | 6,224 (32) | 3,200 (17) | 22,240 (116) | 39,768 (207) | 39,464 (206) |
+| I02A-TRACE-timeline_20261108T200246Z_764014 | 124,121 | 192 | 3 (0) | 192 (1) | 6,158 (32) | 3,200 (17) | 22,240 (116) | 39,768 (207) | 48,248 (251) |
+| I02A-TRACE-timeline_20261108T213113Z_1d82c9 | 113,860 | 192 | 3 (0) | 192 (1) | 6,063 (32) | 3,200 (17) | 22,240 (116) | 39,768 (207) | 38,082 (198) |
+| I02A-TRACE-timeline_20261109T013347Z_69c1bb | 118,023 | 192 | 3 (0) | 192 (1) | 5,482 (29) | 3,200 (17) | 22,240 (116) | 39,768 (207) | 42,826 (223) |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | 114,139 | 192 | 3 (0) | 192 (1) | 5,456 (28) | 3,200 (17) | 22,240 (116) | 39,768 (207) | 38,968 (203) |
 | I02A_20261103T164324Z_348959 | 1,130 | 0 | 2 | 0 | 1,106 | 0 | 0 | 0 | 22 |
 | I02A_20261103T172804Z_a3ca9a | 648 | 0 | 2 | 0 | 624 | 0 | 0 | 0 | 22 |
 | I02A_20261103T172929Z_0e5d39 | 648 | 0 | 2 | 0 | 624 | 0 | 0 | 0 | 22 |
@@ -678,48 +688,48 @@ Execution stops (own tier), per iteration in brackets. `layer` groups kernel row
 | I02C_20261107T181031Z_5626f7 | 3,018 | 0 | 3 | 0 | 2,781 | 0 | 0 | 0 | 234 |
 | I02C_20261107T181629Z_c37c3e | 2,707 | 0 | 3 | 0 | 2,332 | 0 | 0 | 0 | 372 |
 
-Stop check: every execution place is allowed for its kind's storage tier; kernel stops equal the kernel, memcpy and memset rows of the run's device trace; module stops equal the module forward() frames of its torch_trace.json; no row is on two execution tiers; detail is not negative.
+Stop check: every execution place is allowed for its kind's storage tier; kernel stops equal the kernel, memcpy and memset rows of the run's device trace; module stops equal the module forward() frames of its torch_trace.json plus the modules its import inferred (M2); no row is on two execution tiers; detail is not negative.
 
-| run | device trace | trace rows | kernel stops | module frames | module stops | rows on two tiers | result |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| I02A-TRACE-code_20261103T170709Z_0ac2db | torch_trace.json | 18,309 | 18,309 | 17,216 | 17,216 | 0 | ok |
-| I02A-TRACE-components_20261104T142238Z_0b249c | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T195135Z_f32fab | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T195738Z_2a3785 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T195912Z_b38a05 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T201219Z_7ea831 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T204131Z_8c3f47 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T204441Z_dadcfe | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T204701Z_1b9632 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T212815Z_ee256d | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T213518Z_289d7a | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T214523Z_1d27d0 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T214816Z_2b7068 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T215027Z_e1ce13 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-components_20261108T215349Z_561bfe | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-kernels_20261103T181509Z_52744d | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-kernels_20261109T013556Z_9c0b54 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-kernels_20261109T055145Z_5b77fc | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-live_20261103T185532Z_1c1629 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A-TRACE-timeline_20261103T185837Z_e08b8b | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
-| I02A-TRACE-timeline_20261107T172848Z_f2ac52 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
-| I02A-TRACE-timeline_20261108T200246Z_764014 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
-| I02A-TRACE-timeline_20261108T213113Z_1d82c9 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
-| I02A-TRACE-timeline_20261109T013347Z_69c1bb | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
-| I02A-TRACE-timeline_20261109T060522Z_ee2252 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
-| I02A_20261103T164324Z_348959 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261103T172804Z_a3ca9a | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261103T172929Z_0e5d39 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261109T062054Z_42b814 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261109T062307Z_b80715 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261109T062449Z_b6b075 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261109T062635Z_cf942a | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261109T063129Z_320857 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261109T063711Z_70fba8 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02A_20261109T064024Z_4518dc | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02C_20261107T181031Z_5626f7 | none | 0 | 0 | 0 | 0 | 0 | ok |
-| I02C_20261107T181629Z_c37c3e | none | 0 | 0 | 0 | 0 | 0 | ok |
+| run | device trace | trace rows | kernel stops | module frames | inferred modules | module stops | rows on two tiers | result |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| I02A-TRACE-code_20261103T170709Z_0ac2db | torch_trace.json | 18,309 | 18,309 | 17,216 | 0 | 17,216 | 0 | ok |
+| I02A-TRACE-components_20261104T142238Z_0b249c | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T195135Z_f32fab | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T195738Z_2a3785 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T195912Z_b38a05 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T201219Z_7ea831 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T204131Z_8c3f47 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T204441Z_dadcfe | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T204701Z_1b9632 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T212815Z_ee256d | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T213518Z_289d7a | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T214523Z_1d27d0 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T214816Z_2b7068 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T215027Z_e1ce13 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-components_20261108T215349Z_561bfe | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-kernels_20261103T181509Z_52744d | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-kernels_20261109T013556Z_9c0b54 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-live_20261103T185532Z_1c1629 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-timeline_20261103T185837Z_e08b8b | timeline.sqlite | 39,768 | 39,768 | 0 | 22,240 | 22,240 | 0 | ok |
+| I02A-TRACE-timeline_20261107T172848Z_f2ac52 | timeline.sqlite | 39,768 | 39,768 | 0 | 22,240 | 22,240 | 0 | ok |
+| I02A-TRACE-timeline_20261108T200246Z_764014 | timeline.sqlite | 39,768 | 39,768 | 0 | 22,240 | 22,240 | 0 | ok |
+| I02A-TRACE-timeline_20261108T213113Z_1d82c9 | timeline.sqlite | 39,768 | 39,768 | 0 | 22,240 | 22,240 | 0 | ok |
+| I02A-TRACE-timeline_20261109T013347Z_69c1bb | timeline.sqlite | 39,768 | 39,768 | 0 | 22,240 | 22,240 | 0 | ok |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | timeline.sqlite | 39,768 | 39,768 | 0 | 22,240 | 22,240 | 0 | ok |
+| I02A_20261103T164324Z_348959 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261103T172804Z_a3ca9a | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261103T172929Z_0e5d39 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062054Z_42b814 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062307Z_b80715 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062449Z_b6b075 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062635Z_cf942a | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T063129Z_320857 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T063711Z_70fba8 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T064024Z_4518dc | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02C_20261107T181031Z_5626f7 | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
+| I02C_20261107T181629Z_c37c3e | none | 0 | 0 | 0 | 0 | 0 | 0 | ok |
 
 Not counted: host (host run (rolling), no events).
 
@@ -1169,7 +1179,8 @@ Reading the counts:
 
 - The code run's 1.10 M detail rows leave stepping entirely. Its finest stop tier, kernel, has 286 per iteration;
   module has 269.
-- Graphs-on timeline runs have no module stops (missing, 3.1) and 207 to 311 kernel stops per iteration.
+- Graphs-on timeline runs have 22,240 inferred module stops each (M2, 3.1) and 207 to 311 kernel stops per
+  iteration.
 - Hand-offs are an upper bound: every change of box along a request's rows in start order, including overlaps.
 - Runs without traces hold only requests and stamps: about 575 phase stops.
 
@@ -1228,4 +1239,5 @@ Reading the counts:
 | 2026-11-09 | Flow for runs without engine rows (I02C): request in and stream out come from client and server stream rows as 7.4 P3 states; prefill and decode stay none without iterations (fix in M1) | agent |
 | 2026-11-09 | R1 kernels run 9c0b54 is kept for building; a test stack held two small CUDA contexts for 16 s of its 700 s ncu window, so the morning GPU run re-records it | agent |
 | 2026-11-09 | M3 covers the reps with event runs (I01-L2, I02A, I02C); I01A, I01B, I01C and I02B stay "No recorded runs". `moments.toml` may name its run's result file (`result`, default `latency.json`). The moments lint fails a rep whose moments resolve on no run | agent (coordinator ruling) |
+| 2026-11-09 | M2: graphs-on runs get kind `inferred module` (op tier, placed at execution / module, final import only) from the code run's module frames (3.1, `store/modules.py`, the code run per rep in `registry/modules.json`). A frame is kept only when all its device rows pair, consecutive on one stream; decode attention (XQA against the code run's masked MHA) stays unmatched. On R1 (timeline ee2252, kernels run 8f4ae7): 22,240 modules, each with the code run's names and holding its rows; 101 of 310 kernel stops unmatched per decode iteration, 49 of 354 per prefill, shown in the spine headline; per-name kernel totals equal `nsys stats` (`devtools/verify/modules_check.py`). Open: the inspector path, the Kernels tab's module column and the architecture world's toolkit line still find a module only through the launch call, so they miss inferred modules (a held kernel's path also loses its phase and launch call) | agent |
 
