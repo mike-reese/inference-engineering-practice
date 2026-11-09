@@ -215,6 +215,13 @@ export class Dimensions {
     return host ? s.things.find((t) => t.kind === want && t.pre >= host.pre && t.post <= host.post)?.i ?? -1 : -1;
   }
 
+  /** The GPU's SM count: its recorded attribute, else its SM things; 0 when the run records neither. */
+  gpuSms() { const T = this.s.things; return Number(T.find((t) => t.kind === "gpu")?.attrs?.sms) || T.filter((t) => t.kind === "SM").length; }
+
+  /** SMs a kernel can use, inferred from its grid (a block runs on one SM; which SMs ran it is not recorded):
+   *  {used: min(SMs, grid blocks), of: SMs}, or null when the grid or the SM count is not recorded. */
+  smsUsed(grid) { const of = this.gpuSms(); return Array.isArray(grid) && of ? { used: Math.min(of, grid.reduce((a, b) => a * b, 1)), of } : null; }
+
   /** gemm, attention, memory or other (kinds.json kernel_class: by kind, else by the short name), for device rows. */
   kernelClass(id) {
     const s = this.s, kind = s.kinds[s.field("kind", id)].name, name = s.nameText(s.field("name", id));

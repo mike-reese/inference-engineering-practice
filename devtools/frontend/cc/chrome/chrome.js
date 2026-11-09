@@ -105,8 +105,10 @@ export function mountChrome(el) {
     // the run's sampled GPU state at t, from whichever source fills each role (Nsight Systems replay, NVML live)
     const val = (role) => { const i = S ? roleOf(S, role) : -1; return i < 0 ? null : `${S.metrics[i].label} ${fmtValue(n.sample[i], S.metrics[i].unit)}`; };
     const kernels = S && S.dims.stops("execution", "kernel").ids.length;
+    const kd = n.kernel ? S.detailCached(n.kernel.id) : null, sm = kd ? S.dims.smsUsed(kd.args?.grid) : null;
+    if (kd === undefined) S.detail([n.kernel.id]).then(() => live(state, true), (e) => console.error(e));
     const hw = !S ? "" : [...["sm_active", "dram_read", "pcie_rx", "gpu_util"].map(val).filter(Boolean),
-      n.kernel ? esc(name(n.kernel.id)) : kernels ? "no kernel at the cursor" : "no kernel rows in this run",
+      n.kernel ? `${esc(name(n.kernel.id))}${sm ? ` on ${sm.used} SMs (inferred from the grid)` : ""}` : kernels ? "no kernel at the cursor" : "no kernel rows in this run",
       ...(n.transfers.length ? [`copy: ${esc(name(n.transfers[0].id))}`] : [])].join(" · ");
     const ar = !S ? "" : [...n.archPath.slice(1).map((i) => esc(archName(S, i))), ...(n.software ? [`${esc(n.software.name)}: ${esc(name(n.software.id))}`] : [])].join(" › ");
     const nowHtml = [["execution", exec], ["hardware", hw], ["architecture", ar]]

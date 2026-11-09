@@ -114,7 +114,7 @@ function buildModel(S, key) {
   const networks = byKind("network").map((t) => ({ t, key: t.key, name: t.name, procs: procs.filter((p) => under(p, t)) }));
   const g = byKind("gpu")[0] ?? null;
   const first = (...names) => { for (const n of names) { const i = metric(n, g?.i); if (i >= 0) return i; } return -1; };
-  const gpu = g && { t: g, vram: g.attrs?.vram_bytes ?? null, sms: g.attrs?.sms ?? byKind("SM").length,
+  const gpu = g && { t: g, vram: g.attrs?.vram_bytes ?? null,
     mem: first("nvml.memory.used", "memory.used"), util: first("utilization.gpu"), memutil: first("utilization.memory"),
     power: first("nvml.power.draw", "power.draw"), gen: first("pcie.link.gen.current"), clock: first("nvml.clocks.sm", "clocks.sm"),
     temp: first("nvml.temperature.gpu", "temperature.gpu"), rx: first("nvml.pcie.rx"), tx: first("nvml.pcie.tx") };
@@ -488,9 +488,9 @@ export function mountArch(el, { size = "lens" } = {}) {
     if (k) {
       const cause = S.field("cause", k.id), layer = S.field("layer", k.id);
       const mod = S.dims.moduleOf(k.id);
-      const d = S.detailCached(k.id), grid = d?.args?.grid, blocks = grid ? grid.reduce((a, b) => a * b, 1) : null, sms = M.gpu?.sms;
+      const d = S.detailCached(k.id), grid = d?.args?.grid, sm = S.dims.smsUsed(grid);
       const bytes = S.field("bytes", k.id);
-      const dev = grid ? `${name(k.id)} · grid ${grid.join("×")} · ${Math.min(sms, blocks)} of ${sms} SMs (inferred from the grid)`
+      const dev = sm ? `${name(k.id)} · grid ${grid.join("×")} · ${sm.used} of ${sm.of} SMs (inferred from the grid)`
         : bytes > 0 ? `${name(k.id)} · ${bytes} B` : name(k.id);
       texts = [mod >= 0 ? `${layer >= 0 ? `layer ${layer} · ` : ""}${name(mod)}${S.dims.inferred(mod) ? " (inferred, M2)" : ""}${tag}` : `no module row above this kernel${tag}`,
         cause >= 0 ? `${name(cause)} at ${(S.startOf[cause] / 1e6).toFixed(3)} ms (CPU side)${tag}` : `no launch call recorded for this kernel${tag}`,

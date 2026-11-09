@@ -59,7 +59,6 @@ const isDevice = (S, id) => S.dims.ex[id] === tierIndex(S, "kernel") && !S.dims.
 const isCopy = (S, id) => { const k = S.kinds[S.field("kind", id)]?.name; return k === "memcpy" || k === "memset"; };
 const hasModules = (S) => memo(S, "modules", () => S.dims.stops("execution", "module").ids.length > 0);
 const hasInferred = (S) => memo(S, "inferred", () => S.dims.byKind[idx(S).kind.get("inferred module")]?.length > 0);
-const gpuSms = (S) => Number(S.things.find((x) => x.kind === "gpu")?.attrs?.sms) || null;
 
 /** Cold detail of ids from the store's one cache: a getter once every id is held, else null (again() on arrival). */
 function withDetail(S, ids, again) {
@@ -191,13 +190,13 @@ const phasesHere = (S, i) => memo(S, `phases:${i}`, () => {
 // ---------------------------------------------------------------- Selected
 /** Kernel facts (D13's kernel table): cold args (nsys), Nsight Compute counters of profiled kernels, the class rule. */
 function kernelHtml(S, id, d) {
-  const a = d?.args ?? {}, sms = gpuSms(S), prof = S.dims.profiled.has(id), c = S.field("cause", id);
+  const a = d?.args ?? {}, sm = S.dims.smsUsed(a.grid), prof = S.dims.profiled.has(id), c = S.field("cause", id);
   const blocks = Array.isArray(a.grid) ? a.grid.reduce((x, y) => x * y, 1) : null, cv = (m) => d?.counters?.values?.find((v) => v.measure === m);
   const wait = d ? "–" : "…", ncu = (m, f) => { const v = cv(m); return v ? f(v.value, v.unit) : prof && !d ? "…" : "not profiled"; };
   const vals = d?.counters?.values ?? [];
   return `<table class="kv">
     <tr><td>grid</td><td>${blocks != null ? `${a.grid.join("×")} = ${blocks} blocks · block ${esc(a.block?.join("×") ?? "–")}` : wait}</td></tr>
-    <tr><td>SMs</td><td>${blocks != null && sms ? `${Math.min(sms, blocks)} of ${sms} ${tag("Inferred: min(SMs, grid blocks)")}` : wait}</td></tr>
+    <tr><td>SMs</td><td>${sm ? `${sm.used} of ${sm.of} ${tag("Inferred: min(SMs, grid blocks)")}` : wait}</td></tr>
     <tr><td>registers</td><td>${a.registers != null ? `${a.registers} per thread · ${fmtBytes(a.shared_memory)} shared memory per block` : wait}</td></tr>
     <tr><td>DRAM</td><td>${ncu("DRAM read", (v) => `read ${fmtBytes(v)}`)}${cv("DRAM write") ? ` · write ${fmtBytes(cv("DRAM write").value)}` : ""}</td></tr>
     <tr><td>L2</td><td>${ncu("L2 traffic", (v) => fmtBytes(v))}</td></tr>
@@ -574,7 +573,7 @@ const kernelsTab = {
       return;
     }
     const get = withDetail(S, ids, again), cv = (id, m) => get?.(id)?.counters?.values?.find((v) => v.measure === m);
-    const sms = gpuSms(S), mods = hasModules(S), copies = ids.filter((id) => isCopy(S, id)).length;
+    const sms = S.dims.gpuSms(), mods = hasModules(S), copies = ids.filter((id) => isCopy(S, id)).length;
     const modOf = new Map(mods ? ids.map((id) => [id, S.dims.moduleOf(id)]) : []), free = mods ? ids.filter((id) => modOf.get(id) < 0).length : 0;
     const prof = ids.filter((id) => S.dims.profiled.has(id)).length;
     const cell = (id, m, f) => { const v = cv(id, m); return v ? f(v.value) : S.dims.profiled.has(id) && !get ? "…" : "–"; };
@@ -585,15 +584,15 @@ const kernelsTab = {
       ${nav ? `<p>${nav}</p>` : ""}
       <table class="rows kernels"><tr><th>#</th><th>iteration</th><th>layer</th><th>module</th><th>kernel</th><th class="num">µs</th><th class="num">grid</th><th class="num">SMs</th>
         <th class="num">DRAM</th><th class="num">L2</th><th class="num">occupancy</th><th>profiled</th><th>launch</th><th></th></tr>
-      ${ids.map((id, i) => { const a = get?.(id)?.args, blocks = Array.isArray(a?.grid) ? a.grid.reduce((x, y) => x * y, 1) : null, layer = S.field("layer", id), c = S.field("cause", id);
+      ${ids.map((id, i) => { const a = get?.(id)?.args, blocks = Array.isArray(a?.grid) ? a.grid.reduce((x, y) => x * y, 1) : null, sm = S.dims.smsUsed(a?.grid), layer = S.field("layer", id), c = S.field("cause", id);
         const mod = modOf.get(id) ?? -1, dram = cv(id, "DRAM read"), dw = cv(id, "DRAM write");
         return `<tr data-sel="${id}" data-row="${id}"><td>${i + 1}</td><td>${it}</td><td>${layer >= 0 ? layer : "–"}</td><td>${mod >= 0 ? esc(nm(S, mod)) + infMark(S, mod) : "–"}</td>
           <td>${esc(nm(S, id))}</td><td class="num">${((S.endOf[id] - S.startOf[id]) / 1e3).toFixed(1)}</td><td class="num">${blocks ?? (get || isCopy(S, id) ? "–" : "…")}</td>
-          <td class="num">${blocks != null && sms ? `${Math.min(sms, blocks)}/${sms}` : "–"}</td>
+          <td class="num">${sm ? `${sm.used}/${sm.of}` : "–"}</td>
           <td class="num">${dram ? fmtBytes(dram.value + (dw?.value ?? 0)) : cell(id, "DRAM read", fmtBytes)}</td><td class="num">${cell(id, "L2 traffic", fmtBytes)}</td>
           <td class="num">${cell(id, "achieved occupancy", (v) => `${v.toFixed(1)}%`)}</td><td>${S.dims.profiled.has(id) ? "yes" : "no"}</td>
           <td><code>${c >= 0 ? esc(nm(S, c)) : "–"}</code>${c >= 0 ? ` <span class="muted">@ ${ms(S.startOf[c])} ms</span>` : ""}</td><td>${seekLink(S.startOf[id])}</td></tr>`; }).join("")}</table>
-      <p class="muted">SMs: min(${sms ?? "SMs"}, grid blocks) ${tag("Inferred")} · DRAM: read + write bytes · DRAM, L2 and occupancy come from Nsight Compute, on profiled kernels only.</p>`;
+      <p class="muted">SMs: min(${sms || "SMs"}, grid blocks) ${tag("Inferred")} · DRAM: read + write bytes · DRAM, L2 and occupancy come from Nsight Compute, on profiled kernels only.</p>`;
   },
   tick(el, s) {
     const cur = now().kernel?.id;
