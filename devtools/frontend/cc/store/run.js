@@ -11,6 +11,7 @@
 import { decodeBlock } from "./codec.js";
 import { indexEvents, indexIds, reindexKeys, setDerived, restep, LONG_NS } from "./block.js";
 import { N_TIERS, NONE16 } from "./columns.js";
+import { Dimensions } from "./dims.js";
 import { perf } from "../perf.js";
 
 const API = "/api/v3";
@@ -103,6 +104,7 @@ export class RunStore {
     this.ids = indexIds(this.blocks, this.N);
     this.order();
     this.indexLinks();
+    this.dims = new Dimensions(this, m);   // place and stops per (dimension, tier): step(), walk(), counts()
   }
 
   /** Samples of one group (one clock), appended in time order; a live group grows in place (amortized). */
@@ -180,7 +182,7 @@ export class RunStore {
     if (events) this.N = this.blocks.reduce((a, b) => a + b.n, 0);
     const derived = patches.length ? this.derive(patches) : null;
     if (l.reloading) return null;
-    if (events || keys || derived) { this.ids = indexIds(this.blocks, this.N); this.order(); this.indexLinks(); }
+    if (events || keys || derived) { this.ids = indexIds(this.blocks, this.N); this.order(); this.indexLinks(); this.dims.build(); }
     else this.extentLive();
     if (added.length || derived) for (const fn of this.listeners) fn({ added, changed: derived?.gpu ?? [] });
     if (derived) {
@@ -278,6 +280,7 @@ export class RunStore {
       this.gap[r] = k ? g[k >> 1] : Infinity;
       if (r > 0) this.gap[r] = Math.min(this.gap[r], this.gap[r - 1]);
     }
+    this.allRows = merged;   // every row in (start, id) order
     const reqRows = [], iterRows = [];
     for (const id of this.exact[0]) if (this.field("req", id) !== NONE16) reqRows.push(id);
     // Iteration units are the derived `iteration` rows (scheduler stamp to the next one); a run without scheduler
@@ -285,19 +288,9 @@ export class RunStore {
     const ITER = this.kinds.find((k) => k.name === "iteration")?.code ?? -1;
     for (const id of this.exact[1]) if (this.field("kind", id) === ITER && this.field("iter", id) >= 0) iterRows.push(id);
     this.reqRows = Uint32Array.from(reqRows); this.iterRows = Uint32Array.from(iterRows);
-    // An iteration value can recur (a later request, an engine restart), so each iteration row is its own unit: a row
-    // with that value belongs to the latest occurrence starting at or before it. Device work launched in an iteration
-    // runs past the next iteration's start and still extends the iteration that launched it.
-    const occ = new Map();
-    iterRows.forEach((id, k) => { const it = this.field("iter", id); (occ.get(it) ?? occ.set(it, []).get(it)).push(k); });
+    // An iteration unit is its derived row: from its scheduler stamp to where its last own row ends (choice 5, set by
+    // the importer), so the idle gap before the next request belongs to no iteration.
     this.iterLo = Float64Array.from(iterRows, (id) => this.startOf[id]); this.iterHi = Float64Array.from(iterRows, (id) => this.endOf[id]);
-    for (const b of blocks) { const { iter, start, end } = b.cols;
-      for (let i = 0; i < b.n; i++) {
-        const ks = iter[i] >= 0 ? occ.get(iter[i]) : undefined; if (!ks) continue;
-        let lo = 0, hi = ks.length; while (lo < hi) { const m = (lo + hi) >>> 1; if (this.startOf[iterRows[ks[m]]] <= start[i]) lo = m + 1; else hi = m; }
-        const k = ks[Math.max(0, lo - 1)];
-        if (start[i] < this.iterLo[k]) this.iterLo[k] = start[i]; if (end[i] > this.iterHi[k]) this.iterHi[k] = end[i];
-      } }
   }
 
   sorted(ids) {
@@ -341,12 +334,19 @@ export class RunStore {
   /** Rows whose parent is `id`, in (start, id) order. */
   children(id) { return this.ids.child.subarray(this.ids.kids[id], this.ids.kids[id + 1]); }
 
+  /** The next (dir +1) or previous (dir -1) stop of (dimension, tier) after cursor c (section 3.4; dims.js). */
+  step(dim, tier, c, dir) { return this.dims.step(dim, tier, c, dir); }
+
+  /** Alt ← →: the next or previous row of the every-row walk; scope null, {process: thing} or {object: row id}. */
+  walk(dim, tier, c, dir, scope = null) { return this.dims.walk(dim, tier, c, dir, scope); }
+
   /**
-   * The next (dir +1) or previous (dir -1) row in (start, id) order with tier <= r. Ties at one start are visited one
-   * by one in id order. Returns null at the end of the run.
+   * Storage-tier stepping, for the page until M1 moves it to step(dim, tier): the next (dir +1) or previous (dir -1)
+   * row in (start, id) order with storage tier <= r. Ties at one start are visited one by one in id order. Returns
+   * null at the end of the run.
    * @param {Cursor} c @param {1|-1} dir @param {number} r @returns {Cursor|null}
    */
-  step(c, dir, r) {
+  stepStorage(c, dir, r) {
     let bt = dir > 0 ? Infinity : -Infinity, bid = -1;
     for (const b of this.blocks) {
       const idx = b.step[r]; if (!idx.length) continue;
@@ -422,7 +422,7 @@ export class RunStore {
     return out;
   }
 
-  /** The request, iteration and device op at t. A unit's win is its [start, end]; an iteration's runs to the end of the device work it launched. */
+  /** The request, iteration and device op at t. A unit's win is its [start, end] (an iteration's is its derived row's). */
   chain(t) {
     const last =(list) => { let lo = 0, hi = list.length; while (lo < hi) { const k = (lo + hi) >>> 1; if (this.startOf[list[k]] <= t) lo = k + 1; else hi = k; } return lo - 1; };
     const unit = (id) => ({ id, win: [this.startOf[id], this.endOf[id]] });

@@ -27,7 +27,7 @@ export class Control {
   /** @param {import("../store/run.js").RunStore} store @param {import("./url.js").UrlState} init @param {any[]} levels */
   constructor(store, init, levels) {
     this.store = store; this.levels = levels; this.subs = new Set(); this.px = 1200;
-    const req = store.chain(store.extent[0]).request, first = req ? { t: req.win[0], id: req.id } : store.step({ t: -Infinity, id: -1 }, +1, 6);
+    const req = store.chain(store.extent[0]).request, first = req ? { t: req.win[0], id: req.id } : store.stepStorage({ t: -Infinity, id: -1 }, +1, 6);
     // a live run opens following its head unless the URL names a time; default: the first request's start. A URL t is
     // kept as written, even past the rows (a live head carried into the final generation, which shares its t0).
     this.live = store.status === "live" && init.t == null && !store.live?.ended;
@@ -62,7 +62,7 @@ export class Control {
   /** Next or previous row at the grain; "coarser" steps one tier coarser, "finest" visits every row. */
   step(dir, mode = null) {
     const g = this.grain(), r = mode === "coarser" ? Math.max(0, g - 1) : mode === "finest" ? 6 : g;
-    const next = this.store.step(this.cursor, dir, r);
+    const next = this.store.stepStorage(this.cursor, dir, r);
     this.live = false;
     if (next) { this.cursor = next; this.follow(dir); }
     this.request();   // a step past the run end still closes its input mark on the next frame
@@ -106,8 +106,8 @@ export class Control {
   togglePlay() { this.live = false; this.play = { ...this.play, on: !this.play.on }; this.lastPlay = 0; this.carry = 0; this.request(); }
   setRate(rate) { this.play = { ...this.play, rate }; this.request(); }
   setPace(pace) { this.play = { ...this.play, pace }; this.request(); }
-  home() { const c = this.store.step({ t: -Infinity, id: -1 }, +1, this.grain()); if (c) { this.live = false; this.cursor = c; this.follow(-1); this.request(); } }
-  end() { const c = this.store.step({ t: Infinity, id: 2 ** 31 }, -1, this.grain()); if (c) { this.live = false; this.cursor = c; this.follow(+1); this.request(); } }
+  home() { const c = this.store.stepStorage({ t: -Infinity, id: -1 }, +1, this.grain()); if (c) { this.live = false; this.cursor = c; this.follow(-1); this.request(); } }
+  end() { const c = this.store.stepStorage({ t: Infinity, id: 2 ** 31 }, -1, this.grain()); if (c) { this.live = false; this.cursor = c; this.follow(+1); this.request(); } }
   /** Live follow is a cursor rule over a live run (cursor = head - 100 ms, the window trails it); a final run, or a
    *  live run whose writer has ended, has no head to follow. Any seek, step, zoom, pan or play ends it; L toggles. */
   toggleFollow() { if (this.store.status !== "live" || this.store.live?.ended) return; this.live = !this.live; this.play = { ...this.play, on: false }; this.request(); }
@@ -182,7 +182,7 @@ export class Control {
     } else {
       this.carry += EVENTS_PER_S * this.play.rate * dt / 1000;
       for (; this.carry >= 1; this.carry--) {
-        const next = this.store.step(this.cursor, +1, this.grain());
+        const next = this.store.stepStorage(this.cursor, +1, this.grain());
         if (!next) { this.play = { ...this.play, on: false }; break; }
         this.cursor = next;
       }
