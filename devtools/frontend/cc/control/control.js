@@ -414,8 +414,8 @@ async function defaultSession() {
   state.session = { side: "A", runB: null, live: null, ...state.session };
   if (state.sel != null && typeof state.sel !== "string") { pendingSel = typeof state.sel === "object" ? state.sel : null; state.sel = null; }
   state.playing = false;
-  // Per open store: RunStore.bytes() (its blocks, indexes, GPU arrays and samples) and typed_mb, every typed-array
-  // buffer reachable from the store and its units, each counted once (adds startOf, endOf, allRows, the stops).
+  // Per open store: RunStore.bytes() (every typed-array buffer the store holds, by part, and total_mb) and typed_mb,
+  // every typed-array buffer reachable from the store and its units, each counted once (adds the units' own lists).
   // js_heap_mb: Chrome's usedJSHeapSize, which excludes typed arrays, counts garbage not yet collected, and without
   // --enable-precise-memory-info is bucketed and refreshed at most every 20 minutes; a hint, not a measurement.
   perf.provide("memory_mb", () => {
