@@ -32,6 +32,7 @@ const CSS = `
 .sp2 .pane .ptitle { flex:none; padding:2px 8px; font:11px ui-monospace, monospace; text-transform:uppercase; letter-spacing:.5px; }
 .sp2 .pane .pbody { flex:1; min-height:0; overflow:auto; position:relative; }
 .sp2 .pane .zc { position:absolute; inset:0; overflow:visible; }
+.sp2 .pane .zc > .v1arch { height:auto; overflow:visible; }
 .sp2 .pane .ztag { float:right; color:var(--dim); text-transform:none; letter-spacing:0; }
 .sp2 .vdiv { flex:none; width:6px; cursor:col-resize; background:var(--line); }
 .sp2 .hdiv { flex:none; height:6px; cursor:row-resize; background:var(--line); }
