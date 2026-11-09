@@ -153,10 +153,13 @@ $C click --css ".b-hist[aria-label=Back]" >/dev/null; sleep 0.3
 same "history: back restores the selection" "$(ev '__cc.sel')" "$k1"
 check "history: back restores the tab" "$(ev '__cc.dock.tab')" "selected"
 $C key "[" >/dev/null; sleep 0.3
-same "history: [ again reaches the first click's page" "$(ev '__cc.sel')" "$sel"
+# Both clicks must have changed the selection, or an unchanged one passes the next two checks.
+real "$k1" && [ "$k1" != "$sel" ] && got=$(ev '__cc.sel') || got="no first click (k1 '$k1', start '$sel')"
+same "history: [ again reaches the first click's page" "$got" "$sel"
 $C click --css ".b-hist[aria-label=Forward]" >/dev/null; sleep 0.2
 $C key "]" >/dev/null; sleep 0.3
-same "history: forward, then ], returns" "$(ev '__cc.sel')" "$picked"
+real "$picked" && [ "$picked" != "$k1" ] && [ "$picked" != "$sel" ] && got=$(ev '__cc.sel') || got="no second click (picked '$picked')"
+same "history: forward, then ], returns" "$got" "$picked"
 check "history: forward disabled at the end" "$(ev "document.querySelector('.b-hist[aria-label=Forward]').disabled")" "True"
 $C key 5 >/dev/null; sleep 0.2
 b=$(ev 'JSON.stringify(__cc.bounds)')
