@@ -2,5 +2,6 @@
  "source": "modules",
  "title": "Module inference (COMMAND_CENTER.md 7.4, M2): module rows for runs whose device trace has no module frames",
  "_doc": "reference: per rep folder, the code run whose PyTorch profiler trace holds the module forward() frames (the python call place rule 'module forward' in kinds.json). The importer reads that run's rows from the store and infers module rows for the rep's other runs by store/modules.py RULE. Each target run's import signature carries the reference run and its generation, so a re-import of the reference re-imports its targets.",
- "reference": {"I02A-L1_streamed_latency": "I02A-TRACE-code_20261103T170709Z_0ac2db"}
+ "reference": {"I02A-L1_streamed_latency": "I02A-TRACE-code_20261103T170709Z_0ac2db",
+               "I02C-L1_one_slot_queue": "I02C-TRACE-code_20261109T220240Z_15e00d"}
 }

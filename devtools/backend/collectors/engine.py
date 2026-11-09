@@ -15,12 +15,15 @@ them as engine_iterations_raw.jsonl. Bound: the last KEEP_READS reads per contai
 import asyncio
 import collections
 import json
+import logging
 import os
 import re
 import time
 from datetime import datetime, timezone
 
 import aiohttp
+
+log = logging.getLogger(__name__)
 
 KEEP_READS = 600  # raw /metrics reads per container
 RETAIN_S = 600  # raw reads kept this long after their container stops
@@ -169,8 +172,8 @@ class EngineCollector:
             try:
                 async with session.get(f"http://{address}/{path}") as response:
                     info[path] = await response.json()
-            except (aiohttp.ClientError, ValueError):
-                info[path] = None
+            except (aiohttp.ClientError, asyncio.TimeoutError, ValueError):
+                info[path] = None  # a timeout too: an engine that got SIGTERM can stay listed as running and not answer
         for m in c.get("mounts", []):
             if m["destination"] == "/config":
                 local = host_path(m["source"])
@@ -261,9 +264,19 @@ class EngineCollector:
                 out.append({"targets": [address], "labels": {"project": c["project"], "container": c["name"]}})
         return out
 
+    async def tick(self, session: aiohttp.ClientSession) -> None:
+        """One scrape of every running engine. A scrape that raises is logged and the others still land: the loop
+        must outlive any one engine (2026-11-09: a timeout in describe() ended run() and every later run of the day
+        got no /metrics reader)."""
+        engines = await self.engines()
+        results = await asyncio.gather(*(self.scrape(session, c) for c in engines), return_exceptions=True)
+        for c, result in zip(engines, results):
+            if isinstance(result, Exception):
+                log.error("engine scrape of %s failed", c["name"], exc_info=result)
+        self.forget_raw()
+
     async def run(self) -> None:
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
             while True:
-                await asyncio.gather(*(self.scrape(session, c) for c in await self.engines()))
-                self.forget_raw()
+                await self.tick(session)
                 await asyncio.sleep(1)

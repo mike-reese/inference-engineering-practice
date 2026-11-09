@@ -25,6 +25,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 from compose_stack import (NCU_CACHE, NCU_CLOCK, NCU_SETS, TRACE_IMAGE, TRACE_LEVELS, Stack,  # noqa: E402
                            has_profiler, prepare_run_dir, trace_settings, uses_stamps)
 from gpu_sampler import GpuSampler  # noqa: E402
+from run_levels import level_engine_config, level_labels  # noqa: E402
 
 from inference_analysis.efficiency import efficiency  # noqa: E402
 from inference_analysis.latency import N_TTFT, latency_records  # noqa: E402
@@ -130,14 +131,8 @@ def run_stack(run_id: str, trace: str = "off", options: dict | None = None) -> d
     options: the profiler's run options (compose_stack.trace_settings); None keeps the level's defaults."""
     level = TRACE_LEVELS[trace]
     settings = trace_settings(trace, options)
-    config = ENGINE_CONFIG + ("cuda_graph_config: null\n" if level.get("graphs") is False else "") \
-        + ("enable_iter_perf_stats: true\n" if level.get("iter_stats") else "")  # /metrics for the live Engine view
-    run_dir = prepare_run_dir(RESULTS_DIR, run_id, config)
-    save_json(run_dir / "labels.json", {"trace": trace, "measured": trace == "off", "graphs": level.get("graphs", True),
-                                        "profiler": has_profiler(trace), "iter_stats": bool(level.get("iter_stats")),
-                                        "stamps": uses_stamps(trace),
-                                        "profile_range": settings["profile_range"],
-                                        "options": settings["options"]})
+    run_dir = prepare_run_dir(RESULTS_DIR, run_id, level_engine_config(ENGINE_CONFIG, trace))
+    save_json(run_dir / "labels.json", level_labels(trace, settings))
     basis = execution_basis()
     stack = Stack(PROJECT, RESULTS_DIR, run_id, trace=trace, options=options)
     measured_id = f"{run_id}-measured"

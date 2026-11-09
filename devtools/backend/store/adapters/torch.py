@@ -5,8 +5,9 @@ kinds and eids from registry torch_profiler.json.
 Clock: baseTimeNanoseconds + ts (us) is UTC; run clock = that - the run's wall offset (Ctx.wall_offset_ns).
 Parents: a Python frame's "Python parent id" (Observed); every other CPU row by time containment on its thread
 (derive.contain). GPU rows have none: they are reached from their launch call through a cuda launch link
-(CUPTI correlation). Iteration: the executor's _forward_step Python frames in start order, numbered from labels.json
-profile_range; GPU work and its launch call take the frame the launch started in. Code origin of GPU work: "model
+(CUPTI correlation). Iteration: the executor's _forward_step Python frames in start order, each numbered by the
+forward stamp nearest its start (src torch_trace.step_iterations; counted from labels.json profile_range when the run
+has no stamps); GPU work and its launch call take the frame the launch started in. Code origin of GPU work: "model
 code" when an nn.Module frame encloses its launch (the module path), else "engine code" with the innermost
 tensorrt_llm frame.
 
@@ -26,6 +27,8 @@ import numpy as np
 
 from .base import Ctx, Rows, request_short, slug
 from ..derive import contain
+from .stamps import SRC  # noqa: F401
+from inference_analysis.trace.adapters.torch_trace import step_iterations  # noqa: E402
 
 EVIDENCE = "Observed: PyTorch profiler (CUPTI), UTC moved to CLOCK_MONOTONIC with the run's wall offset"
 SOURCE = {"python_function": "python", "cpu_op": "cpu_op", "cuda_runtime": "cuda_runtime",
@@ -76,8 +79,8 @@ def events(path: Path):
 class Torch:
     source = "torch_profiler"
 
-    def __init__(self, ctx: Ctx, request_of, first_iter: int):
-        self.ctx, self.request_of, self.first_iter = ctx, request_of, first_iter
+    def __init__(self, ctx: Ctx, request_of, first_iter: int, forward: list[tuple[int, int]]):
+        self.ctx, self.request_of, self.first_iter, self.forward = ctx, request_of, first_iter, forward
         self.kinds = ctx.reg.sources["torch_profiler"]["event_kinds"]
         self.links: list[tuple[int, int]] = []
         self.stats: dict = {}
@@ -149,11 +152,12 @@ class Torch:
                        if "py_executor.py" in name[i] and name[i].endswith(": _forward_step"))
         ss = np.array([x for x, _ in steps], np.int64)
         se = np.array([y for _, y in steps], np.int64)
+        step_iter = np.array(step_iterations(ss.tolist(), self.first_iter, self.forward), np.int64)
 
         def it_of(ns: np.ndarray) -> np.ndarray:
             i = np.searchsorted(ss, ns, side="right") - 1
             ok = (i >= 0) & (ns <= se[np.maximum(i, 0)])
-            return np.where(ok, self.first_iter + i, -1)
+            return np.where(ok, step_iter[np.maximum(i, 0)], -1) if len(ss) else np.full(len(ns), -1)
 
         it = np.full(n, -1, np.int64)
         launch_of = {}

@@ -12,7 +12,34 @@ from ..schema import Run, Span
 from .common import clock_offset, engine_window, run_dir
 from .nsys import layer_of
 
-STEP_FRAME = "py_executor.py"  # the executor's _forward_step frame: one per iteration
+STEP_FRAME = "py_executor.py"  # the executor's _forward_step frame: one per iteration that runs the model
+STAMPS = "trace/server_stamps.jsonl"
+LOOP_TO_ITERATION = 1  # /perf_metrics iteration = the executor loop counter + 1 (registry run_json.json iteration_from)
+
+
+def forward_stamps(path: Path) -> list[tuple[int, int]]:
+    """(start ns on CLOCK_MONOTONIC, iteration) of each "forward" component stamp, in time order. [] with no file."""
+    if not path.is_file():
+        return []
+    stamps = (json.loads(line) for line in path.read_text().splitlines() if line.strip())
+    return sorted((s["t0"], s["iter"] + LOOP_TO_ITERATION) for s in stamps
+                  if s.get("box") == "forward" and isinstance(s.get("iter"), int))
+
+
+def step_iterations(step_starts: list[int], first_iter: int, forward: list[tuple[int, int]]) -> list[int]:
+    """The iteration of each _forward_step frame (start ns on CLOCK_MONOTONIC, in time order): that of the forward
+    stamp that starts nearest to it. An iteration that schedules no request runs no forward step (I02C-L1: iteration
+    162, between A's last and B's first), so counting frames from the range's first iteration numbers every later
+    step one too low. With no stamps the frames are counted from first_iter."""
+    if not forward:
+        return [first_iter + i for i in range(len(step_starts))]
+    times = [t for t, _ in forward]
+    out = []
+    for start in step_starts:
+        i = bisect.bisect_left(times, start)
+        near = min((j for j in (i - 1, i) if 0 <= j < len(times)), key=lambda j: abs(times[j] - start))
+        out.append(forward[near][1])
+    return out
 
 
 def torch_trace(path: Path, run: Run) -> None:
@@ -64,18 +91,19 @@ def torch_trace(path: Path, run: Run) -> None:
         return [f for f in out if "tensorrt_llm" in f or "torch/nn" in f][-12:]
 
     kernels = sorted((e for e in events if e.get("cat") == "kernel"), key=lambda e: e["ts"])
-    # Iterations: the executor's _forward_step Python frames, numbered from the profile range's first iteration
-    # (labels.profile_range, /perf_metrics numbering). A kernel belongs to the step its launch call ran in.
+    # Iterations: the executor's _forward_step Python frames, each numbered by its forward stamp (step_iterations).
+    # A kernel belongs to the step its launch call ran in.
     steps = sorted((e["ts"], e["ts"] + e["dur"]) for e in events if e.get("cat") == "python_function"
                    and STEP_FRAME in e["name"] and e["name"].endswith(": _forward_step"))
     step_starts = [a for a, _ in steps]
     first_iter = int(str(run.labels.get("profile_range", "1-0")).split("-")[0])
+    step_iter = step_iterations([mono(a) for a in step_starts], first_iter, forward_stamps(run_dir(path) / STAMPS))
 
     def iteration_of(k: dict) -> int | None:
         launch = launches.get(k["args"].get("correlation"))
         ts = launch["ts"] if launch else k["ts"]
         i = bisect.bisect_right(step_starts, ts) - 1
-        return first_iter + i if i >= 0 and ts <= steps[i][1] else None
+        return step_iter[i] if i >= 0 and ts <= steps[i][1] else None
 
     iterations = [iteration_of(k) for k in kernels]
     by_iter = {}

@@ -57,3 +57,57 @@ def test_open_takes_only_nsight_reports_inside_one_run(tmp_path, monkeypatch):
         runner.report_path("R1", "../../../../etc/passwd")
     with pytest.raises(web.HTTPNotFound):
         runner.report_path("../R1", "trace/kernels.ncu-rep")
+
+
+# --- the scrape loop outlives a failing engine (2026-11-09: a timeout in describe() ended it for the day) -----------
+import asyncio  # noqa: E402
+
+
+class Bus:
+    def __init__(self, containers):
+        self.state, self.published = {("containers", None): {"data": containers}}, []
+
+    def publish(self, topic, data, key=None):
+        self.published.append((topic, data))
+
+
+def server(cid: str) -> dict:
+    return {"id": cid, "name": f"server-{cid}", "project": "p", "service": "server", "state": "running",
+            "health": "healthy", "ports": [], "mounts": []}
+
+
+class TimesOut:
+    """A session whose every request times out, as an engine does that got SIGTERM and is still listed as running."""
+    def get(self, url):
+        return self
+
+    async def __aenter__(self):
+        raise asyncio.TimeoutError
+
+    async def __aexit__(self, *exc):
+        return False
+
+
+def test_describe_records_an_engine_that_times_out_instead_of_raising():
+    bus = Bus([server("a")])
+    collector = engine.EngineCollector(bus)
+    asyncio.run(collector.describe(TimesOut(), server("a"), "127.0.0.1:1"))
+    info = collector.info["a"]
+    assert info["version"] is None and info["v1/models"] is None
+    assert bus.published[-1][0] == "engine_info"
+
+
+def test_a_scrape_that_raises_does_not_end_the_tick_or_the_other_engines_scrapes(caplog):
+    collector = engine.EngineCollector(Bus([server("a"), server("b")]))
+    scraped = []
+
+    async def scrape(session, c):
+        scraped.append(c["id"])
+        if c["id"] == "a":
+            raise RuntimeError("engine a")
+
+    collector.scrape = scrape
+    asyncio.run(collector.tick(None))
+    asyncio.run(collector.tick(None))
+    assert scraped == ["a", "b", "a", "b"]
+    assert "engine scrape of server-a failed" in caplog.text

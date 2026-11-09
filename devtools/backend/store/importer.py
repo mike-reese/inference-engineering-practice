@@ -69,6 +69,7 @@ from .adapters.server_log import ServerLog
 from .adapters.stamps import (FILE as STAMPS, INFERRED_ITERATION_BOX, MESSAGE_SOURCES, SRC, ServerStamps,
                               add_iteration, message_comp)
 from .adapters.torch import Torch
+from inference_analysis.trace.adapters.torch_trace import forward_stamps  # noqa: E402
 from .adapters.trackers import Trackers
 from .adapters.wire import PcapReader, Wire
 from .registry import Registry
@@ -374,7 +375,7 @@ def read_sources(ctx: Ctx, run_dir: Path, root: Path, labels: dict, rj: dict,
                            "unit": m.group(1) if m else None, "evidence": rule["evidence"], "ts": ts, "values": v})
     if (run_dir / "trace" / "torch_trace.json").is_file():
         first = int(str(labels.get("profile_range") or "1-0").split("-")[0])
-        torch = Torch(ctx, er.request_of, first)
+        torch = Torch(ctx, er.request_of, first, forward_stamps(run_dir / STAMPS))
         take(torch, torch.read(run_dir / "trace" / "torch_trace.json"))
         notes["torch"] = torch.stats
     de, dk = DockerEvents(ctx), root / "capture" / f"{DOCKER_CAPTURE}.jsonl"
