@@ -5,12 +5,15 @@ GET /api/v3/reps answers {reps, runs}, the shape of D13's session-data.json (pro
         rep.toml launch actions, sections the README's Mechanism, Task, Results, Why It Matters and Pass Check,
         moments the rep's moments.toml (null without one).
   runs: every run of the ie-run/3 store that comes from a rep folder: {id, rep, labels, started, status, result};
-        result is the latency.json summary of the moments' request (scalars of client, engine, wire, remainder, and
-        the segments), or null: results not computed (no latency.json, or none for that request).
+        result is read from the run folder's result file, moments.toml `result` (default latency.json). latency.json
+        is read per request: the summary of the moments' request (scalars of client, engine, wire, remainder, and the
+        segments). Any other result file is read whole. null: results not computed (no result file, or no
+        latency.json entry for that request).
 
 The moments lint, per rep with a moments.toml and per store run of that rep with a result: every moment's `at` and
 evidence `path` resolves to a number in the result, and its `event` names a row of the moment's request (a row
-whose name starts with it). A run without a result is listed as "results not computed" and has nothing to resolve.
+whose name starts with it). A run without a result is listed as "results not computed" and has nothing to resolve;
+a rep whose moments resolve on no run fails.
 Run: python -m store.reps --lint [REP ...]   (CC_STORE picks the store, REPO the checkout); exits 1 on any miss.
 """
 from __future__ import annotations
@@ -28,6 +31,7 @@ REPO = Path(os.environ.get("REPO", Path(__file__).resolve().parents[3]))
 SECTIONS = ["Mechanism", "Task", "Results", "Why It Matters", "Pass Check"]
 STAMP = re.compile(r"(\d{8}T\d{6}Z)")
 ACTION_KEYS = ("id", "group", "label", "description", "measured", "minutes")
+LATENCY = "latency.json"
 
 
 def readme_sections(text: str) -> dict:
@@ -109,16 +113,28 @@ def catalog(repo: Path = REPO, store: Path = CC_STORE) -> dict:
         if rep is None:
             continue
         folder = repo / rd
-        lat = folder / "latency.json"
+        res = folder / result_file(rep)
         suffix = (rep["moments"] or {}).get("request", "measured")
         s = STAMP.search(d.name)
         runs.append({"id": d.name, "rep": rep["id"], "status": m["status"],
                      "labels": json.loads((folder / "labels.json").read_bytes()) if (folder / "labels.json").is_file()
                      else {},
                      "started": s.group(1) if s else None,
-                     "result": measured(json.loads(lat.read_bytes()), suffix) if lat.is_file() else None})
+                     "result": read_result(res, suffix)})
     runs.sort(key=lambda r: (r["started"] or "", r["id"]), reverse=True)
     return {"reps": reps, "runs": runs}
+
+
+def result_file(rep: dict) -> str:
+    """The run's result file named by moments.toml `result`, relative to the run folder."""
+    return (rep["moments"] or {}).get("result", LATENCY)
+
+
+def read_result(path: Path, suffix: str) -> dict | None:
+    if not path.is_file():
+        return None
+    data = json.loads(path.read_bytes())
+    return measured(data, suffix) if path.name == LATENCY else data
 
 
 def request_names(store: Path, run: str, suffix: str) -> tuple[str | None, set[str]]:
@@ -145,11 +161,11 @@ def lint(reps: list[str] | None = None, repo: Path = REPO, store: Path = CC_STOR
             notes.append(f"{rep['id']}: no moments.toml")
             continue
         moments, suffix = rep["moments"].get("moments", []), rep["moments"].get("request", "measured")
-        runs = [r for r in cat["runs"] if r["rep"] == rep["id"]]
+        runs, file = [r for r in cat["runs"] if r["rep"] == rep["id"]], result_file(rep)
         checked = 0
         for run in runs:
             if run["result"] is None:
-                notes.append(f"{rep['id']} {run['id']}: results not computed (no latency.json for *{suffix})")
+                notes.append(f"{rep['id']} {run['id']}: results not computed (no {file} result for *{suffix})")
                 continue
             checked += 1
             req, names = request_names(store, run["id"], suffix)
@@ -164,6 +180,9 @@ def lint(reps: list[str] | None = None, repo: Path = REPO, store: Path = CC_STOR
                 elif not any(n.startswith(mo["event"]) for n in names):
                     misses.append(f"{rep['id']} {run['id']} moment {mo['id']}: event {mo['event']!r} names no row of "
                                   f"request {req}")
+        if not checked:
+            misses.append(f"{rep['id']}: its moments resolve on no run (none of its {len(runs)} store runs has a "
+                          f"{file} result)")
         notes.append(f"{rep['id']}: {len(moments)} moments, {len(runs)} store runs, {checked} with results checked")
     return misses, notes
 

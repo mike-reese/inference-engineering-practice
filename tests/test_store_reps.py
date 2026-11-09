@@ -83,9 +83,27 @@ def test_lint_passes_then_fails_on_a_missing_event_or_path(tmp_path):
     assert len(misses) == 1 and "engine.prefill_ms" in misses[0]
 
 
-def test_a_run_without_results_is_listed_not_checked(tmp_path):
+def test_a_run_without_results_is_listed_and_a_rep_with_none_fails(tmp_path):
     repo, store = make(tmp_path, MOMENTS, ["nothing"])
     (repo / "reps" / "X1-L1_thing" / "results" / "run1_20261108T000000Z_abc" / "latency.json").unlink()
     misses, notes = reps.lint(None, repo, store)
-    assert misses == [] and any("results not computed" in n for n in notes)
+    assert any("results not computed" in n for n in notes)
+    assert len(misses) == 1 and "resolve on no run" in misses[0]
     assert reps.catalog(repo, store)["runs"][0]["result"] is None
+
+
+def test_moments_read_the_result_file_they_name_whole(tmp_path):
+    moments = MOMENTS.replace('request = "measured"', 'request = "measured"\nresult = "analysis/readout.json"')
+    moments = moments.replace("client.ttft_ms", "clients.B.ttft_ms").replace("segments[first_scheduled_time].ms",
+                                                                         "queue.sum_ms")
+    repo, store = make(tmp_path, moments.replace("engine.queue_ms", "clients.A.ttft_ms"),
+                       ["response headers", "event: token", "other"])
+    run_dir = repo / "reps" / "X1-L1_thing" / "results" / "run1_20261108T000000Z_abc"
+    (run_dir / "analysis").mkdir()
+    readout = {"clients": {"A": {"ttft_ms": 40.0}, "B": {"ttft_ms": 2700.0}}, "queue": {"sum_ms": 2690.0}}
+    (run_dir / "analysis" / "readout.json").write_text(json.dumps(readout))
+    assert reps.catalog(repo, store)["runs"][0]["result"] == readout
+    assert reps.lint(None, repo, store)[0] == []
+    (run_dir / "analysis" / "readout.json").write_text(json.dumps({"clients": {"A": {"ttft_ms": 40.0}}}))
+    misses = reps.lint(None, repo, store)[0]
+    assert len(misses) == 2 and all("clients.B.ttft_ms" in m or "queue.sum_ms" in m for m in misses)
