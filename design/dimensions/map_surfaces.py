@@ -1,9 +1,9 @@
 """Old-to-new map of every current surface (COMMAND_CENTER.md, section 9).
 
-Finds the storage tiers, kinds and each kind's place (registry/kinds.json), the D13 worlds (prototypes/D13/model.js),
+Finds the storage tiers, kinds and each kind's place (registry/kinds.json), the worlds (cc/control/control.js),
 the v1 views (frontend/index.html), the cc panels (cc/sidebar, cc/inspector, cc/control/bar.js) and controls
 (cc/control/keys.js) from the source, and looks each one up in surfaces.json. Exits 1 when a surface has no entry, an
-entry matches no surface, or a new place names a tier missing from the ladders ("execution / phase") or a world D13
+entry matches no surface, or a new place names a tier missing from the ladders ("execution / phase") or a world cc/
 does not draw ("Rep world"). Run: python3 design/dimensions/map_surfaces.py [--write]
 """
 import json
@@ -20,14 +20,14 @@ DOC = REPO / "COMMAND_CENTER.md"
 
 
 def worlds() -> list[str]:
-    body = re.search(r"export const WORLDS = (\[.*?\]\]);", (FE / "prototypes/D13/model.js").read_text())[1]
+    body = re.search(r"export const WORLDS = (\[.*?\]\]);", (FE / "cc/control/control.js").read_text())[1]
     return [name for _, name in json.loads(body)]
 
 
 def current(reg: dict) -> list[tuple[str, str]]:
     s = [("tier", t) for t in reg["tiers"]]
     s += [("kind", k["kind"]) for k in reg["kinds"]]
-    s += [("D13 world", w) for w in worlds()]
+    s += [("world", w) for w in worlds()]
     s += [("v1 view", v) for v in dict.fromkeys(re.findall(r'data-view="([a-z_]+)"', (FE / "index.html").read_text()))]
     s += [("panel", p) for p, f in (("sidebar", "cc/sidebar/sidebar.js"), ("inspector", "cc/inspector/tabs.js"),
                                     ("bar", "cc/control/bar.js")) if (FE / f).exists()]
@@ -39,7 +39,7 @@ def current(reg: dict) -> list[tuple[str, str]]:
 
 
 def unknown_names(place: str, ladders: dict, world_names: list[str]) -> list[str]:
-    """Each 'dimension / tier[ and tier]' must start with ladder tiers; each '<Name> world' must be a D13 world."""
+    """Each 'dimension / tier[ and tier]' must start with ladder tiers; each '<Name> world' must be a cc/ world."""
     bad = []
     for dim, rest in re.findall(r"\b(execution|hardware|architecture) / ([^;,]+)", place):
         tiers = sorted(ladders[dim], key=len, reverse=True)
@@ -54,7 +54,7 @@ def unknown_names(place: str, ladders: dict, world_names: list[str]) -> list[str
             rest = rest[len(" and "):]
     for name in re.findall(r"\b([A-Z][a-z]+) world\b", place):
         if name not in world_names and f"{name} world" not in world_names:
-            bad.append(f"{name} world: D13 draws {world_names}")
+            bad.append(f"{name} world: cc/ draws {world_names}")
     return bad
 
 
