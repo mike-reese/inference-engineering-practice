@@ -16,7 +16,7 @@
 // | ladders(), tierOf(dim), tierName(dim, tier), aligned(from, tier, to) | the manifest's ladders; tier; tier name; aligned tier |
 // | stops(dim, tier) | {ids: Uint32Array, t: Float64Array}: stop rows of (dimension, tier) and their times, by (t, id) |
 // | units(tier) | {ids, start, end, reach, long}: units of an execution tier by start (layer: one per (iter, layer) group, id = its first kernel); reach: the longest duration outside the longest 1%; long: the indexes of those longer units (a query at t reads the starts in [t - reach, t] and long) |
-// | now(t) | {exec[6], kernel, phases, flow, flows, comp, process, archPath, sample, sampleIndex, transfers, hwActive} |
+// | now(t) | {exec[6], kernel, phases, flow, flows, comp, process, archPath, software, sample, sampleIndex, transfers, hwActive} |
 // | archName(S, i) | a thing's name on the architecture ladder: a process by its component-map role |
 // | boundsAt(t), eventsIn(b) | playback bounds at t; Uint32Array of every row starting in [b0, b1), by (start, id) |
 // | metrics(), metricInputs() | aux.json metrics [{id, name, value, unit, request, rows}]; Set of row ids the selected one reads |
@@ -25,9 +25,13 @@
 //
 // now(t): exec[i] is the unit of execution tier i holding t, else the last one started before t, as {id, t0, t1} or
 // null; kernel the kernel-tier unit holding t; phases every phase holding t; flow the flow name of exec[phase] and
-// flows those of phases; comp the component thing of exec[phase] (else of the request), -1 when none; archPath the
-// architecture ladder at exec[phase], from the host down: its lane's container and process, then the phase's own
-// component (never the request's: that one runs in another process); process the process thing on it, or -1; sample is
+// flows those of phases; comp the component thing of the first phase at t in exec[phase]'s process that has one
+// (exec[phase] first: an NVTX range has none, a component stamp holding it does), else of the request, -1 when none;
+// archPath the architecture ladder at exec[phase], from the host down: its lane's container and process, then that
+// phase component (never the request's: that one runs in another process); software, while a kernel unit holds t
+// whose launch call sits under exec[phase] (the GPU runs behind the CPU, so a kernel at t may belong to an earlier
+// phase), the finest architecture tier its kind is placed at (kinds.json), as {tier, name, id: the kernel}, else null; process
+// the process thing on archPath, or -1; sample is
 // RunStore.samplesAt(t) (aligned with store().metrics; NaN = no fresh sample) and sampleIndex changes exactly when
 // one of those samples does; transfers (memcpy and memset units holding t) and hwActive (the hardware things the
 // rows at t ran on, with their ancestors) are computed when read.
@@ -345,7 +349,7 @@ function deepest(S, t) { for (let e = S.dims.ladders.execution.length - 1; e >= 
 // ---------------- what is true at the cursor
 let nowKey = "", nowVal = null;
 const EMPTY_NOW = { exec: [null, null, null, null, null, null], kernel: null, phases: [], flow: null, flows: new Set(), comp: -1, process: -1,
-  archPath: [], sample: new Float64Array(0), sampleIndex: 0, transfers: [], hwActive: new Set() };
+  archPath: [], software: null, sample: new Float64Array(0), sampleIndex: 0, transfers: [], hwActive: new Set() };
 /** A thing's name on the architecture ladder: a process by its role in the component map, else its recorded name. */
 export const archName = (S, i) => { const x = S.things[i], role = x?.attrs?.role?.name; return role ? role.split(/ \(|:/)[0] : x?.name ?? ""; };
 /** What is true at the cursor in every dimension, at every tier (contract in the table above). */
@@ -363,7 +367,12 @@ function nowOf(S, t) {
   const flow = exec[P] ? S.dims.flowOf(exec[P].id) : null;
   const flows = new Set(phases.map((x) => S.dims.flowOf(x.id)).filter(Boolean));
   const compOf = (x) => { const c = x ? S.field("comp", x.id) : NONE16; return c === NONE16 ? -1 : c; };
-  const own = compOf(exec[P]), comp = own >= 0 ? own : compOf(exec[0]);
+  const procOf = (x) => S.dims.laneLevel.process[S.field("lane", x.id)];
+  const own = !exec[P] ? -1 : [exec[P], ...phases].filter((x) => procOf(x) === procOf(exec[P])).map(compOf).find((c) => c >= 0) ?? -1;
+  const comp = own >= 0 ? own : compOf(exec[0]);
+  const launchedHere = (k) => { for (let x = S.dims.launchOf(k), n = 0; x >= 0 && n < 400; n++, x = S.field("parent", x)) if (x === exec[P].id) return true; return false; };
+  const A = S.dims.ladders.architecture, place = kernel && exec[P] && launchedHere(kernel.id) ? S.kinds[S.field("kind", kernel.id)].place.architecture : "";
+  const layer = /^(.*) \((.*)\)$/.exec(place), software = layer?.[1] === A[A.length - 1] ? { tier: layer[1], name: layer[2], id: kernel.id } : null;
   const archPath = [];
   if (exec[P]) {
     const lane = S.field("lane", exec[P].id), L = S.dims.laneLevel;
@@ -375,7 +384,7 @@ function nowOf(S, t) {
   let sampleIndex = 0;
   for (const g of S.sampleGroups) { let lo = 0, hi = g.n; while (lo < hi) { const k = (lo + hi) >>> 1; if (g.ts[k] <= t) lo = k + 1; else hi = k; } sampleIndex += lo; }
   let transfers, hwActive;
-  return { exec, kernel, phases, flow, flows, comp, process, archPath, sample: S.samplesAt(t), sampleIndex,
+  return { exec, kernel, phases, flow, flows, comp, process, archPath, software, sample: S.samplesAt(t), sampleIndex,
     get transfers() {
       if (!transfers) { const dev = new Set(S.dims.d.stops.hardware.device?.kinds ?? []);
         transfers = u.holding(K, t).filter((k) => dev.has(S.kinds[S.field("kind", u.of(K).ids[k])]?.name)).map((k) => unit(K, k)); }

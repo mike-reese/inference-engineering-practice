@@ -330,7 +330,8 @@ const atCursor = {
         <div class="label">flows running now</div><div>${n.phases.slice(0, 24).map((u) => { const f = S.dims.flowOf(u.id);
           return `<div><span class="pdot" style="background:${FLOW_COLOR[f] ?? "#8a90a0"}"></span>${link(S, u.id)} <span class="dim">${esc(f ?? "no flow")}</span></div>`; }).join("") || "–"}${n.phases.length > 24 ? `<div class="dim">+${n.phases.length - 24} more</div>` : ""}</div>
         <div class="label" style="color:${DIM_COLOR.architecture}">architecture</div>
-        <ol class="path">${n.archPath.map((i) => `<li><span class="dim">${esc(S.things[i].kind)}</span> ${thingLink(S, i, archName(S, i))}</li>`).join("")}</ol>
+        <ol class="path">${n.archPath.map((i) => `<li><span class="dim">${esc(S.things[i].kind)}</span> ${thingLink(S, i, archName(S, i))}</li>`).join("")}${n.software
+          ? `<li><span class="dim">${esc(n.software.tier)}</span> ${esc(n.software.name)}: ${link(S, n.software.id)}</li>` : ""}</ol>
       </div><div>
         <table class="kv"><tr><td>kernel</td><td>${n.kernel ? link(S, n.kernel.id) : "none running"}</td></tr>
           <tr><td>transfer</td><td>${n.transfers.map((x) => link(S, x.id, `${nm(S, x.id)}, ${fmtBytes(S.field("bytes", x.id))}`)).join("<br>") || "none in flight"}</td></tr></table>

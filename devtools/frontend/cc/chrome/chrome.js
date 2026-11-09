@@ -108,7 +108,7 @@ export function mountChrome(el) {
     const hw = !S ? "" : [...["sm_active", "dram_read", "pcie_rx", "gpu_util"].map(val).filter(Boolean),
       n.kernel ? esc(name(n.kernel.id)) : kernels ? "no kernel at the cursor" : "no kernel rows in this run",
       ...(n.transfers.length ? [`copy: ${esc(name(n.transfers[0].id))}`] : [])].join(" · ");
-    const ar = !S ? "" : n.archPath.slice(1).map((i) => esc(archName(S, i))).join(" › ");
+    const ar = !S ? "" : [...n.archPath.slice(1).map((i) => esc(archName(S, i))), ...(n.software ? [`${esc(n.software.name)}: ${esc(name(n.software.id))}`] : [])].join(" › ");
     const nowHtml = [["execution", exec], ["hardware", hw], ["architecture", ar]]
       .map(([d, v]) => `<span class="k" style="color:${DIM_COLOR[d]}">${d}</span><span class="v">${v}</span>`).join("");
     if (force || pos !== lastPos) { el.querySelector(".pos").innerHTML = pos; lastPos = pos; }
