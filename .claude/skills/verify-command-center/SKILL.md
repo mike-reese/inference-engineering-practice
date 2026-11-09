@@ -82,7 +82,7 @@ Each session's evidence is in `/mnt/ie-data/cc-v2-verify/evidence/<session>/` (s
 
 Proof standard:
 
-- Drive the real user path and record both the action (`actions.jsonl`, with the `--after` screenshot) and the resulting state (a read-only `eval` of `window.__cc`, the URL hash or panel text, or `aria`). `$CCV state` still probes the old page's globals (`window.CC`, `#tlabel`, `#ftabs`); on this page only its `url`, `title`, `ready` and `viewport` fields hold.
+- Drive the real user path and record both the action (`actions.jsonl`, with the `--after` screenshot) and the resulting state (a read-only `eval` of `window.__cc`, the URL hash or panel text, or `aria`). `$CCV state` returns `url`, `title`, `ready`, `viewport` and every field of `window.__cc`.
 - A screenshot alone is not proof of a state change. Pair it with the state before and after.
 - Check side effects where they exist: the URL hash (a JSON view: `world`, `t`, `sel`, `dock`), a runner job (`curl -s "$CCV_APP/runner/jobs?limit=1"`, through the page's proxy), files written in a run folder.
 - Finish with `$CCV console`: zero `pageerror` entries, or report each one.

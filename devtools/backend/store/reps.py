@@ -7,8 +7,8 @@ GET /api/v3/reps answers {reps, runs}, the shape of D13's session-data.json (pro
   runs: every run of the ie-run/3 store that comes from a rep folder: {id, rep, labels, started, status, result};
         result is read from the run folder's result file, moments.toml `result` (default latency.json). latency.json
         is read per request: the summary of the moments' request (scalars of client, engine, wire, remainder, and the
-        segments). Any other result file is read whole. null: results not computed (no result file, or no
-        latency.json entry for that request).
+        segments). Any other result file is read whole. null: results not computed (no result file, no
+        latency.json entry for that request, or moments.toml `complete` names a value in the result that is false).
 
 The moments lint, per rep with a moments.toml and per store run of that rep with a result: every moment's `at` and
 evidence `path` resolves to a number in the result, and its `event` names a row of the moment's request (a row
@@ -113,14 +113,12 @@ def catalog(repo: Path = REPO, store: Path = CC_STORE) -> dict:
         if rep is None:
             continue
         folder = repo / rd
-        res = folder / result_file(rep)
-        suffix = (rep["moments"] or {}).get("request", "measured")
         s = STAMP.search(d.name)
         runs.append({"id": d.name, "rep": rep["id"], "status": m["status"],
                      "labels": json.loads((folder / "labels.json").read_bytes()) if (folder / "labels.json").is_file()
                      else {},
                      "started": s.group(1) if s else None,
-                     "result": read_result(res, suffix)})
+                     "result": read_result(folder / result_file(rep), rep["moments"] or {})})
     runs.sort(key=lambda r: (r["started"] or "", r["id"]), reverse=True)
     return {"reps": reps, "runs": runs}
 
@@ -130,11 +128,14 @@ def result_file(rep: dict) -> str:
     return (rep["moments"] or {}).get("result", LATENCY)
 
 
-def read_result(path: Path, suffix: str) -> dict | None:
+def read_result(path: Path, moments: dict) -> dict | None:
+    """The run's result, or None (results not computed) when the file is missing, latency.json has no entry for the
+    moments' request, or moments.toml `complete` names a value in the result that is false (a failed request)."""
     if not path.is_file():
         return None
     data = json.loads(path.read_bytes())
-    return measured(data, suffix) if path.name == LATENCY else data
+    result = measured(data, moments.get("request", "measured")) if path.name == LATENCY else data
+    return None if "complete" in moments and value_at(result, moments["complete"]) is False else result
 
 
 def request_names(store: Path, run: str, suffix: str) -> tuple[str | None, set[str]]:
@@ -165,7 +166,8 @@ def lint(reps: list[str] | None = None, repo: Path = REPO, store: Path = CC_STOR
         checked = 0
         for run in runs:
             if run["result"] is None:
-                notes.append(f"{rep['id']} {run['id']}: results not computed (no {file} result for *{suffix})")
+                why = f", or {rep['moments']['complete']} is false" if "complete" in rep["moments"] else ""
+                notes.append(f"{rep['id']} {run['id']}: results not computed (no {file} result for *{suffix}{why})")
                 continue
             checked += 1
             req, names = request_names(store, run["id"], suffix)
