@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Command center live check (COMMAND_CENTER.md 7.3, 7.4 M1): one real Launch of I02A `off` through the runner, followed
-# live in ccv on the hidden CCV-1 output. The checks regress.sh cannot make on a dry run: the head moves, follow holds
-# the cursor at the head, and the spine masks the future. It records a run on the GPU (7.3, owner approved): run it
-# only when the GPU is free.
+# live in ccv on the hidden CCV-1 output. The checks regress.sh cannot make on a dry run: the head moves and tracks the
+# stream's head_ns, follow holds the cursor at the head, the spine masks the future, the run becomes a replay at its end,
+# and store-check passes on it. It records a run on the GPU (7.3, owner approved): run it only when the GPU is free.
 # Usage: devtools/verify/live.sh, or CC_URL=http://127.0.0.1:7710/static/cc/index.html for another page. RUNNER_URL
 # (default: the page's origin, which proxies /runner) picks the runner. LIVE_WAIT_S (default 900) bounds the wait for
 # the run's first rows (the stack starts first). Exits 1 on any failed check.
@@ -51,8 +51,24 @@ for _ in 1 2 3 4 5 6 7 8 9 10; do
 done
 check "launch: spine masks the future" "$mask" "True"
 $C shot live-following >/dev/null
+RUN=$(ev '__cc.session.run')
+api=$(curl -s "$APP/api/v3/runs" | python3 -c "import json,sys; print(next((r['head_ns'] for r in json.load(sys.stdin)['runs'] if r['run']=='$RUN'), 'none'))")
+sleep 1
+heads=$(ev "import('./control/control.js').then(m => { const s = m.store(); return [s.live.head, s.head()].join(' '); })")
+read -r frame shown <<<"$heads"
+check "live: the store's frame head_ns is at or past the server's head_ns" "$(python3 -c "print($frame >= $api - 1e3)")" "True"
+check "live: the shown head extrapolates the frame head by under 2 s" "$(python3 -c "print(0 <= $shown - $frame < 2e9)")" "True"
 $C click --css ".ch-nav [data-sh=follow]" >/dev/null; sleep 0.3
 check "launch: follow off" "$(ev '__cc.follow')" "False"
+echo "     waiting up to $WAIT s for $RUN to end"
+waited=0
+while [ $waited -lt "$WAIT" ]; do
+  [ "$(ev '__cc.session.mode')" = replay ] && break
+  sleep 5; waited=$((waited+5))
+done
+check "live: at its end the run becomes a replay with no command" "$(ev '__cc.session.mode + " " + __cc.session.run')" "replay $RUN"
+sc=$(CC_STORE=${CC_STORE:-/mnt/ie-data/cc/store} make -s store-check 2>&1 | grep -E "^(ok|FAIL) +$RUN" | cut -c1-4)
+check "live: store-check passes on $RUN" "$sc" "ok  "
 errs=$($C console | python3 -c 'import json,sys; print(json.load(sys.stdin)["errors"])')
 check "no console errors" "$errs" "0"
 done_
