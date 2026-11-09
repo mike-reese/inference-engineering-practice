@@ -91,7 +91,7 @@ observable result) and `Gotchas`.
 
 - [Rep world](./cc-rep.md): lessons, key moments with "show me", results on three clocks, the TTFT split.
 - [Spine world](./cc-spine.md): step, walk and fly the tiers; lens panes, band labels, zoom and play.
-- [Stacked world](./cc-stacked.md): the 3D board, part picks, hardware tiers, the pulse label and the lens.
+- [Stacked world](./cc-stacked.md): the 3D board, part picks, hardware tiers, the pulse label, the lens, concurrent work and the in-GPU motion (`ccv record`).
 - [Architecture world](./cc-architecture.md): the component map lit at the cursor, cards, processes, software
   layers, the execution strip and the beam.
 - [Load](./cc-load.md): replay any stored run of a rep.

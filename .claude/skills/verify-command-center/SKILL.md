@@ -79,13 +79,42 @@ Each session's evidence is in `/mnt/ie-data/cc-v2-verify/evidence/<session>/` (s
 - `console.jsonl`: console messages, page errors and navigations, recorded by a watcher that `launch` starts. `$CCV console` summarizes it with an error count.
 - `<name>.png`: `$CCV shot <name>` (viewport, or `--css SEL` for one element), or `--after <name>` on any action.
 - `<name>.aria.txt`: `$CCV aria <name>`, the accessibility tree including shadow roots.
+- `<name>.sheet.png`, `<name>.webp`, `<name>.motion.json`, `<name>.rec/`: `$CCV record <name>`, the animation as the
+  user saw it (below).
 
 Proof standard:
 
 - Drive the real user path and record both the action (`actions.jsonl`, with the `--after` screenshot) and the resulting state (a read-only `eval` of `window.__cc`, the URL hash or panel text, or `aria`). `$CCV state` returns `url`, `title`, `ready`, `viewport` and every field of `window.__cc`.
 - A screenshot alone is not proof of a state change. Pair it with the state before and after.
+- A screenshot never proves an animation: a still frame of a paused cursor looks the same whether the scene moves or
+  is frozen (on 2026-11-09 the Stacked GPU stream passed paused screenshots and froze during playback). Watch it with
+  `$CCV record`: start the motion first (play, a key, a drag), then record the region.
 - Check side effects where they exist: the URL hash (a JSON view: `world`, `t`, `sel`, `dock`), a runner job (`curl -s "$CCV_APP/runner/jobs?limit=1"`, through the page's proxy), files written in a run folder.
 - Finish with `$CCV console`: zero `pageerror` entries, or report each one.
+## Watching an animation
+
+`$CCV record NAME [--ms 3000] [--css SEL | --box WxH+X+Y] [--fuzz 8] [--still 20]` keeps every frame Chromium paints
+for `--ms` (CDP `Page.startScreencast`, one frame per repaint, so the frame times are the ones the user sees), crops
+them to the region (the viewport, an element, or a box in CSS pixels) and writes into the session folder:
+
+| File | Holds | Use |
+| --- | --- | --- |
+| `NAME.sheet.png` | 12 evenly spaced frames, 3 per row, each labelled with its time | read it (an image) to see what moved |
+| `NAME.webp` | every frame at its real delay, looping | give Mike the path; it plays in a browser |
+| `NAME.motion.json` | frame intervals (p50, p95, max), changed pixels per consecutive frame pair (`magick compare`, fuzz `--fuzz` %), `moving_pairs` of `pairs`, `longest_still_ms` | the numbers behind the claim |
+| `NAME.rec/` | the raw frames (`fNNNN.jpg`) and crops (`fNNNN.c.png`) | step through by hand |
+
+The command prints the summary of `motion.json` with the three paths. Read it this way:
+
+- `longest_still_ms` is the longest stretch where consecutive frames differ by fewer than `--still` pixels: a frozen
+  animation shows a long stretch (1271 ms in 3 s for the frozen GPU stream), a moving one 0.
+- `moving_pairs` near `pairs` means motion in nearly every frame; `interval_ms` p95 well above 17 ms means the page
+  painted fewer frames than the 60 Hz CCV-1 output (a stall, or nothing changed to repaint).
+- Under 2 frames in `--ms` is an error: the page did not repaint. Run `$CCV doctor`.
+- Choose the region the claim is about. The whole viewport always moves somewhere (the pulse halo), so a viewport
+  recording proves little; the Stacked recipe computes the GPU board's box from its labels (`features/cc-stacked.md`).
+- Always look at the sheet before reporting: the numbers say that pixels changed, the sheet says what changed.
+
 - For performance claims, use `$CCV perf`: draw time and input-to-frame latency recorded by the page.
 - Report a path you could not reach with the command that failed and the unmet precondition. Never report it as verified through a different path.
 
@@ -102,7 +131,7 @@ An "Nsight Systems ↗ / Nsight Compute ↗" button makes the runner start `nsys
 | Helper | Invocation | What it does |
 | --- | --- | --- |
 | `devtools/verify/ccv` | `$CCV <command> [options]`; `$CCV help` | the CLI: shell wrapper for `ccv.mjs` |
-| `devtools/verify/ccv.mjs` | run through `ccv` | launch, CDP input, observation, evidence logging |
+| `devtools/verify/ccv.mjs` | run through `ccv` | launch, CDP input, observation, evidence logging, `record` (needs ImageMagick 7, `magick`) |
 | console watcher | started by `$CCV launch` (`ccv.mjs _watch`); stopped by `$CCV close` | records console messages, page errors and navigations to `console.jsonl` |
 
 `launch` writes one record per session in `~/.local/state/inference-engineering/ccv/sessions/<session>.json` (`pid`, `watcher`, `port`, `profile`, `workspace`, `tile`); a lock in the same folder serializes concurrent launches. Environment: `CCV_SESSION`, `CCV_APP` (`http://127.0.0.1:7710`), `CCV_EVIDENCE`, `CCV_STATE`, `CCV_CHROMIUM` (`/usr/bin/chromium`).

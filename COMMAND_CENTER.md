@@ -66,7 +66,7 @@ Header style and sizing follow D10: thin tabs and compact ladders, nothing stret
 | world | what it draws |
 | --- | --- |
 | Rep (opens first) | the session's front page: what the rep teaches, key moments with "show me", lessons, results on three clocks, TTFT segments, README results, pass checks and task |
-| Stacked world | 3D: the board as floor, architecture standing on its hardware, execution as a moving pulse; a floating, collapsible architecture lens |
+| Stacked world | 3D: the board as floor, architecture standing on its hardware (each container a box on the CPU, its processes stacked inside, a GPU-tenant process tethered to the GPU), execution as a moving pulse; every row live at the cursor lights its process and device in its own flow colour, so CPU and GPU work show side by side; inside the GPU, data streams VRAM → memory controllers → L2 → each SM's L1 → tensor cores (reads) and back (writes), scaled by the DRAM and Tensor Active samples; a floating, collapsible architecture lens |
 | Execution spine | 2D bands, one per execution tier, with sample and copy strips; a lens window on top (55% of the height, draggable) with Architecture, Hardware and Split (side by side, draggable divider) |
 | Architecture | the v1 drawing full screen over a thin execution strip |
 

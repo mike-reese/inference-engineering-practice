@@ -58,6 +58,13 @@ Observe
                                       t, sel, session, dock, ...)
   find TARGET                         where a target is, in the viewport or not, covered or not (no input, no scrolling)
   wait (--text T | --css SEL | --gone-text T | --expr JS) [--timeout ms]
+  record NAME [--ms 3000] [--css SEL | --box WxH+X+Y] [--fuzz 8] [--still 20]
+                                      watch the page for ms milliseconds as the user sees it: every frame Chromium paints
+                                      (screencast), cropped to the region. Writes NAME.rec/ (frames), NAME.sheet.png
+                                      (12 frames with their times, readable as an image), NAME.webp (the animation at real
+                                      timing) and NAME.motion.json (frame intervals, changed pixels per frame pair, the
+                                      longest stretch with fewer than --still changed pixels). Act first (play, a key),
+                                      then record.
   perf                                frame and input-to-frame latency percentiles the page recorded
   console [--tail N]                  console messages and page errors since launch
   eval JS                             READ-ONLY probe; never use it to change app state
@@ -236,6 +243,56 @@ async function key(c, k, mods = []) {
 }
 
 // ---------------------------------------------------------------- observation helpers
+/** Frames the page paints for `ms`, as the user sees them: Page.startScreencast sends one per repaint (acked, so the
+ *  browser keeps sending), cropped to the region, then summarized into a contact sheet, an animation and motion. */
+async function record(c, name, opt) {
+  const ms = Number(opt.ms || 3000), fuzz = Number(opt.fuzz ?? 8), still = Number(opt.still ?? 20);
+  const dir = path.join(session(), `${name.replace(/[^\w.-]/g, "_")}.rec`);
+  fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
+  const view = await c.eval("({ w: innerWidth, h: innerHeight })");
+  let box = { x: 0, y: 0, w: view.w, h: view.h };
+  if (opt.css) { const r = await locate(c, { css: opt.css }, { allowCovered: true }); box = { x: r.rect.left, y: r.rect.top, w: r.rect.width, h: r.rect.height }; }
+  else if (opt.box) { const m = /^(\d+)x(\d+)\+(-?\d+)\+(-?\d+)$/.exec(opt.box); if (!m) throw new Error("--box is WxH+X+Y in CSS pixels"); box = { w: +m[1], h: +m[2], x: +m[3], y: +m[4] }; }
+  const frames = [];
+  c.on((d) => {
+    if (d.method !== "Page.screencastFrame") return;
+    const { data, metadata, sessionId } = d.params, file = path.join(dir, `f${String(frames.length).padStart(4, "0")}.jpg`);
+    fs.writeFileSync(file, Buffer.from(data, "base64"));
+    frames.push({ file, t: metadata.timestamp * 1000 });
+    c.send("Page.screencastFrameAck", { sessionId }).catch(() => {});
+  });
+  await c.send("Page.startScreencast", { format: "jpeg", quality: 92, everyNthFrame: 1 });
+  await new Promise((r) => setTimeout(r, ms));
+  await c.send("Page.stopScreencast");
+  if (frames.length < 2) throw new Error(`only ${frames.length} frame(s) painted in ${ms} ms: the page is not repainting (ccv doctor)`);
+  const t0 = frames[0].t;
+  const px = (f) => Math.round(f);
+  const first = execFileSync("magick", ["identify", "-format", "%w", frames[0].file]).toString();
+  const k = Number(first) / view.w, crop = `${px(box.w * k)}x${px(box.h * k)}+${px(box.x * k)}+${px(box.y * k)}`;
+  for (const f of frames) { f.crop = f.file.replace(/\.jpg$/, ".c.png"); execFileSync("magick", [f.file, "-crop", crop, "+repage", f.crop]); }
+  const pairs = [];
+  for (let i = 1; i < frames.length; i++) {
+    let out = "";
+    try { execFileSync("magick", ["compare", "-metric", "AE", "-fuzz", `${fuzz}%`, frames[i - 1].crop, frames[i].crop, "null:"], { stdio: ["ignore", "ignore", "pipe"] }); }
+    catch (e) { out = e.stderr?.toString() ?? ""; }   // compare exits 1 when the images differ and prints the count on stderr
+    pairs.push({ at_ms: +(frames[i].t - t0).toFixed(1), changed_px: Math.round(parseFloat(out) || 0) });
+  }
+  let freeze = 0, run = 0;
+  for (let i = 0; i < pairs.length; i++) { const dt = frames[i + 1].t - frames[i].t; run = pairs[i].changed_px < still ? run + dt : 0; freeze = Math.max(freeze, run); }
+  const gaps = frames.slice(1).map((f, i) => f.t - frames[i].t).sort((a, b) => a - b), q = (p) => +gaps[Math.min(gaps.length - 1, Math.floor(gaps.length * p))].toFixed(1);
+  const changed = pairs.map((p) => p.changed_px).sort((a, b) => a - b), qc = (p) => changed[Math.min(changed.length - 1, Math.floor(changed.length * p))];
+  const base = path.join(session(), name.replace(/[^\w.-]/g, "_"));
+  const pick = Array.from({ length: Math.min(12, frames.length) }, (_, i) => frames[Math.round((i * (frames.length - 1)) / Math.max(1, Math.min(12, frames.length) - 1))]);
+  execFileSync("magick", ["montage", ...pick.flatMap((f) => ["-label", `${(f.t - t0).toFixed(0)} ms`, f.crop]), "-tile", "3x", "-geometry", "+4+4",
+    "-background", "#0f1115", "-fill", "#d7dae0", "-pointsize", "14", `${base}.sheet.png`]);
+  execFileSync("magick", [...frames.flatMap((f, i) => ["-delay", `${Math.max(1, Math.round(((frames[i + 1]?.t ?? f.t + 16.7) - f.t) / 10))}`, f.crop]), "-loop", "0", `${base}.webp`]);
+  const motion = { ms, frames: frames.length, region: { ...box, crop_px: crop }, fuzz_pct: fuzz, still_px: still,
+    interval_ms: { p50: q(0.5), p95: q(0.95), max: q(1) }, changed_px: { p50: qc(0.5), p95: qc(0.95), max: qc(1) },
+    moving_pairs: pairs.filter((p) => p.changed_px >= still).length, pairs: pairs.length, longest_still_ms: +freeze.toFixed(1), per_pair: pairs };
+  fs.writeFileSync(`${base}.motion.json`, JSON.stringify(motion, null, 1));
+  const { per_pair, ...summary } = motion;
+  return { ...summary, sheet: `${base}.sheet.png`, animation: `${base}.webp`, motion: `${base}.motion.json`, frames_dir: dir };
+}
 async function screenshot(c, name, css) {
   await c.settle();
   const params = { format: "png" };
@@ -490,6 +547,7 @@ async function run(cmd, pos, opt) {
           else hit = await c.eval(`(${FINDER})(${JSON.stringify(spec(opt))})`).then((r) => (r.error ? null : r));
           if (hit) break; await sleep(150); }
         if (!hit) throw new Error(`wait timed out: ${JSON.stringify(opt)}`); out = { waited: hit }; break; }
+      case "record": out = await record(c, pos[0] || `rec-${Date.now()}`, opt); break;
       case "perf": out = await c.eval(`(() => { if (window.PERF) return window.PERF.report(); const q = (a, p) => { if (!a || !a.length) return null; const b = a.slice().sort((x, y) => x - y); return +b[Math.min(b.length - 1, Math.floor(b.length * p))].toFixed(2); };
         return { draws: (window.FT || []).length, draw_p50_ms: q(window.FT, .5), draw_p95_ms: q(window.FT, .95), input_to_frame_p50_ms: q(window.LATS, .5), input_to_frame_p95_ms: q(window.LATS, .95) }; })()`); break;
       case "console": { const file = path.join(session(), "console.jsonl"); const lines = fs.existsSync(file) ? fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean) : [];
