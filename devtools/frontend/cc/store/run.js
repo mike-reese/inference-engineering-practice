@@ -9,7 +9,7 @@
 // next generation: the page reloads it). A seal frame's `derived` sets the parent, cause, tier and depth of held rows;
 // `rev` counts those seals, so a view that indexes rows by tier or parent rebuilds when it changes.
 import { decodeBlock } from "./codec.js";
-import { indexEvents, indexIds, reindexKeys, setDerived, restep, LONG_NS } from "./block.js";
+import { indexEvents, indexIds, reindexKeys, setDerived, restep, LONG_NS, KIDS_EVERY } from "./block.js";
 import { N_TIERS, NONE16 } from "./columns.js";
 import { Dimensions } from "./dims.js";
 import { perf } from "../perf.js";
@@ -306,15 +306,15 @@ export class RunStore {
     return out;
   }
 
+  /** Links by their from row and by their to row (link indexes), and caused rows by their cause row (row ids). */
   indexLinks() {
-    const N = this.N, csr = (key, n, val) => { const off = new Uint32Array(N + 1); for (let i = 0; i < n; i++) if (key(i) >= 0) off[key(i) + 1]++;
-      for (let j = 0; j < N; j++) off[j + 1] += off[j]; const rows = new Uint32Array(off[N]), at = off.slice(0, N);
-      for (let i = 0; i < n; i++) if (key(i) >= 0) rows[at[key(i)]++] = val(i); return { off, rows }; };
-    const L = this.links, nL = L ? L.from.length : 0;
-    this.linkFrom = csr((i) => L.from[i], nL, (i) => i); this.linkTo = csr((i) => L.to[i], nL, (i) => i);
-    const cause = new Int32Array(N);
-    for (const b of this.blocks) for (let i = 0; i < b.n; i++) cause[b.cols.id[i]] = b.cols.cause[i];
-    this.causes = csr((id) => cause[id], N, (id) => id);
+    const L = this.links, from = [[], []], to = [[], []], cause = [[], []];
+    if (L) for (let i = 0; i < L.from.length; i++) {
+      if (L.from[i] >= 0) { from[0].push(L.from[i]); from[1].push(i); }
+      if (L.to[i] >= 0) { to[0].push(L.to[i]); to[1].push(i); }
+    }
+    for (const b of this.blocks) { const { id, cause: c } = b.cols; for (let i = 0; i < b.n; i++) if (c[i] >= 0) { cause[0].push(c[i]); cause[1].push(id[i]); } }
+    this.linkFrom = pairs(...from); this.linkTo = pairs(...to); this.causes = pairs(...cause);
   }
 
   /** One hot column value of one row. */
@@ -332,7 +332,13 @@ export class RunStore {
   nameText(i) { const n = this.names[i]; return Array.isArray(n) ? n[0] : n; }
 
   /** Rows whose parent is `id`, in (start, id) order. */
-  children(id) { return this.ids.child.subarray(this.ids.kids[id], this.ids.kids[id + 1]); }
+  children(id) {
+    const { child, every } = this.ids, j = Math.floor(id / KIDS_EVERY), a = every[j], b = every[j + 1];
+    const parent = (k) => this.field("parent", child[k]);
+    const lo = a + first(b - a, (k) => parent(a + k) < id);
+    let hi = lo; while (hi < b && parent(hi) === id) hi++;
+    return child.subarray(lo, hi);
+  }
 
   /** The next (dir +1) or previous (dir -1) stop of (dimension, tier) after cursor c (section 3.4; dims.js). */
   step(dim, tier, c, dir) { return this.dims.step(dim, tier, c, dir); }
@@ -425,9 +431,9 @@ export class RunStore {
   /** Links touching a row (zmq, network, serves) plus its cause and the rows it caused. */
   linksOf(id) {
     const out = [], L = this.links;
-    if (L) for (const s of [this.linkFrom, this.linkTo]) for (let k = s.off[id]; k < s.off[id + 1]; k++) { const i = s.rows[k]; out.push({ from: L.from[i], to: L.to[i], kind: this.linkKinds[L.kind[i]]?.name ?? `link ${L.kind[i]}` }); }
+    if (L) for (const s of [this.linkFrom, this.linkTo]) for (const i of valuesOf(s, id)) out.push({ from: L.from[i], to: L.to[i], kind: this.linkKinds[L.kind[i]]?.name ?? `link ${L.kind[i]}` });
     const c = this.field("cause", id); if (c >= 0) out.push({ from: c, to: id, kind: "cause" });
-    for (let k = this.causes.off[id]; k < this.causes.off[id + 1]; k++) out.push({ from: id, to: this.causes.rows[k], kind: "cause" });
+    for (const x of valuesOf(this.causes, id)) out.push({ from: id, to: x, kind: "cause" });
     return out;
   }
 
@@ -531,13 +537,48 @@ export class RunStore {
     return l.wall == null ? Math.max(this.extent[1], l.head) : l.head + 1e6 * (performance.timeOrigin + performance.now() - l.wall);
   }
 
-  /** Resident bytes, for PERF.report(). */
+  /**
+   * Resident bytes, for PERF.report(): every ArrayBuffer the store holds, each counted once, under the first part
+   * that reaches it. columns: the blocks' hot columns; gpu: their GPU copies; indexes: the other per-block indexes;
+   * samples; order: startOf, endOf, allRows, the per-tier lists and the request and iteration rows; ids: the id map
+   * and children; links: the links table and the link and cause indexes; dims: Dimensions and its caches; other:
+   * anything else. total_mb sums them.
+   */
   bytes() {
-    let cols = 0, idx = 0, gpu = 0;
-    for (const b of this.blocks) { for (const c of Object.values(b.cols)) cols += c.byteLength;
-      for (const s of b.step) idx += s.byteLength; idx += b.lane.rows.byteLength + b.comp.rows.byteLength + b.req.rows.byteLength;
-      gpu += b.gpu.time.byteLength + b.gpu.attr.byteLength + b.gpu.ident.byteLength; }
-    const samples = this.sampleGroups.reduce((a, g) => a + g.ts.byteLength + g.cols.reduce((x, c) => x + c.byteLength, 0), 0);
-    return { columns_mb: cols / 2 ** 20, indexes_mb: idx / 2 ** 20, gpu_mb: gpu / 2 ** 20, samples_mb: samples / 2 ** 20 };
+    const seen = new Set(), mb = {};
+    const count = (part, ...roots) => {
+      const todo = roots; let n = 0;
+      while (todo.length) {
+        const v = todo.pop();
+        if (v == null || typeof v !== "object" || seen.has(v)) continue;
+        seen.add(v);
+        const buf = ArrayBuffer.isView(v) ? v.buffer : v instanceof ArrayBuffer ? v : null;
+        if (buf) { if (!seen.has(buf)) { seen.add(buf); n += buf.byteLength; } }
+        else if (!(v instanceof EventTarget)) for (const y of v instanceof Map || v instanceof Set ? v.values() : Object.values(v)) if (y && typeof y === "object") todo.push(y);
+      }
+      mb[`${part}_mb`] = n / 2 ** 20;
+    };
+    count("columns", ...this.blocks.map((b) => b.cols)); count("gpu", ...this.blocks.map((b) => b.gpu)); count("indexes", ...this.blocks);
+    count("samples", this.sampleGroups, this.groups);
+    count("order", this.startOf, this.endOf, this.allRows, this.exact, this.gap, this.reqRows, this.iterRows, this.iterLo, this.iterHi);
+    count("ids", this.ids); count("links", this.links, this.linkFrom, this.linkTo, this.causes); count("dims", this.dims); count("other", this);
+    mb.total_mb = Object.values(mb).reduce((a, x) => a + x, 0);
+    return mb;
   }
 }
+
+/** The first k in [0, n) for which before(k) is false; before must be true on a prefix and false after it. */
+function first(n, before) {
+  let lo = 0, hi = n;
+  while (lo < hi) { const k = (lo + hi) >>> 1; if (before(k)) lo = k + 1; else hi = k; }
+  return lo;
+}
+
+/** (key, value) pairs sorted by key then value, for a key whose values are few and most keys have none. */
+function pairs(keys, values) {
+  const o = Uint32Array.from(keys.keys()).sort((a, b) => keys[a] - keys[b] || values[a] - values[b]);
+  return { key: Uint32Array.from(o, (k) => keys[k]), value: Uint32Array.from(o, (k) => values[k]) };
+}
+
+/** The values of one key, in increasing order. */
+function valuesOf(p, key) { return p.value.subarray(first(p.key.length, (k) => p.key[k] < key), first(p.key.length, (k) => p.key[k] <= key)); }
