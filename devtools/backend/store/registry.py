@@ -77,10 +77,6 @@ class Registry:
             kinds.append(KindRule(i, e["kind"], e["tier"], e.get("nest_bump", False), e.get("derived", False),
                                   e["color"], e["label"], e["home"], e["place"]))
         links = tuple(LinkKind(i, e["kind"], e["cause"], e["label"]) for i, e in enumerate(k["link_kinds"]))
-        hardware = set(k["ladders"]["hardware"]) | {"-"}
-        unplaced = [m["metric"] for m in k["metrics"] if m.get("place", {}).get("hardware") not in hardware]
-        if unplaced:
-            raise ValueError(f"kinds.json: metrics {unplaced} need place.hardware, a hardware ladder tier or '-'")
         for names, what in (([x.kind for x in kinds], "kind"), ([x.kind for x in links], "link kind"),
                             ([b["key"] for b in c["boxes"]], "box"), ([b["key"] for b in c["bounds"]], "bound")):
             if len(set(names)) != len(names):
