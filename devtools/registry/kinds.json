@@ -39,10 +39,11 @@
       {"class": "other"}
     ],
     "flow": {
-      "_doc": "The hot flow column: which logical job of its request a row does (D13 flows). Codes are positions in names; none (255) is no flow. Rows placed at execution request span every flow: none. A row in a stream-out box is stream out. An engine timestamp named by prefill or decode takes it. A row with an iteration takes the iteration's flow: prefill when its 'batch scheduled' stamp lists context requests (stamp.context) or num_ctx_tokens > 0, or an engine timestamp names it 'prefill (iteration N)'; decode when that stamp lists none, or an engine timestamp 'decode (iterations a-b)' covers it. Any other row of a request: request in when it starts before the request's turn (the start of its first prefill row), else stream out. A request with no prefill row, and a row with no request and no iteration flow, have none.",
+      "_doc": "The hot flow column: which logical job of its request a row does (D13 flows). Codes are positions in names; none (255) is no flow. Rows placed at execution request span every flow: none. A row in a stream-out box is stream out. An engine timestamp named by prefill or decode takes it. A row with an iteration takes the iteration's flow: prefill when its 'batch scheduled' stamp lists context requests (stamp.context) or num_ctx_tokens > 0, or an engine timestamp names it 'prefill (iteration N)'; decode when that stamp lists none, or an engine timestamp 'decode (iterations a-b)' covers it. Any other row of a request: request in when it starts before the request's turn, else stream out. The turn is the start of the request's first prefill row; a request with none (no engine iterations, as in I02C) turns at its first stream row: a row in a stream-out box, or a row named by stream_names (the client's body reads and server-sent events). A request with neither, and a row with no request and no iteration flow, have none.",
       "names": ["request in", "prefill", "decode", "stream out"],
       "none": 255,
       "stream_out_boxes": ["responses", "ipc_rsp", "detokenize", "postprocess"],
+      "stream_names": "^(body read|event: .+)$",
       "engine_names": {"prefill": "^prefill \\(iteration (\\d+)\\)$", "decode": "^decode \\(iterations (\\d+)-(\\d+)\\)$"},
       "stamp": "batch scheduled"
     }

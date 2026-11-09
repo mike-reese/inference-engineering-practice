@@ -600,7 +600,9 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
         named[eng[[bool(rx.match(x)) for x in name_s[eng].tolist()]]] = flow_names.index(which)
     roles = process_roles(run, things, pos_of, lane, comp_ix)
     stream_box = np.array([b in fr["stream_out_boxes"] for b in box.tolist()], bool)
-    flow = derive.flows(flow_names, it, it_flow, named, stream_box,
+    stream_rx = re.compile(fr["stream_names"])
+    stream_named = np.array([bool(stream_rx.match(x)) for x in names], bool)[name_code]
+    flow = derive.flows(flow_names, it, it_flow, named, stream_box, stream_named,
                         np.isin(kinds_s, reg.execution_kinds("request")), req, start_abs)
     t0 = clk["t0_ns"] if clk["t0_ns"] is not None else old.t0_ns if old else int(start_abs.min())
     t0_rule = (clk["rule"] if clk["t0_ns"] is not None else "the previous generation's t0" if old

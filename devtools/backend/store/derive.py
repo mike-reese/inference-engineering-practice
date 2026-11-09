@@ -302,10 +302,11 @@ def iteration_flows(sched_iter: list[int], sched_stamp: list[dict], engine_names
 
 
 def flows(names: list[str], it: np.ndarray, it_flow: dict[int, int], named: np.ndarray, stream_box: np.ndarray,
-          request_tier: np.ndarray, req: np.ndarray, start: np.ndarray) -> np.ndarray:
+          stream_named: np.ndarray, request_tier: np.ndarray, req: np.ndarray, start: np.ndarray) -> np.ndarray:
     """flow column (kinds.json dimensions.flow). named: a flow code from the row's own name (engine timestamps),
-    FLOW_NONE if none; stream_box: the row sits in a stream-out box; request_tier: the row is placed at execution
-    request (it spans every flow)."""
+    FLOW_NONE if none; stream_box: the row sits in a stream-out box; stream_named: the row's name matches
+    stream_names (a client body read or server-sent event); request_tier: the row is placed at execution request
+    (it spans every flow)."""
     request_in, prefill, stream_out = names.index("request in"), names.index("prefill"), names.index("stream out")
     out = np.full(len(it), FLOW_NONE, np.uint8)
     for v in np.unique(it[it >= 0]).tolist():
@@ -314,10 +315,14 @@ def flows(names: list[str], it: np.ndarray, it_flow: dict[int, int], named: np.n
     out[named != FLOW_NONE] = named[named != FLOW_NONE]
     out[stream_box] = stream_out
     rest = (out == FLOW_NONE) & (req != NONE16)
-    pre = np.flatnonzero((out == prefill) & (req != NONE16))
     turn = {}
-    for r, t in zip(req[pre].tolist(), start[pre].tolist()):
-        turn[r] = min(turn.get(r, t), t)
+    for first in ((out == prefill), (stream_box | stream_named)):   # a request without a prefill row turns at its first stream row
+        rows = np.flatnonzero(first & (req != NONE16))
+        at = {}
+        for r, t in zip(req[rows].tolist(), start[rows].tolist()):
+            at[r] = min(at.get(r, t), t)
+        for r, t in at.items():
+            turn.setdefault(r, t)
     for i in np.flatnonzero(rest).tolist():
         t = turn.get(int(req[i]))
         if t is not None:

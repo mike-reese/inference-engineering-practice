@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import math
 import re
+from functools import cached_property
 from pathlib import Path
 from typing import NamedTuple
 
@@ -126,8 +127,7 @@ class Ctx:
         (rep.toml compose_projects) and the devtools' (deploy/devtools.yaml name)."""
         if self._projects is None:
             out, d = set(), self.dir
-            if d is not None and (d / "topology.json").is_file():
-                out.add(json.loads((d / "topology.json").read_bytes()).get("project"))
+            out.add(self.own_project)
             if d is not None and (d.parent.parent / "rep.toml").is_file():
                 import tomllib
                 out |= set(tomllib.loads((d.parent.parent / "rep.toml").read_text()).get("compose_projects", []))
@@ -137,17 +137,26 @@ class Ctx:
             self._projects = out - {None}
         return self._projects
 
+    @cached_property
+    def own_project(self) -> str | None:
+        """The run's own Compose project (topology.json), or None when the run folder has no topology.json."""
+        d = self.dir
+        if d is None or not (d / "topology.json").is_file():
+            return None
+        return json.loads((d / "topology.json").read_bytes()).get("project")
+
     def docker_container(self, name: str, project: str | None = None) -> str | None:
         """The container thing of a Docker container name (Docker events and stats), or None when it belongs to no
-        project of this run (dropped, counted). Compose names <project>-<service>-<n> of the run's own services
-        merge into the container the lane rules name (host/server), so one container is one thing."""
+        project of this run (dropped, counted). A Compose name <project>-<service>-<n> merges into the container the
+        lane rules name (host/server) only when (project, service) is the run's own project and a lane-rule service,
+        so one container is one thing and a rep's test project (same services) stays a container of its own."""
         proj = project or next((p for p in sorted(self.projects, key=len, reverse=True)
                                 if name.startswith(p + "-")), None)
         if proj not in self.projects:
             self.count("docker", f"containers of other projects dropped: {name} ({proj})")
             return None
         m = re.fullmatch(re.escape(proj) + r"-(.+)-\d+", name)
-        rule = next((x for x in self.lane_rules if m and x["container"] == m[1]), None)
+        rule = next((x for x in self.lane_rules if m and proj == self.own_project and x["container"] == m[1]), None)
         if rule is None:
             return self.thing(f"host/{name}", "host", "container", name, {"project": proj}, "Observed: Docker Engine API")
         key = self.container(rule["process_prefix"])
