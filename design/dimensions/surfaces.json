@@ -26,20 +26,20 @@
   "v1 view:logs":      {"new": "control plane (bottom), outside the world"},
   "v1 view:tools":     {"new": "control plane (bottom); run-specific containers (Grafana, Prometheus, DCGM, node exporter) are in the run's world as architecture / container"},
 
-  "panel:sidebar":   {"new": "hardware / system, persistent in every view"},
+  "panel:sidebar":   {"new": "hardware / system and device and unit, each metric at its place in registry/kinds.json (a click focuses that tier); persistent in every view"},
   "panel:inspector": {"new": "detail of the selection in any dimension; holds every detail row"},
   "panel:bar":       {"new": "the timeline strip: ticks are the stops of the focused (dimension, tier)"},
 
-  "control:previous / next stop of the focused tier":                              {"new": "unchanged (section 2.4): the previous or next stop of the focused (dimension, tier), section 3.4"},
-  "control:stop one tier coarser":                                                 {"new": "unchanged (section 2.4): a step at the next coarser tier of the same dimension"},
-  "control:fly one tier coarser / finer":                                          {"new": "unchanged (section 2.4): fly one tier coarser or finer in the focused dimension; the cursor stays"},
-  "control:focus execution / hardware / architecture":                             {"new": "unchanged (section 2.4): pick the focused dimension; when paired, its tier comes from the alignment table"},
-  "control:tier n of the focused dimension":                                       {"new": "unchanged (section 2.4): fly to tier n of the focused dimension"},
-  "control:paired / independent tiers":                                            {"new": "unchanged (section 2.4): paired tiers follow the alignment table of section 3.4"},
-  "control:next world":                                                            {"new": "unchanged (section 2.4): cycle the four worlds of section 2.2"},
-  "control:dock bottom / right":                                                   {"new": "unchanged (section 2.4): move the dock"},
-  "control:play every event in the bounds, looping":                               {"new": "unchanged (section 2.4): play the bounds, the execution unit at the cursor (section 2.3)"},
-  "control:pace: events / time":                                                   {"new": "unchanged (section 2.4): the playback pace"},
-  "control:previous / next row of the focused tier (walk every row, section 3.4)": {"new": "unchanged (section 2.4): the first walk mode of section 3.4; the second mode (rows of the selected process or object, owner) has no key yet"},
-  "control:back / forward through selections (choice 4)":                          {"new": "unchanged (section 2.4): selection history, section 8 choice 4"}
+  "control:previous / next stop of the focused tier":                              {"new": "← → (section 2.4): the previous or next stop of the focused (dimension, tier), section 3.4"},
+  "control:stop one tier coarser":                                                 {"new": "Shift ← → (section 2.4): a step at the next coarser tier of the same dimension"},
+  "control:fly one tier coarser / finer":                                          {"new": "↑ ↓ (section 2.4): fly one tier coarser or finer in the focused dimension; the cursor stays"},
+  "control:focus execution / hardware / architecture":                             {"new": "E H A (section 2.4): pick the focused dimension; when paired, its tier comes from the alignment table"},
+  "control:tier n of the focused dimension":                                       {"new": "1-6 (section 2.4): fly to tier n of the focused dimension"},
+  "control:paired / independent tiers":                                            {"new": "P (section 2.4): paired tiers follow the alignment table of section 3.4"},
+  "control:next world":                                                            {"new": "W (section 2.4): cycle the four worlds of section 2.2"},
+  "control:dock bottom / right":                                                   {"new": "D (section 2.4): move the dock"},
+  "control:play every event in the bounds, looping":                               {"new": "Space (section 2.4): play the bounds, the execution unit at the cursor (section 2.3)"},
+  "control:pace: events / time":                                                   {"new": "T (section 2.4): the playback pace"},
+  "control:previous / next row of the focused tier (walk every row, section 3.4)": {"new": "Alt ← → (section 2.4): the first walk mode of section 3.4; the second mode (rows of the selected process or object, owner) has no key yet"},
+  "control:back / forward through selections (choice 4)":                          {"new": "[ ] (section 2.4): selection history, section 8 choice 4"}
 }

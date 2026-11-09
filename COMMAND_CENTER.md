@@ -366,7 +366,8 @@ capture/clock.json            the run's t0_ns and wall offset, fixed when the li
 Server `backend/store/serve.py`:
 
 - `GET /api/v3/runs`: `{runs: [{run, generation, status, t0_ns, head_ns, rows, tier_counts, bytes}]}`, newest first
-- `GET /api/v3/runs/{run}/manifest` (ETag, no-cache, 304)
+- `GET /api/v3/runs/{run}/manifest` (ETag, no-cache, 304), plus `metric_places`: every registry metric's place (its
+  hardware tier), joined when served, so a registry change needs no import
 - `GET /api/v3/runs/{run}/blocks/{gen}/{name}` (a CCVB block or `aux.json`; immutable, ETag)
 - `GET /api/v3/runs/{run}/detail?ids=` (at most 256; or `?eids=`): hot fields decoded, cold fields, `parents`,
   `cause`, `links`, `metrics`, `counters`, and `open: {nsys: {run, path, t}, ncu: {run, path, profile_row}}`
@@ -377,9 +378,9 @@ Server `backend/store/serve.py`:
   and status frames
 
 Browser: one `RunStore` (`frontend/cc/store/run.js`) answers `step(dim, tier)` and `walk` (the place and stop rules
-of the manifest, applied by `store/dims.js`), `stepStorage` (the storage-tier step, until M1), `grainFor`,
-`widthFor`, `chain`, `activeBy`, `scan`, `count`, `row`, `children`, `linksOf`, `samplesAt`, `series`, `detail`,
-`resolve`, `subscribe`, `head`. It hides blocks, CCVB, the socket, dictionaries, indexes, the id map and generations.
+of the manifest, applied by `store/dims.js`), `grainFor`, `widthFor`, `chain`, `activeBy`, `scan`, `count`, `row`,
+`children`, `linksOf`, `samplesAt`, `series`, `metricTier`, `detail`, `resolve`, `subscribe`, `head`. It hides
+blocks, CCVB, the socket, dictionaries, indexes, the id map and generations.
 
 ### 6.5 Live and replay are one path
 
@@ -419,8 +420,11 @@ of the manifest, applied by `store/dims.js`), `stepStorage` (the storage-tier st
 
 ### 6.6 Accepted tradeoffs
 
-- Browser memory (10.9 MB for the timeline run, 120 MB for the code run; budget 160 MB per open run, choice 9) for
-  no network on any step, scrub or zoom. Compare holds two runs.
+- Browser memory for no network on any step, scrub or zoom: budget 160 MB per open run (choice 9), counted as the
+  total of every typed array the run's `RunStore` and its units hold (`ccv perf` `memory_mb` `typed_mb`; MB = 2^20
+  bytes). Measured 2026-11-09: 153.05 MB for the code run, 1.14 M rows at about 140 bytes per row (hot columns 57,
+  GPU copies 40, start, end and the order lists 24, the id map 8, dimensions 6.5, block indexes 4.7). Compare holds
+  two runs.
 - Two encodings of the hot columns (Parquet canonical, CCVB derived) for zero-parse loads and DuckDB for agents.
 - A reload (target 250 ms) when a new generation lands, for one id rule per generation.
 
@@ -477,6 +481,7 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 | key moments | `moments.toml` per rep; `event` resolved against the run's names (P3 lint) | I02A file exists |
 | live head and mask | `head_ns` and stream frames | measured |
 | hardware each unit ran on | the kind's hardware place in `registry/kinds.json` (section 9), refined by lane (thread: CPU, stream: GPU) | inferred, P3 |
+| hardware tier of each sidebar metric (`hwside.js` `tier`) | the metric's hardware place in `registry/kinds.json` (section 3.2), joined to the manifest when served | inferred, M1 |
 | process role (HTTP process, executor worker) | each component boundary maps to the pid whose lanes carry its stamps | inferred, P3 |
 | GPU memory held per process and container | `nvidia-smi --query-compute-apps` at 500 ms, group `gpu-apps` | measured, P2 |
 | kernel class (gemm, attention, memory, other) | name rule in `registry/kinds.json` | inferred, P3 |
@@ -589,21 +594,21 @@ marks an open choice.
 | v1 view | metrics | hardware / system (persistent sidebar) |
 | v1 view | logs | control plane (bottom), outside the world |
 | v1 view | tools | control plane (bottom); run-specific containers (Grafana, Prometheus, DCGM, node exporter) are in the run's world as architecture / container |
-| panel | sidebar | hardware / system, persistent in every view |
+| panel | sidebar | hardware / system and device and unit, each metric at its place in registry/kinds.json (a click focuses that tier); persistent in every view |
 | panel | inspector | detail of the selection in any dimension; holds every detail row |
 | panel | bar | the timeline strip: ticks are the stops of the focused (dimension, tier) |
-| control | previous / next stop of the focused tier | unchanged (section 2.4): the previous or next stop of the focused (dimension, tier), section 3.4 |
-| control | stop one tier coarser | unchanged (section 2.4): a step at the next coarser tier of the same dimension |
-| control | fly one tier coarser / finer | unchanged (section 2.4): fly one tier coarser or finer in the focused dimension; the cursor stays |
-| control | focus execution / hardware / architecture | unchanged (section 2.4): pick the focused dimension; when paired, its tier comes from the alignment table |
-| control | tier n of the focused dimension | unchanged (section 2.4): fly to tier n of the focused dimension |
-| control | paired / independent tiers | unchanged (section 2.4): paired tiers follow the alignment table of section 3.4 |
-| control | next world | unchanged (section 2.4): cycle the four worlds of section 2.2 |
-| control | dock bottom / right | unchanged (section 2.4): move the dock |
-| control | play every event in the bounds, looping | unchanged (section 2.4): play the bounds, the execution unit at the cursor (section 2.3) |
-| control | pace: events / time | unchanged (section 2.4): the playback pace |
-| control | previous / next row of the focused tier (walk every row, section 3.4) | unchanged (section 2.4): the first walk mode of section 3.4; the second mode (rows of the selected process or object, owner) has no key yet |
-| control | back / forward through selections (choice 4) | unchanged (section 2.4): selection history, section 8 choice 4 |
+| control | previous / next stop of the focused tier | ← → (section 2.4): the previous or next stop of the focused (dimension, tier), section 3.4 |
+| control | stop one tier coarser | Shift ← → (section 2.4): a step at the next coarser tier of the same dimension |
+| control | fly one tier coarser / finer | ↑ ↓ (section 2.4): fly one tier coarser or finer in the focused dimension; the cursor stays |
+| control | focus execution / hardware / architecture | E H A (section 2.4): pick the focused dimension; when paired, its tier comes from the alignment table |
+| control | tier n of the focused dimension | 1-6 (section 2.4): fly to tier n of the focused dimension |
+| control | paired / independent tiers | P (section 2.4): paired tiers follow the alignment table of section 3.4 |
+| control | next world | W (section 2.4): cycle the four worlds of section 2.2 |
+| control | dock bottom / right | D (section 2.4): move the dock |
+| control | play every event in the bounds, looping | Space (section 2.4): play the bounds, the execution unit at the cursor (section 2.3) |
+| control | pace: events / time | T (section 2.4): the playback pace |
+| control | previous / next row of the focused tier (walk every row, section 3.4) | Alt ← → (section 2.4): the first walk mode of section 3.4; the second mode (rows of the selected process or object, owner) has no key yet |
+| control | back / forward through selections (choice 4) | [ ] (section 2.4): selection history, section 8 choice 4 |
 <!-- /gen:surfaces -->
 
 ## 10. Stop counts per run

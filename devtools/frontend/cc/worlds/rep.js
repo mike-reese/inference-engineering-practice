@@ -1,6 +1,6 @@
 // Rep world: the run's overview. What the rep does and teaches, what came out (one run, or two side by side in
 // compare), and its key moments: each one jumps the replay to where the lesson can be seen.
-import { state, subscribe, select, setTier, setWorld, store } from "../control/control.js";
+import { state, subscribe, select, setTier, setWorld, store, openedStore } from "../control/control.js";
 import { repOf, runOf, kindOf, whenOf, valueAt, ttftSegments, fmtMs, esc, md, lessonsOf } from "../session.js";
 
 /** The first row, in time order, of the moments' request (moments.toml `request`, a request id suffix) whose name
@@ -11,6 +11,14 @@ function eventRow(S, event, suffix) {
   const named = new Set(); S.names.forEach((_, i) => { if (S.nameText(i).startsWith(event)) named.add(i); });
   for (const id of S.allRows) if (S.field("req", id) === req && named.has(S.field("name", id))) return id;
   return -1;
+}
+/** Client TTFT from a run's client rows, as latency.py defines it: the request's first "event: token" client event
+ *  minus its "send" client event, in ms. null when the run holds neither. */
+function clientTtft(S, suffix) {
+  const req = S.requests.findIndex((r) => r.endsWith(suffix)), kind = S.kinds.find((k) => k.name === "client event")?.code;
+  const at = (name) => { for (const id of S.allRows) if (S.field("req", id) === req && S.field("kind", id) === kind && S.nameText(S.field("name", id)) === name) return S.startOf[id]; return null; };
+  const send = req < 0 ? null : at("send"), token = send == null ? null : at("event: token");
+  return token == null ? null : (token - send) / 1e6;
 }
 const CLOCKS = [["client", "#7cc4ff"], ["wire", "#58d68d"], ["engine", "#f5a623"]];
 const ROWS = [
@@ -76,13 +84,18 @@ export function mount(el) {
       : `<p class="none">Results not computed for this run (no latency.json in its folder).</p>`;
     if (!b) return `<table class="res"><tr><th></th>${CLOCKS.map(([c, col]) => `<th style="color:${col}">${c}</th>`).join("")}</tr>
       ${ROWS.map(([name, p]) => `<tr><td>${name}</td>${CLOCKS.map(([c]) => `<td>${fmtMs(valueAt(ra, p[c]))}</td>`).join("")}</tr>`).join("")}</table>`;
+    // client TTFT comes from each run's client rows in the store (7.4), filled in once both stores are open
     const rows = ROWS.flatMap(([name, p]) => CLOCKS.map(([c, col]) => {
-      const va = valueAt(ra, p[c]), vb = valueAt(rb, p[c]), d = va != null && vb != null ? vb - va : null;
-      return `<tr><td>${name} <span style="color:${col}">${c}</span></td><td>${fmtMs(va)}</td><td>${fmtMs(vb)}</td>
-        <td class="${d > 0 ? "up" : d < 0 ? "down" : ""}">${d == null ? "–" : `${d > 0 ? "+" : ""}${d.toFixed(3)}`}</td>
-        <td class="${d > 0 ? "up" : d < 0 ? "down" : ""}">${d == null || !va ? "–" : `${d > 0 ? "+" : ""}${(100 * d / va).toFixed(1)}%`}</td></tr>`;
+      const fromRows = name === "TTFT" && c === "client";
+      return `<tr${fromRows ? ` data-rows="ttft"` : ""}><td>${name} <span style="color:${col}">${c}</span></td>${fromRows ? delta(null, null) : delta(valueAt(ra, p[c]), valueAt(rb, p[c]))}</tr>`;
     })).join("");
-    return `<table class="res"><tr><th></th><th>A</th><th>B</th><th>B − A</th><th>%</th></tr>${rows}</table>`;
+    return `<table class="res"><tr><th></th><th>A</th><th>B</th><th>B − A</th><th>%</th></tr>${rows}</table>
+      <p class="muted" style="font-size:12px;margin:6px 0 0">TTFT client: recomputed from each run's client rows in the store (first token event − send). Other rows: latency.json.</p>`;
+  }
+  function delta(va, vb) {
+    const d = va != null && vb != null ? vb - va : null, cls = d > 0 ? "up" : d < 0 ? "down" : "";
+    return `<td>${fmtMs(va)}</td><td>${fmtMs(vb)}</td><td class="${cls}">${d == null ? "–" : `${d > 0 ? "+" : ""}${d.toFixed(3)}`}</td>
+      <td class="${cls}">${d == null || !va ? "–" : `${d > 0 ? "+" : ""}${(100 * d / va).toFixed(1)}%`}</td>`;
   }
 
   function segments(run, scale, label) {
@@ -136,6 +149,10 @@ export function mount(el) {
         <section><details open><summary>Results notes (README)</summary>${md(rep.sections.Results) || '<p class="none">No Results section.</p>'}</details></section>
         <section><details><summary>Pass checks</summary>${md(rep.sections["Pass Check"])}</details></section>
       </div>`;
+    if (b) Promise.all([openedStore(ss.run), openedStore(ss.runB)]).then(([SA, SB]) => {
+      const tr = box.querySelector('tr[data-rows="ttft"]'), req = rep.moments?.request ?? "measured";
+      if (state.session === ss && tr) tr.innerHTML = tr.firstElementChild.outerHTML + delta(SA && clientTtft(SA, req), SB && clientTtft(SB, req));
+    });
   }
   const unsub = subscribe((s, ch) => { if (ch.session) render(s); });
   return () => { unsub(); root.remove(); };
