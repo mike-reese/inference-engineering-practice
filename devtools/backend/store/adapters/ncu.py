@@ -26,21 +26,38 @@ def labels(run_dir: Path) -> dict:
         return {}
 
 
+def _stamp(p: Path) -> str:
+    return p.name.rsplit("_", 2)[-2] if p.name.count("_") >= 2 else ""
+
+
+def _timelines_before(runs: list[Path], k: Path) -> list[Path]:
+    return [t for t in runs if labels(t).get("trace") == "timeline" and _stamp(t) < _stamp(k)]
+
+
 def profile_run_for(run_dir: Path) -> Path | None:
     """The kernels-level run whose counters belong to this timeline-level run, or None."""
     if labels(run_dir).get("trace") != "timeline":
         return None
-    stamp = lambda p: p.name.rsplit("_", 2)[-2] if p.name.count("_") >= 2 else ""   # noqa: E731
-    runs = sorted((p for p in run_dir.parent.iterdir() if (p / "labels.json").is_file()), key=stamp)
-    mine = stamp(run_dir)
+    runs = sorted((p for p in run_dir.parent.iterdir() if (p / "labels.json").is_file()), key=_stamp)
+    mine = _stamp(run_dir)
     for k in runs:
         lab = labels(k)
-        if lab.get("trace") != "kernels" or not lab.get("profile_range") or stamp(k) <= mine:
+        if lab.get("trace") != "kernels" or not lab.get("profile_range") or _stamp(k) <= mine:
             continue
-        before = [t for t in runs if labels(t).get("trace") == "timeline" and stamp(t) < stamp(k)]
+        before = _timelines_before(runs, k)
         if before and before[-1].name == run_dir.name and _same_prompt(run_dir, k):
             return k
     return None
+
+
+def timeline_run_for(run_dir: Path) -> Path | None:
+    """The timeline-level run whose profile_run_for is this kernels-level run, or None."""
+    if labels(run_dir).get("trace") != "kernels":
+        return None
+    runs = sorted((p for p in run_dir.parent.iterdir() if (p / "labels.json").is_file()), key=_stamp)
+    before = _timelines_before(runs, run_dir)
+    tied = before and profile_run_for(before[-1])
+    return before[-1] if tied and tied.name == run_dir.name else None
 
 
 def _same_prompt(a: Path, b: Path) -> bool:

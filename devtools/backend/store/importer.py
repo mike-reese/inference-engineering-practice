@@ -59,7 +59,7 @@ from .adapters.client import STAMPS_FILE, ClientRecords, ClientStamps
 from .adapters.docker import CAPTURE as DOCKER_CAPTURE, DockerEvents
 from .adapters.engine import ITER_CAPTURE, ITER_FILE, EngineIterations, EngineRecords, engine_series, engine_values
 from .adapters.gpu import FILE as GPU_CSV, TRACK as GPU_TRACK, CsvTail, parse as parse_gpu
-from .adapters.ncu import NcuHeadline, labels as read_labels, profile_run_for
+from .adapters.ncu import NcuHeadline, labels as read_labels, profile_run_for, timeline_run_for
 from .adapters.nsys import FORWARD_STEP, Nsys
 from .adapters.prometheus import series as prometheus_series
 from .adapters.stamps import (FILE as STAMPS, INFERRED_ITERATION_BOX, MESSAGE_SOURCES, SRC, ServerStamps,
@@ -90,6 +90,9 @@ ENGINE_EVIDENCE = ("Observed: the engine's /prometheus/metrics, scraped once a s
 ENGINE_PROCESS = "server"     # the engine's samples sit on its container (registry lanes: process prefix "server")
 GPU_GROUP = re.sub(r"[^A-Za-z0-9]+", "-", GPU_TRACK).strip("-")   # gpu.csv samples: group samples-gpu0-nvidia-smi
 SUPERSEDED = ("nsys/", "torch/", "ncu/")
+# The observer whose clock stamps a metric input row (D13's Metrics tab "clock"), by the row's adapter source; any other
+# source is its own observer. A sample input's observer is its sample group (one clock per group, 6.3).
+OBSERVER = {"client_records": "client", "client_stamps": "client", "pcap": "wire", "engine_records": "engine"}
 ROW_GROUP = 4096
 
 
@@ -126,7 +129,7 @@ def clock(run_dir: Path, root: Path) -> dict:
 
 
 # ---------------------------------------------------------------------- signature, generations
-def inputs_signature(run_dir: Path, root: Path, reg: Registry, profile_run: Path | None) -> str:
+def inputs_signature(run_dir: Path, root: Path, reg: Registry, profile_run: Path | None, tie: dict | None) -> str:
     h = hashlib.sha256()
     paths = [p for p in sorted(run_dir.rglob("*")) if p.is_file() and p.suffix != ".log"]
     paths += sorted((root / "capture").glob("*")) if (root / "capture").is_dir() else []
@@ -134,6 +137,8 @@ def inputs_signature(run_dir: Path, root: Path, reg: Registry, profile_run: Path
     if profile_run is not None:
         paths += [profile_run / f for f in ("labels.json", "prompt.json", "trace/kernels.csv", "trace/sections.csv")]
         h.update(profile_run.name.encode())
+    if tie is not None:
+        h.update(f"{tie['run']}\0{tie['generation']}".encode())
     for p in paths:
         if p.is_file():
             st = p.stat()
@@ -158,9 +163,28 @@ def import_run(run_dir: Path, reg: Registry, out_root: Path = CC_STORE, repo: Pa
         raise ImportStop(f"{run_dir.name}: the run is being written live ({e})") from None
 
 
+def timeline_tie(run_dir: Path, runs: Path) -> dict | None:
+    """A kernels-level run's tie to its timeline run, as that run's import wrote it in the store: {run, generation,
+    kernels (its manifest tools.ncu.kernels), event_eids (the tied kernel rows, in profile row order)}. None when the run
+    has no timeline run, or that run's manifest does not tie this run's counters."""
+    t = timeline_run_for(run_dir)
+    mp = runs / t.name / "manifest.json" if t else None
+    if mp is None or not mp.is_file():
+        return None
+    m = json.loads(mp.read_bytes())
+    ncu = m.get("tools", {}).get("ncu") or {}
+    if ncu.get("run") != run_dir.name or not ncu.get("kernels"):
+        return None
+    prof = runs / t.name / f"g{m['generation']}" / "profiles.parquet"
+    eids = duckdb.sql(f"SELECT event_eid FROM read_parquet('{prof}') WHERE event_eid IS NOT NULL "
+                      "GROUP BY profile_row, event_eid ORDER BY profile_row").fetchall()
+    return {"run": t.name, "generation": m["generation"], "kernels": ncu["kernels"], "event_eids": [e for (e,) in eids]}
+
+
 def _import(run_dir: Path, root: Path, reg: Registry, repo: Path, force: bool) -> Manifest | None:
     profile_run = profile_run_for(run_dir)
-    sig = inputs_signature(run_dir, root, reg, profile_run)
+    tie = timeline_tie(run_dir, root.parent)
+    sig = inputs_signature(run_dir, root, reg, profile_run, tie)
     old = Manifest.load(root / "manifest.json") if (root / "manifest.json").is_file() else None
     if old and old.inputs_sig == sig and not force:
         return None
@@ -170,7 +194,7 @@ def _import(run_dir: Path, root: Path, reg: Registry, repo: Path, force: bool) -
     tmp = root / f"g{gen}.tmp"
     tmp.mkdir(parents=True)
     try:
-        manifest = _build(run_dir, root, reg, repo, tmp, gen, sig, old, profile_run)
+        manifest = _build(run_dir, root, reg, repo, tmp, gen, sig, old, profile_run, tie)
         os.replace(tmp, root / f"g{gen}")
     except BaseException:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -403,7 +427,7 @@ def column_groups(clocks: dict, samples: list, reg: Registry, pos_of: dict, cata
 
 # ---------------------------------------------------------------------- the generation
 def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen: int, sig: str, old: Manifest | None,
-           profile_run: Path | None) -> Manifest:
+           profile_run: Path | None, tie: dict | None) -> Manifest:
     t_start = time.perf_counter()
     run = run_dir.name
     labels = read_labels(run_dir)
@@ -416,6 +440,7 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     except KeyError as e:
         raise ImportStop(f"{run}: {e.args[0]}") from None
     caps, cap_stats = read_captures(root, ctx)
+    ctx.topology()
     c = src.cols
     m0 = len(src)
     if not m0:
@@ -644,7 +669,9 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
             else:
                 missing_in.append(sid)
         unresolved_inputs += len(missing_in)
-        metrics.append({**{k: v for k, v in mt.items() if k != "inputs"},
+        seen = [OBSERVER.get(source_s[i], source_s[i]) for i in rows_in] + \
+               [g.removeprefix("samples-") for g, _ in samples_in]
+        metrics.append({**{k: v for k, v in mt.items() if k != "inputs"}, "clock": " → ".join(dict.fromkeys(seen)) or None,
                         "inputs": {"rows": rows_in, "samples": samples_in, "unresolved": missing_in}})
     facts, absent = {}, []
     for f in FACT_FILES:
@@ -706,6 +733,8 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     if "ncu" in tools and ncu_meta:
         tools["ncu"] |= {"kernels": ncu_meta, "counters": list(reg.ncu_headline),
                          "event_ids": sorted({r["event_id"] for r in profile_rows if r["event_id"] is not None})}
+    if "ncu" in tools and tie:
+        tools["ncu"]["timeline"] = tie
 
     kind_counts = {reg.kinds[k].kind: int(v) for k, v in enumerate(np.bincount(kind, minlength=len(reg.kinds))) if v}
     stats = {
@@ -973,6 +1002,8 @@ def main() -> None:
     repo, reg = Path(os.environ.get("REPO", "/repo")), Registry.load()
     runs = sorted(p.name for p in (CC_STORE / "runs").iterdir() if (p / "manifest.json").is_file()
                   and p.name != "host") if a.all else a.runs
+    # a kernels-level run reads its timeline run's tie from the store, so it imports after the timeline runs
+    runs.sort(key=lambda r: any(read_labels(d).get("trace") == "kernels" for d in repo.glob(f"reps/*/results/{r}")))
     failed = []
     for run in runs:
         t = time.perf_counter()

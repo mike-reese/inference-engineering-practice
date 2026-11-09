@@ -9,7 +9,7 @@
 import { state, store, storeError, now, units, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { NONE16 } from "../store/columns.js";
 import { roleOf, fmtValue, fmtBytes, fmtSpan, periodOf, why } from "../sidebar/samples.js";
-import { SESSION, repOf, runOf, kindOf as runKind, whenOf, esc } from "../session.js";
+import { repOf, runOf, kindOf as runKind, whenOf, esc } from "../session.js";
 import { nsysWhere } from "./nsight.js";
 
 const ms = (ns, d = 3) => (ns / 1e6).toFixed(d);
@@ -156,24 +156,19 @@ function lifecycle(S, ci, t) {
   for (const [t0, name] of evs) { if (t0 > t) break; if (name.startsWith("health_status")) health = name.replace(/^health_status:\s*/, ""); else at = name; }
   return { state: at, health };
 }
-/** The container's docker inspect record in aux.json facts.topology (topology.json), or null. */
-function inspected(S, c, again) {
-  const a = auxOf(S, again), name = `/${c.attrs?.docker ?? c.name}`;
-  return a?.facts?.topology?.value?.containers?.find((x) => x.Name === name) ?? null;
-}
 const metricOf = (S, metric, thing) => S.metrics.findIndex((m) => m.metric === metric && m.thing === thing);
 /** The index of the newest sample of metric i at or before t (it changes when the metric's value does), or -1. */
 function sampleAt(S, i, t) { const g = i >= 0 ? S.groupOf(i) : null; return g ? upper(g.ts, t) - 1 : -1; }
 /** D13's container card: name, lifecycle, image and project, CPU, memory, network and GPU memory per process. */
-function card(S, ci, t, again) {
+function card(S, ci, t) {
   const c = S.things[ci], v = S.samplesAt(t), at = (metric, thing = ci) => { const i = metricOf(S, metric, thing); return i < 0 ? NaN : v[i]; };
-  const life = lifecycle(S, ci, t), ins = inspected(S, c, again), mib = (b) => (Number.isNaN(b) ? "–" : (b / 2 ** 20).toFixed(0));
-  const limit = ins?.HostConfig?.Memory ? ` / ${mib(ins.HostConfig.Memory)}` : ins ? " (no limit)" : "";
+  const life = lifecycle(S, ci, t), a = c.attrs ?? {}, mib = (b) => (Number.isNaN(b) ? "–" : (b / 2 ** 20).toFixed(0));
+  const limit = a.mem_limit ? ` / ${mib(a.mem_limit)}` : "image" in a ? " (no limit)" : "";
   const cpu = at("docker.cpu_pct"), rx = at("docker.rx_rate"), tx = at("docker.tx_rate");
   const gpu = S.things.filter((p) => p.kind === "process" && p.pre >= c.pre && p.post <= c.post)
     .map((p) => [p, at("gpu.app.memory.used", p.i)]).filter(([, m]) => !Number.isNaN(m));
   return `<div class="card"><div class="title">${thingLink(S, ci)}<span class="state">${esc(life.state ?? "no lifecycle event yet")}${life.health ? ` · ${esc(life.health)}` : ""}</span></div>
-    <div class="image">${[esc(ins?.Config?.Image ?? (auxes.has(S) ? "image not in topology.json" : "…")), esc(c.attrs?.project ?? "")].filter(Boolean).join(" · ")}</div>
+    <div class="image">${[esc(a.image ?? "image not recorded"), esc(a.project ?? "")].filter(Boolean).join(" · ")}</div>
     <div>cpu ${Number.isNaN(cpu) ? "–" : cpu.toFixed(1)}% · mem ${mib(at("docker.mem_bytes"))}${limit} MiB${Number.isNaN(rx) ? "" : ` · rx ${rx.toFixed(0)} tx ${Number.isNaN(tx) ? "–" : tx.toFixed(0)} B/s`}</div>
     ${gpu.map(([p, m]) => `<div style="color:#9fc3ff">GPU held: ${m.toFixed(0)} MiB · ${esc(p.attrs?.role?.name ?? p.name)} pid ${esc(p.attrs?.pid ?? "–")}</div>`).join("")}</div>`;
 }
@@ -256,7 +251,7 @@ function rowView(S, s, again) {
   return `<div class="cols"><div>${left.join("")}</div><div>${right.join("")}</div></div>`;
 }
 
-function thingView(S, s, again) {
+function thingView(S, s) {
   const i = S.things.findIndex((x) => x.key === s.sel), x = S.things[i];
   if (!x) return `<p class="muted">${esc(s.sel)} is not a thing of this run.</p>`;
   const dim = ARCH_KINDS.has(x.kind) ? "architecture" : "hardware", T = S.things;
@@ -266,7 +261,7 @@ function thingView(S, s, again) {
   if (attrs.length) left.push(`<table class="kv">${attrs.map(([key, v]) => `<tr><td>${esc(key)}</td><td class="wrap">${v && typeof v === "object" ? esc(v.name ?? JSON.stringify(v)) : esc(v ?? "–")}</td></tr>`).join("")}</table>`);
   if (up.length) left.push(`<div class="label">parents</div><ol class="path">${up.map((p) => `<li><span class="dim">${esc(T[p].kind)}</span> ${thingLink(S, p)}</li>`).join("")}</ol>`);
   const right = [];
-  if (x.kind === "container") right.push(card(S, i, s.t, again));
+  if (x.kind === "container") right.push(card(S, i, s.t));
   if (x.kind === "process") {
     const m = metricOf(S, "gpu.app.memory.used", i), v = m < 0 ? NaN : S.samplesAt(s.t)[m];
     if (m >= 0) right.push(`<div class="label">GPU memory held at the cursor</div><div>${Number.isNaN(v) ? `– <span class="dim">${esc(why(S, m))}</span>` : `${v.toFixed(0)} MiB`} <span class="dim">${esc(periodOf(S, m))}</span></div>`);
@@ -289,14 +284,14 @@ const selected = {
     const S = store();
     if (s.sel == null) { el.innerHTML = `<p class="muted">Nothing selected. Step with ← →, click a stop on the timeline, a tier, or a thing in the world.</p>`; return; }
     if (!S) { el.innerHTML = noRun(); return; }
-    el.innerHTML = typeof s.sel === "number" ? rowView(S, s, again) : thingView(S, s, again);
+    el.innerHTML = typeof s.sel === "number" ? rowView(S, s, again) : thingView(S, s);
   },
 };
 
 // ---------------------------------------------------------------- At cursor
 const SAMPLE_ROWS = [["SMs active", "sm_active"], ["GPU utilization", "gpu_util"], ["DRAM read", "dram_read"], ["DRAM write", "dram_write"],
   ["PCIe RX", "pcie_rx"], ["PCIe TX", "pcie_tx"], ["host CPU busy", null, "host.cpu.busy"], ["GPU memory used", "mem_used"]];
-function sampleBlock(S, n, again) {
+function sampleBlock(S, n) {
   const rows = [], missing = [];
   for (const [label, role, metric] of SAMPLE_ROWS) {
     const i = role ? roleOf(S, role) : S.metrics.findIndex((m) => m.metric === metric);
@@ -308,7 +303,7 @@ function sampleBlock(S, n, again) {
   const ci = n.archPath.find((i) => S.things[i]?.kind === "container");
   return `<div class="label" style="color:${DIM_COLOR.hardware}">hardware · sample ${n.sampleIndex} (state, not a stop)</div>
     <table class="kv">${rows.join("")}</table>${missing.length ? `<div class="dim">not recorded in this run: ${esc(missing.join(", "))}</div>` : ""}
-    ${ci != null ? card(S, ci, state.t, again) : ""}`;
+    ${ci != null ? card(S, ci, state.t) : ""}`;
 }
 const atCursor = {
   key: "cursor", label: "At cursor",
@@ -317,7 +312,7 @@ const atCursor = {
     const n = now();
     return [S, s.sel, s.rev, n.phases.map((u) => u.id).join(), n.exec.map((u) => u?.id).join(), n.kernel?.id, n.transfers.map((x) => x.id).join(), n.archPath.join()];
   },
-  render(el, s, again) {
+  render(el, s) {
     const S = store(); if (!S) { el.innerHTML = noRun(); return; }
     const n = now(), L = S.dims.ladders.execution;
     const exec = n.exec.map((u, i) => `<tr><td>${esc(L[i])}</td><td>${u ? link(S, u.id, unitText(S, L[i], u.id)) : "–"}</td></tr>`).join("");
@@ -331,7 +326,7 @@ const atCursor = {
       </div><div>
         <table class="kv"><tr><td>kernel</td><td>${n.kernel ? link(S, n.kernel.id) : "none running"}</td></tr>
           <tr><td>transfer</td><td>${n.transfers.map((x) => link(S, x.id, `${nm(S, x.id)}, ${fmtBytes(S.field("bytes", x.id))}`)).join("<br>") || "none in flight"}</td></tr></table>
-        <div class="ac-smp" data-i="${n.sampleIndex}">${sampleBlock(S, n, again)}</div></div></div>`;
+        <div class="ac-smp" data-i="${n.sampleIndex}">${sampleBlock(S, n)}</div></div></div>`;
   },
   tick(el, s) {
     const t = el.querySelector(".ac-t"), S = store(); if (!t || !S) return;
@@ -379,8 +374,8 @@ function metricRows(S, s, list, again) {
   const inputs = (m) => [...(m.inputs?.rows ?? []).map((id) => (id < S.N ? link(S, id, nm(S, id).slice(0, 28)) : `row ${id}`)),
     ...(m.inputs?.samples?.length ? [tag(`${m.inputs.samples.length} samples`)] : []), ...(m.inputs?.unresolved ?? []).map((u) => tag(`unresolved ${u}`))].join("<br>");
   const source = (m) => (get || !inputRows(S, [m]).length ? sourcesOf(S, m, get).join(" · ") || "–" : "…");
-  return `<table class="metrics"><tr><th>metric</th><th>formula</th><th>value</th><th>inputs (click)</th><th>source</th></tr>${list.map((m) => `<tr data-m="${esc(mid(m))}" class="${s.metric === mid(m) ? "on" : ""}">
-    <td>${esc(m.name)}</td><td><code>${esc(m.formula)}</code></td><td>${valueText(m)}</td><td class="inp">${inputs(m) || "–"}</td><td class="dim">${esc(source(m))}</td></tr>`).join("")}</table>`;
+  return `<table class="metrics"><tr><th>metric</th><th>clock</th><th>formula</th><th>value</th><th>inputs (click)</th><th>source</th></tr>${list.map((m) => `<tr data-m="${esc(mid(m))}" class="${s.metric === mid(m) ? "on" : ""}">
+    <td>${esc(m.name)}</td><td>${esc(m.clock ?? "–")}</td><td><code>${esc(m.formula)}</code></td><td>${valueText(m)}</td><td class="inp">${inputs(m) || "–"}</td><td class="dim">${esc(source(m))}</td></tr>`).join("")}</table>`;
 }
 const metricsTab = {
   key: "metrics", label: "Metrics",
@@ -505,29 +500,35 @@ function moduleOf(S, id) {
   for (let x = S.field("cause", id), n = 0; x >= 0 && n < 400; x = S.field("parent", x), n++) if (S.dims.ex[x] === M) return x;
   return -1;
 }
-/** A run whose kernel counters sit on another run: the newest timeline run of the rep whose manifest ties this run's
- *  Nsight Compute capture (tools.ncu.run), and that run's detail of the tied rows. Cached per run. */
+/** A kernels-level run's counters sit on its timeline run: the manifest's tools.ncu.timeline (the import's tie) names
+ *  that run and the tied rows by eid; this is that run's detail of them. Cached per run. */
 const ties = new Map();
+// A GET detail asks at most 256 rows (the route's limit) in a request line under the server's 8,190 bytes (aiohttp's
+// max_line_size): eids are free text, so the tied rows go in requests cut by length as well as count.
+const DETAIL_ROWS = 256, LINE_MAX = 8190 - "GET  HTTP/1.1".length;
+function eidQueries(path, eids) {
+  const out = []; let q = [], len = path.length + 1;
+  for (const x of eids) {
+    const p = `eids=${encodeURIComponent(x)}`;
+    if (q.length && (q.length === DETAIL_ROWS || len + p.length + 1 > LINE_MAX)) { out.push(`${path}?${q.join("&")}`); q = []; len = path.length + 1; }
+    q.push(p); len += p.length + 1;
+  }
+  if (q.length) out.push(`${path}?${q.join("&")}`);
+  return out;
+}
 function tiedTo(S, again) {
   let e = ties.get(S.run);
   if (!e) {
-    e = { state: "looking" }; ties.set(S.run, e);
-    const rep = runOf(S.run)?.rep ?? state.session.rep;
-    (async () => {
-      const runs = SESSION.runs.filter((x) => x.rep === rep && x.id !== S.run && x.labels?.trace === "timeline").sort((a, b) => (b.started ?? "").localeCompare(a.started ?? ""));
-      for (const x of runs) {
-        const r = await fetch(`/api/v3/runs/${encodeURIComponent(x.id)}/manifest`); if (!r.ok) continue;
-        const ncu = (await r.json()).tools?.ncu;
-        if (ncu?.run !== S.run || !ncu.event_ids?.length) continue;
-        const rows = [];
-        for (let i = 0; i < ncu.event_ids.length; i += 256) {
-          const d = await fetch(`/api/v3/runs/${encodeURIComponent(x.id)}/detail?ids=${ncu.event_ids.slice(i, i + 256).join(",")}`);
-          if (!d.ok) throw new Error(`GET detail of ${x.id}: HTTP ${d.status}`);
-          rows.push(...(await d.json()).rows);
-        }
-        Object.assign(e, { state: "found", run: x.id, ncu, rows: rows.sort((a, b) => a.start - b.start) }); return;
+    const tl = S.tools.ncu?.timeline;
+    e = { state: tl ? "looking" : "none" }; ties.set(S.run, e);
+    if (tl) (async () => {
+      const rows = [];
+      for (const url of eidQueries(`/api/v3/runs/${encodeURIComponent(tl.run)}/detail`, tl.event_eids)) {
+        const d = await fetch(url);
+        if (!d.ok) throw new Error(`GET detail of ${tl.run}: HTTP ${d.status}`);
+        rows.push(...(await d.json()).rows);
       }
-      e.state = "none";
+      Object.assign(e, { state: "found", run: tl.run, ncu: tl, rows: rows.sort((a, b) => a.start - b.start) });
     })().catch((err) => { e.state = "failed"; e.error = String(err.message ?? err); console.error("bar: ncu tie", err); }).finally(() => again());
   }
   return e;
@@ -537,7 +538,7 @@ function tiedHtml(S, again) {
   const head = `<p><b>This run holds no kernel rows.</b> It is the Nsight Compute capture (<code>${esc(ncu.path)}</code>): ncu replays each profiled kernel, so the
     run keeps the request's client, wire and engine rows but no timeline of the GPU. ${openBtn(ncu, "Nsight Compute ↗", "Open this run's Nsight Compute report")}</p>`;
   if (e.state === "looking") return `${head}<p class="muted">looking for the timeline run that ties these counters…</p>`;
-  if (e.state !== "found") return `${head}<p class="muted">${e.state === "failed" ? `could not read the tie: ${esc(e.error)}` : "No timeline run of this rep ties these counters (no manifest names this run in tools.ncu)."}</p>`;
+  if (e.state !== "found") return `${head}<p class="muted">${e.state === "failed" ? `could not read the tie: ${esc(e.error)}` : "No timeline run ties these counters (the manifest's tools.ncu names no timeline run)."}</p>`;
   const k = e.ncu.kernels ?? {}, cv = (d, m) => d.counters?.values?.find((v) => v.measure === m);
   const cell = (d, m, f) => { const v = cv(d, m); return v ? f(v.value) : "–"; };
   return `${head}<p>Its counters are tied to <b>${e.rows.length} kernels of iteration ${esc(k.iteration ?? "–")}</b> of timeline run <code>${esc(e.run)}</code>

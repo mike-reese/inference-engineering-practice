@@ -104,9 +104,11 @@ function buildModel(S, key) {
     for (const id of evRows) if (S.field("lane", id) === t.i) events.push({ t: S.startOf[id], name: S.nameText(S.field("name", id)) });
     const ps = procs.filter((p) => under(p, t));
     return { t, key: t.key, name: t.name, project: t.attrs?.project ?? null, events, health: events.some((e) => e.name.startsWith("health_status")),
+      docker: t.attrs?.docker ?? null, image: t.attrs?.image ?? null, networks: t.attrs?.networks ?? null, netns: t.attrs?.netns ?? null, memLimit: t.attrs?.mem_limit ?? null,
       cpu: metric("docker.cpu_pct", t.i), mem: metric("docker.mem_bytes", t.i), rx: metric("docker.rx_rate", t.i), tx: metric("docker.tx_rate", t.i),
       procs: ps, gpu: ps.map((p) => ({ p, m: metric("gpu.app.memory.used", p.i) })).filter((x) => x.m >= 0) };
   });
+  for (const c of containers) c.sharesWith = c.netns ? containers.find((o) => o.docker === c.netns) ?? null : null;
   const networks = byKind("network").map((t) => ({ t, key: t.key, name: t.name, procs: procs.filter((p) => under(p, t)) }));
   const g = byKind("gpu")[0] ?? null;
   const first = (...names) => { for (const n of names) { const i = metric(n, g?.i); if (i >= 0) return i; } return -1; };
@@ -283,22 +285,31 @@ function procList(procs, X) {
 
 function card(c, withProcs, X) {
   const gpu = c.gpu.length ? `<div class="gpuheld" data-v="gpu"></div>` : "";
+  const net = c.netns ? `uses the network namespace of <b>${escape(c.sharesWith?.name ?? c.netns)}</b>` : "";
   return `<div class="card" data-id="${escape(c.key)}" data-sel="${escape(c.key)}" data-project="${escape(c.project ?? "")}" data-service="${escape(c.key)}"
     title="open the components inside this container">
     <div class="title"><i class="dot"></i>${escape(c.name)}<span class="state"></span></div>
-    <div class="image" title="the container's image is not in the store">image not recorded</div>
+    <div class="image"${c.image ? "" : ` title="the run has no topology.json"`}>${escape(c.image ?? "image not recorded")}</div>
     <div class="row"><span data-v="cpu"></span> ${spark("cpu")}</div>
-    <div class="row"><span data-v="mem"></span></div>
-    <div class="row net" data-v="net"></div>
+    <div class="row"><span data-v="mem"></span>${c.memLimit ? ` ${bar("mem")}` : ""}</div>
+    <div class="row net"${c.netns ? "" : ` data-v="net"`}>${net}</div>
     ${gpu}${withProcs ? procList(c.procs, X) : ""}<div class="nowis" data-now="${escape(c.key)}"></div>
   </div>`;
 }
 
+/** D13's project: one box per network (topology.json), each container drawn with the containers that join its network
+ *  namespace. */
 function project(name, containers, withProcs, X) {
-  return `<section class="project"><div class="label">project ${escape(name ?? "not recorded")}</div><div class="network">
-      <div class="label" title="the containers' networks are not in the store">network not recorded</div>
-      <div class="cards">${containers.map((c) => card(c, withProcs, X)).join("")}</div>
-    </div></section>`;
+  const nets = new Map();
+  for (const c of containers) {
+    if (containers.includes(c.sharesWith)) continue;
+    const net = c.networks?.[0] ?? null;
+    (nets.get(net) ?? nets.set(net, []).get(net)).push(c, ...containers.filter((o) => o.sharesWith === c));
+  }
+  return `<section class="project"><div class="label">project ${escape(name ?? "not recorded")}</div>${[...nets].map(([net, cs]) => `<div class="network">
+      <div class="label"${net ? "" : ` title="the run has no topology.json"`}>${net ? `network ${escape(net)}` : "network not recorded"}</div>
+      <div class="cards">${cs.map((c) => card(c, withProcs, X)).join("")}</div>
+    </div>`).join("")}</section>`;
 }
 const networkBox = (n, withProcs) => `<div class="network" data-id="${escape(n.key)}"><div class="label" data-sel="${escape(n.key)}">${escape(n.name)}</div>
   ${withProcs ? n.procs.map(procRow).join("") : ""}<div class="nowis" data-now="${escape(n.key)}"></div></div>`;
@@ -399,7 +410,7 @@ export function mountArch(el, { size = "lens" } = {}) {
       boxes: new Map(q(".cbox").map((g) => [g.dataset.box, { g, b: M.box.get(g.dataset.box), stat: g.querySelector("[data-stat]"), fon: g.querySelector(".fon") }])),
       edges: q(".edge"), blabels: q("[data-blabel]").map((n) => ({ n, B: M.bounds.find((b) => b.key === n.dataset.blabel) })),
       cards: q(".card[data-project]").map((n) => ({ n, c: M.containers.find((c) => c.key === n.dataset.id), state: n.querySelector(".state"), now: n.querySelector("[data-now]"),
-        v: (k) => n.querySelector(`[data-v="${k}"]`), spark: (k) => n.querySelector(`[data-spark="${k}"] polyline`) })),
+        v: (k) => n.querySelector(`[data-v="${k}"]`), spark: (k) => n.querySelector(`[data-spark="${k}"] polyline`), bar: (k) => n.querySelector(`[data-bar="${k}"]`) })),
       nets: q(".network[data-id]").map((n) => ({ n, key: n.dataset.id, now: n.querySelector("[data-now]") })),
       procs: q("[data-proc]").map((n) => ({ n, p: S.things.find((t) => t.key === n.dataset.proc) })),
       layers: q("[data-layer]").map((n) => ({ n, now: n.querySelector(".nowis") })),
@@ -509,11 +520,13 @@ export function mountArch(el, { size = "lens" } = {}) {
     if (ctx.si === v.si) return;
     v.si = ctx.si;
     const s = ctx.n.sample, val = (i) => (i >= 0 ? s[i] : NaN);
-    for (const { c, v: el_, spark: sp } of v.cards) {
+    for (const { c, v: el_, spark: sp, bar: b } of v.cards) {
       setText(el_("cpu"), `CPU ${fmt.pct(val(c.cpu))}`);
       sp("cpu")?.setAttribute("points", c.cpu >= 0 ? sparkPoints(history(S, c.cpu, t)) : "");
-      setText(el_("mem"), `mem ${fmt.mib(val(c.mem))}`);
-      setText(el_("net"), `↓ ${fmt.rate(val(c.rx))} ↑ ${fmt.rate(val(c.tx))}`);
+      const mem = val(c.mem);
+      setText(el_("mem"), `mem ${fmt.mib(mem)}${c.memLimit ? ` / ${fmt.mib(c.memLimit)}` : ""}`);
+      if (b("mem")) b("mem").style.width = `${Number.isNaN(mem) ? 0 : Math.min(100, (100 * mem) / c.memLimit).toFixed(1)}%`;
+      const nv = el_("net"); if (nv) setText(nv, `↓ ${fmt.rate(val(c.rx))} ↑ ${fmt.rate(val(c.tx))}${c.networks?.length ? ` · ${c.networks.join(", ")}` : ""}`);
       const gv = el_("gpu");
       if (gv) {
         const held = c.gpu.map((x) => ({ ...x, mib: val(x.m) })).filter((x) => x.mib > 0);

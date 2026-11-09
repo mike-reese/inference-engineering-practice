@@ -343,7 +343,7 @@ g<gen>/events-<block>.parquet hot + cold columns, sorted (start, id), zstd
 g<gen>/links.parquet          every link (from, to, kind, weight, rule, evidence)
 g<gen>/samples-<group>.parquet one group per source track and shared clock (ts_ns, one column per metric)
 g<gen>/profiles.parquet       Nsight Compute headline counters per kernel, in the registry unit
-g<gen>/aux.json               calculated metrics with their inputs (row ids, sample indexes), facts, measures
+g<gen>/aux.json               calculated metrics with their inputs (row ids, sample indexes) and clock, facts, measures
 g<gen>/<block>.ccvb           binary twin of each hot block (typed arrays in the browser)
 capture/<source>.jsonl        live-only sources: gpu (NVML), docker, docker-stats, engine, engine_iterations_raw
 capture/clock.json            the run's t0_ns and wall offset, fixed when the live run opens
@@ -354,7 +354,12 @@ capture/clock.json            the run's t0_ns and wall offset, fixed when the li
   period_ms, period_ns_measured, evidence}]`.
 - `blocks`: `[{name, table, band, rows, t, tier_counts, bytes, etag}]`. Bands: `spine` (tiers 0..2, resident) and
   `fine` (tiers 3..6, blocks of 32,768 rows). Every browser query merges across blocks.
-- `tools`: `{nsys: {run, path, session_start_ns, evidence}, ncu: {run, path, kernels, counters}}`.
+- `tools`: `{nsys: {run, path, session_start_ns, evidence}, ncu: {run, path, kernels, counters}}`. A kernels-level
+  run's `ncu` also names its timeline run: `timeline: {run, generation, kernels, event_eids}` (the tied kernel rows
+  by eid), so a kernels run imports after its timeline run.
+- A metric's `clock` in `aux.json` names the observers whose clocks stamp its inputs, in input order: `client`,
+  `wire`, `engine` for those row sources, the source name for any other, the sample group for samples.
+- Container things carry `image`, `networks`, `netns` and `mem_limit` from the run's `topology.json` when it exists.
 - CCVB: `"CCVB"`, u32 header length, header JSON `{schema:"ccvb/1", table, block, band, gen, rows, base_rows, t,
   tier_counts, dict_delta, metrics, columns:[{name,type,offset,length}]}`, then 8-byte-aligned column buffers.
 - The previous generation stays until the next import; older ones are deleted.
@@ -487,6 +492,7 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 | kernel class (gemm, attention, memory, other) | name rule in `registry/kinds.json` | inferred, P3 |
 | SMs used by a kernel | min(36, grid blocks) from cold `args` | inferred, labelled |
 | containers shown | compose and docker names merged into one thing; only the rep's and devtools' projects kept | P3 importer fix |
+| container image, networks, network namespace, memory limit | the run's `topology.json` (`docker inspect` after `compose up`), set on the container thing as `image`, `networks`, `netns`, `mem_limit`; a run without it says "image not recorded" | measured (runs with `topology.json`) |
 | box run counts and flow stripes | one load-time aggregate over `comp` and `flow` in `RunStore` | P3 |
 
 ### 7.3 Runs to record (owner approved, 2026-11-08)
@@ -644,15 +650,25 @@ Execution stops (own tier), per iteration in brackets. `layer` groups kernel row
 | I02A-TRACE-components_20261108T215349Z_561bfe | 3,175 | 128 | 2 (0) | 128 (1) | 3,004 (23) | 0 (0) | 0 (0) | 0 (0) | 41 (0) |
 | I02A-TRACE-kernels_20261103T181509Z_52744d | 11,698 | 0 | 3 | 0 | 11,673 | 0 | 0 | 0 | 22 |
 | I02A-TRACE-kernels_20261109T013556Z_9c0b54 | 8,911 | 192 | 3 (0) | 192 (1) | 8,340 (43) | 0 (0) | 0 (0) | 0 (0) | 376 (2) |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | 8,480 | 192 | 3 (0) | 192 (1) | 7,995 (42) | 0 (0) | 0 (0) | 0 (0) | 290 (2) |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | 8,418 | 192 | 3 (0) | 192 (1) | 7,925 (41) | 0 (0) | 0 (0) | 0 (0) | 298 (2) |
 | I02A-TRACE-live_20261103T185532Z_1c1629 | 1,471 | 0 | 2 | 0 | 1,447 | 0 | 0 | 0 | 22 |
 | I02A-TRACE-timeline_20261103T185837Z_e08b8b | 90,952 | 128 | 3 (0) | 0 (0) | 3,508 (27) | 3,200 (25) | 0 (0) | 39,768 (311) | 40,161 (314) |
 | I02A-TRACE-timeline_20261107T172848Z_f2ac52 | 93,163 | 192 | 3 (0) | 192 (1) | 6,224 (32) | 3,200 (17) | 0 (0) | 39,768 (207) | 39,464 (206) |
 | I02A-TRACE-timeline_20261108T200246Z_764014 | 101,881 | 192 | 3 (0) | 192 (1) | 6,158 (32) | 3,200 (17) | 0 (0) | 39,768 (207) | 48,248 (251) |
 | I02A-TRACE-timeline_20261108T213113Z_1d82c9 | 91,620 | 192 | 3 (0) | 192 (1) | 6,063 (32) | 3,200 (17) | 0 (0) | 39,768 (207) | 38,082 (198) |
 | I02A-TRACE-timeline_20261109T013347Z_69c1bb | 95,783 | 192 | 3 (0) | 192 (1) | 5,482 (29) | 3,200 (17) | 0 (0) | 39,768 (207) | 42,826 (223) |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | 91,899 | 192 | 3 (0) | 192 (1) | 5,456 (28) | 3,200 (17) | 0 (0) | 39,768 (207) | 38,968 (203) |
 | I02A_20261103T164324Z_348959 | 1,130 | 0 | 2 | 0 | 1,106 | 0 | 0 | 0 | 22 |
 | I02A_20261103T172804Z_a3ca9a | 648 | 0 | 2 | 0 | 624 | 0 | 0 | 0 | 22 |
 | I02A_20261103T172929Z_0e5d39 | 648 | 0 | 2 | 0 | 624 | 0 | 0 | 0 | 22 |
+| I02A_20261109T062054Z_42b814 | 1,052 | 0 | 2 | 0 | 949 | 0 | 0 | 0 | 101 |
+| I02A_20261109T062307Z_b80715 | 1,018 | 0 | 2 | 0 | 914 | 0 | 0 | 0 | 102 |
+| I02A_20261109T062449Z_b6b075 | 1,051 | 0 | 2 | 0 | 946 | 0 | 0 | 0 | 103 |
+| I02A_20261109T062635Z_cf942a | 1,023 | 0 | 2 | 0 | 920 | 0 | 0 | 0 | 101 |
+| I02A_20261109T063129Z_320857 | 1,022 | 0 | 2 | 0 | 919 | 0 | 0 | 0 | 101 |
+| I02A_20261109T063711Z_70fba8 | 1,010 | 0 | 2 | 0 | 907 | 0 | 0 | 0 | 101 |
+| I02A_20261109T064024Z_4518dc | 1,017 | 0 | 2 | 0 | 910 | 0 | 0 | 0 | 105 |
 | I02C_20261107T181031Z_5626f7 | 3,018 | 0 | 3 | 0 | 2,781 | 0 | 0 | 0 | 234 |
 | I02C_20261107T181629Z_c37c3e | 2,707 | 0 | 3 | 0 | 2,332 | 0 | 0 | 0 | 372 |
 
@@ -677,15 +693,25 @@ Stop check: every execution place is allowed for its kind's storage tier; kernel
 | I02A-TRACE-components_20261108T215349Z_561bfe | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02A-TRACE-kernels_20261103T181509Z_52744d | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02A-TRACE-kernels_20261109T013556Z_9c0b54 | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02A-TRACE-live_20261103T185532Z_1c1629 | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02A-TRACE-timeline_20261103T185837Z_e08b8b | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
 | I02A-TRACE-timeline_20261107T172848Z_f2ac52 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
 | I02A-TRACE-timeline_20261108T200246Z_764014 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
 | I02A-TRACE-timeline_20261108T213113Z_1d82c9 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
 | I02A-TRACE-timeline_20261109T013347Z_69c1bb | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | timeline.sqlite | 39,768 | 39,768 | 0 | 0 | 0 | ok |
 | I02A_20261103T164324Z_348959 | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02A_20261103T172804Z_a3ca9a | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02A_20261103T172929Z_0e5d39 | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062054Z_42b814 | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062307Z_b80715 | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062449Z_b6b075 | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T062635Z_cf942a | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T063129Z_320857 | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T063711Z_70fba8 | none | 0 | 0 | 0 | 0 | 0 | ok |
+| I02A_20261109T064024Z_4518dc | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02C_20261107T181031Z_5626f7 | none | 0 | 0 | 0 | 0 | 0 | ok |
 | I02C_20261107T181629Z_c37c3e | none | 0 | 0 | 0 | 0 | 0 | ok |
 
@@ -712,15 +738,25 @@ Hardware and architecture stops (`dimensions.stops` in kinds.json). Hardware: de
 | I02A-TRACE-components_20261108T215349Z_561bfe | 2 | 128 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 514 | 1,162 | 1,793 | 0 |
 | I02A-TRACE-kernels_20261103T181509Z_52744d | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 3 | 428 | 428 | 635 | 0 |
 | I02A-TRACE-kernels_20261109T013556Z_9c0b54 | 3 | 192 | 0 | 0 | 0 | 0 | 0 | 3 | 3 | 805 | 1,759 | 2,682 | 0 |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | 3 | 192 | 0 | 0 | 0 | 0 | 0 | 3 | 3 | 730 | 1,667 | 2,679 | 0 |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | 3 | 192 | 0 | 0 | 0 | 0 | 0 | 3 | 3 | 799 | 1,762 | 2,687 | 0 |
 | I02A-TRACE-live_20261103T185532Z_1c1629 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 277 | 277 | 419 | 0 |
 | I02A-TRACE-timeline_20261103T185837Z_e08b8b | 3 | 0 | 5,628 | 34,140 | 0 | 0 | 7,512 | 3 | 3 | 581 | 581 | 635 | 39,768 |
 | I02A-TRACE-timeline_20261107T172848Z_f2ac52 | 3 | 192 | 5,628 | 34,140 | 266 | 266 | 7,512 | 3 | 3 | 921 | 1,939 | 2,673 | 39,768 |
 | I02A-TRACE-timeline_20261108T200246Z_764014 | 3 | 192 | 5,628 | 34,140 | 0 | 0 | 7,512 | 3 | 3 | 942 | 1,992 | 2,681 | 39,768 |
 | I02A-TRACE-timeline_20261108T213113Z_1d82c9 | 3 | 192 | 5,628 | 34,140 | 0 | 0 | 7,512 | 3 | 3 | 839 | 1,793 | 2,676 | 39,768 |
 | I02A-TRACE-timeline_20261109T013347Z_69c1bb | 3 | 192 | 5,628 | 34,140 | 266 | 266 | 7,512 | 3 | 3 | 917 | 1,954 | 2,686 | 39,768 |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | 3 | 192 | 5,628 | 34,140 | 266 | 266 | 7,512 | 3 | 3 | 908 | 1,879 | 2,702 | 39,768 |
 | I02A_20261103T164324Z_348959 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 282 | 282 | 422 | 0 |
 | I02A_20261103T172804Z_a3ca9a | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 283 | 283 | 422 | 0 |
 | I02A_20261103T172929Z_0e5d39 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 286 | 286 | 424 | 0 |
+| I02A_20261109T062054Z_42b814 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 281 | 281 | 421 | 0 |
+| I02A_20261109T062307Z_b80715 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 281 | 281 | 421 | 0 |
+| I02A_20261109T062449Z_b6b075 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 281 | 281 | 421 | 0 |
+| I02A_20261109T062635Z_cf942a | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 279 | 279 | 420 | 0 |
+| I02A_20261109T063129Z_320857 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 281 | 281 | 421 | 0 |
+| I02A_20261109T063711Z_70fba8 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 281 | 281 | 421 | 0 |
+| I02A_20261109T064024Z_4518dc | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 281 | 281 | 421 | 0 |
 | I02C_20261107T181031Z_5626f7 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 3 | 341 | 341 | 515 | 0 |
 | I02C_20261107T181629Z_c37c3e | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 3 | 618 | 618 | 922 | 0 |
 
@@ -887,6 +923,40 @@ Hardware samples (state, not stops): count and median period.
 | I02A-TRACE-kernels_20261109T013556Z_9c0b54 | nvml-pcie-rx | 26,985 | 30,078 µs |
 | I02A-TRACE-kernels_20261109T013556Z_9c0b54 | nvml-pcie-tx | 26,986 | 30,078 µs |
 | I02A-TRACE-kernels_20261109T013556Z_9c0b54 | uncore | 7,785 | 100,299 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | docker-ie-i02a-l1-capture-1 | 730 | 1,002,883 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | docker-ie-i02a-l1-client-1 | 655 | 1,002,973 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | docker-ie-i02a-l1-server-1 | 734 | 1,002,910 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | docker-ie-i02a-l1-trackers-1 | 730 | 1,002,903 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | engine | 657 | 1,003,533 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | gpu-apps-host-pid-2240 | 1,466 | 500,085 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | gpu-apps-server-pid-208 | 1,406 | 500,071 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | gpu-apps-server-pid-341 | 1,383 | 500,078 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | gpu0-nvidia-smi | 7,295 | 100,184 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | host | 7,321 | 99,999 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | nvme | 7,321 | 100,000 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | nvml-500ms | 1,526 | 500,082 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | nvml-50ms | 15,232 | 50,082 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | nvml-gpm | 7,595 | 100,082 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | nvml-pcie-rx | 25,328 | 30,080 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | nvml-pcie-tx | 25,331 | 30,081 µs |
+| I02A-TRACE-kernels_20261109T055145Z_5b77fc | uncore | 7,301 | 100,286 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | docker-ie-i02a-l1-capture-1 | 717 | 1,002,916 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | docker-ie-i02a-l1-client-1 | 652 | 1,002,912 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | docker-ie-i02a-l1-server-1 | 721 | 1,002,895 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | docker-ie-i02a-l1-trackers-1 | 717 | 1,002,910 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | engine | 652 | 1,003,503 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | gpu-apps-host-pid-2240 | 1,439 | 500,055 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | gpu-apps-server-pid-208 | 1,386 | 500,057 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | gpu-apps-server-pid-341 | 1,363 | 500,060 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | gpu0-nvidia-smi | 7,161 | 100,183 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | host | 7,188 | 99,999 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | nvme | 7,188 | 99,999 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | nvml-500ms | 1,498 | 500,082 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | nvml-50ms | 14,946 | 50,082 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | nvml-gpm | 7,442 | 100,082 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | nvml-pcie-rx | 24,854 | 30,081 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | nvml-pcie-tx | 24,855 | 30,081 µs |
+| I02A-TRACE-kernels_20261109T060737Z_8f4ae7 | uncore | 7,168 | 100,288 µs |
 | I02A-TRACE-live_20261103T185532Z_1c1629 | gpu0-nvidia-smi | 782 | 100,201 µs |
 | I02A-TRACE-timeline_20261103T185837Z_e08b8b | gpu0-metrics | 44,466 | 100 µs |
 | I02A-TRACE-timeline_20261103T185837Z_e08b8b | gpu0-nvidia-smi | 862 | 100,205 µs |
@@ -936,9 +1006,153 @@ Hardware samples (state, not stops): count and median period.
 | I02A-TRACE-timeline_20261109T013347Z_69c1bb | nvml-pcie-rx | 4,095 | 30,084 µs |
 | I02A-TRACE-timeline_20261109T013347Z_69c1bb | nvml-pcie-tx | 4,095 | 30,080 µs |
 | I02A-TRACE-timeline_20261109T013347Z_69c1bb | uncore | 917 | 100,293 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | docker-ie-i02a-l1-capture-1 | 86 | 1,002,468 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | docker-ie-i02a-l1-client-1 | 16 | 1,003,191 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | docker-ie-i02a-l1-server-1 | 88 | 1,002,484 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | docker-ie-i02a-l1-trackers-1 | 86 | 1,002,481 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | engine | 18 | 1,003,609 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | gpu-apps-host-pid-2240 | 174 | 499,999 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | gpu-apps-server-pid-216 | 117 | 500,017 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | gpu-apps-server-pid-407 | 94 | 500,019 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | gpu0-metrics | 46,726 | 100 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | gpu0-nvidia-smi | 866 | 100,181 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | host | 864 | 100,000 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | nvme | 864 | 99,999 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | nvml-500ms | 231 | 500,082 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | nvml-50ms | 2,309 | 50,083 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | nvml-gpm | 1,156 | 100,083 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | nvml-pcie-rx | 3,837 | 30,083 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | nvml-pcie-tx | 3,838 | 30,083 µs |
+| I02A-TRACE-timeline_20261109T060522Z_ee2252 | uncore | 862 | 100,295 µs |
 | I02A_20261103T164324Z_348959 | gpu0-nvidia-smi | 711 | 100,196 µs |
 | I02A_20261103T172804Z_a3ca9a | gpu0-nvidia-smi | 710 | 100,201 µs |
 | I02A_20261103T172929Z_0e5d39 | gpu0-nvidia-smi | 711 | 100,203 µs |
+| I02A_20261109T062054Z_42b814 | docker-ie-i02a-l1-capture-1 | 73 | 1,002,512 µs |
+| I02A_20261109T062054Z_42b814 | docker-ie-i02a-l1-client-1 | 3 | 1,004,176 µs |
+| I02A_20261109T062054Z_42b814 | docker-ie-i02a-l1-server-1 | 76 | 1,002,534 µs |
+| I02A_20261109T062054Z_42b814 | docker-ie-i02a-l1-trackers-1 | 73 | 1,002,460 µs |
+| I02A_20261109T062054Z_42b814 | engine | 8 | 1,002,537 µs |
+| I02A_20261109T062054Z_42b814 | gpu-apps-host-pid-2240 | 148 | 499,887 µs |
+| I02A_20261109T062054Z_42b814 | gpu-apps-host-pid-528549 | 148 | 499,887 µs |
+| I02A_20261109T062054Z_42b814 | gpu-apps-server-pid-1 | 95 | 499,873 µs |
+| I02A_20261109T062054Z_42b814 | gpu-apps-server-pid-310 | 71 | 499,873 µs |
+| I02A_20261109T062054Z_42b814 | gpu0-nvidia-smi | 734 | 100,193 µs |
+| I02A_20261109T062054Z_42b814 | host | 732 | 100,000 µs |
+| I02A_20261109T062054Z_42b814 | nvme | 732 | 100,001 µs |
+| I02A_20261109T062054Z_42b814 | nvml-500ms | 154 | 500,085 µs |
+| I02A_20261109T062054Z_42b814 | nvml-50ms | 1,537 | 50,086 µs |
+| I02A_20261109T062054Z_42b814 | nvml-gpm | 768 | 100,087 µs |
+| I02A_20261109T062054Z_42b814 | nvml-pcie-rx | 2,554 | 30,091 µs |
+| I02A_20261109T062054Z_42b814 | nvml-pcie-tx | 2,554 | 30,089 µs |
+| I02A_20261109T062054Z_42b814 | uncore | 731 | 100,295 µs |
+| I02A_20261109T062307Z_b80715 | docker-ie-i02a-l1-capture-1 | 67 | 1,002,782 µs |
+| I02A_20261109T062307Z_b80715 | docker-ie-i02a-l1-client-1 | 2 | 1,005,621 µs |
+| I02A_20261109T062307Z_b80715 | docker-ie-i02a-l1-server-1 | 71 | 1,002,779 µs |
+| I02A_20261109T062307Z_b80715 | docker-ie-i02a-l1-trackers-1 | 67 | 1,002,789 µs |
+| I02A_20261109T062307Z_b80715 | engine | 3 | 1,043,859 µs |
+| I02A_20261109T062307Z_b80715 | gpu-apps-host-pid-2240 | 136 | 500,052 µs |
+| I02A_20261109T062307Z_b80715 | gpu-apps-host-pid-549343 | 136 | 500,052 µs |
+| I02A_20261109T062307Z_b80715 | gpu-apps-server-pid-1 | 83 | 500,043 µs |
+| I02A_20261109T062307Z_b80715 | gpu-apps-server-pid-310 | 59 | 500,013 µs |
+| I02A_20261109T062307Z_b80715 | gpu0-nvidia-smi | 678 | 100,195 µs |
+| I02A_20261109T062307Z_b80715 | host | 674 | 100,000 µs |
+| I02A_20261109T062307Z_b80715 | nvme | 674 | 99,999 µs |
+| I02A_20261109T062307Z_b80715 | nvml-500ms | 143 | 500,086 µs |
+| I02A_20261109T062307Z_b80715 | nvml-50ms | 1,425 | 50,085 µs |
+| I02A_20261109T062307Z_b80715 | nvml-gpm | 712 | 100,085 µs |
+| I02A_20261109T062307Z_b80715 | nvml-pcie-rx | 2,368 | 30,091 µs |
+| I02A_20261109T062307Z_b80715 | nvml-pcie-tx | 2,367 | 30,091 µs |
+| I02A_20261109T062307Z_b80715 | uncore | 673 | 100,301 µs |
+| I02A_20261109T062449Z_b6b075 | docker-ie-i02a-l1-capture-1 | 73 | 1,002,570 µs |
+| I02A_20261109T062449Z_b6b075 | docker-ie-i02a-l1-client-1 | 2 | 1,002,404 µs |
+| I02A_20261109T062449Z_b6b075 | docker-ie-i02a-l1-server-1 | 76 | 1,002,581 µs |
+| I02A_20261109T062449Z_b6b075 | docker-ie-i02a-l1-trackers-1 | 72 | 1,002,564 µs |
+| I02A_20261109T062449Z_b6b075 | engine | 7 | 1,002,923 µs |
+| I02A_20261109T062449Z_b6b075 | gpu-apps-host-pid-2240 | 147 | 500,036 µs |
+| I02A_20261109T062449Z_b6b075 | gpu-apps-host-pid-568483 | 147 | 500,036 µs |
+| I02A_20261109T062449Z_b6b075 | gpu-apps-server-pid-1 | 95 | 500,028 µs |
+| I02A_20261109T062449Z_b6b075 | gpu-apps-server-pid-310 | 71 | 500,028 µs |
+| I02A_20261109T062449Z_b6b075 | gpu0-nvidia-smi | 728 | 100,196 µs |
+| I02A_20261109T062449Z_b6b075 | host | 725 | 99,999 µs |
+| I02A_20261109T062449Z_b6b075 | nvme | 725 | 99,999 µs |
+| I02A_20261109T062449Z_b6b075 | nvml-500ms | 153 | 500,085 µs |
+| I02A_20261109T062449Z_b6b075 | nvml-50ms | 1,525 | 50,085 µs |
+| I02A_20261109T062449Z_b6b075 | nvml-gpm | 762 | 100,085 µs |
+| I02A_20261109T062449Z_b6b075 | nvml-pcie-rx | 2,534 | 30,091 µs |
+| I02A_20261109T062449Z_b6b075 | nvml-pcie-tx | 2,534 | 30,089 µs |
+| I02A_20261109T062449Z_b6b075 | uncore | 724 | 100,297 µs |
+| I02A_20261109T062635Z_cf942a | docker-ie-i02a-l1-capture-1 | 67 | 1,002,636 µs |
+| I02A_20261109T062635Z_cf942a | docker-ie-i02a-l1-client-1 | 2 | 1,003,448 µs |
+| I02A_20261109T062635Z_cf942a | docker-ie-i02a-l1-server-1 | 71 | 1,002,496 µs |
+| I02A_20261109T062635Z_cf942a | docker-ie-i02a-l1-trackers-1 | 67 | 1,002,645 µs |
+| I02A_20261109T062635Z_cf942a | engine | 5 | 1,003,141 µs |
+| I02A_20261109T062635Z_cf942a | gpu-apps-host-pid-2240 | 137 | 500,071 µs |
+| I02A_20261109T062635Z_cf942a | gpu-apps-host-pid-588676 | 137 | 500,071 µs |
+| I02A_20261109T062635Z_cf942a | gpu-apps-server-pid-1 | 85 | 500,091 µs |
+| I02A_20261109T062635Z_cf942a | gpu-apps-server-pid-310 | 61 | 500,044 µs |
+| I02A_20261109T062635Z_cf942a | gpu0-nvidia-smi | 679 | 100,196 µs |
+| I02A_20261109T062635Z_cf942a | host | 675 | 100,000 µs |
+| I02A_20261109T062635Z_cf942a | nvme | 675 | 100,000 µs |
+| I02A_20261109T062635Z_cf942a | nvml-500ms | 144 | 500,083 µs |
+| I02A_20261109T062635Z_cf942a | nvml-50ms | 1,437 | 50,087 µs |
+| I02A_20261109T062635Z_cf942a | nvml-gpm | 718 | 100,087 µs |
+| I02A_20261109T062635Z_cf942a | nvml-pcie-rx | 2,389 | 30,090 µs |
+| I02A_20261109T062635Z_cf942a | nvml-pcie-tx | 2,388 | 30,090 µs |
+| I02A_20261109T062635Z_cf942a | uncore | 674 | 100,299 µs |
+| I02A_20261109T063129Z_320857 | docker-ie-i02a-l1-capture-1 | 68 | 1,002,715 µs |
+| I02A_20261109T063129Z_320857 | docker-ie-i02a-l1-client-1 | 3 | 1,002,567 µs |
+| I02A_20261109T063129Z_320857 | docker-ie-i02a-l1-server-1 | 71 | 1,002,726 µs |
+| I02A_20261109T063129Z_320857 | docker-ie-i02a-l1-trackers-1 | 68 | 1,002,733 µs |
+| I02A_20261109T063129Z_320857 | engine | 4 | 1,004,049 µs |
+| I02A_20261109T063129Z_320857 | gpu-apps-host-pid-2240 | 137 | 499,993 µs |
+| I02A_20261109T063129Z_320857 | gpu-apps-host-pid-619344 | 137 | 499,993 µs |
+| I02A_20261109T063129Z_320857 | gpu-apps-server-pid-1 | 85 | 500,008 µs |
+| I02A_20261109T063129Z_320857 | gpu-apps-server-pid-310 | 61 | 499,970 µs |
+| I02A_20261109T063129Z_320857 | gpu0-nvidia-smi | 682 | 100,199 µs |
+| I02A_20261109T063129Z_320857 | host | 678 | 99,999 µs |
+| I02A_20261109T063129Z_320857 | nvme | 678 | 99,999 µs |
+| I02A_20261109T063129Z_320857 | nvml-500ms | 145 | 500,086 µs |
+| I02A_20261109T063129Z_320857 | nvml-50ms | 1,444 | 50,086 µs |
+| I02A_20261109T063129Z_320857 | nvml-gpm | 721 | 100,084 µs |
+| I02A_20261109T063129Z_320857 | nvml-pcie-rx | 2,398 | 30,092 µs |
+| I02A_20261109T063129Z_320857 | nvml-pcie-tx | 2,399 | 30,089 µs |
+| I02A_20261109T063129Z_320857 | uncore | 677 | 100,302 µs |
+| I02A_20261109T063711Z_70fba8 | docker-ie-i02a-l1-capture-1 | 67 | 1,002,622 µs |
+| I02A_20261109T063711Z_70fba8 | docker-ie-i02a-l1-client-1 | 2 | 1,005,242 µs |
+| I02A_20261109T063711Z_70fba8 | docker-ie-i02a-l1-server-1 | 71 | 1,002,646 µs |
+| I02A_20261109T063711Z_70fba8 | docker-ie-i02a-l1-trackers-1 | 67 | 1,002,585 µs |
+| I02A_20261109T063711Z_70fba8 | engine | 3 | 1,044,314 µs |
+| I02A_20261109T063711Z_70fba8 | gpu-apps-host-pid-2240 | 137 | 499,978 µs |
+| I02A_20261109T063711Z_70fba8 | gpu-apps-host-pid-651804 | 137 | 499,978 µs |
+| I02A_20261109T063711Z_70fba8 | gpu-apps-server-pid-1 | 84 | 500,001 µs |
+| I02A_20261109T063711Z_70fba8 | gpu-apps-server-pid-308 | 61 | 500,000 µs |
+| I02A_20261109T063711Z_70fba8 | gpu0-nvidia-smi | 679 | 100,197 µs |
+| I02A_20261109T063711Z_70fba8 | host | 675 | 100,000 µs |
+| I02A_20261109T063711Z_70fba8 | nvme | 675 | 100,000 µs |
+| I02A_20261109T063711Z_70fba8 | nvml-500ms | 144 | 500,084 µs |
+| I02A_20261109T063711Z_70fba8 | nvml-50ms | 1,432 | 50,085 µs |
+| I02A_20261109T063711Z_70fba8 | nvml-gpm | 715 | 100,083 µs |
+| I02A_20261109T063711Z_70fba8 | nvml-pcie-rx | 2,377 | 30,089 µs |
+| I02A_20261109T063711Z_70fba8 | nvml-pcie-tx | 2,378 | 30,092 µs |
+| I02A_20261109T063711Z_70fba8 | uncore | 673 | 100,300 µs |
+| I02A_20261109T064024Z_4518dc | docker-ie-i02a-l1-capture-1 | 67 | 1,002,502 µs |
+| I02A_20261109T064024Z_4518dc | docker-ie-i02a-l1-client-1 | 2 | 1,004,869 µs |
+| I02A_20261109T064024Z_4518dc | docker-ie-i02a-l1-server-1 | 71 | 1,002,477 µs |
+| I02A_20261109T064024Z_4518dc | docker-ie-i02a-l1-trackers-1 | 67 | 1,002,493 µs |
+| I02A_20261109T064024Z_4518dc | engine | 3 | 1,044,635 µs |
+| I02A_20261109T064024Z_4518dc | gpu-apps-host-pid-2240 | 136 | 500,053 µs |
+| I02A_20261109T064024Z_4518dc | gpu-apps-host-pid-674691 | 136 | 500,053 µs |
+| I02A_20261109T064024Z_4518dc | gpu-apps-server-pid-1 | 83 | 500,071 µs |
+| I02A_20261109T064024Z_4518dc | gpu-apps-server-pid-309 | 60 | 500,141 µs |
+| I02A_20261109T064024Z_4518dc | gpu0-nvidia-smi | 678 | 100,196 µs |
+| I02A_20261109T064024Z_4518dc | host | 676 | 100,000 µs |
+| I02A_20261109T064024Z_4518dc | nvme | 676 | 99,999 µs |
+| I02A_20261109T064024Z_4518dc | nvml-500ms | 143 | 500,084 µs |
+| I02A_20261109T064024Z_4518dc | nvml-50ms | 1,426 | 50,086 µs |
+| I02A_20261109T064024Z_4518dc | nvml-gpm | 710 | 100,086 µs |
+| I02A_20261109T064024Z_4518dc | nvml-pcie-rx | 2,370 | 30,089 µs |
+| I02A_20261109T064024Z_4518dc | nvml-pcie-tx | 2,371 | 30,090 µs |
+| I02A_20261109T064024Z_4518dc | uncore | 675 | 100,323 µs |
 | I02C_20261107T181031Z_5626f7 | gpu0-nvidia-smi | 1,016 | 100,190 µs |
 | I02C_20261107T181031Z_5626f7 | prometheus | 2 | 7,413,886 µs |
 | I02C_20261107T181629Z_c37c3e | gpu0-nvidia-smi | 892 | 100,189 µs |

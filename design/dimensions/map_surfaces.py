@@ -29,7 +29,7 @@ def current(reg: dict) -> list[tuple[str, str]]:
     s += [("kind", k["kind"]) for k in reg["kinds"]]
     s += [("D13 world", w) for w in worlds()]
     s += [("v1 view", v) for v in dict.fromkeys(re.findall(r'data-view="([a-z_]+)"', (FE / "index.html").read_text()))]
-    s += [("panel", p) for p, f in (("sidebar", "cc/sidebar/sidebar.js"), ("inspector", "cc/inspector/inspector.js"),
+    s += [("panel", p) for p, f in (("sidebar", "cc/sidebar/sidebar.js"), ("inspector", "cc/inspector/tabs.js"),
                                     ("bar", "cc/control/bar.js")) if (FE / f).exists()]
     keys = (FE / "cc/control/keys.js").read_text()
     s += [("control", d) for d in re.findall(r'does: "([^"]+)"', keys)]

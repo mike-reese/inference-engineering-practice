@@ -155,13 +155,39 @@ class Ctx:
         if proj not in self.projects:
             self.count("docker", f"containers of other projects dropped: {name} ({proj})")
             return None
-        m = re.fullmatch(re.escape(proj) + r"-(.+)-\d+", name)
-        rule = next((x for x in self.lane_rules if m and proj == self.own_project and x["container"] == m[1]), None)
+        rule = self._lane_rule(name, proj)
         if rule is None:
             return self.thing(f"host/{name}", "host", "container", name, {"project": proj}, "Observed: Docker Engine API")
         key = self.container(rule["process_prefix"])
         self.things[key][3].update({"docker": name, "project": proj})
         return key
+
+    def _lane_rule(self, name: str, project: str) -> dict | None:
+        """The lane rule a Compose container <project>-<service>-<n> of the run's own project merges into, or None."""
+        m = re.fullmatch(re.escape(project) + r"-(.+)-\d+", name)
+        return next((x for x in self.lane_rules if m and project == self.own_project and x["container"] == m[1]), None)
+
+    def topology(self) -> None:
+        """Facts from the run's topology.json (docker inspect at the run's start) on the container things the run has:
+        its Docker name and project, image, networks, netns (the Docker name of the container whose network namespace
+        it joins, None when it has its own) and mem_limit (bytes, None when unlimited). No-op without topology.json."""
+        p = self.dir / "topology.json" if self.dir is not None else None
+        if p is None or not p.is_file():
+            return
+        topo = json.loads(p.read_bytes())
+        proj, name_of = topo.get("project"), {c["Id"]: c["Name"].lstrip("/") for c in topo["containers"]}
+        for c in topo["containers"]:
+            name, hc = c["Name"].lstrip("/"), c["HostConfig"]
+            rule = self._lane_rule(name, proj)
+            key = f"host/{rule['container']}" if rule else f"host/{name}"
+            if key not in self.things:
+                continue
+            mode = hc.get("NetworkMode") or ""
+            self.things[key][3].update({
+                "docker": name, "project": proj, "image": c["Config"]["Image"],
+                "networks": sorted((c.get("NetworkSettings") or {}).get("Networks") or {}),
+                "netns": name_of.get(mode[10:], mode[10:]) if mode.startswith("container:") else None,
+                "mem_limit": hc.get("Memory") or None})
 
     def stream_lane(self, device: int, stream: int, name: str | None = None, attrs: dict | None = None) -> str:
         return self.thing(f"gpu{device}/stream {stream}", f"gpu{device}", "stream", name or f"stream {stream}",
