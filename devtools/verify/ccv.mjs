@@ -54,7 +54,8 @@ Act (real input events; a target outside the viewport is scrolled into view firs
 Observe
   shot NAME [--css SEL]               screenshot (viewport or one element) into the session folder
   aria NAME                           accessibility tree (pierces shadow roots) as text
-  state                               app snapshot: URL, READY, timeline label, camera, focus level, flyout tab, errors
+  state                               app snapshot: URL, title, READY, viewport and the page state window.__cc (world, tiers,
+                                      t, sel, session, dock, ...); on the legacy D5v2 page its timeline, camera, focus level, flyout tab
   find TARGET                         where a target is, in the viewport or not, covered or not (no input, no scrolling)
   wait (--text T | --css SEL | --gone-text T | --expr JS) [--timeout ms]
   perf                                frame and input-to-frame latency percentiles the page recorded
@@ -245,19 +246,18 @@ async function screenshot(c, name, css) {
   return file;
 }
 const STATE_PROBE = String.raw`(() => {
-  const $ = (q) => document.querySelector(q);
-  const cc = window.CC, f = cc?.control?.frame;   // v3 page (static/cc): read-only probes; the D5v2 page sets SC, LEVELS, DEEPEST
-  const sc = cc?.scene ?? window.SC, cam = sc?.camera?.position, tg = sc?.controls?.target;
-  const names = (cc?.scene?.levels ?? window.LEVELS ?? []).map((l) => l.name);
-  const focus = f ? f.focus : typeof window.DEEPEST === "function" ? window.DEEPEST() : null;
-  return { url: location.href, title: document.title, ready: !!window.READY, t_first_ms: window.T_FIRST ?? null,
-    cursor: f ? { t: f.cursor.t, id: f.cursor.id } : undefined, window_ns: f?.win, grain: f?.grainName, sel: f?.sel,
+  const base = { url: location.href, title: document.title, ready: !!window.READY, viewport: [innerWidth, innerHeight] };
+  if (window.__cc) return { ...base, ...JSON.parse(JSON.stringify(window.__cc)) };   // /static/cc: control.js state
+  const $ = (q) => document.querySelector(q);   // the legacy D5v2 page (until M4) sets SC, LEVELS, DEEPEST
+  const cam = window.SC?.camera?.position, tg = window.SC?.controls?.target;
+  const names = (window.LEVELS ?? []).map((l) => l.name), focus = typeof window.DEEPEST === "function" ? window.DEEPEST() : null;
+  return { ...base, t_first_ms: window.T_FIRST ?? null,
     timeline: $("#tlabel")?.textContent ?? null, playing: $("#play")?.textContent?.includes("pause") ?? null,
     focus_level: focus == null ? null : { index: focus, name: names[focus] ?? null }, levels: names,
     camera: cam ? { position: [cam.x, cam.y, cam.z].map((v) => +v.toPrecision(6)), target: [tg.x, tg.y, tg.z].map((v) => +v.toPrecision(6)) } : null,
     flyout_tab: document.querySelector("#ftabs button.on")?.dataset.t ?? null,
     dock: document.body.classList.contains("dock-bottom") ? "bottom" : document.querySelector("#side") ? "right" : null,
-    summary_head: ($("#sum")?.innerText || "").split("\n").slice(0, 6), viewport: [innerWidth, innerHeight] };
+    summary_head: ($("#sum")?.innerText || "").split("\n").slice(0, 6) };
 })()`;
 
 async function axText(c) {
@@ -434,7 +434,7 @@ async function doctor() {
   try { const r = await fetch(`${APP}/runner/health`); add("runner (Run tab)", r.ok, r.ok ? "ok" : `HTTP ${r.status} (make runner in the main checkout)`); }
   catch (e) { add("runner (Run tab)", false, e.message); }
   if (v) { try { const c = await CDP.attach(rec.port); const s = await c.eval(STATE_PROBE); c.close();
-    add("page is the app", s.url.startsWith(APP), s.url); add("scene READY", s.ready, s.timeline ?? ""); } catch (e) { add("page", false, e.message); } }
+    add("page is the app", s.url.startsWith(APP), s.url); add("scene READY", s.ready, s.world ?? s.timeline ?? ""); } catch (e) { add("page", false, e.message); } }
   return { ok: checks.every((c) => c.ok), checks, evidence: session() };
 }
 

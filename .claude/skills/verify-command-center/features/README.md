@@ -37,13 +37,13 @@ $CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L
 
 ## Reading state
 
-- `window.__cc` is the page state. Read it only with `$CCV eval`: `world`, `focus`, `tiers`, `t`, `sel` (a row id,
-  or a thing key such as `gpu0` or `host/client`), `bounds`, `dock`, `nav` (`{back, fwd}`), `session`, `playing`,
-  `pace`, `rate`, `follow` and `metric`.
+- `window.__cc` is the page state. Read it with `$CCV state` or a read-only `$CCV eval`: `world`, `focus`, `tiers`,
+  `t`, `sel` (a row id, or a thing key such as `gpu0` or `host/client`), `bounds`, `dock`, `nav` (`{back, fwd}`),
+  `session`, `playing`, `pace`, `rate`, `follow` and `metric`.
 - A row's kind and name:
   `$CCV eval 'import("./control/control.js").then((m) => { const S = m.store(), id = __cc.sel; return S.kinds[S.field("kind", id)].name + ": " + S.nameText(S.field("name", id)); })'`.
-- `$CCV state` still probes the old page's globals (`window.CC`, `#tlabel`, `#ftabs`). On this page only its `url`,
-  `title`, `ready` and `viewport` fields hold.
+- `$CCV state` returns `url`, `title`, `ready`, `viewport` and every field of `window.__cc` (above). On the legacy
+  D5v2 page it returns that page's `timeline`, `camera`, `focus_level` and `flyout_tab` instead.
 
 ## Page handles
 
