@@ -38,7 +38,12 @@ Preconditions:
 - **Show me.** Run `$CCV click --css '#stage .rw [data-go="first-read-role"]' --after rep-show-me`. The Spine world
   opens at execution › phase: `__cc.sel` is `52847`, `__cc.t` is `73402194561`, and the bar's Selected tab starts
   `execution · phase` `body read` `at 73402.195 ms from the run's t0 · 24.078 ms from its request's send`.
+  `__cc.bounds` is that phase unit, `[73401789686, 73402650050]`, not the whole run.
 - **Back to the Rep world.** Run `$CCV click --css '.ch-nav button[data-w=rep]'`. `sel` and `t` are kept.
+- **A run whose request did not complete.** Open I02C run `I02C_20261107T181031Z_5626f7` in the Rep world. Results
+  show A's values (headers `6.066 ms`, TTFT `48.878 ms`, end-to-end `2860.301 ms`), `–` for B, and the flag
+  `Request B did not complete in this run (clients.B.complete is false).` Each "show me" is disabled and names the
+  missing row, for example `no response headers row for B in this run`.
 - **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas
