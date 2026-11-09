@@ -1001,3 +1001,11 @@ Reading the counts:
 | 2026-11-08 | gpu-apps records every GPU process, desktop ones included; the views show only processes of the run's containers | agent |
 | 2026-11-08 | R1 waits for an idle GPU (a game held it at 100%); P3 and M1 proceed on f2ac52 and 1d82c9, and every R1 check reruns once R1 exists | agent |
 | 2026-11-08 | R1 recorded (7.3): timeline `I02A-TRACE-timeline_20261109T013347Z_69c1bb`, and its kernels run `I02A-TRACE-kernels_20261109T013556Z_9c0b54` (Nsight Compute, iteration 67), tied by the rule of `registry/ncu.json` | agent |
+| 2026-11-09 | Kernel short names: when the first template argument of a generic base is a builtin type, the name is `ns::base` (e.g. `gemvx::kernel`), a refinement of choice 7 | agent |
+| 2026-11-09 | Iteration ends are uncapped (choice 5); row assignment to an iteration still stops at the next scheduler stamp | agent |
+| 2026-11-09 | Stop table: hand-offs from the request's phase rows (container and process from the lane's ancestors); hardware node = iteration, unit = kernels, device = memcpy and memset; software layer stops at the launch call | agent |
+| 2026-11-09 | I02A `moments.toml` events renamed to stored row names so the lint resolves them; claims and lessons unchanged | agent |
+| 2026-11-09 | Container merge keys on (project, service), not service alone, so a rep's test project stays separate (fix in M1) | agent |
+| 2026-11-09 | Flow for runs without engine rows (I02C): request in and stream out come from client and server stream rows as 7.4 P3 states; prefill and decode stay none without iterations (fix in M1) | agent |
+| 2026-11-09 | R1 kernels run 9c0b54 is kept for building; a test stack held two small CUDA contexts for 16 s of its 700 s ncu window, so the morning GPU run re-records it | agent |
+
