@@ -2,10 +2,9 @@
 # Command center regression check (COMMAND_CENTER.md 7.4, P1): drives the page at CC_URL in ccv on the hidden CCV-1
 # output and reads its state from window.__cc. Expected values come from the store (/api/v3/runs), the run's
 # latency.json, the rep's moments.toml and rep.toml, registry/components.json and COMMAND_CENTER.md, never literals.
-# A page that reads a snapshot instead of the store (D13's session-data.json beside its index.html) narrows the run
-# and rep choices to what both hold, and its moments are the snapshot's. Launch uses the runner's dry_run, so nothing
+# Launch uses the runner's dry_run, so nothing
 # starts; the checks that need a real recording (the head moves, follow holds the head, the mask) are in live.sh.
-# Usage: devtools/verify/regress.sh, or CC_URL=http://127.0.0.1:7710/static/prototypes/D13/index.html for D13.
+# Usage: devtools/verify/regress.sh, or CC_URL=http://127.0.0.1:7711/static/cc/index.html for another server.
 # RUNNER_URL (default: the page's origin, which proxies /runner) picks the runner. Exits 1 on any failed check.
 set -u
 cd "$(dirname "$0")/../.."   # repo root
@@ -83,20 +82,12 @@ def ttft(r):  # the measured request's client TTFT in latency.json, or None when
 
 store = [r["run"] for r in get(f"{app}/api/v3/runs")["runs"]]   # newest first
 folders_of = {r: f for r in store for f in folders.values() if (f / "results" / r).is_dir()}
-snap_url = url.rsplit("/", 1)[0] + "/session-data.json"
-try:
-    snap = get(snap_url)
-except Exception:
-    snap = None
-shown = (lambda r: True) if snap is None else (lambda r: any(x["id"] == r and x["result"] for x in snap["runs"]))
 out["TTFT"] = f"{ttft(run):.3f} ms" if run in store and ttft(run) is not None else "no TTFT for " + run
-out["RUN_B"] = next((r for r in store if r != run and folders_of.get(r) == folder and ttft(r) is not None and shown(r)), "")
-no_runs = [i for i in sorted(folders) if not any(f == folders[i] for f in folders_of.values())
-           and (snap is None or (any(x["id"] == i for x in snap["reps"]) and not any(x["rep"] == i for x in snap["runs"])))]
+out["RUN_B"] = next((r for r in store if r != run and folders_of.get(r) == folder and ttft(r) is not None), "")
+no_runs = [i for i in sorted(folders) if not any(f == folders[i] for f in folders_of.values())]
 out["NO_RUNS_REP"] = no_runs[0] if no_runs else ""
-out["SNAPSHOT"] = snap_url if snap is not None else "none (store)"
-# "Show me" selects the event the page's own moment names: the snapshot's, else the served catalog's (moments.toml)
-page_reps = snap["reps"] if snap is not None else get(f"{app}/api/v3/reps")["reps"]
+# "Show me" selects the event the served catalog's moment names (moments.toml)
+page_reps = get(f"{app}/api/v3/reps")["reps"]
 show = next(m for m in next(r for r in page_reps if r["id"] == rep)["moments"]["moments"] if m["id"] == "prefill")
 out["SHOW_ID"], out["SHOW_EVENT"] = show["id"], show["event"]
 
@@ -109,7 +100,7 @@ print("\n".join(f"{k}={shlex.quote(str(v))}" for k, v in out.items()))
 EOF
 ) || { n=$((n+1)); echo "FAIL expectations: could not read the store or the files"; done_; }
 eval "$EXPECT"
-echo "     session $REP / $RUN; run B $RUN_B; snapshot $SNAPSHOT"
+echo "     session $REP / $RUN; run B $RUN_B"
 
 check "default: tiers independent" "$(ev '__cc.paired')" "False"
 check "default: opens on the Rep world" "$(ev '__cc.world')" "rep"

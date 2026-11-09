@@ -8,7 +8,7 @@ GET /api/v3/runs/{run}/blocks/{gen}/{name}    a CCVB block, or aux.json; immutab
 GET /api/v3/runs/{run}/detail?ids=1,2         {rows: [...]}, at most 256 ids; ?eids=<eid> (one eid per parameter,
                                               eids are free text) resolves stable eids to rows
 GET /api/v3/runs/{run}/raw?id=                the row's raw record from the run folder
-GET /api/v3/reps                              {reps, runs}: the rep catalog, D13's session-data.json shape
+GET /api/v3/reps                              {reps, runs}: the rep catalog, the deleted D13 prototype's session-data.json shape
                                               (store/reps.py)
 WS  /api/v3/stream?run=&have=                 live frames (store/stream.py)
 

@@ -1,6 +1,6 @@
 """The rep catalog for the command center shell, and the moments lint (COMMAND_CENTER.md 2.5, 2.6, 7.2).
 
-GET /api/v3/reps answers {reps, runs}, the shape of D13's session-data.json (prototypes/D13/tools/build_session.py):
+GET /api/v3/reps answers {reps, runs}, the shape of the deleted D13 prototype's session-data.json (git history):
   reps: every reps/*/README.md folder: {id, title, folder, registered, actions, sections, moments}; actions are the
         rep.toml launch actions, sections the README's Mechanism, Task, Results, Why It Matters and Pass Check,
         moments the rep's moments.toml (null without one).
