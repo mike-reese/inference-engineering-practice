@@ -46,7 +46,8 @@ const RESULT_VIEWS = {
 };
 const isNum = (v) => typeof v === "number" && !Number.isNaN(v);
 /** The Results table of a rep's results (one, or A and B): {file, cols, rows: [{label, path: {column: path}}],
- *  fromRows}, holding only the rows and columns where some result has a number. No layout for the file: no columns. */
+ *  fromRows}, holding only the rows where some result has a number, and the columns where some result has a number or
+ *  a null (a value the result names but lacks: a request that did not complete). No layout for the file: no columns. */
 export function resultTable(rep, results) {
   const file = resultFile(rep), v = RESULT_VIEWS[file];
   if (!v) return { file, cols: [], rows: [] };
@@ -54,13 +55,16 @@ export function resultTable(rep, results) {
   const has = (p) => results.some((r) => isNum(valueAt(r, p)));
   const rows = v.rows.map(([label, leaf]) => ({ label, path: Object.fromEntries(all.map((c) => [c.name, `${c.base}.${typeof leaf === "string" ? leaf : leaf[c.name]}`])) }))
     .filter((r) => all.some((c) => has(r.path[c.name])));
-  return { file, cols: all.filter((c) => rows.some((r) => has(r.path[c.name]))), rows, fromRows: v.fromRows?.(rep?.moments?.request) };
+  const named = (p) => results.some((r) => r && valueAt(r, p) === null);
+  return { file, cols: all.filter((c) => rows.some((r) => has(r.path[c.name]) || named(r.path[c.name]))), rows, fromRows: v.fromRows?.(rep?.moments?.request) };
 }
 /** The Load panel's TTFT marker of a run result: {label, value, file}, null when the file has no layout or no TTFT. */
 export function ttftMark(rep, result) {
   const file = resultFile(rep), m = result && RESULT_VIEWS[file]?.marker(result, rep?.moments?.request), value = m && valueAt(result, m[1]);
   return isNum(value) ? { label: m[0], value, file } : null;
 }
+/** A run whose moments' request did not complete (moments.toml `complete` is false): its flag, else "". */
+export const incompleteText = (run) => (run?.incomplete ? `request ${run.incomplete} did not complete` : "");
 export const fmtMs = (v) => (v == null || Number.isNaN(+v) ? "–" : `${(+v).toFixed(3)} ms`);
 export const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 

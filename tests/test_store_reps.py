@@ -109,7 +109,7 @@ def test_moments_read_the_result_file_they_name_whole(tmp_path):
     assert len(misses) == 2 and all("clients.B.ttft_ms" in m or "queue.sum_ms" in m for m in misses)
 
 
-def test_a_run_whose_complete_value_is_false_is_not_computed(tmp_path):
+def test_a_run_whose_complete_value_is_false_keeps_its_result_and_names_the_request(tmp_path):
     moments = MOMENTS.replace('request = "measured"', 'request = "measured"\nresult = "readout.json"\n'
                                                       'complete = "clients.B.complete"')
     moments = moments.replace("client.ttft_ms", "clients.B.ttft_ms").replace("segments[first_scheduled_time].ms",
@@ -120,10 +120,12 @@ def test_a_run_whose_complete_value_is_false_is_not_computed(tmp_path):
     failed = {"clients": {"A": {"complete": True, "ttft_ms": 40.0}, "B": {"complete": False, "ttft_ms": None}}}
     (run_dir / "readout.json").write_text(json.dumps(failed))
     misses, notes = reps.lint(None, repo, store)
-    assert reps.catalog(repo, store)["runs"][0]["result"] is None
-    assert any("results not computed" in n and "clients.B.complete" in n for n in notes)
+    run = reps.catalog(repo, store)["runs"][0]
+    assert run["result"] == failed and run["incomplete"] == "measured"
+    assert any("request measured did not complete" in n and "clients.B.complete" in n for n in notes)
     assert len(misses) == 1 and "resolve on no run" in misses[0]
     done = {"clients": {"A": {"complete": True, "ttft_ms": 40.0}, "B": {"complete": True, "ttft_ms": 2700.0}}}
     (run_dir / "readout.json").write_text(json.dumps(done))
-    assert reps.catalog(repo, store)["runs"][0]["result"] == done
+    run = reps.catalog(repo, store)["runs"][0]
+    assert run["result"] == done and run["incomplete"] is None
     assert reps.lint(None, repo, store)[0] == []

@@ -1,7 +1,7 @@
 // The shell around the worlds: which session is open (a replayed run, a live launch, or two runs compared) and the
 // panel that opens one. Every world draws the session's run; the shell only chooses it.
 import { state, loadRun, launch, compareRuns, setFollow, setSide } from "../control/control.js";
-import { SESSION, repOf, runOf, runsOf, kindOf, whenOf, ttftMark, fmtMs, esc } from "../session.js";
+import { SESSION, repOf, runOf, runsOf, kindOf, whenOf, ttftMark, incompleteText, fmtMs, esc } from "../session.js";
 
 const CSS = `
 .sh-blk { display:flex; align-items:center; gap:8px; margin-left:14px; padding-left:14px; border-left:1px solid #263041; min-width:0; }
@@ -107,7 +107,7 @@ export function mountShell(chromeEl) {
     ${esc(r.id)}<small>${esc(r.title)} · ${runsOf(r.id).length} runs${r.registered ? "" : " · replay only"}</small></button>`).join("")}</div>`;
   const resultMark = (r) => { const m = r.result && ttftMark(repOf(r.rep), r.result);
     return m ? `<span class="m ok" title="from the run's ${esc(m.file)}">${esc(m.label)} ${fmtMs(m.value)} · ${esc(m.file)}</span>`
-      : `<span class="m">${r.result ? "no TTFT in its result" : "results not computed"}</span>`; };
+      : `<span class="m">${r.incomplete ? incompleteText(r) : r.result ? "no TTFT in its result" : "results not computed"}</span>`; };
   function runRows(rep, btn) {
     const runs = runsOf(rep);
     if (!runs.length) return `<p class="none">No recorded runs for ${esc(rep)} under its results folder.</p>`;

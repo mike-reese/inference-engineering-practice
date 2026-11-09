@@ -77,7 +77,9 @@ const upper = (a, x) => { let lo = 0, hi = a.length; while (lo < hi) { const k =
 const under = (t, a) => t.pre >= a.pre && t.post <= a.post;
 const FLOW_LABEL = { "request in": "request in: client to the engine queue", prefill: "prefill: build the KV cache, first token",
   decode: "decode loop: one token per pass", "stream out": "stream out: token back to the user" };
-const LAYER_ORDER = ["toolkit", "runtime", "device code"];   // a launch goes toolkit -> runtime -> device code (doc 3.3)
+/** The software layers under model forward, in launch order (toolkit -> runtime -> device code, doc 3.3), each with
+ *  its role in D13's words. The registry names each kind's layer (kinds.json place), not the layer's role. */
+const LAYERS = [["toolkit", "builds the op and calls the runtime"], ["runtime", "queues the launch on a CUDA stream"], ["device code", "runs on the SMs"]];
 const PREV_SCAN = 64;   // the request's phase rows looked back through for the box a step came from
 const HISTORY = 120;    // v1 keeps about 120 samples of history per series
 
@@ -117,7 +119,7 @@ function buildModel(S, key) {
     power: first("nvml.power.draw", "power.draw"), gen: first("pcie.link.gen.current"), clock: first("nvml.clocks.sm", "clocks.sm"),
     temp: first("nvml.temperature.gpu", "temperature.gpu"), rx: first("nvml.pcie.rx"), tx: first("nvml.pcie.tx") };
   // software layers: the kinds the registry places at architecture / software layer, by layer
-  const layers = LAYER_ORDER.map((name) => ({ name, kinds: S.kinds.filter((k) => k.place?.architecture === `software layer (${name})`).map((k) => k.name) }));
+  const layers = LAYERS.map(([name, role]) => ({ name, role, kinds: S.kinds.filter((k) => k.place?.architecture === `software layer (${name})`).map((k) => k.name) }));
   return { key, map, size: map?.attrs?.size ?? [1400, 700], edges: map?.attrs?.edges ?? [], drives: map?.attrs?.drives ?? {},
     boxes, bounds, box: new Map(boxes.map((b) => [b.key, b])), boxOfThing: new Map(boxes.map((b) => [b.i, b])),
     containers, networks, gpu, layers, host: byKind("host") };
@@ -337,7 +339,7 @@ function infraHTML(S, M, X, withProcs) {
 
 const layersHTML = (M) => `<div class="swrows"><div class="label">software layer · under model forward</div><div class="cards">${M.layers.map((L) =>
   `<div class="card up" data-layer="${L.name}"><div class="title"><i class="dot"></i>${escape(L.name)}</div>
-    <div class="image">${escape(L.kinds.join(", "))}</div><div class="nowis"></div></div>`).join("")}</div></div>`;
+    <div class="image">${escape(L.role)}</div><div class="image">${escape(L.kinds.join(", "))}</div><div class="nowis"></div></div>`).join("")}</div></div>`;
 
 // ---------------- the view
 export function mountArch(el, { size = "lens" } = {}) {

@@ -3,8 +3,9 @@
 #   result = the run's result file, relative to the run folder. This rep writes no latency.json; rep.py writes
 #            readout.json, read whole: paths start at its top level (clients.A, clients.B, native, prometheus_delta)
 #   at, evidence = readout.json paths in ms. The client durations are from each request's own send
-#   complete = a readout.json path: a run where it is false is listed as "results not computed" (B timed out and has
-#              no headers or tokens, as in I02C_20261107T181031Z_5626f7)
+#   complete = a readout.json path: where it is false the moments do not resolve on that run (the lint skips it, and
+#              "show me" is off for an event row the run lacks); its results still show, flagged "request B did not
+#              complete" (B timed out and has no headers or tokens, as in I02C_20261107T181031Z_5626f7)
 
 # Request B: sent on A's first content, it waits for A on the one engine slot.
 request = "B"

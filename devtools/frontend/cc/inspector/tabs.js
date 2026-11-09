@@ -6,10 +6,10 @@
 // Links are data attributes the bar handles in one place: data-sel (a row id or a thing key), data-seek (a time),
 // data-m (a metric id), data-world, data-run (load a run of the rep), data-open (a Nsight report), data-raw (a row's
 // raw record).
-import { state, store, storeError, now, units, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
+import { state, store, storeError, now, archName, units, DIM_COLOR, FLOW_COLOR } from "../control/control.js";
 import { NONE16 } from "../store/columns.js";
 import { roleOf, fmtValue, fmtBytes, fmtSpan, periodOf, why } from "../sidebar/samples.js";
-import { repOf, runOf, kindOf as runKind, whenOf, esc } from "../session.js";
+import { repOf, runOf, kindOf as runKind, whenOf, incompleteText, esc } from "../session.js";
 import { nsysWhere } from "./nsight.js";
 
 const ms = (ns, d = 3) => (ns / 1e6).toFixed(d);
@@ -34,6 +34,9 @@ const FLOW_TEXT = { "request in": "request in: client to the engine queue", pref
 const SEG_COLORS = ["#58a6ff", "#3fb950", "#d29922", "#bc8cff", "#f778ba"];   // D13's split colours, by position
 /** Thing kinds of the architecture dimension; every other thing is hardware (the registry has no tier per thing kind). */
 const ARCH_KINDS = new Set(["container", "process", "thread", "network", "component map", "boundary", "component"]);
+/** The hardware tier of a hardware thing kind, for the Selected heading: D13's tiers (data.js) for the same parts. */
+const HW_TIER = { host: "node", board: "node", cpu: "device", gpu: "device", VRAM: "device", "host memory": "device", nvme: "device",
+  chipset: "device", "bus link": "device", SM: "unit", "copy engine": "unit", "L2 cache": "unit", "memory controller": "unit" };
 const MAX_LIST = 200;
 
 // ---------------------------------------------------------------- per-store lookups, rebuilt when rows change
@@ -114,14 +117,14 @@ function ladderOf(S, id) {
 }
 const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text)}</li>`).join("")}</ol>`;
 
-/** Where a row runs in the architecture: the container, process and thread of its lane (a device row: of the thread
+/** Where a row runs on the architecture ladder: the container and process of its lane (a device row: of the thread
  *  that launched it), then its component box. */
 function whereHtml(S, id) {
-  const T = S.things, c = S.field("cause", id), comp = S.field("comp", id);
+  const T = S.things, c = S.field("cause", id), comp = S.field("comp", id), L = S.dims.laneLevel;
   let lane = S.field("lane", id);
   if (T[lane]?.kind === "stream" && c >= 0) lane = S.field("lane", c);
-  const path = []; for (let x = T[lane]; x && x.parent >= 0; x = T[x.parent]) path.unshift(x.i);
-  return `<ol class="path">${path.map((i) => `<li><span class="dim">${esc(T[i].kind)}</span> ${thingLink(S, i)}</li>`).join("")}${comp !== NONE16 && T[comp] ? `<li><span class="dim">component</span> ${thingLink(S, comp)}</li>` : ""}</ol>`;
+  const path = [L.container[lane], L.process[lane]].filter((i) => i >= 0);
+  return `<ol class="path">${path.map((i) => `<li><span class="dim">${esc(T[i].kind)}</span> ${thingLink(S, i, archName(S, i))}</li>`).join("")}${comp !== NONE16 && T[comp] ? `<li><span class="dim">component</span> ${thingLink(S, comp)}</li>` : ""}</ol>`;
 }
 
 /** A payload drawn as D13 drew it: token ids as chips, texts and bodies as text, SSE events as text, lists of records
@@ -257,7 +260,7 @@ function thingView(S, s) {
   const dim = ARCH_KINDS.has(x.kind) ? "architecture" : "hardware", T = S.things;
   const up = []; for (let p = x.parent; p != null && p >= 0; p = T[p].parent) up.unshift(p);
   const attrs = Object.entries(x.attrs ?? {}).filter(([key]) => !["x", "y", "w", "h", "edges", "size"].includes(key));
-  const left = [`<div class="label" style="color:${DIM_COLOR[dim]}">${dim} · ${esc(x.kind)}</div><h3>${esc(x.name)}</h3>`, `<div class="dim">${esc(x.evidence ?? "")}</div>`];
+  const left = [`<div class="label" style="color:${DIM_COLOR[dim]}">${dim} · ${esc(dim === "hardware" ? HW_TIER[x.kind] ?? x.kind : x.kind)}</div><h3>${esc(x.name)}</h3>`, `<div class="dim">${esc(x.evidence ?? "")}</div>`];
   if (attrs.length) left.push(`<table class="kv">${attrs.map(([key, v]) => `<tr><td>${esc(key)}</td><td class="wrap">${v && typeof v === "object" ? esc(v.name ?? JSON.stringify(v)) : esc(v ?? "–")}</td></tr>`).join("")}</table>`);
   if (up.length) left.push(`<div class="label">parents</div><ol class="path">${up.map((p) => `<li><span class="dim">${esc(T[p].kind)}</span> ${thingLink(S, p)}</li>`).join("")}</ol>`);
   const right = [];
@@ -322,7 +325,7 @@ const atCursor = {
         <div class="label">flows running now</div><div>${n.phases.slice(0, 24).map((u) => { const f = S.dims.flowOf(u.id);
           return `<div><span class="pdot" style="background:${FLOW_COLOR[f] ?? "#8a90a0"}"></span>${link(S, u.id)} <span class="dim">${esc(f ?? "no flow")}</span></div>`; }).join("") || "–"}${n.phases.length > 24 ? `<div class="dim">+${n.phases.length - 24} more</div>` : ""}</div>
         <div class="label" style="color:${DIM_COLOR.architecture}">architecture</div>
-        <ol class="path">${n.archPath.map((i) => `<li><span class="dim">${esc(S.things[i].kind)}</span> ${thingLink(S, i)}</li>`).join("")}${n.comp >= 0 ? `<li><span class="dim">component</span> ${thingLink(S, n.comp)}</li>` : ""}</ol>
+        <ol class="path">${n.archPath.map((i) => `<li><span class="dim">${esc(S.things[i].kind)}</span> ${thingLink(S, i, archName(S, i))}</li>`).join("")}</ol>
       </div><div>
         <table class="kv"><tr><td>kernel</td><td>${n.kernel ? link(S, n.kernel.id) : "none running"}</td></tr>
           <tr><td>transfer</td><td>${n.transfers.map((x) => link(S, x.id, `${nm(S, x.id)}, ${fmtBytes(S.field("bytes", x.id))}`)).join("<br>") || "none in flight"}</td></tr></table>
@@ -603,7 +606,7 @@ const RESULTS = [["client TTFT"], ["wire TTFT"], ["engine TTFT"], ["engine queue
   ["client mean ITL"], ["client end-to-end"]];
 function sessionHtml(s) {
   const ss = s.session, rep = repOf(ss.rep);
-  const run = (id, label) => { const r = runOf(id); return `<tr><td>${label}</td><td><code>${esc(id)}</code> ${r ? `${esc(runKind(r))} · ${whenOf(r)}${r.result ? "" : " · results not computed"}` : ""}</td></tr>`; };
+  const run = (id, label) => { const r = runOf(id); return `<tr><td>${label}</td><td><code>${esc(id)}</code> ${r ? `${esc(runKind(r))} · ${whenOf(r)}${r.result ? "" : " · results not computed"}${r.incomplete ? ` · ${esc(incompleteText(r))}` : ""}` : ""}</td></tr>`; };
   return `<table class="kv"><tr><td>mode</td><td>${esc(ss.mode)}${ss.mode === "live" ? ` · ${esc(ss.live?.state ?? "")} · head at ${ms(s.head)} ms` : ""}</td></tr>
     <tr><td>rep</td><td>${esc(ss.rep)} · ${esc(rep?.title)}</td></tr>
     ${ss.mode === "compare" ? run(ss.run, "run A") + run(ss.runB, "run B") : run(ss.run, "run")}

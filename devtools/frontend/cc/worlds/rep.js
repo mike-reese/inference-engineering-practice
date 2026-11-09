@@ -44,6 +44,7 @@ const CSS = `
 .rw .mom .ev b { color:#fff; font-weight:600; } .rw .mom .ev .b { color:#d2b8ff; }
 .rw button.go { background:#1b2a40; color:#cfe3ff; border:1px solid #2e4a6e; border-radius:6px; padding:4px 10px; font:inherit; font-size:13px; cursor:pointer; white-space:nowrap; align-self:start; }
 .rw button.go:hover { background:#25406a; }
+.rw button.go:disabled { background:none; border-color:#263041; color:#7d8ba0; cursor:default; white-space:normal; max-width:220px; text-align:right; }
 .rw table.res { border-collapse:collapse; width:100%; font:13px ui-monospace, monospace; }
 .rw table.res th, .rw table.res td { padding:5px 8px; text-align:right; border-bottom:1px solid #1d2635; white-space:nowrap; }
 .rw table.res th:first-child, .rw table.res td:first-child { text-align:left; } .rw table.res th { color:#8fa3bd; font-weight:600; }
@@ -76,7 +77,10 @@ export function mount(el) {
   });
 
   const colHead = (c) => `<span${c.color ? ` style="color:${c.color}"` : ""}>${esc(c.name)}</span>`;
-  const notComputed = (rep) => `Results not computed for this run (no ${esc(resultFile(rep))} result in its folder${rep.moments?.complete ? `, or ${esc(rep.moments.complete)} is false` : ""}).`;
+  const notComputed = (rep) => `Results not computed for this run (no ${esc(resultFile(rep))} result in its folder).`;
+  /** The flag of each shown run whose moments' request did not complete; tag names the run in compare. */
+  const flags = (runs) => runs.filter(([r]) => r?.incomplete).map(([r, tag]) =>
+    `<p class="none flag">${tag ? `${tag} · ` : ""}Request ${esc(r.incomplete)} did not complete in this run (${esc(repOf(r.rep)?.moments?.complete)} is false). Its missing values show as –.</p>`).join("");
   /** One run's Results table from its rep's result file; tag names the run when A and B have different files. */
   function table(rep, run, tag) {
     const head = tag ? `<h3>${tag}</h3>` : "", t = resultTable(rep, [run?.result]);
@@ -84,7 +88,7 @@ export function mount(el) {
     if (!t.rows.length) return `${head}<p class="none">The command center has no Results layout for ${esc(t.file)}.</p>`;
     return `${head}<table class="res"><tr><th></th>${t.cols.map((c) => `<th>${colHead(c)}</th>`).join("")}</tr>
       ${t.rows.map((r) => `<tr><td>${esc(r.label)}</td>${t.cols.map((c) => `<td>${fmtMs(valueAt(run.result, r.path[c.name]))}</td>`).join("")}</tr>`).join("")}</table>
-      <p class="muted src">Values from the run's ${esc(t.file)}.</p>`;
+      <p class="muted src">Values from the run's ${esc(t.file)}.</p>${flags([[run]])}`;
   }
   function results(rep, a, b) {
     const ra = a?.result, rb = b?.result, repB = b && repOf(b.rep);
@@ -99,7 +103,7 @@ export function mount(el) {
       return `<tr${fromRows ? ` data-rows="ttft"` : ""}><td>${esc(r.label)} ${colHead(c)}</td>${fromRows ? delta(null, null) : delta(valueAt(ra, r.path[c.name]), valueAt(rb, r.path[c.name]))}</tr>`;
     })).join("");
     return `<table class="res"><tr><th></th><th>A</th><th>B</th><th>B − A</th><th>%</th></tr>${rows}</table>
-      <p class="muted src">${t.fromRows ? `${t.fromRows.join(" ")}: recomputed from each run's client rows in the store (first token event − send). Other rows: the runs' ${esc(t.file)}.` : `Values from the runs' ${esc(t.file)}.`}</p>`;
+      <p class="muted src">${t.fromRows ? `${t.fromRows.join(" ")}: recomputed from each run's client rows in the store (first token event − send). Other rows: the runs' ${esc(t.file)}.` : `Values from the runs' ${esc(t.file)}.`}</p>${flags([[a, "A"], [b, "B"]])}`;
   }
   /** whyA, whyB: shown in place of a missing value, saying why it is missing. */
   function delta(va, vb, whyA, whyB) {
@@ -166,6 +170,19 @@ export function mount(el) {
       if (state.session === ss && tr) tr.innerHTML = tr.firstElementChild.outerHTML + delta(ta.ms, tb.ms, ta.why, tb.why);
     });
   }
-  const unsub = subscribe((s, ch) => { if (ch.session) render(s); });
+  /** "Show me" is off, saying why, for a moment whose event row the shown run lacks (a request that did not complete).
+   *  A live run is left alone: its rows are still arriving. */
+  function offMissing(rep, ss) {
+    if (ss.mode === "live" || !rep?.moments) return;
+    const req = rep.moments.request ?? "measured";
+    openedStore(ss.mode === "compare" && ss.side === "B" ? ss.runB : ss.run).then((S) => {
+      if (!S || state.session !== ss) return;
+      for (const b of box.querySelectorAll("[data-go]")) {
+        const m = rep.moments.moments.find((x) => x.id === b.dataset.go);
+        if (m && eventRow(S, m.event, req) < 0) { b.disabled = true; b.textContent = `no ${m.event} row for ${req} in this run`; }
+      }
+    });
+  }
+  const unsub = subscribe((s, ch) => { if (ch.session) { render(s); offMissing(repOf(s.session.rep), s.session); } });
   return () => { unsub(); root.remove(); };
 }

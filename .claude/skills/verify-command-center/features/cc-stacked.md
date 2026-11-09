@@ -12,7 +12,8 @@ part's tier. The lens on the stage shows the architecture view and collapses.
   cursor), `pulse` (the unit at the cursor), `stat` (utilization text).
 - `stk-tiers` with hardware focused, keys 1 to 6 set the tier; `.ch-focus .t` and `.d` name it.
 - `stk-pick` a click on a part's mesh selects it (`__cc.sel` is the part's key) and sets its hardware tier.
-- `stk-pulse` the pulse label follows the execution tier: request, forward step, kernel.
+- `stk-pulse` the pulse label follows the execution tier and reads as the spine band does: request, iteration with its
+  flow, forward step, kernel.
 - `stk-lens` `#stage .lens .tog` collapses and expands the lens.
 
 ## How to get to it (user POV)
@@ -39,10 +40,11 @@ Preconditions:
 - **Pick a part.** At tier 3, find a pickable point near the GPU label. This probe moves only the hover box:
   `$CCV eval '(() => { const cv = document.querySelector("#stage canvas"), r = cv.getBoundingClientRect(), L = [...document.querySelectorAll("#stage .sw-lbl")].find((e) => /5060/.test(e.textContent)).getBoundingClientRect(); const hits = []; for (let y = r.top + 10; y < r.bottom; y += 12) for (let x = r.left + 10; x < r.right; x += 12) { cv.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y, bubbles: true })); if (cv.style.cursor === "pointer") hits.push([x, y]); } cv.dispatchEvent(new PointerEvent("pointerleave")); const cx = (L.left + L.right) / 2, cy = (L.top + L.bottom) / 2; hits.sort((a, b) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(b[0] - cx, b[1] - cy)); return Math.round(hits[0][0]) + "," + Math.round(hits[0][1]); })()'`
   returned `1234,679`. `$CCV click --at 1234,679 --after stacked-pick`: `sel` is `gpu0`, focus `hardware`, tier
-  `2` (device). The bar starts `hardware · gpu` `NVIDIA GeForce RTX 5060 Ti` `Observed: nvidia-smi, CUDA device
+  `2` (device). The bar starts `hardware · device` `NVIDIA GeForce RTX 5060 Ti` `Observed: nvidia-smi, CUDA device
   properties` with `cc 12.0`, `sms 36`, `l2_bytes 33554432`, `vram_bytes 16712335360`, `bus_bits 128`,
   `copy_engines 2`.
-- **Pulse.** `$CCV key e`, then 1: the pulse reads `request`; 3: `[Executor] _forward_step 67: 0 ctx reqs, 1 gen reqs`;
+- **Pulse.** `$CCV key e`, then 1: the pulse reads `request measured` (the request band's label); 2: `iteration 68:
+  decode`; 3: `[Executor] _forward_step 67: 0 ctx reqs, 1 gen reqs`;
   6: `Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_32x32_128x1_tn_align8>`.
 - **Lens.** `$CCV click --css '#stage .lens .tog'`: the button reads `expand` and the lens body is hidden. Click
   again: `collapse`, shown.

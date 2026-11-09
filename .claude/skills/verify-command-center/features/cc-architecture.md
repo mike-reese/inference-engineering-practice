@@ -12,8 +12,8 @@ below it holds the request, phase and kernel rows on one time axis, and a beam j
   the box's phase at or after the cursor.
 - `arch-cards` at tiers 3 and 4: `.card[data-sel]` and process rows `[data-proc]`. `.nowis` says where the request
   is now.
-- `arch-layers` at tier 6: `[data-layer]` cards (toolkit, runtime, device code) with the module, launch call and
-  kernel at the cursor.
+- `arch-layers` at tier 6: `[data-layer]` cards (toolkit, runtime, device code), each with its role line (for
+  example `builds the op and calls the runtime`), its kinds, and the module, launch call and kernel at the cursor.
 - `arch-strip` `#stage .aw .strip`: `rect.u[data-l=i]` selects a row, `[data-fit]` toggles `[fit]` and `[run]`, a
   click on empty space seeks.
 - `arch-beam` `#stage .aw .beam path` from the strip to the lit box or card.

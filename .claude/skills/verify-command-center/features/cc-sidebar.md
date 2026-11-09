@@ -40,7 +40,7 @@ Preconditions:
   `window: 0.00 to 88294.36 ms (request)`. Key 3 returns to the phase window.
 - **Click a row.** `$CCV click --css '#hw .hwrow[title^="DRAM read"]' --after sidebar-dram`: focus `hardware`, tier
   `3` (unit), `sel` `gpu0`. 13 rows are marked `tier` (the unit-tier metrics) and 23 rows `sel` (the metrics sampled
-  on `gpu0`). The bar starts `hardware · gpu` `NVIDIA GeForce RTX 5060 Ti`.
+  on `gpu0`). The bar starts `hardware · device` `NVIDIA GeForce RTX 5060 Ti` (the part's own tier, as D13).
 - **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas
