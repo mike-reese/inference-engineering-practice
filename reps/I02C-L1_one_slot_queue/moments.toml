@@ -1,0 +1,46 @@
+# Key moments: where in a run each lesson of this rep can be seen. The command center's Rep world lists them in
+# order; "show me" moves the replay to the moment. Fields as in reps/I02A-L1_streamed_latency/moments.toml, except:
+#   result = the run's result file, relative to the run folder. This rep writes no latency.json; rep.py writes
+#            readout.json, read whole: paths start at its top level (clients.A, clients.B, native, prometheus_delta)
+#   at, evidence = readout.json paths in ms. The client durations are from each request's own send
+
+# Request B: sent on A's first content, it waits for A on the one engine slot.
+request = "B"
+result = "readout.json"
+
+[[moments]]
+id = "headers-at-once"
+title = "B is accepted at once"
+lesson = "A long TTFT can include waiting."
+at = "clients.B.durations.headers_ms"
+event = "response headers"
+note = "The server answers B's request with headers within milliseconds, while A still holds the slot. B's wait starts after the server accepts it, not on the network."
+evidence = [
+  { label = "B headers", path = "clients.B.durations.headers_ms" },
+  { label = "B TTFT", path = "clients.B.durations.ttft_ms" },
+]
+
+[[moments]]
+id = "first-token-waits"
+title = "B's first token waits for A to finish"
+lesson = "A long TTFT can include waiting."
+at = "clients.B.durations.ttft_ms"
+event = "event: token"
+note = "The engine schedules one request per iteration, so B gets GPU work only when A completes. B's TTFT holds A's whole generation."
+evidence = [
+  { label = "A TTFT", path = "clients.A.durations.ttft_ms" },
+  { label = "A end-to-end", path = "clients.A.durations.e2e_ms" },
+  { label = "B TTFT", path = "clients.B.durations.ttft_ms" },
+]
+
+[[moments]]
+id = "done"
+title = "B ends one generation after A"
+lesson = "Two requests in flight, one scheduled."
+at = "clients.B.durations.e2e_ms"
+event = "protocol complete"
+note = "The client held A and B open together, but the engine served them one after the other. B's end-to-end is about A's plus its own generation."
+evidence = [
+  { label = "A end-to-end", path = "clients.A.durations.e2e_ms" },
+  { label = "B end-to-end", path = "clients.B.durations.e2e_ms" },
+]

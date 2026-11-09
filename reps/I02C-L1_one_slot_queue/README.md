@@ -28,5 +28,13 @@ We don't need any new functions for this. Instead, we'll be reusing our infrastr
 | Storage | Model weights and Docker data: `/dev/nvme0n1p2` (WD Black SN7100, `/mnt/ie-data`). Practice `.venv`: same device since 2026-11-07. Nothing is written to `/mnt/ie-kv-spill`. `rep.py` saves `findmnt -T` for each path |
 | Machine state | Recorded by `rep.py` in `results/<run id>/basis.json`: SM clock, temperature, power and other GPU processes at start and end |
 
+## Why It Matters
 
-
+- **A long TTFT can include waiting.** B is sent on A's first content and gets GPU work only when A completes. In run
+  `I02C_20261107T181629Z_c37c3e`, B's TTFT was 2727.3 ms against A's 42.5 ms, for the same prompt.
+- **Two requests in flight, one scheduled.** The client holds A and B open together, while the engine
+  (`--max_batch_size 1`) schedules one request per iteration.
+- **Clients, queue entries and scheduled requests answer different questions.** Each points to a different place a
+  delay can live. In the same run, the engine's queue time summed to 2.69 s over 2 requests, and
+  `/prometheus/metrics` agreed with `/perf_metrics` to 0.0 ms. Which request waited is unavailable: there is no
+  validated client/native join.

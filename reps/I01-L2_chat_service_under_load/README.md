@@ -232,3 +232,14 @@ The server was killed 0.3 s into a 512-token generation. The client saw HTTP 200
 - The failure request's pcap is incomplete (Inspection point 4).
 
 ## Why It Matters
+
+- **Prompt length moves prefill, not decode.** From ISL 64 to 1024, TTFT P50 rises by 91.0 ms and prefill by 88.6 ms;
+  decode grows by 7.2 ms, inside its own band spread (run `I01L2_20261031T000505Z_b7369e`).
+- **Every millisecond has a component and a clock.** TTFT splits into nine segments on the client, capture and
+  server-log clocks, joined within ±0.028 ms. Network and client segments stay below 1 ms each.
+- **A content event is not a token.** The SDK delivers text, so the client measures content-event gaps, not ITL.
+  Exact ITL and transport EOF are recorded as unavailable.
+- **Histogram quantiles are estimates.** Prometheus interpolates inside a bucket: the TTFT P95 estimate is 142.500 ms
+  against 121.969 ms raw. The bucket counts are exact.
+- **A stream can start and still fail.** In the failure test the client saw HTTP 200 and first content at 40.1 ms,
+  then `APIConnectionError` at 439.3 ms.
