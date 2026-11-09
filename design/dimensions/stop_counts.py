@@ -14,10 +14,12 @@ The stop check, per run; exits 1 on any failure:
 --self-test maps "cuda runtime call" to phase. The launch calls are then claimed twice, so it must exit 1.
 
 Run: uv run --no-project --with duckdb python design/dimensions/stop_counts.py [--write | --self-test]
+CC_STORE (default /mnt/ie-data/cc/store) picks the store, as for store.check.
 --write replaces the block between the gen:stops markers in COMMAND_CENTER.md.
 """
 import argparse
 import json
+import os
 import re
 import sqlite3
 import sys
@@ -31,7 +33,7 @@ from places import check_places, load, tier_of
 HERE = Path(__file__).parent
 REPO = HERE.parent.parent
 DOC = REPO / "COMMAND_CENTER.md"
-STORE = Path("/mnt/ie-data/cc/store/runs")
+STORE = Path(os.environ.get("CC_STORE", "/mnt/ie-data/cc/store")) / "runs"
 NONE16 = 65535
 NSYS_DEVICE = ("CUPTI_ACTIVITY_KIND_KERNEL", "CUPTI_ACTIVITY_KIND_MEMCPY", "CUPTI_ACTIVITY_KIND_MEMSET")
 TORCH_DEVICE = {"kernel", "gpu_memcpy", "gpu_memset"}
