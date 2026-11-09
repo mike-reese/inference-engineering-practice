@@ -1,5 +1,5 @@
 """PyTorch profiler: trace/torch_trace.json (TLLM_TORCH_PROFILE_TRACE, Kineto), every complete event (ph "X") one
-row (import only). Rows, attributes, parents and code origin as the ie-run/2 prototype (D2 ingest.py torch_events);
+row (import only). Rows, attributes, parents and code origin as the ie-run/2 prototype;
 kinds and eids from registry torch_profiler.json.
 
 Clock: baseTimeNanoseconds + ts (us) is UTC; run clock = that - the run's wall offset (Ctx.wall_offset_ns).
@@ -117,7 +117,7 @@ class Torch:
             nbytes.append(a.get("bytes"))
             args.append(json.dumps({k: v for k, v in a.items() if k not in ("correlation", "bytes")},
                                    separators=(",", ":")))
-        # thread labels (metadata events, written after the X events): CPU rows only, as D2 did
+        # thread labels (metadata events, written after the X events): CPU rows only, as ie-run/2 did
         for k in range(len(args)):
             label = tnames.get((pid[k], tid[k])) if pid[k] not in (0, -1) else None
             if label:
@@ -158,7 +158,7 @@ class Torch:
         it = np.full(n, -1, np.int64)
         launch_of = {}
         for i in np.flatnonzero(is_launch & (corr >= 0)).tolist():
-            launch_of[int(corr[i])] = i                      # the last launch call of a correlation id wins (D2)
+            launch_of[int(corr[i])] = i                      # the last launch call of a correlation id wins (ie-run/2)
         code_origin, code_where = np.full(n, None, dtype=object), np.full(n, None, dtype=object)
         origin = {"model code": 0, "engine code": 0, "no launch": 0}
         work = np.flatnonzero(is_gpu & (corr >= 0))

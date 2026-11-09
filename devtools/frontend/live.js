@@ -1,5 +1,4 @@
 // The live state: one SSE connection to the backend plus the history fetches, folded into one shared object.
-// Used by the v1 shell (app.js) and by the v2 scene's panels (prototypes/D5v2), so both read the same live feed.
 
 const HISTORY = 120; // seconds of sparkline per series
 const KEEP_LOG_LINES = 5000; // per container, in the browser

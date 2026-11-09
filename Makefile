@@ -79,7 +79,7 @@ check:  ## make check REP=<folder under reps/>: that rep's pass checks
 	@test -n "$(REP)" || { echo "set REP=<folder under reps/>, e.g. make check REP=I02C-L1_one_slot_queue"; exit 2; }
 	uv run --no-sync pytest -q reps/$(REP)
 
-# Command center v3 store (ie-run/3 under CC_STORE): every ie-run/2 run converted, CCVB round trip, tier invariant,
+# Command center v3 store (ie-run/3 under CC_STORE): CCVB round trip, tier invariant,
 # unique eids, schema.py == frontend/cc/store/columns.js. DuckDB and numpy only (the bulk data venv on the data drive).
 CC_PY ?= /mnt/ie-data/venvs/cc-v2-proto/bin/python
 store-check:

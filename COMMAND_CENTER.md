@@ -333,7 +333,10 @@ adds what the interface needs on top.
 The store ranks rows on a 7-tier ladder in `devtools/registry/kinds.json`: request, iteration, stage, op, call,
 device, os. Its rungs mix the three dimensions. Tier 4 (call) holds 1,120,878 of 1,140,076 rows in the code run
 (measured), so stepping on it walks about 17,500 rows per iteration. The interface steps on the per-dimension tiers
-of section 3 instead. The storage tier stays as a column until nothing reads it (M4). Kind-by-kind placement is
+of section 3 instead. The storage tier stays as a column until nothing reads it. At M4 it is still read: the
+importer splits blocks into the spine and fine bands by it, `RunStore` builds its per-tier orders and grain from it
+(`cc/store/run.js`, `block.js`), and the `top-level` place rule compares it with the kind's tier (`cc/store/dims.js`,
+`stop_counts.py`). Kind-by-kind placement is
 each kind's `place` in `devtools/registry/kinds.json` (P3); section 9 maps every surface onto it.
 
 - `derive_tier`: the kind's tier; one finer when nested in the same kind (NVTX only). `tier(child) >= tier(parent)`
@@ -534,12 +537,12 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 | M1 production cutover | `cc/` gets the D13 chrome, stage, four worlds, bar, sidebar and shell, drawn only from `RunStore`, the registry and `/api/v3/reps`. Load replays any stored run; Launch posts `/runner/jobs` and follows the live run through `RunWatcher` and the stream, with mask and follow; Compare opens two stores with the A / B switch (choice 3). "Show me" uses the moment's `event`. `levels/` and `scene/` are deleted; `data.js` and `session-data.json` are not copied. The verify recipes are rewritten for the new page, one per world plus Load, Launch, Compare and the inspector. `walkthroughs.sh` (section 5) is written. | `regress.sh` passes on `/static/cc/index.html` with R1, with 0 console errors. `walkthroughs.sh` passes. `cc/` contains no `scratch`, `stand-in` or `simulated` text and no import from `prototypes/`. One real Launch of I02A `off`: followed live, the shown head equals the stream's `head_ns`, and at its end it becomes a replay with no command; `make store-check` passes on it (live eids in final). Compare: B − A in the Rep world equals TTFT recomputed from each run's client rows in the store, not read from `latency.json`. The sidebar's DRAM % at an R1 cursor equals the nsys GPU metrics of that 100 µs window in R1's `.sqlite`. The code run opens within 160 MB (`ccv perf`). |
 | M2 module inference | Graphs-on runs get module rows by matching kernel sequences against the code run's modules. Until then their module tier says "missing" (3.1). | For R1, every inferred module's kernel names equal the code run's for that module; each module span contains its kernels; unmatched kernels per iteration are counted and shown (286 against 207 kernels per iteration, measured, so 1:1 cannot hold); per-name kernel totals equal `nsys stats -r cuda_gpu_kern_sum` for R1. |
 | M3 rep files | `moments.toml` for every rep with recorded event runs: I01-L2, I02A, I02C; `rep.toml` for each with a `rep.py` (I02A, I02C). I01-L2 has no `rep.py`, so it has no `rep.toml` and is replay only. I01A, I01B, I01C and I02B have no event runs to import and stay "No recorded runs". | The moments lint passes for I01-L2, I02A and I02C, and a rep whose moments resolve on no run fails it. The Rep world lists moments for each, and `regress.sh` passes. |
-| M4 retire | Delete `store_v2.py` and `/api/v2`, `prototypes/D1`, `D2`, `D5v2`, `D13`, the v2 collectors, the legacy D5v2 recipes, and the storage `tier` column once nothing reads it. The v1 page stays until the owner retires it. Deleting `/mnt/ie-data/cc-v2-proto` (29 GB, the v2 store) is data deletion: the owner confirms it at M4 (choice 1). | `map_surfaces.py` exits 0 reading only `cc/` and v1. A grep of `devtools/` and the skill finds no removed path. `regress.sh` passes with 0 failed requests in the console log. `make store-check` passes. |
+| M4 retire | Delete `store_v2.py` and `/api/v2`, `prototypes/D1`, `D2`, `D5v2`, `D13`, the v2 collectors, the legacy D5v2 recipes, and the storage `tier` column once nothing reads it. The v1 page stays until the owner retires it. Deleting `/mnt/ie-data/cc-v2-proto` (29 GB, the v2 store) is data deletion: the owner confirms it at M4 (choice 1). Code status (2026-11-09): `store_v2.py`, `/api/v2`, D1, D2, D5v2, the v2 collector path (`/api/components?saved=`, read only by D5v2) and the legacy recipes are deleted. D13 stays until the parity verification (decision log, 2026-11-08). The `tier` column stays: it is still read (6.2). The v2 store on disk is not part of the code change. | `map_surfaces.py` exits 0 reading only `cc/` and v1. A grep of `devtools/` and the skill finds no removed path. `regress.sh` passes with 0 failed requests in the console log. `make store-check` passes. |
 
 ## 8. Resolved choices (owner, 2026-11-08, on the agent's recommendation)
 
-1. **v2 alongside during the migration.** The v2 store and D5v2 stay read-only until M4. The verify skill opens D5v2
-   only for legacy recipes. M4 removes the code; the owner confirms deleting the 29 GB v2 store at M4.
+1. **v2 alongside during the migration.** The v2 store and D5v2 stay read-only until M4. M4 removes the code and
+   the verify skill's legacy recipes; the owner confirms deleting the 29 GB v2 store at M4.
 2. **Snap-to-tier zoom.** No snap. Flying to a tier already sets that tier's natural window (3.4); wheel zoom stays
    free from 0.5x to 16x.
 3. **Compare as a split.** No split. The A / B switch is final; the Rep world shows A, B, B − A and %.
@@ -563,9 +566,10 @@ Every list in `data.js` and `hwside.js`, with its production source. "P2" and "P
 
 ## 9. Map of every current surface
 
-Generated by `map_surfaces.py` from the registry (tiers, kinds and each kind's place), the D13 worlds (`model.js`),
-the v1 `index.html`, the `cc/` panels and `cc/control/keys.js`. It fails when a surface has no entry, an entry
-matches no surface, or a new place names a tier missing from the ladders or a world D13 does not draw. "owner"
+Generated by `map_surfaces.py` from the registry (tiers, kinds and each kind's place), the `cc/` worlds
+(`cc/control/control.js`), the v1 `index.html`, the `cc/` panels and `cc/control/keys.js`. It fails when a surface
+has no entry, an entry matches no surface, or a new place names a tier missing from the ladders or a world `cc/` does
+not draw. "owner"
 marks an open choice.
 
 <!-- gen:surfaces -->
@@ -602,10 +606,10 @@ marks an open choice.
 | kind | profiler message | execution: detail; hardware: -; architecture: process (profiler) |
 | kind | process start | execution: detail; hardware: -; architecture: process (lifecycle stop) |
 | kind | inferred module | execution: module; hardware: device (GPU); architecture: software layer (toolkit) |
-| D13 world | Rep | the session's front page, outside the dimensions: moments put the cursor on stops in any dimension |
-| D13 world | Stacked world | all three dimensions in 3D: architecture standing on its hardware (the board as floor), execution as a moving pulse |
-| D13 world | Execution spine | execution / request to kernel as bands, with a lens on architecture and hardware |
-| D13 world | Architecture | architecture / container, process and component (the v1 drawing) over a thin execution strip |
+| world | Rep | the session's front page, outside the dimensions: moments put the cursor on stops in any dimension |
+| world | Stacked world | all three dimensions in 3D: architecture standing on its hardware (the board as floor), execution as a moving pulse |
+| world | Execution spine | execution / request to kernel as bands, with a lens on architecture and hardware |
+| world | Architecture | architecture / container, process and component (the v1 drawing) over a thin execution strip |
 | v1 view | infra | architecture / container and process, hardware / system |
 | v1 view | components | architecture / component |
 | v1 view | run | header session shell: Launch (live); results in the Rep world |
@@ -1243,4 +1247,5 @@ Reading the counts:
 | 2026-11-09 | M3 covers the reps with event runs (I01-L2, I02A, I02C); I01A, I01B, I01C and I02B stay "No recorded runs". `moments.toml` may name its run's result file (`result`, default `latency.json`). The moments lint fails a rep whose moments resolve on no run | agent (coordinator ruling) |
 | 2026-11-09 | M2: graphs-on runs get kind `inferred module` (op tier, placed at execution / module, final import only) from the code run's module frames (3.1, `store/modules.py`, the code run per rep in `registry/modules.json`). A frame is kept only when all its device rows pair, consecutive on one stream; decode attention (XQA against the code run's masked MHA) stays unmatched. On R1 (timeline ee2252, kernels run 8f4ae7): 22,240 modules, each with the code run's names and holding its rows; 101 of 310 kernel stops unmatched per decode iteration, 49 of 354 per prefill, shown in the spine headline; per-name kernel totals equal `nsys stats` (`devtools/verify/modules_check.py`). Open: the inspector path, the Kernels tab's module column and the architecture world's toolkit line still find a module only through the launch call, so they miss inferred modules (a held kernel's path also loses its phase and launch call) | agent |
 | 2026-11-09 | R1 re-recorded (7.3) with the GPU to itself: timeline `I02A-TRACE-timeline_20261109T060522Z_ee2252`, kernels run `I02A-TRACE-kernels_20261109T060737Z_8f4ae7` (Nsight Compute, iteration 67, 266 of 266 kernels tied). It replaces 69c1bb + 9c0b54 as R1; a fresh pair was needed because the importer pairs a timeline with the first kernels run after it | agent |
+| 2026-11-09 | M4 code: "the v2 collectors" read as the collector code only D5v2 called (`/api/components?saved=`); the nvidia-smi, dmon, engine, log, Docker and component collectors feed the v1 page, which stays. The `tier` column stays because the page and the stop check still read it (6.2). `map_surfaces.py` reads the worlds from `cc/control/control.js`, so section 9 labels them "world". `prototypes/D9` is not on the M4 list and stays | agent |
 
