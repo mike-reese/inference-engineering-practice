@@ -85,7 +85,7 @@ export class RunStore {
     this.metricPlaces = m.metric_places;   // registry metric name -> {hardware: tier name or "-"}
     // manifest `tools` ({nsys: {run, path, ...}, ncu: {run, path, kernels, ...}}) and `source` ({run_dir, importer, live?}), as written
     this.tools = m.tools ?? {}; this.source = m.source ?? null; this.auxEntry = m.aux ?? null;
-    this.listeners = new Set(); this.details = new Map(); this.inflight = new Map(); this.events = new Map();
+    this.details = new Map(); this.inflight = new Map(); this.events = new Map();
     this.rev = 0;   // seals whose `derived` changed held rows; a seal also drops the detail cache (parents, cause, links)
     const nThings = m.things.length, nReqs = m.requests.length;
     this.blocks = []; this.sampleGroups = []; this.groups = new Map(); this.links = null;
@@ -159,7 +159,7 @@ export class RunStore {
   /** Merge every queued frame. Returns {events, samples, derived} merged counts, or null when nothing changed. */
   flush() {
     const l = this.live; if (!l || !l.queue.length) return null;
-    const frames = l.queue.splice(0), added = [], patches = [], nT = this.things.length, nR = this.requests.length;
+    const frames = l.queue.splice(0), patches = [], nT = this.things.length, nR = this.requests.length;
     let events = 0, samples = 0, keys = false;
     for (const { data } of frames) {
       if (typeof data === "string") { const msg = JSON.parse(data); if (msg.type === "seal" && msg.derived) patches.push(msg.derived); this.onText(msg); continue; }
@@ -169,7 +169,7 @@ export class RunStore {
       if (header.table === "events") {
         if (header.base_rows !== this.N + events) { console.error(`live: frame ${header.seq} starts at row ${header.base_rows}, expected ${this.N + events}`); this.reload("row gap"); return null; }
         const b = indexEvents(header, cols, this.things.length, this.requests.length);
-        this.blocks.push(b); added.push(b.gpu); events += header.rows;
+        this.blocks.push(b); events += header.rows;
         // a row is known at the source once it ends (a span is written at its end): its end is its source time
         let lo = Infinity, hi = -Infinity; for (const e of cols.end) { if (e < lo) lo = e; if (e > hi) hi = e; }
         l.lat.push(["events", header, lo, hi]);
@@ -182,22 +182,21 @@ export class RunStore {
     keys = this.things.length !== nT || this.requests.length !== nR;
     if (keys) for (const b of this.blocks) reindexKeys(b, this.things.length, this.requests.length);
     if (events) this.N = this.blocks.reduce((a, b) => a + b.n, 0);
-    const derived = patches.length ? this.derive(patches) : null;
+    const derived = patches.length ? this.derive(patches) : null;   // the ids a seal changed
     if (l.reloading) return null;
     if (events || keys || derived) { this.ids = indexIds(this.blocks, this.N); this.order(); this.indexLinks(); this.dims.build(); }
     else this.extentLive();
-    if (added.length || derived) for (const fn of this.listeners) fn({ added, changed: derived?.gpu ?? [] });
     if (derived) {
       this.rev++; this.details.clear(); this.inflight.clear();   // parents, cause and links of cached details may be stale
-      this.emit("derived", derived.ids);
+      this.emit("derived", derived);
     }
-    return events || samples || derived ? { events, samples, derived: derived?.ids.size ?? 0 } : null;
+    return events || samples || derived ? { events, samples, derived: derived?.size ?? 0 } : null;
   }
 
   /**
    * Apply seal-time derivations ({ids, parent, cause, tier, depth}, parallel lists; a later seal wins) to the held
-   * rows: columns, GPU copy, and the tier indexes of each block whose rows changed tier. Returns the changed ids and
-   * the GPU copies to upload again, or null after asking for a reload when a seal names a row the page does not hold.
+   * rows: columns, and the tier indexes of each block whose rows changed tier. Returns the Set of changed ids, or null
+   * after asking for a reload when a seal names a row the page does not hold.
    */
   derive(patches) {
     const pi = new Int32Array(this.N).fill(-1), pj = new Int32Array(this.N);
@@ -207,19 +206,18 @@ export class RunStore {
         if (!(Number.isInteger(id) && id >= 0 && id < this.N)) { console.error(`live: a seal derives row ${id}, the page holds ${this.N}`); this.reload("derived row not held"); return null; }
         pi[id] = p; pj[id] = j;
       } }
-    const ids = new Set(), gpu = [];
+    const ids = new Set();
     for (const b of this.blocks) {
-      const { id } = b.cols; let hit = false, moved = false;
+      const { id } = b.cols; let moved = false;
       for (let i = 0; i < b.n; i++) {
         const p = pi[id[i]]; if (p < 0) continue;
         const d = patches[p], j = pj[id[i]];
         if (setDerived(b, i, d.parent[j], d.cause[j], d.tier[j], d.depth[j])) moved = true;
-        hit = true; ids.add(id[i]);
+        ids.add(id[i]);
       }
       if (moved) restep(b);
-      if (hit) gpu.push(b.gpu);
     }
-    return { ids, gpu };
+    return ids;
   }
 
   /** Dictionary growth carried by a frame: names and requests append ({from, add}); things and metrics are full lists. */
@@ -525,9 +523,6 @@ export class RunStore {
     return d ? d.id : null;
   }
 
-  /** The render seam: fn receives {added: GpuRows[]} now for every resident block, and again when rows arrive. */
-  subscribe(fn) { this.listeners.add(fn); fn({ added: this.blocks.map((b) => b.gpu) }); return () => this.listeners.delete(fn); }
-
   /** A live run's extent runs to the head (the writer's clock now), so the cursor can follow it past the last row. */
   extentLive() {
     if (!this.live) return;
@@ -545,7 +540,7 @@ export class RunStore {
 
   /**
    * Resident bytes, for PERF.report(): every ArrayBuffer the store holds, each counted once, under the first part
-   * that reaches it. columns: the blocks' hot columns; gpu: their GPU copies; indexes: the other per-block indexes;
+   * that reaches it. columns: the blocks' hot columns; indexes: the other per-block indexes;
    * samples; order: startOf, endOf, allRows, the per-tier lists and the request and iteration rows; ids: the id map
    * and children; links: the links table and the link and cause indexes; dims: Dimensions and its caches; other:
    * anything else. total_mb sums them.
@@ -564,7 +559,7 @@ export class RunStore {
       }
       mb[`${part}_mb`] = n / 2 ** 20;
     };
-    count("columns", ...this.blocks.map((b) => b.cols)); count("gpu", ...this.blocks.map((b) => b.gpu)); count("indexes", ...this.blocks);
+    count("columns", ...this.blocks.map((b) => b.cols)); count("indexes", ...this.blocks);
     count("samples", this.sampleGroups, this.groups);
     count("order", this.startOf, this.endOf, this.allRows, this.exact, this.gap, this.reqRows, this.iterRows, this.iterLo, this.iterHi);
     count("ids", this.ids); count("links", this.links, this.linkFrom, this.linkTo, this.causes); count("dims", this.dims); count("other", this);

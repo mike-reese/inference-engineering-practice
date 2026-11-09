@@ -15,10 +15,8 @@ export const localRows = (n, len) => new (n <= IDENTITY.length ? Uint16Array : U
 /**
  * @typedef {Uint16Array | Uint32Array} Local   local row numbers (Uint32 only past 65,536 rows in a block)
  * @typedef {{off: Uint32Array, rows: Local}} Csr   rows of key k are rows[off[k] .. off[k+1])
- * @typedef {{time: Float32Array, attr: Float32Array, ident: Float32Array, n: number}} GpuRows
- *   time: per row [startHi, startLo, endHi, endLo]; attr: [lane, kind, tier, depth]; ident: [id, name]
  * @typedef {{name: string, band: string, n: number, t: number[], cols: Record<string, any>,
- *   step: Local[], lane: Csr, comp: Csr, req: Csr, long: Local, gpu: GpuRows}} EventBlock
+ *   step: Local[], lane: Csr, comp: Csr, req: Csr, long: Local}} EventBlock
  */
 
 /** @returns {EventBlock} */
@@ -30,7 +28,7 @@ export function indexEvents(header, cols, nThings, nReqs) {
   return {
     name: header.block, band: header.band, n, t: header.t, cols, step: stepIndex(cols.tier, n),
     lane: csr(cols.lane, n, nThings), comp: csr(cols.comp, n, nThings), req: csr(cols.req, n, nReqs),
-    long: longRows, gpu: gpuRows(cols, n),
+    long: longRows,
   };
 }
 
@@ -51,13 +49,12 @@ function stepIndex(tier, n) {
 }
 
 /**
- * A seal's derived values for local row i (live runs): parent, cause, tier and depth in the columns and the GPU copy.
+ * A seal's derived values for local row i (live runs): parent, cause, tier and depth in the columns.
  * Returns true when the tier changed; the caller then calls restep(b) once for the block.
  */
 export function setDerived(b, i, parent, cause, tier, depth) {
   const c = b.cols, moved = c.tier[i] !== tier;
   c.parent[i] = parent; c.cause[i] = cause; c.tier[i] = tier; c.depth[i] = depth;
-  b.gpu.attr[i * 4 + 2] = tier; b.gpu.attr[i * 4 + 3] = depth;
   return moved;
 }
 
@@ -77,18 +74,6 @@ function csr(key, n, k) {
   const rows = localRows(n, off[k]), at = off.slice(0, k);
   for (let i = 0; i < n; i++) if (key[i] !== NONE16) rows[at[key[i]]++] = i;
   return { off, rows };
-}
-
-/** Float32 hi/lo pairs keep a start exact relative to any window start on the GPU: (hi - winHi) + (lo - winLo). */
-function gpuRows(c, n) {
-  const time = new Float32Array(n * 4), attr = new Float32Array(n * 4), ident = new Float32Array(n * 2);
-  for (let i = 0; i < n; i++) {
-    const s = c.start[i], e = c.end[i], sh = Math.fround(s), eh = Math.fround(e);
-    time[i * 4] = sh; time[i * 4 + 1] = s - sh; time[i * 4 + 2] = eh; time[i * 4 + 3] = e - eh;
-    attr[i * 4] = c.lane[i]; attr[i * 4 + 1] = c.kind[i]; attr[i * 4 + 2] = c.tier[i]; attr[i * 4 + 3] = c.depth[i];
-    ident[i * 2] = c.id[i]; ident[i * 2 + 1] = c.name[i];
-  }
-  return { time, attr, ident, n };
 }
 
 /** Parents per entry of `ids.every`, the sampled start of each parent's children in `ids.child`. */

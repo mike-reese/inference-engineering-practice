@@ -379,7 +379,7 @@ Server `backend/store/serve.py`:
 
 Browser: one `RunStore` (`frontend/cc/store/run.js`) answers `step(dim, tier)` and `walk` (the place and stop rules
 of the manifest, applied by `store/dims.js`), `grainFor`, `widthFor`, `chain`, `activeBy`, `scan`, `count`, `row`,
-`children`, `linksOf`, `samplesAt`, `series`, `metricTier`, `detail`, `resolve`, `subscribe`, `head`. It hides
+`children`, `linksOf`, `samplesAt`, `series`, `metricTier`, `detail`, `resolve`, `head`. It hides
 blocks, CCVB, the socket, dictionaries, indexes, the id map and generations.
 
 ### 6.5 Live and replay are one path
@@ -422,9 +422,9 @@ blocks, CCVB, the socket, dictionaries, indexes, the id map and generations.
 
 - Browser memory for no network on any step, scrub or zoom: budget 160 MB per open run (choice 9), counted as the
   total of every typed array the run's `RunStore` and its units hold (`ccv perf` `memory_mb` `typed_mb`; MB = 2^20
-  bytes). Measured 2026-11-09: 153.05 MB for the code run, 1.14 M rows at about 140 bytes per row (hot columns 57,
-  GPU copies 40, start, end and the order lists 24, the id map 8, dimensions 6.5, block indexes 4.7). Compare holds
-  two runs.
+  bytes). Measured 2026-11-09 in the spine world: 109.89 MB for the code run, 1.14 M rows at about 101 bytes per row
+  (hot columns 57, start, end and the order lists 24, the id map 8, dimensions 6.9, block indexes 4.7), the same in 3
+  opens. The browser holds no per-row GPU copy: the spine paints its units on a 2D canvas. Compare holds two runs.
 - Two encodings of the hot columns (Parquet canonical, CCVB derived) for zero-parse loads and DuckDB for agents.
 - A reload (target 250 ms) when a new generation lands, for one id rule per generation.
 
@@ -453,7 +453,7 @@ where it is (`.claude/skills/verify-command-center`); M1 rewrites its recipes fo
 | `bar.js` | `control/bar.js`, `inspector/` | tab list already matches `inspector/tabs.js`; keep `nsight.js` links |
 | `zoom.js` | `zoom.js` | as built |
 | `regress.sh` | `devtools/verify/regress.sh` (P1) | page from `CC_URL`; expectations from the store and rep files |
-| (none) | `levels/*`, `scene/*` (3D side-by-side levels) | deleted in M1. The Stacked world uses no `scene/` helper. `scene/rows_gpu.js` (the only way to draw 93K to 1.14M rows) moves to `worlds/spine/`; `scene/samples.js` (imported by the sidebar and inspector) moves to `sidebar/` |
+| (none) | `levels/*`, `scene/*` (3D side-by-side levels) | deleted in M1. The Stacked world uses no `scene/` helper. `scene/rows_gpu.js` and the store's per-row GPU copies it read (43.52 MB in the code run) are deleted: the spine paints its units on a 2D canvas, so nothing called it; `scene/samples.js` (imported by the sidebar and inspector) moves to `sidebar/` |
 
 ### 7.2 Where each scratch value comes from
 
