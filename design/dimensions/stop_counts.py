@@ -11,7 +11,8 @@ The stop check, per run; exits 1 on any failure:
   - kernel stops equal the kernel, memcpy and memset rows of the run's own device trace, the files the importer reads:
     trace/*.sqlite (Nsight Systems CUPTI tables) and trace/torch_trace.json (PyTorch profiler); 0 with neither;
   - module stops equal the module forward() frames of trace/torch_trace.json (the kind rule's match on its
-    python_function events); 0 without one (graphs-on runs: module is missing until M2);
+    python_function events) plus the module rows the import inferred (graphs-on runs, M2: the manifest's import stats
+    "modules", rule in devtools/backend/store/modules.py); 0 with neither;
   - every row has one tier per dimension: its kind has a valid place in each, and no row is claimed by two execution
     tiers (its kind's place and the CPU side of a kernel stop);
   - detail, the rows no stop tier claims, is never negative.
@@ -89,7 +90,7 @@ def load_run(con, run_dir: Path, reg: dict) -> dict:
                          f"from '{f}')").fetchall()[0]
         samples[f.stem.removeprefix("samples-")] = (k, med)
     return {"m": m, "h": h, "profiled": profiled, "source": source, "want": want, "modules": modules,
-            "samples": samples}
+            "inferred": m["import"].get("modules", {}).get("rows", 0), "samples": samples}
 
 
 def level_of(things: list, kinds: list[str]) -> np.ndarray:
@@ -220,9 +221,9 @@ def stops(R: dict, reg: dict, place: dict) -> tuple[dict, dict]:
     elif k_stops != R["want"]:
         bad.append(f"kernel stops {k_stops:,} differ from the {R['want']:,} kernel, memcpy and memset rows of "
                    f"{R['source']}")
-    if len(S["execution"]["module"]) != R["modules"]:
+    if len(S["execution"]["module"]) != R["modules"] + R["inferred"]:
         bad.append(f"module stops {len(S['execution']['module']):,} differ from the {R['modules']:,} module forward() "
-                   f"frames of the run's torch_trace.json")
+                   f"frames of the run's torch_trace.json plus the {R['inferred']:,} modules its import inferred")
     return S, {"detail": detail, "launches": len(launch_ids), "twice": int(twice.sum()), "bad": bad}
 
 
@@ -245,14 +246,16 @@ def table(reg: dict, results: dict, skipped: list[str]) -> str:
         out.append(f"| {run} | {R['rows']:,} | {R['iters']} | " + " | ".join(cells) + " |")
     out += ["", "Stop check: every execution place is allowed for its kind's storage tier; kernel stops equal the kernel, "
             "memcpy and memset rows of the run's device trace; module stops equal the module forward() frames of its "
-            "torch_trace.json; no row is on two execution tiers; detail is not negative.", "",
-            "| run | device trace | trace rows | kernel stops | module frames | module stops | rows on two tiers | result |",
-            "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+            "torch_trace.json plus the modules its import inferred (M2); no row is on two execution tiers; detail is not "
+            "negative.", "",
+            "| run | device trace | trace rows | kernel stops | module frames | inferred modules | module stops | "
+            "rows on two tiers | result |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for run, R in results.items():
         want = "n/a" if R["want"] is None else f"{R['want']:,}"
         c, f = R["counts"]["execution"], R["facts"]
-        out.append(f"| {run} | {R['source']} | {want} | {c['kernel']:,} | {R['modules']:,} | {c['module']:,} | "
-                   f"{f['twice']:,} | {'FAIL: ' + '; '.join(f['bad']) if f['bad'] else 'ok'} |")
+        out.append(f"| {run} | {R['source']} | {want} | {c['kernel']:,} | {R['modules']:,} | {R['inferred']:,} | "
+                   f"{c['module']:,} | {f['twice']:,} | {'FAIL: ' + '; '.join(f['bad']) if f['bad'] else 'ok'} |")
     if skipped:
         out += ["", "Not counted: " + "; ".join(skipped) + "."]
     out += ["", "Hardware and architecture stops (`dimensions.stops` in kinds.json). Hardware: device steps on transfers "
@@ -284,7 +287,7 @@ def check(reg: dict, place: dict, runs: dict) -> tuple[dict, list[str]]:
         c = counts(S)
         h = R["h"]
         results[name] = {"rows": len(h["id"]), "counts": c, "facts": facts, "source": R["source"], "want": R["want"],
-                         "modules": R["modules"], "samples": R["samples"],
+                         "modules": R["modules"], "inferred": R["inferred"], "samples": R["samples"],
                          "iters": c["execution"]["iteration"] or len(np.unique(h["iter"][h["iter"] >= 0]))}
     return results, problems + [f"{run}: {b}" for run, R in results.items() for b in R["facts"]["bad"]]
 
