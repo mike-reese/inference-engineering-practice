@@ -44,6 +44,7 @@ const CSS = `
 .rw .mom .ev b { color:#fff; font-weight:600; } .rw .mom .ev .b { color:#d2b8ff; }
 .rw button.go { background:#1b2a40; color:#cfe3ff; border:1px solid #2e4a6e; border-radius:6px; padding:4px 10px; font:inherit; font-size:13px; cursor:pointer; white-space:nowrap; align-self:start; }
 .rw button.go:hover { background:#25406a; }
+.rw button.go:disabled { background:none; border-color:#263041; color:#7d8ba0; cursor:default; white-space:normal; max-width:220px; text-align:right; }
 .rw table.res { border-collapse:collapse; width:100%; font:13px ui-monospace, monospace; }
 .rw table.res th, .rw table.res td { padding:5px 8px; text-align:right; border-bottom:1px solid #1d2635; white-space:nowrap; }
 .rw table.res th:first-child, .rw table.res td:first-child { text-align:left; } .rw table.res th { color:#8fa3bd; font-weight:600; }
@@ -169,6 +170,19 @@ export function mount(el) {
       if (state.session === ss && tr) tr.innerHTML = tr.firstElementChild.outerHTML + delta(ta.ms, tb.ms, ta.why, tb.why);
     });
   }
-  const unsub = subscribe((s, ch) => { if (ch.session) render(s); });
+  /** "Show me" is off, saying why, for a moment whose event row the shown run lacks (a request that did not complete).
+   *  A live run is left alone: its rows are still arriving. */
+  function offMissing(rep, ss) {
+    if (ss.mode === "live" || !rep?.moments) return;
+    const req = rep.moments.request ?? "measured";
+    openedStore(ss.mode === "compare" && ss.side === "B" ? ss.runB : ss.run).then((S) => {
+      if (!S || state.session !== ss) return;
+      for (const b of box.querySelectorAll("[data-go]")) {
+        const m = rep.moments.moments.find((x) => x.id === b.dataset.go);
+        if (m && eventRow(S, m.event, req) < 0) { b.disabled = true; b.textContent = `no ${m.event} row for ${req} in this run`; }
+      }
+    });
+  }
+  const unsub = subscribe((s, ch) => { if (ch.session) { render(s); offMissing(repOf(s.session.rep), s.session); } });
   return () => { unsub(); root.remove(); };
 }
