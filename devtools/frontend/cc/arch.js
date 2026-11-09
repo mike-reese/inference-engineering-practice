@@ -480,20 +480,19 @@ export function mountArch(el, { size = "lens" } = {}) {
   }
 
   function updateLayers(ctx) {
-    const E = S.dims.ladders.execution, K = E.indexOf("kernel"), MOD = E.indexOf("module");
+    const K = S.dims.ladders.execution.indexOf("kernel");
     const k = ctx.kernel ?? ctx.n.exec[K];
     const tag = ctx.kernel ? "" : k ? " (last kernel before the cursor)" : "";
     const name = (id) => S.nameText(S.field("name", id));
     let texts = ["no kernel yet", "no kernel yet", "no kernel yet"], sels = [null, null, null];
     if (k) {
       const cause = S.field("cause", k.id), layer = S.field("layer", k.id);
-      let mod = -1;
-      for (let x = cause >= 0 ? cause : S.field("parent", k.id); x >= 0; x = S.field("parent", x)) if (S.dims.ex[x] === MOD) { mod = x; break; }
+      const mod = S.dims.moduleOf(k.id);
       const d = S.detailCached(k.id), grid = d?.args?.grid, blocks = grid ? grid.reduce((a, b) => a * b, 1) : null, sms = M.gpu?.sms;
       const bytes = S.field("bytes", k.id);
       const dev = grid ? `${name(k.id)} · grid ${grid.join("×")} · ${Math.min(sms, blocks)} of ${sms} SMs (inferred from the grid)`
         : bytes > 0 ? `${name(k.id)} · ${bytes} B` : name(k.id);
-      texts = [mod >= 0 ? `${layer >= 0 ? `layer ${layer} · ` : ""}${name(mod)}${tag}` : `no module row above this kernel${tag}`,
+      texts = [mod >= 0 ? `${layer >= 0 ? `layer ${layer} · ` : ""}${name(mod)}${S.dims.inferred(mod) ? " (inferred, M2)" : ""}${tag}` : `no module row above this kernel${tag}`,
         cause >= 0 ? `${name(cause)} at ${(S.startOf[cause] / 1e6).toFixed(3)} ms (CPU side)${tag}` : `no launch call recorded for this kernel${tag}`,
         `${dev}${tag}`];
       sels = [mod >= 0 ? mod : null, cause >= 0 ? cause : null, k.id];

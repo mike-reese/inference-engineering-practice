@@ -58,6 +58,7 @@ const tierIndex = (S, name) => S.dims.ladders.execution.indexOf(name);
 const isDevice = (S, id) => S.dims.ex[id] === tierIndex(S, "kernel") && !S.dims.side[id];
 const isCopy = (S, id) => { const k = S.kinds[S.field("kind", id)]?.name; return k === "memcpy" || k === "memset"; };
 const hasModules = (S) => memo(S, "modules", () => S.dims.stops("execution", "module").ids.length > 0);
+const hasInferred = (S) => memo(S, "inferred", () => S.dims.byKind[idx(S).kind.get("inferred module")]?.length > 0);
 const gpuSms = (S) => Number(S.things.find((x) => x.kind === "gpu")?.attrs?.sms) || null;
 
 /** Cold detail of ids from the store's one cache: a getter once every id is held, else null (again() on arrival). */
@@ -95,27 +96,29 @@ function layerUnit(S, id) {
 
 /**
  * The execution units above a row, coarsest first, then the row: its request and iteration (hot req and iter), the
- * rows of an execution tier on its parent chain (a device row climbs from the call that launched it), and the layer
- * unit of its (iteration, layer). A device row of a run with no module frames says module is missing (3.1, M2).
+ * rows of an execution tier on the parent chain of the call that launched it (phase, a code run's module frames, the
+ * call), its own parent chain (a graphs-on device row's inferred modules, M2) just above that call, and the layer
+ * unit of its (iteration, layer). A device row with no module row above it says so (3.1, M2).
  */
 function ladderOf(S, id) {
   const X = idx(S), L = S.dims.ladders.execution, ex = S.dims.ex, out = [];
   const r = S.field("req", id), it = S.field("iter", id);
   if (r !== NONE16 && X.req.has(r) && X.req.get(r) !== id) out.push([L[0], X.req.get(r), unitText(S, L[0], X.req.get(r))]);
   if (it >= 0 && X.iter.has(it) && X.iter.get(it) !== id) out.push([L[1], X.iter.get(it)]);
-  const up = [];
-  let x = S.field("parent", id);
-  if (x < 0) { const c = S.field("cause", id); if (c >= 0 && S.dims.side[c]) x = c; }
-  for (let n = 0; x >= 0 && n < 400; n++, x = S.field("parent", x)) if (S.dims.side[x] || ex[x] >= 2) up.push([execLabel(S, x), x]);
-  up.reverse();
+  const climb = (x) => { const a = []; for (let n = 0; x >= 0 && n < 400; n++, x = S.field("parent", x)) if (S.dims.side[x] || ex[x] >= 2) a.push([execLabel(S, x), x]); return a.reverse(); };
+  const c = S.field("cause", id), launch = S.dims.side[c] ? climb(c) : [], own = climb(S.field("parent", id));
+  const call = launch.findIndex(([, y]) => S.dims.side[y]), up = call < 0 ? [...launch, ...own] : [...launch.slice(0, call), ...own, ...launch.slice(call)];
   const inner = up.findIndex(([, y]) => ex[y] > tierIndex(S, "layer") || S.dims.side[y]), at = inner < 0 ? up.length : inner;
   const extra = [];
   if (S.field("layer", id) >= 0 && it >= 0) { const lu = layerUnit(S, id); if (lu >= 0) extra.push([L[3], lu, unitText(S, L[3], lu)]); }
-  if (isDevice(S, id) && !hasModules(S)) extra.push([L[4], null, "missing: this run has no module frames (M2)"]);
+  if (isDevice(S, id) && S.dims.moduleOf(id) < 0) extra.push([L[4], null, !hasModules(S) ? "missing: this run has no module frames (M2)"
+    : hasInferred(S) ? "none: no inferred module holds this kernel (M2)" : "none: no module frame above this kernel's launch call"]);
   up.splice(at, 0, ...extra);
   return [...out, ...up, [execLabel(S, id), id, unitText(S, execLabel(S, id), id)]];
 }
-const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text)}</li>`).join("")}</ol>`;
+/** The mark an inferred module row (M2) carries wherever the inspector names it. */
+const infMark = (S, id) => (id != null && S.dims.inferred(id) ? ` ${tag("inferred (M2)")}` : "");
+const pathHtml = (S, items) => `<ol class="path">${items.map(([tier, id, text]) => `<li><span class="dim">${esc(tier)}</span> ${id == null ? `<span class="muted">${esc(text)}</span>` : link(S, id, text)}${infMark(S, id)}</li>`).join("")}</ol>`;
 
 /** Where a row runs on the architecture ladder: the container and process of its lane (a device row: of the thread
  *  that launched it), then its component box. */
@@ -318,7 +321,7 @@ const atCursor = {
   render(el, s) {
     const S = store(); if (!S) { el.innerHTML = noRun(); return; }
     const n = now(), L = S.dims.ladders.execution;
-    const exec = n.exec.map((u, i) => `<tr><td>${esc(L[i])}</td><td>${u ? link(S, u.id, unitText(S, L[i], u.id)) : "–"}</td></tr>`).join("");
+    const exec = n.exec.map((u, i) => `<tr><td>${esc(L[i])}</td><td>${u ? link(S, u.id, unitText(S, L[i], u.id)) + infMark(S, u.id) : "–"}</td></tr>`).join("");
     el.innerHTML = `<div class="cols"><div>
         <h3><span class="ac-t">${ms(s.t)}</span> ms <span class="muted">from the run's t0 · everything true at the cursor</span></h3>
         <div class="label" style="color:${DIM_COLOR.execution}">execution</div><table class="kv">${exec}</table>
@@ -497,12 +500,6 @@ const iterDevice = (S, it) => memo(S, `dev:${it}`, () => {
 });
 /** A link to iteration `it`: its scheduler stamp, else its first device row; "" when it has neither. */
 const iterLink = (S, it, text) => { const row = idx(S).iter.get(it) ?? iterDevice(S, it)[0]; return row != null ? link(S, row, text) : ""; };
-/** The module row (execution / module) above a device row: up the parents of the call that launched it. */
-function moduleOf(S, id) {
-  const M = tierIndex(S, "module");
-  for (let x = S.field("cause", id), n = 0; x >= 0 && n < 400; x = S.field("parent", x), n++) if (S.dims.ex[x] === M) return x;
-  return -1;
-}
 /** A kernels-level run's counters sit on its timeline run: the manifest's tools.ncu.timeline (the import's tie) names
  *  that run and the tied rows by eid; this is that run's detail of them. Cached per run. */
 const ties = new Map();
@@ -574,18 +571,19 @@ const kernelsTab = {
     }
     const get = withDetail(S, ids, again), cv = (id, m) => get?.(id)?.counters?.values?.find((v) => v.measure === m);
     const sms = gpuSms(S), mods = hasModules(S), copies = ids.filter((id) => isCopy(S, id)).length;
+    const modOf = new Map(mods ? ids.map((id) => [id, S.dims.moduleOf(id)]) : []), free = mods ? ids.filter((id) => modOf.get(id) < 0).length : 0;
     const prof = ids.filter((id) => S.dims.profiled.has(id)).length;
     const cell = (id, m, f) => { const v = cv(id, m); return v ? f(v.value) : S.dims.profiled.has(id) && !get ? "…" : "–"; };
     el.innerHTML = `<p><b>iteration ${it}</b> · ${ids.length} device rows (${ids.length - copies} kernels, ${copies} copies and memsets) ·
         ${prof} profiled${prof && ncu?.kernels ? ` (Nsight Compute run ${esc(short(S, ncu.run))}, tied by launch order and name ${tag(word(ncu.kernels.evidence))})` : ""}
-        ${mods ? "" : "· module missing: no module frames in this run (M2)"} · click a row to select it
+        ${!mods ? "· module missing: no module frames in this run (M2)" : hasInferred(S) ? `· modules inferred (M2): ${free} of ${ids.length} device rows in no module` : ""} · click a row to select it
         ${openBtn(S.tools.nsys, "Nsight Systems ↗", "Open the run's report in Nsight Systems")} ${prof ? openBtn(ncu, "Nsight Compute ↗", "Open the profiled kernels in Nsight Compute") : ""}</p>
       ${nav ? `<p>${nav}</p>` : ""}
       <table class="rows kernels"><tr><th>#</th><th>iteration</th><th>layer</th><th>module</th><th>kernel</th><th class="num">µs</th><th class="num">grid</th><th class="num">SMs</th>
         <th class="num">DRAM</th><th class="num">L2</th><th class="num">occupancy</th><th>profiled</th><th>launch</th><th></th></tr>
       ${ids.map((id, i) => { const a = get?.(id)?.args, blocks = Array.isArray(a?.grid) ? a.grid.reduce((x, y) => x * y, 1) : null, layer = S.field("layer", id), c = S.field("cause", id);
-        const mod = mods ? moduleOf(S, id) : -1, dram = cv(id, "DRAM read"), dw = cv(id, "DRAM write");
-        return `<tr data-sel="${id}" data-row="${id}"><td>${i + 1}</td><td>${it}</td><td>${layer >= 0 ? layer : "–"}</td><td>${mod >= 0 ? esc(nm(S, mod)) : "–"}</td>
+        const mod = modOf.get(id) ?? -1, dram = cv(id, "DRAM read"), dw = cv(id, "DRAM write");
+        return `<tr data-sel="${id}" data-row="${id}"><td>${i + 1}</td><td>${it}</td><td>${layer >= 0 ? layer : "–"}</td><td>${mod >= 0 ? esc(nm(S, mod)) + infMark(S, mod) : "–"}</td>
           <td>${esc(nm(S, id))}</td><td class="num">${((S.endOf[id] - S.startOf[id]) / 1e3).toFixed(1)}</td><td class="num">${blocks ?? (get || isCopy(S, id) ? "–" : "…")}</td>
           <td class="num">${blocks != null && sms ? `${Math.min(sms, blocks)}/${sms}` : "–"}</td>
           <td class="num">${dram ? fmtBytes(dram.value + (dw?.value ?? 0)) : cell(id, "DRAM read", fmtBytes)}</td><td class="num">${cell(id, "L2 traffic", fmtBytes)}</td>

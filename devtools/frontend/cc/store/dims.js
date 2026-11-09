@@ -176,6 +176,17 @@ export class Dimensions {
 
   flowOf(id) { const f = this.s.field("flow", id); return f === this.FLOW_NONE ? null : this.flowNames[f]; }
 
+  /** The innermost module row (execution / module) above a row, or -1: up its own parents (a graphs-on device row's
+   *  inferred modules, M2), then up the parents of the call that launched it (a code run's module frames). */
+  moduleOf(id) {
+    const s = this.s, M = this.ladders.execution.indexOf("module"), c = s.field("cause", id);
+    for (let x of [s.field("parent", id), this.side[c] ? c : -1]) for (let n = 0; x >= 0 && n < 400; n++, x = s.field("parent", x)) if (this.ex[x] === M) return x;
+    return -1;
+  }
+
+  /** Whether a row is an inferred module (M2): matched to the code run's module frames, not recorded. */
+  inferred(id) { return this.s.kinds[this.s.field("kind", id)].name === "inferred module"; }
+
   /** The hardware thing a row ran on (index into things), or -1: by kind first, else by its lane's kind. A stream
    *  lane sits under its GPU; a thread lane sits under its process, so its CPU is the one under the same host. */
   ranOn(id) {
