@@ -13,6 +13,7 @@ import json
 import math
 import re
 from pathlib import Path
+from typing import NamedTuple
 
 SLUG = re.compile(r"[^A-Za-z0-9_.:+-]+")
 FIELDS = ("start", "end", "lane", "kind", "name", "req", "iter", "bytes", "box", "eid", "what", "args", "term",
@@ -65,6 +66,15 @@ class Rows:
         return {f: col[i] for f, col in self.cols.items()}
 
 
+class Column(NamedTuple):
+    """One column of a sample clock (a samples block): a registry metric (kinds.json metrics) on a thing. metric is
+    the column name, unique in its clock; label replaces the registry metric's label (one column per CPU)."""
+    metric: str
+    rule: str
+    thing: str
+    label: str | None = None
+
+
 class Ctx:
     """What the adapters of one run share: things (lanes and their containers), eid ordinals, the wall clock offset.
     wall_offset_ns = UTC ns - CLOCK_MONOTONIC ns on this machine; pcap, nsys and PyTorch times are UTC."""
@@ -90,11 +100,15 @@ class Ctx:
         lane = f"{process}/{thread}"
         if lane in self.things:
             return lane
-        cont = self.container(process)
-        self.thing(f"{cont}/{process}", cont, "process", process, {"pid": pid},
-                   "Observed" if pid is not None else "Observed (no pid recorded)")
-        return self.thing(lane, f"{cont}/{process}", "thread", thread, {"tid": tid, "kernel_thread_name": kthread},
+        attrs = {"tid": tid, "kernel_thread_name": kthread}
+        return self.thing(lane, self.process(process, pid), "thread", thread, attrs,
                           "Observed" if tid is not None or thread else "Observed (no thread id recorded)")
+
+    def process(self, process: str, pid=None) -> str:
+        """The process thing under its container, e.g. host/server/server pid 87."""
+        cont = self.container(process)
+        return self.thing(f"{cont}/{process}", cont, "process", process, {"pid": pid},
+                          "Observed" if pid is not None else "Observed (no pid recorded)")
 
     def container(self, process: str) -> str:
         """The container thing of a process (registry `lanes`: process prefix -> container), e.g. host/server."""

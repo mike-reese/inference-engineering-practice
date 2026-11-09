@@ -12,6 +12,9 @@ the live path wrote has the same eid in the final generation:
   trace/torch_trace.json                                PyTorch profiler rows (adapters/torch.py)
   capture/docker.jsonl                                  container events (adapters/docker.py)
   gpu.csv; capture/gpu.jsonl, docker-stats.jsonl, engine.jsonl   samples (nvidia-smi, NVML, Docker stats, Prometheus)
+  run.json spans prometheus/*                           samples-prometheus, the rep's own scrapes (adapters/prometheus.py)
+  trackers/*.jsonl, gpu_apps.jsonl                      host, NVMe, uncore and GPU process samples, process starts
+                                                        (adapters/trackers.py)
   the kernels-level run's trace/kernels.csv, sections.csv        Nsight Compute headline counters (adapters/ncu.py)
   $CC_STORE/probe/inventory.json                        host and GPU things (store/probe.py, probed once)
 Then the derivations of derive.py: containment parents, cause links, tiers, derived iterations, iterations, requests,
@@ -62,6 +65,7 @@ from .adapters.prometheus import series as prometheus_series
 from .adapters.stamps import (FILE as STAMPS, INFERRED_ITERATION_BOX, MESSAGE_SOURCES, SRC, ServerStamps,
                               add_iteration, message_comp)
 from .adapters.torch import Torch
+from .adapters.trackers import Trackers
 from .adapters.wire import PcapReader, Wire
 from .registry import Registry
 from .schema import (BLOCK_ROWS, COLD, COLUMNS, DEVICE_TIER, METRIC_DTYPE, NONE16, SPINE_MAX_TIER, TIERS, Manifest,
@@ -249,8 +253,13 @@ def read_sources(ctx: Ctx, run_dir: Path, root: Path, labels: dict, rj: dict,
                                "values": np.array([r[2][m] for r in kept], np.float64),
                                "spans": {f"gpu/sample/{r[0]}": k for k, r in enumerate(kept)}})
     series += prometheus_series(ctx, rj.get("spans", []))
+    tr = Trackers(run_dir, ctx)
+    got = tr.read(final=True)
+    take(tr.procs, tr.rows(got))
+    tracked = tr.samples(got)
+    notes["trackers unreadable lines"] = tr.unreadable()
     notes["nsys session"] = None if nsys is None else nsys.session_utc_ns
-    return rows, links, {"engine": er, "nsys": nsys}, series
+    return rows, links, {"engine": er, "nsys": nsys, "trackers": (tr.clocks, tracked)}, series
 
 
 def reg_samples(reg: Registry, source: str) -> dict:
@@ -367,6 +376,27 @@ def capture_groups(caps: dict, stats: dict, reg: Registry, pos_of: dict, catalog
         stats[ENGINE_CAPTURE]["series not kept per scrape (buckets, other families)"] = dropped
         if recs:
             group("engine", recs, order["engine"], caps["engine thing"], ENGINE_EVIDENCE)
+    return groups
+
+
+def column_groups(clocks: dict, samples: list, reg: Registry, pos_of: dict, catalog: list) -> list[dict]:
+    """Samples of the column adapters (adapters/trackers.py): one group per clock in declaration order, each column a
+    registry metric on its own thing; the same groups and catalog the live writer builds."""
+    by: dict[str, list] = {}
+    for clock, ns, values in samples:
+        by.setdefault(clock, []).append((ns, values))
+    groups = []
+    for clock, cols in clocks.items():
+        recs = by.get(clock)
+        if not recs:
+            continue
+        g = {"track": clock, "name": f"samples-{clock}", "ts": np.array([t for t, _ in recs], np.int64),
+             "metrics": [c.metric for c in cols], "codes": [],
+             "values": [np.array([v.get(c.metric, np.nan) for _, v in recs], np.float64) for c in cols]}
+        for c in cols:
+            rule = reg.metric_rules[c.rule] | ({"label": c.label} if c.label else {})
+            catalog.append(_catalog(len(catalog), c.metric, rule, None, pos_of[c.thing], g, rule["evidence"]))
+        groups.append(g)
     return groups
 
 
@@ -562,6 +592,7 @@ def _build(run_dir: Path, root: Path, reg: Registry, repo: Path, out: Path, gen:
     # Samples, run.json metrics (inputs by span id), guard
     groups, catalog = sample_groups(series, reg, pos_of)
     groups += capture_groups(caps, cap_stats, reg, pos_of, catalog)
+    groups += column_groups(*by["trackers"], reg, pos_of, catalog)
     span_s = col("span_id")
     row_of_span = {s: i for i, s in enumerate(span_s.tolist()) if s}
     sample_of_span = {sid: [g["name"], k] for g in groups for s in g.get("series", [])

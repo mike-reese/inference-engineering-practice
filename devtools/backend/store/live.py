@@ -443,6 +443,32 @@ class RunWriter:
         for _, ns, values in reads:
             self.add_samples(c, ns, values, None, "")
 
+    def column_samples(self, trackers, got: dict) -> None:
+        """Samples of the column adapters (adapters/trackers.Trackers, fed this read): a clock is declared at its first
+        sample, each column a registry metric on its own thing (importer.column_groups builds the same catalog)."""
+        samples = trackers.samples(got)
+        if not samples:
+            return
+        clocks = trackers.clocks                   # after the feed: it declares the clocks of these samples
+        self.sync_things()
+        for clock, ns, values in samples:
+            c = self.clocks.get(clock) or self._column_clock(clock, clocks[clock])
+            self.add_samples(c, ns, values, None, "")
+
+    def _column_clock(self, clock: str, cols: list) -> SampleClock:
+        codes = []
+        for col in cols:
+            rule = self.reg.metric_rules[col.rule]
+            codes.append(len(self.catalog))
+            self.catalog.append({"code": len(self.catalog), "metric": col.metric, "label": col.label or rule["label"],
+                                 "unit": rule["unit"], "thing": self.thing_ix[col.thing], "group": f"samples-{clock}",
+                                 "sidebar": bool(rule["sidebar"]), "source": rule["source"],
+                                 "period_ms": rule["period_ms"], "period_ns_measured": None,
+                                 "evidence": rule["evidence"]})
+        c = self.clocks[clock] = SampleClock(clock, [col.metric for col in cols], codes)
+        self.catalog_dirty = True
+        return c
+
     # ------------------------------------------------------------------ sealing
     def maybe_seal(self) -> None:
         if self.n - self.sealed >= BLOCK_ROWS or time.monotonic() - self.last_seal >= SEAL_S:

@@ -95,6 +95,7 @@ class Live:
         got = await asyncio.to_thread(src.read, True)
         w.append(src.rows(got, final=True))
         w.gpu_reads(got["gpu"])
+        w.column_samples(src.trackers, got["trackers"])
         r["closing"] = True                            # no more records: the writer is about to release the folder
         self.note(w, force=True)
         w.close({"why": "run.json written", "at_mono_ns": time.monotonic_ns()})
@@ -226,6 +227,7 @@ class Live:
                     got = await asyncio.to_thread(src.read)
                     w.append(src.rows(got))
                     w.gpu_reads(got["gpu"])
+                    w.column_samples(src.trackers, got["trackers"])
                     self.note(w)
                     w.maybe_seal()
                 self.note(self.host)
