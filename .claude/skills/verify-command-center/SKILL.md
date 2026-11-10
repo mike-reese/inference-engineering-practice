@@ -104,7 +104,8 @@ them to the region (the viewport, an element, or a box in CSS pixels) and writes
 | `NAME.motion.json` | frame intervals (p50, p95, max), changed pixels per consecutive frame pair (`magick compare`, fuzz `--fuzz` %), `moving_pairs` of `pairs`, `longest_still_ms` | the numbers behind the claim |
 | `NAME.rec/` | the raw frames (`fNNNN.jpg`) and crops (`fNNNN.c.png`) | step through by hand |
 
-The command prints the summary of `motion.json` with the three paths. Read it this way:
+The command prints the summary of `motion.json` with the four paths (`sheet`, `animation`, `motion`,
+`frames_dir`). Read it this way:
 
 - `longest_still_ms` is the longest stretch where consecutive frames differ by fewer than `--still` pixels: a frozen
   animation shows a long stretch (1271 ms in 3 s for the frozen GPU stream), a moving one 0.
