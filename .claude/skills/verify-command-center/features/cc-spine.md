@@ -63,7 +63,8 @@ Preconditions:
   stops.
 - **Lanes.** `$CCV click --css '.sp2 .lhead button[data-lanes=packed]'`: the request label reads `1 request` `1 lane`
   and the note `18 lanes do not fit: …`. `[data-lanes=request]` returns to `3 lanes`. The choice is kept in
-  `localStorage["cc.spine.lanes"]`.
+  `localStorage["cc.spine.lanes"]`. Do not pass `--after` on these two clicks (Gotchas): read the labels with `eval`,
+  then take the screenshot with the next key, `$CCV key ArrowRight --after spine-packed`.
 - **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas
@@ -73,6 +74,11 @@ Preconditions:
 - A double-click is two clicks: each selects the box under it, or seeks when no box is there. Expect the selection or
   the cursor to move. The fit is animated: read the axis after it settles, not at once.
 - In time pace the bounds play in 8 s at ×1, looping. A long bound wraps fast at ×4.
+- After a click on a lane button, or on the `Architecture` lens button when another lens was on, `$CCV shot` and
+  `--after` time out (`CDP Page.captureScreenshot did not answer in 30 s`) while the page is healthy: `doctor`
+  passes, `eval` answers and the state changed. `hover` and a later lane click do not end it; the next key that
+  changes the page (`ArrowRight`) or a new page load does. Seen on 2026-11-11 (session `vcc-maint-1111`) on each of four
+  lane clicks and on the one lens click tried; the cause is not known (SKILL.md, Hidden monitor).
 - After any change to how the bands place units, run `devtools/verify/overlap_check.py` (about 2 s, half tile, the
   I02C code run): no two units open at the same time share y, and each stream (the boxes of one colour key, the
   8th field of each box) keeps its lanes. It reads `window.__spineLayout()` at the fitted view only; a page without

@@ -45,9 +45,11 @@ Preconditions:
 - **Containers.** `$CCV key 3`: `architecture › container`, same two lines.
 - **Container samples move inside a request.** Open the run `I02A_20261109T205538Z_14d5d8` (recorded with the 100 ms
   cgroup and 50 ms NVML samplers) at `"tiers":{"execution":2,"hardware":2,"architecture":2},"t":67437000000` (its
-  measured request runs 67437 to 67672 ms) and press → twelve times, reading the server card's `[data-v=cpu]`,
-  `[data-v=mem]` and `[data-v=net]` after each. Recorded 2026-11-09: `CPU 118 %` and `↑ 175.5 KiB/s` up to 67440.1
-  ms, then `CPU 16 %` and `↑ 23.0 KiB/s` from 67457.1 ms; `RAM 3565` then `3566 MiB / 8192 MiB`. The memory row reads
+  measured request runs 67437 to 67672 ms) and press → sixteen times, reading the server card's `[data-v=cpu]`,
+  `[data-v=mem]` and `[data-v=net]` after each. Recorded 2026-11-09, re-driven 2026-11-11: `CPU 118 %` and
+  `↑ 175.5 KiB/s` through the fifteenth press (the thirteenth is at 67439.9 ms), then `CPU 16 %` and `↑ 23.0 KiB/s`
+  from the sixteenth, at 67457.1 ms; `RAM 3565` then `3566 MiB / 8192 MiB`. Twelve presses end at 67439.8 ms, before
+  the change. The memory row reads
   `RAM`, not `mem`: it is host RAM (cgroup), the GPU memory is the card's blue `GPU` line. On a run recorded before
   2026-11-09 (R1) the same steps show one Docker stats sample a second, so the values hold across a whole request.
 - **GPU memory adds up.** On the same view, `#gpu [data-held] li` lists every process holding GPU memory at the
