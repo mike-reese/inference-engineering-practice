@@ -10,7 +10,7 @@ bottom (or right) and the hardware sidebar on the right.
 
 - The app server and the host runner are up. The main checkout serves the page: `ie-devtools-v2scene` at
   `http://127.0.0.1:7710` with the store `/mnt/ie-data/cc/store` (54 entries on 2026-11-10), and the runner at
-  `:7701` behind the page's `/runner` proxy. Every recipe was re-driven there on 2026-11-10. The recipes were first
+  `:7701` behind the page's `/runner` proxy. Every recipe was re-driven there on 2026-11-10 and on 2026-11-11. The recipes were first
   recorded on 2026-11-09 on the cc-migration worktree (`ie-devtools-cc` at `:7711`, store `/mnt/ie-data/cc/store-cc`);
   each file's "Recorded on" line names that first recording. Set `CCV_APP` to the server you verify.
 - Both can be down (on 2026-11-10, after a reboot): `docker ps` lists no `ie-devtools-v2scene` and

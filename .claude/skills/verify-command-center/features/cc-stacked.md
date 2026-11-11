@@ -14,7 +14,8 @@ part's tier. The lens on the stage shows the architecture view and collapses.
 ## Sub-features
 
 - `stk-labels` CSS2D labels `#stage .sw-lbl`: `big` parts, `proc` plates (`proc on` while the process has a live
-  row or GPU work at the cursor), `proc box` containers (name, `container`, Docker CPU sample), `pulse` (the unit at
+  row or GPU work at the cursor), `proc box` containers (name, `container`, the CPU sample: the 100 ms cgroup
+  sampler's on a run that has it, else Docker stats), `pulse` (the unit at
   the cursor), `stat` (utilization text, `launches GPU work` on the tether of the process whose GPU work is live).
 - `stk-motion` the in-GPU stream moves while playing and between kernels (`$CCV record`); `devtools/verify/motion.sh`
   checks it moves at 60 Hz.
@@ -47,6 +48,10 @@ Preconditions:
   `client-1 container CPU 13 %`, `capture-1 container CPU 0.0 %`, `trackers-1 container CPU 1.0 %`; the plates
   (`proc on`) `trtllm-serve process`, `executor worker process`, `client`, and `bridge network` (off);
   `launches GPU work` (the executor's tether); and the pulse `[Executor] _forward_step 67: 0 ctx reqs, 1 gen reqs`.
+  A run recorded with the cgroup sampler (`I02A_20261109T205538Z_14d5d8` at `t` 67437000000, 2026-11-11) lists 24:
+  the same ten parts, nine containers (`server-1 container CPU 118 %`, `client-1`, `dcgm-1`, `devtools-1`,
+  `grafana-1`, `node-1`, `prometheus-1`, `capture-1`, `trackers-1`), the plates `server pid 1`, `server pid 422`,
+  `client` and `bridge network`, and the pulse `send`.
 - **Concurrent work.** At the same cursor the executor plate and the GPU board glow decode green, the client plate
   is lit in its row's flow, the trtllm-serve plate is white (live OS calls, no flow recorded). `$CCV key h`, key 4
   (unit): the stat line reads `Kernel2<…>: 36/36 SMs (inferred from the grid) · 266.8 MiB read from VRAM (Nsight
