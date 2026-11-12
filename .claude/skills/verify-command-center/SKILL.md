@@ -17,7 +17,7 @@ CCV=~/Work/Code/Personal/inference-engineering-practice/devtools/verify/ccv
 
 ## Launch
 
-1. The app server: `docker start ie-devtools-v2scene` (port 7710; serves the main checkout, mounted read-only at `/repo`; v3 store read-write). For Launch, the host runner: `make runner` in `~/Work/Code/Personal/inference-engineering-practice`. A backend change needs `docker restart ie-devtools-v2scene`. During M1 the `cc-migration` worktree is served by `ie-devtools-cc` on port 7711 with the store `/mnt/ie-data/cc/store-cc`; set `CCV_APP=http://127.0.0.1:7711` to verify it.
+1. The app server: `docker start ie-devtools-v2scene` (port 7710; serves the main checkout, mounted read-only at `/repo`; v3 store read-write). The store is `/mnt/ie-data/cc/store`. The host runner: `make runner` in `~/Work/Code/Personal/inference-engineering-practice` (port 7701, reached through the page's `/runner` proxy). Launch needs it, and `doctor` fails without it; if you started it, stop it with `make runner-down` when you finish. A backend change needs `docker restart ie-devtools-v2scene`. Set `CCV_APP` to verify another server (the `cc-migration` server on port 7711 stopped after the cutover of 2026-11-09).
 2. The browser: `export CCV_SESSION=<feature-or-task>`, check that `$CCV sessions` is empty (one ccv browser at a time on this machine), then `$CCV launch --url "<view>"` (half tile, the default and the minimum) or `$CCV launch --size full --url "<view>"`. The page reads its view (run, world, tiers, cursor, selection, dock) from the URL hash once at load; `features/README.md` has the `view` helper. A frontend change needs a new page load with a new query string. Ready when the output has `"ready": {"scene": true, "ready": true}`: the page set `window.READY` on its first frame with the run's store open. The output also names the `workspace`, `tile` and `viewport`.
 
 ## Sessions
@@ -46,6 +46,7 @@ Owner rule (2026-11-08): never switch Mike's focus, not even for a moment.
 - Chromium asks for window activation on every synthetic click. The `ccv-agent-*` window rule (`suppress_event`, `no_focus`) drops that request. Keys, scrolling and screenshots work without focus (`Emulation.setFocusEmulationEnabled`).
 - Never create, remove or reconfigure an output, and never run `hyprctl reload`, `hyprctl dispatch` or focus and workspace commands: each one can move Mike's focus. If `CCV-1` is missing, stop and tell Mike; the fix (`hyprctl output create headless CCV-1`) is his to run.
 - Mike sees the page through your evidence: `--after` screenshots, `$CCV shot`, `$CCV state`.
+- A screenshot can time out (`CDP Page.captureScreenshot did not answer in 30 s`) while `doctor` still passes and frames are drawn. Seen on 2026-11-12 in runs of several minutes, then gone; the cause is not known. The action of an `--after` command has still happened: read the state, and use `$CCV aria` as evidence. When `$CCV shot --css SEL` times out, the viewport stays at the element's size (980x613 after `.sh-pan`) and `doctor` fails on the viewport: `$CCV close` and launch again.
 
 ## Doctor
 
