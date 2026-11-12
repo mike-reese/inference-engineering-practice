@@ -9,7 +9,7 @@ below it holds the request, phase and kernel rows on one time axis, and a beam j
 ## Sub-features
 
 - `arch-map` `#stage .arch .cbox[data-box=K]` with classes `on`, `prev`, `seen`, `driven`, `lit`. A click selects
-  the box's phase at or after the cursor.
+  the box's first phase after the cursor, or its first phase of the run when none is left.
 - `arch-cards` at tiers 3 and 4: `.card[data-sel]` and process rows `[data-proc]`. `.nowis` says where the request
   is now.
 - `arch-layers` at tier 6: `[data-layer]` cards (toolkit, runtime, device code), each with its role line (for
@@ -79,7 +79,8 @@ Preconditions:
 
 - `__cc.tiers.architecture` is 0-based: key 5 (component) is `4`. Keys 1 and 2 show the fleet and its hosts, 3 the
   container cards, 4 the cards with their processes, 5 the component map, and 6 the map with the software layers.
-- A box click selects that box's phase at or after the cursor, so `t` moves forward.
+- A box click selects that box's first phase after the cursor, so `t` moves forward; after the box's last phase it
+  wraps to the first one, and `t` moves back.
 - A strip seek lands between rows, so `t` can be fractional.
 - `walkthroughs.sh` checks the lit boxes and the forward box's busy state at the ASGI headers against the store.
 - Packets fire only when the phases at the cursor change. Whole-run bounds at time pace cut most trips short (a newer

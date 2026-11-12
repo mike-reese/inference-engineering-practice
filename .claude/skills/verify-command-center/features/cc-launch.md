@@ -42,8 +42,9 @@ Preconditions:
   must be true. Read `curl -s "$CCV_APP/runner/jobs?limit=1"`, then
   `$CCV click --css '.sh-pan [data-p=launch][data-v=off]' --after launch-live`. The runner's newest job is unchanged.
   `__cc.session.mode` is `live` with `live` `{"action":{"id":"off","label":"Measured run"},"options":{},"job":null,
-  "dry_run":true,"state":"dry run"}`; the world is `spine`; follow is on. The header reads `dry run`; the stage
-  reads `dry run: the runner checked the action and started nothing`.
+  "dry_run":true,"state":"dry run","note":null}`; the world is `spine`; follow is on. The header reads
+  `● Live dry run`; the stage reads `dry run: the runner checked the action and started nothing` and, in the Spine
+  world, `dry run: the runner started nothing, so there is no run to draw`.
 - **Follow off.** `$CCV click --css '.ch-nav [data-sh=follow]'`: `__cc.follow` is false.
 - **Rep world chip.** `$CCV click --css '.ch-nav button[data-w=rep]'`: the chip reads
   `● live · Measured run · dry run, nothing started`.
