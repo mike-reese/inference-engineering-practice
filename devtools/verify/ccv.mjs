@@ -330,12 +330,31 @@ async function waitReady(c, timeout = 60000) {
   }
   throw new Error(`page not READY after ${timeout} ms (run ccv console for page errors)`);
 }
-const hypr = (...args) => execFileSync("hyprctl", args, { encoding: "utf8" });
+const hypr = (...args) => (adoptHyprland(), execFileSync("hyprctl", args, { encoding: "utf8" }));
 const seatMonitor = () => JSON.parse(hypr("-j", "monitors")).find((m) => m.name === SEAT.output);
 const sessionWindow = (rec) => JSON.parse(hypr("-j", "clients")).find((w) => w.class === rec.app_id);
 const ruleName = (rec) => `ccv-seat-${rec.app_id}`;
 const onTile = (w, m, rec) => !!w && !!m && w.monitor === m.id && w.workspace.id === rec.workspace && w.size.join("x") === rec.tile.size.join("x");
+// A shell started before Hyprland (an agent shell after a reboot) or kept across a compositor restart has
+// no signature or a dead one. Adopt the running instance when there is exactly one; never guess between two.
+function adoptHyprland() {
+  const rt = process.env.XDG_RUNTIME_DIR || `/run/user/${process.getuid()}`, dir = path.join(rt, "hypr");
+  const live = (sig) => !!sig && fs.existsSync(path.join(dir, sig, ".socket.sock"));
+  if (!live(process.env.HYPRLAND_INSTANCE_SIGNATURE)) {
+    let sigs = [];
+    try { sigs = fs.readdirSync(dir).filter(live); } catch {}
+    if (sigs.length !== 1) throw new Error(`not in a Hyprland session, and ${sigs.length} running Hyprland instances found in ${dir} (need exactly 1): the hidden monitor needs Hyprland. Tell Mike`);
+    process.env.HYPRLAND_INSTANCE_SIGNATURE = sigs[0];
+  }
+  if (!process.env.WAYLAND_DISPLAY) {
+    let socks = [];
+    try { socks = fs.readdirSync(rt).filter((f) => /^wayland-\d+$/.test(f)); } catch {}
+    if (socks.length !== 1) throw new Error(`no WAYLAND_DISPLAY, and ${socks.length} wayland sockets in ${rt} (need exactly 1). Tell Mike`);
+    process.env.WAYLAND_DISPLAY = socks[0];
+  }
+}
 function checkSeat() {
+  adoptHyprland();
   if (!process.env.HYPRLAND_INSTANCE_SIGNATURE) throw new Error("not in a Hyprland session: the hidden monitor needs Hyprland");
   const m = seatMonitor();
   // Creating an output moves Mike's focus, so only Hyprland start (SEAT.config) creates it.
