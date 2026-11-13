@@ -46,7 +46,10 @@ Preconditions:
 - **Kernel path (M2).** Open R1 as above with `"sel":{"eid":"kernel/i66/Kernel2#96"}`. `.b-body ol.path` reads
   request `measured`, iteration `iteration 66`, phase `[Executor] _forward_step 65: 1 ctx reqs, 0 gen reqs`, layer
   `layer 24 of iteration 66`, three modules tagged `inferred (M2)` (`logits_processor.py(13)`, `embedding.py(90)`,
-  `linear.py(2303)`, innermost last), kernel (CPU side) `cuLaunchKernel`, kernel `Kernel2<…>`. With
+  `linear.py(2303)`, innermost last), kernel (CPU side) `cuLaunchKernel`, kernel `Kernel2<…>`, then the place:
+  container `server-1 (trtllm-serve)`, process `executor worker process`, component `GPU kernels`. A kernel row's
+  Selected tab also holds one `Nsight Systems ↗` button (`#bar [data-open]`, the run's `trace/timeline.nsys-rep`);
+  do not click it. With
   `kernel/i70/kernel_mha#0` (decode attention, unmatched) the module step reads `none: no inferred module holds this
   kernel (M2)` and the launch call is `cudaGraphLaunch_v10000`. The code run `I02A-TRACE-code_20261103T170709Z_0ac2db`
   has no iteration or phase rows, so its kernel path reads request, layer, its measured module frames (untagged),
@@ -73,11 +76,14 @@ Preconditions:
 - **Dock.** `$CCV key d`: `dock.pos` `right`, body `dock-right`. `$CCV click --css '.b-pos'`: back to `bottom`.
   `$CCV click --css '[data-act=big]'`: `dock.big` true. `$CCV click --css '.b-collapse'`: `dock.open` false, body
   `dock-closed`; again: open.
-- **Transport.** From `sel` `65151` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `65152` at
-  `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
-  `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
-  5456 in view · 91898 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 0.000–88294.364
-  (88.294 s)`. `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
+- **Transport.** After the Tokens seek (`t` `73405855954`): `$CCV click --css '[data-act=next]'` gives `sel` `65152`
+  at `73405857673`; `[data-act=back]` gives `65151` at `73405855954`. The pace starts as `time`, so change it both
+  ways: `$CCV select --css '.b-pace' --option events` (`pace` `events`), then `--option time`, and
+  `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`. `.b-grain` reads `grain: execution › phase ·
+  4 in view · 77 events in bounds` and `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 73405.856–73406.304
+  (448.3 µs)`: the bounds are the phase holding the cursor (2026-11-13; the whole-run numbers recorded on 2026-11-09,
+  `5456 in view · 91898 events`, no longer show from this recipe). `$CCV click --css '[data-act=play]'` plays
+  (`playing` true); click again to stop.
 - **Strips.** `$CCV click --css '.b-over' --frac 0.5,0.5`: `t` `44505584510`, the middle of the run extent
   `[716805506, 88294363514]`. `$CCV click --css '.b-detail' --frac 0.3,0.5`: a stop lay within 6 px, so `sel` `127`
   and `t` `22710249081`. `$CCV drag --css '.b-detail' --by 120,0 --steps 6`: `t` `49196581417.85`, `sel` kept.
