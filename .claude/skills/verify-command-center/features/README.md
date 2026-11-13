@@ -48,7 +48,7 @@ $CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L
 
 | Part | Handles |
 | --- | --- |
-| worlds | `.ch-nav button[data-w=rep]` (also `stacked`, `spine`, `architecture`); key W cycles |
+| worlds | `.ch-nav button[data-w=rep]` (also `stacked`, `spine`, `architecture`), labelled `Rep`, `Stacked world`, `Execution spine`, `Architecture`; key W cycles |
 | position | `.ch-nav .pos`, for example `execution › phase (3/6) · t = 73378.117 ms · 5456 stops here` |
 | focus | `.ch-focus .t` (title), `.ch-focus .d` (what the tier shows) |
 | ladders | `button[data-act=focus][data-dim=D]`, `button[data-act=tier][data-dim=D][data-n=i]` (i 0-based), `button[data-act=paired][data-n=1]` (or `0`), `button[data-act=keys]` |

@@ -20,7 +20,9 @@ part's tier. The lens on the stage shows the architecture view and collapses.
   checks it moves at 60 Hz.
 - `stk-live` concurrent work: each lit plate, container, device and particle takes the flow colour of its own row.
 - `stk-tiers` with hardware focused, keys 1 to 6 set the tier; `.ch-focus .t` and `.d` name it.
-- `stk-pick` a click on a part's mesh selects it (`__cc.sel` is the part's key) and sets its hardware tier.
+- `stk-pick` a click on a part's mesh selects it (`__cc.sel` is the part's key) and sets its hardware tier. A click
+  on a plate or a container box selects that process or container and keeps the tier; a click on the pulse sphere,
+  a kernel or a copy selects its row (`stacked.js`, `onUp`; the recipe drives the part pick only).
 - `stk-pulse` the pulse label follows the execution tier and reads as the spine band does: request, iteration with its
   flow, forward step, kernel.
 - `stk-lens` `#stage .lens .tog` collapses and expands the lens.
@@ -55,22 +57,25 @@ Preconditions:
 - **Motion while playing** (`stk-motion`). Screenshots cannot prove it; record it. At hardware tier 3 (device), the
   GPU board's box comes from its labels:
   `B=$($CCV eval '(() => { const L = [...document.querySelectorAll("#stage .sw-lbl")]; const g = L.find(e => /5060/.test(e.textContent)).getBoundingClientRect(), v = L.find(e => /VRAM/.test(e.textContent)).getBoundingClientRect(); const x0 = Math.round(g.left - 60), x1 = Math.round(v.right + 10), y1 = Math.round(g.top), y0 = Math.round(y1 - (x1 - x0) * 0.42); return `${x1-x0}x${y1-y0}+${x0}+${y0}`; })()' | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')`
-  (`514x216+1061+461` at full size; `707x297+739+389` with the GPU selected, so compute it in the view you record). Open R1 at execution tier 2 (iteration), `t` 73402310386, click
+  (`514x216+1061+461` at full size; `707x297+739+389` with the GPU selected, so compute it in the view you record). Open R1 at execution tier 2 (iteration: `"tiers":{"execution":1,"hardware":2,"architecture":4}` in the hash, which is 0-based), `t` 73402310386, click
   `[data-act=play]`, then `$CCV record gpu-play --ms 3000 --box $B`. On 2026-11-09 (session `rec-proof`): 122
-  frames, `moving_pairs` 121 of 121, `longest_still_ms` 0. The build before the fix gave 31 of 82 and 1271 ms, so
+  frames, `moving_pairs` 121 of 121, `longest_still_ms` 0; on 2026-11-13: 135 frames, 134 of 134, 0. The frame
+  count varies; every pair must move. The build before the fix gave 31 of 82 and 1271 ms, so
   the check fails when the stream freezes. The sheet shows yellow outlines on the active SMs and dots between VRAM,
   the memory controllers, L2 and the SMs.
 - **Between kernels.** At `t` 73402702979 (execution tier 6, a 3 µs gap) no kernel holds the cursor; the GPU stat
   label reads `between kernels · last fill ended 1.6 µs ago · next computeBlockDigitCounts in 1.6 µs · SMs active
   62 % (about 22/36) · DRAM read 55 % (sample)`, and `$CCV record between-kernels --ms 1500 --box 1500x620+600+300`
-  at hardware tier 4 gives 67 of 67 moving pairs. A run without kernel rows (`I02A_20261109T064024Z_4518dc`) also
+  at hardware tier 4 gives 67 of 67 moving pairs (66 of 66 on 2026-11-13). A run without kernel rows (`I02A_20261109T064024Z_4518dc`) also
   streams, from its NVML SM and DRAM samples.
 - **Hardware tiers.** `$CCV key h`, then keys 1 to 6. `.ch-focus .t` reads `hardware › system`, `› node`,
   `› device`, `› unit`, `› kernel traffic`, `› SM internals`. Key 3's description is
   `bytes moving between devices`; key 6's is `warps, shared memory, registers (Nsight Compute)`.
 - **Pick a part.** At tier 3, find a pickable point near the GPU label. The camera flies after a tier
   change: run the probe until it returns the same point twice (a point probed during the flight, `1210,691` on
-  2026-11-12, selects nothing). This probe moves only the hover box:
+  2026-11-12 and `862,739` on 2026-11-13, selects nothing). The flight takes 900 ms:
+  `$CCV wait --expr 'new Promise((r) => setTimeout(() => r(true), 1000))'` after the key is enough. Probe with
+  nothing selected: with `gpu0` already selected the probe returns another point (`910,691`). This probe moves only the hover box:
   `$CCV eval '(() => { const cv = document.querySelector("#stage canvas"), r = cv.getBoundingClientRect(), L = [...document.querySelectorAll("#stage .sw-lbl")].find((e) => /5060/.test(e.textContent)).getBoundingClientRect(); const hits = []; for (let y = r.top + 10; y < r.bottom; y += 12) for (let x = r.left + 10; x < r.right; x += 12) { cv.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y, bubbles: true })); if (cv.style.cursor === "pointer") hits.push([x, y]); } cv.dispatchEvent(new PointerEvent("pointerleave")); const cx = (L.left + L.right) / 2, cy = (L.top + L.bottom) / 2; hits.sort((a, b) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(b[0] - cx, b[1] - cy)); return Math.round(hits[0][0]) + "," + Math.round(hits[0][1]); })()'`
   returned `1234,679`. `$CCV click --at 1234,679 --after stacked-pick`: `sel` is `gpu0`, focus `hardware`, tier
   `2` (device). The bar starts `hardware · device` `NVIDIA GeForce RTX 5060 Ti` `Observed: nvidia-smi, CUDA device

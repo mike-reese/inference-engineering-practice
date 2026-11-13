@@ -51,8 +51,9 @@ Preconditions:
 - **GPU memory adds up.** On the same view, `#gpu [data-held] li` lists every process holding GPU memory at the
   cursor (the run's containers and the host's own, for example Hyprland), then `[data-part=reserved]` (driver
   reserve), `[data-part=rest]` (no listed process) and `[data-part=used]` (`= 9.84 GiB used, one NVML read`). The
-  parts sum to the used line within display rounding. On R1 the list ends with one `[data-part=rest]` line, the used
-  memory minus the compute processes its sampler listed (1.52 GiB at t = 74 s, total 9.57 GiB).
+  parts sum to the used line within display rounding. On R1 the list has no reserved line: after the processes comes
+  one `[data-part=rest]` line, the used memory minus the compute processes its sampler listed (1.52 GiB at
+  t = 73.4 s), then `[data-part=used]` (`= 9.57 GiB used`).
 - **Select a card.** `$CCV click --css '#stage .arch .card[data-sel]'`: `sel` `host/client`; the bar starts
   `architecture · container` `client-1 (Locust client)` `Observed: topology.json (docker inspect)`.
 - **Software layers.** `$CCV key 6`: `architecture › software layer`. The cards read
@@ -64,8 +65,11 @@ Preconditions:
   The layers read `toolkit: layer 0 · tensorrt_llm/_torch/modules/linear.py(2303): forward (inferred, M2)`,
   `runtime: cuLaunchKernel at 72228.648 ms (CPU side)` and
   `device code: Kernel2<…> · grid 8×1×5 · 36 of 36 SMs (inferred from the grid)`.
+- **Click a layer card.** Each `[data-layer]` card is a link to its row (`data-sel`: toolkit `9843`, runtime `9841`,
+  device code `9844` here). `$CCV click --css '#stage .arch [data-layer="runtime"]'`: `sel` `9841`
+  (`cuda runtime call: cuLaunchKernel`), `t` `72228648013`.
 - **Strip fit.** `$CCV click --css '#stage .aw .strip [data-fit]'`: the toggle reads `[run]`, then `[fit]` again.
-- **Strip seek.** `$CCV click --css '#stage .aw .strip svg' --frac 0.6,0.97`: `t` moves (to `52317855238` here);
+- **Strip seek.** `$CCV click --css '#stage .aw .strip svg' --frac 0.6,0.97`: `t` moves (to `52317855238.07` here);
   `sel` is kept.
 - **Console.** `$CCV console`: 0 errors.
 

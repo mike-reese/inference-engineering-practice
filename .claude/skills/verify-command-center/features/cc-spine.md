@@ -22,7 +22,7 @@ plays the events inside the bounds.
 
 ## How to get to it (user POV)
 
-- "Show me" in the Rep world opens it. Otherwise click `Spine` in the header, or press W.
+- "Show me" in the Rep world opens it. Otherwise click `Execution spine` in the header (`.ch-nav button[data-w=spine]`), or press W.
 
 ## Driving it with ccv
 
@@ -56,7 +56,8 @@ Preconditions:
   `$CCV eval '[...document.querySelectorAll(".sp2 .spine svg .axl")].map((t) => t.textContent).join(" ")'`: ticks
   2 µs apart (`73381.720 ms` to `73381.740 ms`). `$CCV wheel --css '#stage .spine svg' --dy -240 --steps 3`: ticks
   0.5 µs apart (`73381.7265 ms` to `73381.7335 ms`).
-- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 2 µs ticks return. The clicks landed on no unit,
+- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 2 µs ticks return once the fit's animation ends
+  (read at once, the axis is still moving: `73381.724 ms` to `73381.737 ms`, 1 µs apart, on 2026-11-13). The clicks landed on no unit,
   so they only moved the cursor (`t` `73381729922.63`, `sel` kept); over a unit they select it.
 - **Play.** `$CCV key " "`, read `__cc.bounds`, wait 3 s, read `__cc`: `playing` true, `t` inside the bounds, the
   bounds equal to those read just after play started (play can change them from those before it), `pace` `time`, `rate` `1`. `$CCV key " "` stops.
