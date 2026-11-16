@@ -49,7 +49,4 @@ Preconditions:
 ## Gotchas
 
 - The run list is the store's, not the results folders'. A run folder that was never imported does not show.
-- On 2026-11-12 the screenshots taken while the panel listed I02C-L1's runs timed out (SKILL.md, Hidden monitor;
-  the same timeout later hit the Spine world, so the panel may not be the cause). Read the rows with `eval` or
-  `$CCV aria` when that happens.
 - Load always opens on the Rep world. `regress.sh` checks the replay, the world and the empty-rep message.

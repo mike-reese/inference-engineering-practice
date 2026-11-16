@@ -63,8 +63,9 @@ Preconditions:
 - **Tokens.** `[data-tab=tokens]` starts `requests: warmup · measured · closer` `measured · 64 tokens · each read on
   three clocks`. Its third row reads `3 " KV" iteration 68 27.739 ms 30.304 ms 30.628 ms 3.615 ms 2.565 ms 0.323 ms ↦`;
   `$CCV click --css '.b-body [data-seek]' --nth 2` moves `t` to `73405855954` and keeps `sel`.
-- **Kernels.** `[data-tab=kernels]` starts `iteration 64 · 310 device rows (266 kernels, 44 copies and memsets) · 0
-  profiled · modules inferred (M2): 101 of 310 device rows in no module`. It holds one Nsight button:
+- **Kernels.** After the Tokens seek, `[data-tab=kernels]` starts `iteration 69 · 310 device rows (266 kernels, 44
+  copies and memsets) · 0 profiled · modules inferred (M2): 101 of 310 device rows in no module` (`iteration 64`,
+  with the same counts, when the tab opens at the send). It holds one Nsight button:
   `$CCV eval '[...document.querySelectorAll("#bar [data-open]")].map((b) => b.textContent.trim() + " " + b.dataset.open)'`
   gives `Nsight Systems ↗ {"run":"I02A-TRACE-timeline_20261109T060522Z_ee2252","path":"trace/timeline.nsys-rep"}`.
   Do not click it (see Gotchas).
