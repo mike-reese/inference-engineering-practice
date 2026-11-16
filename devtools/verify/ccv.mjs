@@ -293,11 +293,28 @@ async function record(c, name, opt) {
   const { per_pair, ...summary } = motion;
   return { ...summary, sheet: `${base}.sheet.png`, animation: `${base}.webp`, motion: `${base}.motion.json`, frames_dir: dir };
 }
+// Chromium answers a capture with the next frame it draws, and a page at rest draws none: with the outputs in DPMS
+// off (2026-11-16) such a capture never answered, while one sent right after a click did. Changing the default
+// background colour and putting it back redraws the root layer without touching the page's DOM or state, so the
+// capture answers. The transparent colour can show in the capture only on a page that paints no background.
+async function capture(c, params) {
+  let done = false;
+  const shot = c.send("Page.captureScreenshot", params);
+  shot.then(() => { done = true; }, () => { done = true; });
+  const redraw = (async () => {
+    for (await sleep(400); !done; await sleep(500)) {
+      await c.send("Emulation.setDefaultBackgroundColorOverride", { color: { r: 0, g: 0, b: 0, a: 0 } }).catch(() => {});
+      await sleep(50);
+      await c.send("Emulation.setDefaultBackgroundColorOverride", {}).catch(() => {});
+    }
+  })();
+  try { return await shot; } finally { await redraw; }
+}
 async function screenshot(c, name, css) {
   await c.settle();
   const params = { format: "png" };
   if (css) { const r = await locate(c, { css }, { allowCovered: true }); params.clip = { x: r.rect.left, y: r.rect.top, width: r.rect.width, height: r.rect.height, scale: 1 }; }
-  const { data } = await c.send("Page.captureScreenshot", params);
+  const { data } = await capture(c, params);
   const file = path.join(session(), `${name.replace(/[^\w.-]/g, "_")}.png`);
   fs.writeFileSync(file, Buffer.from(data, "base64"));
   return file;
