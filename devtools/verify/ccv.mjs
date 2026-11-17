@@ -39,6 +39,13 @@ Session
   back | forward                      the browser's Back / Forward buttons (history entries, hash changes included)
   close                               stop this session's browser and console watcher, free its tile; evidence stays
 
+Seat (a bare browser for another program: no app, no watcher, no READY wait, no evidence folder)
+  seat open --session NAME [--size half|full] [--url URL]
+                                      fresh-profile headed Chromium on ${SEAT.output} (app id ${SEAT.app_prefix}NAME), start page URL or
+                                      about:blank; exits 1, closing it, unless the window is in its tile. Prints {session, pid,
+                                      port, workspace, tile, profile, app_id}; drive it over CDP on 127.0.0.1:port
+  seat close --session NAME           stop it, free its tile, delete its profile; a no-op if it is not running
+
 Act (real input events; a target outside the viewport is scrolled into view first; it must then be visible and not covered)
   click   TARGET [--frac fx,fy] [--button left|right|middle] [--count 2]
   hover   TARGET
@@ -100,6 +107,8 @@ const liveRecs = () => records().filter((r) => alive(r.pid));
 
 let NAME = null;   // the session this command acts on (resolveName)
 function resolveName(cmd, opt) {
+  // A seat is opened and closed by another program: named explicitly, never by inference.
+  if (cmd === "seat") { if (!opt.session || opt.session === true) throw new Error("ccv seat open|close needs --session NAME"); return opt.session; }
   const name = opt.session || process.env.CCV_SESSION;
   if (name) return name;
   if (cmd === "launch") return new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
@@ -405,24 +414,22 @@ function release(rec) {
   fs.rmSync(recPath(rec.session), { force: true });
 }
 
-async function launch(opt) {
-  const old = readRec(NAME);
-  if (old && alive(old.pid)) throw new Error(`session ${NAME} is already running (pid ${old.pid}, workspace ${old.workspace}); use it, or ccv close --session ${NAME}`);
-  const size = opt.size || "half";
-  if (!TILES[size]) throw new Error(`--size is half or full, not ${size}`);
-  const monitor = opt.headless ? null : checkSeat();
-  const rec = await withLock(() => allocate(NAME, size, !!opt.headless));
+// Our Chromium for an allocated record: an empty profile; headed in its tile on CCV-1 when monitor is given, else
+// --headless=new. Throws, after closing what it opened, unless a headed window is in that tile. Shared by launch and seat.
+async function startBrowser(rec, monitor, url) {
+  const fail = async (msg) => { await close(); throw new Error(msg); };
+  fs.rmSync(rec.profile, { recursive: true, force: true });
   const args = [`--remote-debugging-port=${rec.port}`, `--user-data-dir=${rec.profile}`, "--no-first-run", "--no-default-browser-check", "--disable-extensions",
-    "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding", "--disable-background-timer-throttling", "--new-window", opt.url || SIDE];
-  if (opt.headless) args.unshift("--headless=new");
+    "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding", "--disable-background-timer-throttling", "--new-window", url];
+  if (!monitor) args.unshift("--headless=new");
   else {
     args.unshift(`--class=${rec.app_id}`);
     // "silent" on a workspace never moves focus; a rule naming the monitor would focus it.
-    hypr("eval", `hl.window_rule({ name = "${ruleName(rec)}", match = { class = "^${rec.app_id}$" }, workspace = "${rec.workspace} silent", float = true, size = "${rec.tile.size.join(" ")}", move = "${rec.tile.at.join(" ")}" })`);
+    try { hypr("eval", `hl.window_rule({ name = "${ruleName(rec)}", match = { class = "^${rec.app_id}$" }, workspace = "${rec.workspace} silent", float = true, size = "${rec.tile.size.join(" ")}", move = "${rec.tile.at.join(" ")}" })`); }
+    catch (e) { await fail(`could not place the window on ${SEAT.output}, so no browser was started: ${e.message}`); }
   }
   const child = spawn(BROWSER, args, { detached: true, stdio: "ignore" }); child.unref();
-  writeRec({ ...rec, pid: child.pid });
-  const fail = async (msg) => { await close(); throw new Error(msg); };
+  writeRec({ ...readRec(NAME), pid: child.pid });
   for (let i = 0; i < 80 && !(await versionInfo(rec.port)); i++) await sleep(250);
   if (!(await versionInfo(rec.port))) await fail(`Chromium did not open its debugging port ${rec.port} in 20 s`);
   if (monitor) {
@@ -430,6 +437,34 @@ async function launch(opt) {
     const w = sessionWindow(rec);
     if (!onTile(w, monitor, rec)) await fail(`the browser window is not in its ${rec.tile.size.join("x")} tile on workspace ${rec.workspace} (${w ? `monitor ${w.monitor}, workspace ${w.workspace.name}, ${w.size.join("x")}` : "no window"}): check ${SEAT.config}`);
   }
+}
+
+/** ccv seat open|close: launch and close without the app (no watcher, no READY wait, no evidence). Never headless. */
+async function seat(sub, opt) {
+  const rec = readRec(NAME);
+  if (rec && !rec.seat && alive(rec.pid)) throw new Error(`${NAME} was started by ccv launch, not seat open: ccv close --session ${NAME}`);
+  if (sub === "close") return rec ? close() : { closed: false, session: NAME, note: "not running" };
+  if (sub !== "open") throw new Error(`ccv seat open|close, not ${JSON.stringify(sub)}`);
+  if (rec && alive(rec.pid)) throw new Error(`seat ${NAME} is already open (pid ${rec.pid}, port ${rec.port}); ccv seat close --session ${NAME} first`);
+  const size = opt.size || "half";
+  if (!TILES[size]) throw new Error(`--size is half or full, not ${size}`);
+  const monitor = checkSeat();
+  const fresh = await withLock(() => allocate(NAME, size, false));
+  writeRec({ ...fresh, seat: true });
+  await startBrowser(fresh, monitor, opt.url && opt.url !== true ? opt.url : "about:blank");
+  const r = readRec(NAME);
+  return { session: NAME, pid: r.pid, port: r.port, workspace: r.workspace, tile: r.tile.side, profile: r.profile, app_id: r.app_id };
+}
+
+async function launch(opt) {
+  const old = readRec(NAME);
+  if (old && alive(old.pid)) throw new Error(`session ${NAME} is already running (pid ${old.pid}, workspace ${old.workspace}); use it, or ccv close --session ${NAME}`);
+  const size = opt.size || "half";
+  if (!TILES[size]) throw new Error(`--size is half or full, not ${size}`);
+  const monitor = opt.headless ? null : checkSeat();
+  const rec = await withLock(() => allocate(NAME, size, !!opt.headless));
+  await startBrowser(rec, monitor, opt.url || SIDE);
+  const fail = async (msg) => { await close(); throw new Error(msg); };
   const watcher = spawn(process.execPath, [new URL(import.meta.url).pathname, "_watch"], { detached: true, stdio: "ignore", env: { ...process.env, CCV_SESSION: NAME } });
   watcher.unref();
   writeRec({ ...readRec(NAME), watcher: watcher.pid });
@@ -469,8 +504,9 @@ async function close() {
   if (!rec) return { closed: false, note: `no session ${NAME}` };
   for (const pid of [rec.watcher, rec.pid]) if (pid && pid !== process.pid && alive(pid)) { try { process.kill(-pid, "SIGTERM"); } catch { try { process.kill(pid, "SIGTERM"); } catch {} } }
   for (let i = 0; i < 20 && alive(rec.pid) && rec.pid !== process.pid; i++) await sleep(200);
+  if (rec.pid !== process.pid && alive(rec.pid)) { try { process.kill(-rec.pid, "SIGKILL"); } catch {} for (let i = 0; i < 10 && alive(rec.pid); i++) await sleep(100); }
   release(rec);
-  return { closed: true, session: NAME, pid: rec.pid, freed: rec.workspace ? `workspace ${rec.workspace} ${rec.tile.side}` : null, evidence_kept: session() };
+  return { closed: true, session: NAME, pid: rec.pid, freed: rec.workspace ? `workspace ${rec.workspace} ${rec.tile.side}` : null, evidence_kept: rec.seat ? null : session() };
 }
 
 function sessions() {
@@ -508,6 +544,7 @@ async function run(cmd, pos, opt) {
   if (cmd === "sessions") return sessions();
   if (cmd === "launch") return launch(opt);
   if (cmd === "close") return close();
+  if (cmd === "seat") return seat(pos[0], opt);
   if (cmd === "doctor") return doctor();
   if (cmd === "_watch") { await watch(); return null; }
 
@@ -587,8 +624,8 @@ const { pos, opt } = parse(rest);
 try {
   NAME = resolveName(cmd, opt);
   const out = await run(cmd, pos, opt);
-  if (out) { if (NAME && cmd !== "_watch") logAction({ cmd, pos, opt, ok: true, out }); console.log(JSON.stringify(out, null, 1)); }
+  if (out) { if (NAME && cmd !== "_watch" && cmd !== "seat") logAction({ cmd, pos, opt, ok: true, out }); console.log(JSON.stringify(out, null, 1)); }
 } catch (e) {
-  if (NAME && cmd !== "_watch") { try { logAction({ cmd, pos, opt, ok: false, error: e.message }); } catch {} }
+  if (NAME && cmd !== "_watch" && cmd !== "seat") { try { logAction({ cmd, pos, opt, ok: false, error: e.message }); } catch {} }
   console.log(JSON.stringify({ ok: false, error: e.message })); process.exit(1);
 }

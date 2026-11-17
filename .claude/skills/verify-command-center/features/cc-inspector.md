@@ -73,11 +73,12 @@ Preconditions:
 - **Dock.** `$CCV key d`: `dock.pos` `right`, body `dock-right`. `$CCV click --css '.b-pos'`: back to `bottom`.
   `$CCV click --css '[data-act=big]'`: `dock.big` true. `$CCV click --css '.b-collapse'`: `dock.open` false, body
   `dock-closed`; again: open.
-- **Transport.** From `sel` `65151` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `65152` at
-  `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
-  `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
-  5456 in view · 91898 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 0.000–88294.364
-  (88.294 s)`. `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
+- **Transport.** From `t` `73405855954` (the Tokens seek above; the stop there is `65151`): `$CCV click --css '[data-act=next]'` gives `65152` at
+  `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` (already the
+  default) and `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; with the whole run as the bounds (after
+  the `.b-over` click below) `.b-grain` reads `grain: execution › phase · 5456 in view · 114138 events in bounds`
+  and `.b-tlabel` ends `/ 88294.364 ms · bounds 0.000–88294.364 (88.294 s)` (re-recorded 2026-11-17; inside a phase's
+  bounds they read for example `4 in view · 76 events in bounds` and `bounds 73405.858–73406.304 (446.1 µs)`). `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
 - **Strips.** `$CCV click --css '.b-over' --frac 0.5,0.5`: `t` `44505584510`, the middle of the run extent
   `[716805506, 88294363514]`. `$CCV click --css '.b-detail' --frac 0.3,0.5`: a stop lay within 6 px, so `sel` `127`
   and `t` `22710249081`. `$CCV drag --css '.b-detail' --by 120,0 --steps 6`: `t` `49196581417.85`, `sel` kept.

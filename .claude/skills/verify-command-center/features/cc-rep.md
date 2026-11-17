@@ -48,8 +48,8 @@ Preconditions:
 
 ## Gotchas
 
-- The moments come from the rep's `moments.toml` through `/api/v3/reps`. An entry can name several events; "show me"
-  selects the first row of the first one.
+- The moments come from the rep's `moments.toml` through `/api/v3/reps`. Each entry names one `event`, matched as a prefix of
+  a row's name; "show me" selects the first matching row of the entry's request in time order.
 - The dock tab starts as `selection` (D13's name). The bar shows it as Selected.
 - `walkthroughs.sh` checks every moment's row and time, and every split segment's value and click bounds, against
   the store and `latency.json`.

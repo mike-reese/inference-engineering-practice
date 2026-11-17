@@ -8,10 +8,11 @@ bottom (or right) and the hardware sidebar on the right.
 
 ## Baseline preconditions
 
-- The app server and the host runner are up. On 2026-11-09 the recipes ran on the cc-migration worktree:
-  `ie-devtools-cc` at `http://127.0.0.1:7711` with the store `/mnt/ie-data/cc/store-cc` (39 runs), and the runner
-  at `:7702` behind the page's `/runner` proxy. After the cutover the main checkout serves the page at `:7710`. Set
-  `CCV_APP` to the server you verify.
+- The app server and the host runner are up. The main checkout serves the page from `ie-devtools-v2scene` at
+  `http://127.0.0.1:7710` with the store `/mnt/ie-data/cc/store` (54 runs on 2026-11-17), and its runner listens on
+  `:7701` (`make runner`) behind the page's `/runner` proxy. All recipes were re-driven there on 2026-11-17. They
+  were recorded on 2026-11-09 on the cc-migration worktree (`ie-devtools-cc` at `:7711`, store
+  `/mnt/ie-data/cc/store-cc`, runner `:7702`), since merged into main. Set `CCV_APP` to the server you verify.
 - `$CCV sessions` is empty before you launch. Run one ccv browser at a time on this machine: on 2026-11-08 several
   WebGL browsers next to a GPU engine crashed it. Close yours (`$CCV close`) after each recipe.
 - R1 is `I02A-TRACE-timeline_20261109T060522Z_ee2252` (generation 4, final): the I02A timeline run that
@@ -26,7 +27,7 @@ The page reads its view once at load from the URL hash, a JSON object: `session`
 query string. The recipes use this helper:
 
 ```bash
-CCV=devtools/verify/ccv; export CCV_APP=http://127.0.0.1:7711 CCV_SESSION=cc-<recipe>
+CCV=devtools/verify/ccv; export CCV_APP=http://127.0.0.1:7710 CCV_SESSION=cc-<recipe>
 R1=I02A-TRACE-timeline_20261109T060522Z_ee2252
 view() { python3 -c 'import sys,urllib.parse; print(sys.argv[1] + "/static/cc/index.html?r=" + sys.argv[3] + "#" + urllib.parse.quote(sys.argv[2]))' "$CCV_APP" "$1" "$RANDOM"; }
 $CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"rep"}')"
@@ -47,7 +48,7 @@ $CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L
 
 | Part | Handles |
 | --- | --- |
-| worlds | `.ch-nav button[data-w=rep]` (also `stacked`, `spine`, `architecture`); key W cycles |
+| worlds | `.ch-nav button[data-w=rep]` (also `stacked`, `spine`, `architecture`), labelled `Rep`, `Stacked world`, `Execution spine`, `Architecture`; key W cycles |
 | position | `.ch-nav .pos`, for example `execution › phase (3/6) · t = 73378.117 ms · 5456 stops here` |
 | focus | `.ch-focus .t` (title), `.ch-focus .d` (what the tier shows) |
 | ladders | `button[data-act=focus][data-dim=D]`, `button[data-act=tier][data-dim=D][data-n=i]` (i 0-based), `button[data-act=paired][data-n=1]` (or `0`), `button[data-act=keys]` |
@@ -56,7 +57,7 @@ $CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L
 | bar links | `.b-body [data-sel]` select, `[data-seek]` seek, `[data-m]` metric, `[data-raw]` raw record, `[data-world]` world, `[data-run]` load, `#bar [data-open]` Nsight |
 | sidebar | `#hw .hwrow` (its `title` starts with the metric label), `#hw h3` (one per clock), `#hw .win` |
 | Rep world | `#stage .rw`: `h1`, `.top .chip`, `.mom` (`.t`, `.ev`), `[data-go=<moment id>]`, `.lesson`, `table.res`, `.seg > div` |
-| Spine world | `.sp2 .lhead button[data-mode=hw]` (also `split`, `arch`), `.sp2 .rl[data-band=i]`, `#stage .spine svg`, `.sp2 .pane .ptitle` |
+| Spine world | `.sp2 .lhead button[data-mode=hw]` (also `split`, `arch`), `.sp2 .lhead button[data-lanes=request]` (or `packed`), `.sp2 .rl[data-band=i]` (hidden while scrolled out of the bands), `#stage .spine svg`, `.sp2 .pane .ptitle`; `window.__spineLayout()` reports the drawn boxes and `view.scrollTop` |
 | Stacked world | `#stage canvas` (parts are picked on it), `#stage .sw-lbl` labels, `#stage .lens .tog` |
 | Architecture world | `#stage .arch .cbox[data-box=K]` (`.on`, `.driven`), `.card[data-sel]`, `[data-proc]`, `[data-layer]` with `.nowis`; strip `#stage .aw .strip rect.u[data-l=i]`, `[data-fit]` |
 
@@ -93,7 +94,7 @@ observable result) and `Gotchas`.
 ## Features
 
 - [Rep world](./cc-rep.md): lessons, key moments with "show me", results on three clocks, the TTFT split.
-- [Spine world](./cc-spine.md): step, walk and fly the tiers; lens panes, band labels, zoom and play.
+- [Spine world](./cc-spine.md): step, walk and fly the tiers; lens panes, band labels, lanes, zoom and play.
 - [Stacked world](./cc-stacked.md): the 3D board, part picks, hardware tiers, the pulse label, the lens, concurrent work and the in-GPU motion (`ccv record`).
 - [Architecture world](./cc-architecture.md): the component map lit at the cursor, cards, processes, software
   layers, the execution strip and the beam.
