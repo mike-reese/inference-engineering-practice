@@ -27,7 +27,7 @@ part's tier. The lens on the stage shows the architecture view and collapses.
 
 ## How to get to it (user POV)
 
-- Click `Stacked` in the header, or press W.
+- Click `Stacked world` in the header, or press W.
 
 ## Driving it with ccv
 
@@ -54,9 +54,10 @@ Preconditions:
 - **Motion while playing** (`stk-motion`). Screenshots cannot prove it; record it. At hardware tier 3 (device), the
   GPU board's box comes from its labels:
   `B=$($CCV eval '(() => { const L = [...document.querySelectorAll("#stage .sw-lbl")]; const g = L.find(e => /5060/.test(e.textContent)).getBoundingClientRect(), v = L.find(e => /VRAM/.test(e.textContent)).getBoundingClientRect(); const x0 = Math.round(g.left - 60), x1 = Math.round(v.right + 10), y1 = Math.round(g.top), y0 = Math.round(y1 - (x1 - x0) * 0.42); return `${x1-x0}x${y1-y0}+${x0}+${y0}`; })()' | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')`
-  (`514x216+1061+461` at full size). Open R1 at execution tier 2 (iteration), `t` 73402310386, click
+  (`514x216+1061+461` at full size). Open R1 at the iteration tier (key 2, `"execution":1` in the view), `t` 73402310386, click
   `[data-act=play]`, then `$CCV record gpu-play --ms 3000 --box $B`. On 2026-11-09 (session `rec-proof`): 122
-  frames, `moving_pairs` 121 of 121, `longest_still_ms` 0. The build before the fix gave 31 of 82 and 1271 ms, so
+  frames, `moving_pairs` 121 of 121, `longest_still_ms` 0 (2026-11-17, next to a game on the GPU: 118 frames, 117 of
+  117, 0). The build before the fix gave 31 of 82 and 1271 ms, so
   the check fails when the stream freezes. The sheet shows yellow outlines on the active SMs and dots between VRAM,
   the memory controllers, L2 and the SMs.
 - **Between kernels.** At `t` 73402702979 (execution tier 6, a 3 µs gap) no kernel holds the cursor; the GPU stat
