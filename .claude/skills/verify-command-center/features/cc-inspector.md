@@ -60,7 +60,8 @@ Preconditions:
 - **Tokens.** `[data-tab=tokens]` starts `requests: warmup · measured · closer` `measured · 64 tokens · each read on
   three clocks`. Its third row reads `3 " KV" iteration 68 27.739 ms 30.304 ms 30.628 ms 3.615 ms 2.565 ms 0.323 ms ↦`;
   `$CCV click --css '.b-body [data-seek]' --nth 2` moves `t` to `73405855954` and keeps `sel`.
-- **Kernels.** `[data-tab=kernels]` starts `iteration 64 · 310 device rows (266 kernels, 44 copies and memsets) · 0
+- **Kernels.** At the send cursor (before the Tokens seek; after it the tab reads `iteration 69`),
+  `[data-tab=kernels]` starts `iteration 64 · 310 device rows (266 kernels, 44 copies and memsets) · 0
   profiled · modules inferred (M2): 101 of 310 device rows in no module`. It holds one Nsight button:
   `$CCV eval '[...document.querySelectorAll("#bar [data-open]")].map((b) => b.textContent.trim() + " " + b.dataset.open)'`
   gives `Nsight Systems ↗ {"run":"I02A-TRACE-timeline_20261109T060522Z_ee2252","path":"trace/timeline.nsys-rep"}`.
@@ -76,8 +77,8 @@ Preconditions:
 - **Transport.** From `sel` `65151` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `65152` at
   `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
   `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
-  5456 in view · 91898 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 0.000–88294.364
-  (88.294 s)`. `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
+  4 in view · 77 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 73405.856–73406.304
+  (448.3 µs)` (the bounds are the selected phase's unit; re-recorded 2026-11-18 on `:7710`). `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
 - **Strips.** `$CCV click --css '.b-over' --frac 0.5,0.5`: `t` `44505584510`, the middle of the run extent
   `[716805506, 88294363514]`. `$CCV click --css '.b-detail' --frac 0.3,0.5`: a stop lay within 6 px, so `sel` `127`
   and `t` `22710249081`. `$CCV drag --css '.b-detail' --by 120,0 --steps 6`: `t` `49196581417.85`, `sel` kept.
