@@ -24,7 +24,7 @@ Preconditions:
 
 - Baseline (README). Recorded on 2026-11-09 on `:7711`, session `m1c-skill-launch`.
 - Never launch without the dry run. First check the runner honors it:
-  `curl -s $CCV_APP/runner/health` must print `"dry_run": true`.
+  `curl -s $CCV_APP/runner/health` must print `"dry_run": true`. A 502 means the runner is down: `make runner`.
 - Open with `?dry_run=1` in the query:
   `$CCV launch --size full --url "$CCV_APP/static/cc/index.html?dry_run=1&r=$RANDOM#$(python3 -c 'import sys,urllib.parse; print(urllib.parse.quote(sys.argv[1]))' '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"rep"}')"`.
 
@@ -42,8 +42,8 @@ Preconditions:
   must be true. Read `curl -s "$CCV_APP/runner/jobs?limit=1"`, then
   `$CCV click --css '.sh-pan [data-p=launch][data-v=off]' --after launch-live`. The runner's newest job is unchanged.
   `__cc.session.mode` is `live` with `live` `{"action":{"id":"off","label":"Measured run"},"options":{},"job":null,
-  "dry_run":true,"state":"dry run"}`; the world is `spine`; follow is on. The header reads `dry run`; the stage
-  reads `dry run: the runner checked the action and started nothing`.
+  "dry_run":true,"state":"dry run","note":null}`; the world is `spine`; follow is on. The header reads `dry run`; the stage
+  reads `● live · dry run: the runner checked the action and started nothing`.
 - **Follow off.** `$CCV click --css '.ch-nav [data-sh=follow]'`: `__cc.follow` is false.
 - **Rep world chip.** `$CCV click --css '.ch-nav button[data-w=rep]'`: the chip reads
   `● live · Measured run · dry run, nothing started`.

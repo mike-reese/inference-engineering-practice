@@ -27,7 +27,7 @@ part's tier. The lens on the stage shows the architecture view and collapses.
 
 ## How to get to it (user POV)
 
-- Click `Stacked` in the header, or press W.
+- Click `Stacked world` in the header, or press W.
 
 ## Driving it with ccv
 
