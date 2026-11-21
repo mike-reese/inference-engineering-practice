@@ -1,8 +1,9 @@
 # Compare
 
 Compare opens two runs, A and B. The Rep world shows both results side by side with `B − A` and `%` columns. The
-replay worlds show one side at a time, under a ribbon that names it. The header's A and B buttons switch sides; the
-cursor time is kept.
+replay worlds show one side at a time, under a ribbon that names it. The header's A and B buttons switch sides. The
+cursor time is kept while it lies inside the other run. Past that run's end it moves to the end, and it stays there
+when you switch back.
 
 ## Sub-features
 

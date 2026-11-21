@@ -11,9 +11,10 @@ thing it is sampled on.
 - `side-groups` `#hw h3`, one per clock: source, period, `(measured)`.
 - `side-rows` `#hw .hwrow`: `.nm`, `.val`, `.ev` (source · period · tier), `.why` (stale or implausible), class
   `stale`.
-- `side-click` a row click: focus hardware, the metric's tier, `sel` the thing; rows of that tier get `tier`, rows
-  of that thing get `sel`.
-- `side-window` `#hw .win`: the sparkline window, the bounds of the execution tier.
+- `side-click` a row click: focus hardware, the metric's tier, `sel` the thing. Rows of that tier get `tier` only
+  while hardware is focused (key E clears them). Rows of that thing keep `sel`.
+- `side-window` `#hw .win`: the sparkline window, the bounds of the execution tier. When no unit of that tier holds
+  the cursor, the window widens to a coarser unit or the whole run, and its label still names the selected tier.
 
 ## How to get to it (user POV)
 
