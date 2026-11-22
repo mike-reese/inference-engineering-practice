@@ -74,7 +74,10 @@ Preconditions:
 - **Dock.** `$CCV key d`: `dock.pos` `right`, body `dock-right`. `$CCV click --css '.b-pos'`: back to `bottom`.
   `$CCV click --css '[data-act=big]'`: `dock.big` true. `$CCV click --css '.b-collapse'`: `dock.open` false, body
   `dock-closed`; again: open.
-- **Transport.** From `sel` `65151` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `65152` at
+- **Transport.** Reach `sel` `65151` at `73405855954` from the Tokens tab, through token 3's engine-time link:
+  `$CCV click --css '.b-tabs [data-tab=tokens]'`, `$CCV wait --css '.b-body table.tokens tr[data-t]'`,
+  `$CCV click --css '.b-body table.tokens tr[data-t] td:nth-child(4) [data-sel]' --nth 2`.
+  `$CCV click --css '[data-act=next]'` gives `65152` at
   `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
   `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
   4 in view · 77 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 73405.856–73406.304

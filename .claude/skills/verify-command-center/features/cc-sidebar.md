@@ -30,7 +30,8 @@ Preconditions:
 
 - **Groups.** `$CCV eval '[...document.querySelectorAll("#hw h3")].map((h) => h.textContent)'` lists 9 groups:
   `Nsight Systems GPU metrics · every 100.0 µs (measured)`, `nvidia-smi query (gpu.csv) · every 100.181 ms
-  (measured)`, four NVML groups (500.082 ms, 50.083 ms, 30.083 ms twice), `NVML GPM · every 100.083 ms (measured)`,
+  (measured)`, `NVML · every 500.082 ms (measured)`, `NVML · every 50.083 ms (measured)`,
+  `NVML GPM · every 100.083 ms (measured)`, `NVML · every 30.083 ms (measured)` twice,
   `/proc/stat (trackers sidecar) + /proc/meminfo (trackers sidecar) · every 100.000 ms (measured)` and
   `perf stat -I 100, uncore_imc … + uncore_cbox … · every 100.295 ms (measured)`.
 - **Rows.** 27 rows, none stale. The Nsight Systems rows read `DRAM read 97 %`, `DRAM write 1.0 %`,
