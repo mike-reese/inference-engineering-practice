@@ -51,9 +51,12 @@ Preconditions:
 - **GPU memory adds up.** On the same view, `#gpu [data-held] li` lists every process holding GPU memory at the
   cursor (the run's containers and the host's own, for example Hyprland), then `[data-part=reserved]` (driver
   reserve), `[data-part=rest]` (no listed process) and `[data-part=used]` (`= 9.84 GiB used, one NVML read`). The
-  parts sum to the used line within display rounding. On R1 the list has no `reserved` line: after the processes come one `[data-part=rest]` line, the used
-  memory minus the compute processes its sampler listed (1.52 GiB at t = 73.4 s), and `[data-part=used]`
-  (`= 9.57 GiB used`).
+  parts sum to the used line within display rounding.
+- **Back to R1.** The steps below read R1, and the page reads its view once per load, so reopen it:
+  `$CCV open "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"architecture","focus":"architecture","tiers":{"execution":2,"hardware":2,"architecture":4},"t":73381153020}')"`,
+  `$CCV click --css '#stage .arch .cbox[data-box="forward"]'` (`sel` `62251`, `t` `73382016397`), then `$CCV key 3`.
+  R1's GPU list has no `reserved` line: after the processes come one `[data-part=rest]` line, the used memory minus
+  the compute processes its sampler listed (1.52 GiB), and `[data-part=used]` (`= 9.57 GiB used`).
 - **Select a card.** `$CCV click --css '#stage .arch .card[data-sel]'`: `sel` `host/client`; the bar starts
   `architecture · container` `client-1 (Locust client)` `Observed: topology.json (docker inspect)`.
 - **Software layers.** `$CCV key 6`: `architecture › software layer`. The cards read
