@@ -59,7 +59,7 @@ Preconditions:
   frames, `moving_pairs` 121 of 121, `longest_still_ms` 0. The build before the fix gave 31 of 82 and 1271 ms, so
   the check fails when the stream freezes. The sheet shows yellow outlines on the active SMs and dots between VRAM,
   the memory controllers, L2 and the SMs.
-- **Between kernels.** At `t` 73402702979 (execution tier 6, a 3 µs gap) no kernel holds the cursor; the GPU stat
+- **Between kernels.** At `t` 73402702979 (execution tier 6, a 3 µs gap) at hardware tier 4 or finer (the label is hidden at tier 3), no kernel holds the cursor; the GPU stat
   label reads `between kernels · last fill ended 1.6 µs ago · next computeBlockDigitCounts in 1.6 µs · SMs active
   62 % (about 22/36) · DRAM read 55 % (sample)`, and `$CCV record between-kernels --ms 1500 --box 1500x620+600+300`
   at hardware tier 4 gives 67 of 67 moving pairs. A run without kernel rows (`I02A_20261109T064024Z_4518dc`) also
@@ -87,3 +87,4 @@ Preconditions:
   part's mesh as above.
 - The camera framing depends on the tier and the viewport. Find the point again after a tier change or a resize.
 - `__cc.tiers.hardware` is 0-based: key 3 sets `2`.
+- `drag` on the canvas rotates the camera with the left button and pans it with `--button right`.

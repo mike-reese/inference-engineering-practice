@@ -18,7 +18,7 @@ below it holds the request, phase and kernel rows on one time axis, and a beam j
   click on empty space seeks.
 - `arch-beam` `#stage .aw .beam path` from the strip to the current phase's `on` box, card or process row.
 - `arch-motion` while playing, a packet (`.compmap .packet`) glides from the previous box to the new one over 300 ms
-  (about 18 frames), and the beam's dot (`.aw .beam circle`) follows the cursor along the strip, at 60 Hz.
+  (about 18 frames), and the beam's dot (`.aw .beam circle`) sits on the current phase's rect in the strip (the kernel's at tier 6), so it moves unit by unit rather than with the cursor line, at 60 Hz.
   `devtools/verify/motion.sh` checks both.
 
 ## How to get to it (user POV)

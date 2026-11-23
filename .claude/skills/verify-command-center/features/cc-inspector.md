@@ -3,7 +3,7 @@
 The inspector bar sits below the stage (or on its right). Six tabs: Selected (the selected row's detail, evidence,
 place in the three dimensions, links and raw record), At cursor (everything true at the cursor on every tier),
 Metrics (the run's `aux.json` metrics with their formulas and input rows, and the TTFT split), Tokens (the cursor
-request's tokens on three clocks), Kernels (the cursor iteration's device rows) and Run (the run's generation,
+request's tokens on three clocks), Kernels (the device rows of the selected row's iteration, else the cursor's) and Run (the run's generation,
 requests, iterations and units, with the Nsight buttons). Under the tabs: the transport (step, play, pace, rate)
 and two strips, the run overview and the detail window. Row names are links that select, `↦` links seek, and "↗"
 buttons ask the host runner to open a report in Nsight Systems or Nsight Compute.

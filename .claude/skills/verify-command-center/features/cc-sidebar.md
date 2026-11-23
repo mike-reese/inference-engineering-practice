@@ -1,14 +1,14 @@
 # Hardware sidebar
 
 The hardware sidebar on the right shows every sidebar metric of the run's catalog at the cursor, grouped by clock
-(one source and one sampling period per group). Each row holds the value at the cursor, a min-max sparkline over the
+(one sampling period and one or more sources per group). Each row holds the value at the cursor, a min-max sparkline over the
 bounds (it zooms with the execution tier), and its source, period and hardware tier. A row with no fresh sample at
 the cursor is greyed with the reason. A click on a row sets the hardware tier to the metric's tier and selects the
 thing it is sampled on.
 
 ## Sub-features
 
-- `side-groups` `#hw h3`, one per clock: source, period, `(measured)`.
+- `side-groups` `#hw h3`, one per clock: sources, period, `(measured)`.
 - `side-rows` `#hw .hwrow`: `.nm`, `.val`, `.ev` (source · period · tier), `.why` (stale or implausible), class
   `stale`.
 - `side-click` a row click: focus hardware, the metric's tier, `sel` the thing. Rows of that tier get `tier` only
