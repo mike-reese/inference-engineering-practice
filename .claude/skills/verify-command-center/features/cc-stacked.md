@@ -27,7 +27,7 @@ part's tier. The lens on the stage shows the architecture view and collapses.
 
 ## How to get to it (user POV)
 
-- Click `Stacked` in the header, or press W.
+- Click `Stacked world` in the header (`.ch-nav button[data-w=stacked]`), or press W.
 
 ## Driving it with ccv
 
@@ -41,7 +41,8 @@ Preconditions:
   lists 20 visible labels (re-recorded 2026-11-09 on `:7700`, session `stacked-recipe`):
   `Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz (8C/16T)`, `host RAM 62.7 GiB`, `bridge network`, `WD_BLACK SN7100 1TB`,
   `Intel Z390 chipset`, `NVIDIA GeForce RTX 5060 Ti`, `GDDR7 15.6 GiB (VRAM)`, `DMI 3.0, x4 at 8 GT/s`,
-  `PCIe Gen 3 x8`, `PCIe 8.0 GT/s PCIe x4`; the containers (`proc box on`) `server-1 container CPU 344 %`,
+  `PCIe Gen 3 x8`, `PCIe 8.0 GT/s PCIe x4`; the containers (`proc box on`, three lines each, joined by newlines in
+  `textContent`) `server-1 container CPU 344 %`,
   `client-1 container CPU 13 %`, `capture-1 container CPU 0.0 %`, `trackers-1 container CPU 1.0 %`; the plates
   (`proc on`) `trtllm-serve process`, `executor worker process`, `client`, and `bridge network` (off);
   `launches GPU work` (the executor's tether); and the pulse `[Executor] _forward_step 67: 0 ctx reqs, 1 gen reqs`.
@@ -54,7 +55,7 @@ Preconditions:
 - **Motion while playing** (`stk-motion`). Screenshots cannot prove it; record it. At hardware tier 3 (device), the
   GPU board's box comes from its labels:
   `B=$($CCV eval '(() => { const L = [...document.querySelectorAll("#stage .sw-lbl")]; const g = L.find(e => /5060/.test(e.textContent)).getBoundingClientRect(), v = L.find(e => /VRAM/.test(e.textContent)).getBoundingClientRect(); const x0 = Math.round(g.left - 60), x1 = Math.round(v.right + 10), y1 = Math.round(g.top), y0 = Math.round(y1 - (x1 - x0) * 0.42); return `${x1-x0}x${y1-y0}+${x0}+${y0}`; })()' | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')`
-  (`514x216+1061+461` at full size). Open R1 at execution tier 2 (iteration), `t` 73402310386, click
+  (`514x216+1061+461` at full size; `707x297+739+389` with the GPU selected, so compute it in the view you record). Open R1 at execution tier 2 (iteration), `t` 73402310386, click
   `[data-act=play]`, then `$CCV record gpu-play --ms 3000 --box $B`. On 2026-11-09 (session `rec-proof`): 122
   frames, `moving_pairs` 121 of 121, `longest_still_ms` 0. The build before the fix gave 31 of 82 and 1271 ms, so
   the check fails when the stream freezes. The sheet shows yellow outlines on the active SMs and dots between VRAM,
@@ -67,7 +68,9 @@ Preconditions:
 - **Hardware tiers.** `$CCV key h`, then keys 1 to 6. `.ch-focus .t` reads `hardware › system`, `› node`,
   `› device`, `› unit`, `› kernel traffic`, `› SM internals`. Key 3's description is
   `bytes moving between devices`; key 6's is `warps, shared memory, registers (Nsight Compute)`.
-- **Pick a part.** At tier 3, find a pickable point near the GPU label. This probe moves only the hover box:
+- **Pick a part.** At tier 3, find a pickable point near the GPU label. The camera flies after a tier
+  change: run the probe until it returns the same point twice (a point probed during the flight, `1210,691` on
+  2026-11-12, selects nothing). This probe moves only the hover box:
   `$CCV eval '(() => { const cv = document.querySelector("#stage canvas"), r = cv.getBoundingClientRect(), L = [...document.querySelectorAll("#stage .sw-lbl")].find((e) => /5060/.test(e.textContent)).getBoundingClientRect(); const hits = []; for (let y = r.top + 10; y < r.bottom; y += 12) for (let x = r.left + 10; x < r.right; x += 12) { cv.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y, bubbles: true })); if (cv.style.cursor === "pointer") hits.push([x, y]); } cv.dispatchEvent(new PointerEvent("pointerleave")); const cx = (L.left + L.right) / 2, cy = (L.top + L.bottom) / 2; hits.sort((a, b) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(b[0] - cx, b[1] - cy)); return Math.round(hits[0][0]) + "," + Math.round(hits[0][1]); })()'`
   returned `1234,679`. `$CCV click --at 1234,679 --after stacked-pick`: `sel` is `gpu0`, focus `hardware`, tier
   `2` (device). The bar starts `hardware · device` `NVIDIA GeForce RTX 5060 Ti` `Observed: nvidia-smi, CUDA device

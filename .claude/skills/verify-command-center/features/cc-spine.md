@@ -2,14 +2,20 @@
 
 The Spine world draws the execution ladder as bands on one time axis, with a lens pane of the hardware or
 architecture view at the cursor. Keys step between the stops of the focused tier, walk every row, and fly up and
-down the tiers. Band labels set the tier. The wheel zooms the axis; a double-click fits it. Space plays the events
-inside the bounds.
+down the tiers. Band labels set the tier. Units open at the same time stack in lanes; each label shows its band's
+lane count, and the bands scroll when the lanes do not fit. The wheel zooms the axis; a double-click fits it. Space
+plays the events inside the bounds.
 
 ## Sub-features
 
-- `spine-step` ← → next stop, Shift ← → a stop one tier coarser, Alt ← → the next row of any process, ↑ ↓ fly.
+- `spine-step` ← → next stop, Shift ← → a stop one tier coarser, Alt ← → the next row of the focused tier (every process), ↑ ↓ fly.
 - `spine-lens` `.sp2 .lhead button[data-mode=hw]` (also `split`, `arch`): one or two lens panes (`.sp2 .pane`).
-- `spine-bands` `.sp2 .rl[data-band=i]`: a click sets execution tier i.
+- `spine-bands` `.sp2 .rl[data-band=i]`: a click sets execution tier i. The label reads tier number, name and lane
+  count (`3 phase8 lanes`).
+- `spine-lanes` `.sp2 .lhead button[data-lanes=request]` (`one per request`) and `[data-lanes=packed]` (`reuse when
+  free`) choose how the request band uses lanes; the choice is kept in localStorage `cc.spine.lanes`. When the
+  lanes do not fit, `.sp2 .legend .fit` says so, and a wheel over the tier names (`.sp2 .gut`) or Shift + wheel
+  scrolls the bands.
 - `spine-zoom` wheel on `#stage .spine svg` zooms the axis; a double-click fits it, and each of its clicks also
   selects or seeks.
 - `spine-play` Space plays every event in the bounds, looping; the bounds hold during play.
@@ -38,16 +44,22 @@ Preconditions:
 - **Walk.** `$CCV key ArrowRight --mods alt`: `62209 component stamp: batch scheduled`, same `t`.
 - **Lens.** `$CCV click --css '.sp2 .lhead button[data-mode=hw]'`: one pane, `hardware · 3 device`. `split`: two
   panes, `architecture` and `hardware · 3 device`. `arch`: one pane, `architecture`.
-- **Band label.** `$CCV click --css '.sp2 .rl[data-band="5"]'`: `__cc.tiers.execution` is `5` and the lit label is
-  `6 kernel`. `data-band="2"` returns to `3 phase`.
+- **Lanes.** `$CCV click --css '.sp2 .lhead button[data-lanes=packed]'`: the button is on, localStorage
+  `cc.spine.lanes` is `packed`, and the request label changes from `1 request3 lanes` to `1 request1 lane`.
+  `[data-lanes=request]` returns.
+- **Band label.** On R1 the lanes do not fit at full size (`.legend .fit` reads `20 lanes do not fit: …`), so the
+  labels of bands 3 to 5 are not drawn and a click on them fails with `matched but not visible`. Scroll the bands
+  first: `$CCV wheel --css '.sp2 .gut' --dy 240 --steps 3`. Then `$CCV click --css '.sp2 .rl[data-band="5"]'`:
+  `__cc.tiers.execution` is `5` and the lit label (`.rl.on`) is `6 kernel2 lanes`. `data-band="2"` returns to
+  `3 phase8 lanes`.
 - **Zoom.** Read the axis with
   `$CCV eval '[...document.querySelectorAll(".sp2 .spine svg .axl")].map((t) => t.textContent).join(" ")'`: ticks
-  1 µs apart (`73381.720 ms` to `73381.737 ms`). `$CCV wheel --css '#stage .spine svg' --dy -240 --steps 3`: ticks
-  0.5 µs apart (`73381.7265 ms` to `73381.7325 ms`).
-- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 1 µs ticks return. The clicks also selected
-  `62210 nvtx range: _schedule` at `73381721534`.
-- **Play.** `$CCV key " "`, wait 3 s, read `__cc`: `playing` true, `t` inside the bounds, the bounds equal to those
-  at play start, `pace` `time`, `rate` `1`. `$CCV key " "` stops.
+  2 µs apart (`73381.720 ms` to `73381.740 ms`). `$CCV wheel --css '#stage .spine svg' --dy -240 --steps 3`: ticks
+  0.5 µs apart (`73381.7265 ms` to `73381.7335 ms`).
+- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 2 µs ticks return. The clicks landed on no unit,
+  so they only moved the cursor (`t` `73381729922.63`, `sel` kept); over a unit they select it.
+- **Play.** `$CCV key " "`, read `__cc.bounds`, wait 3 s, read `__cc`: `playing` true, `t` inside the bounds, the
+  bounds equal to those read just after play started (play can change them from those before it), `pace` `time`, `rate` `1`. `$CCV key " "` stops.
 - **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas
@@ -56,7 +68,7 @@ Preconditions:
   starts with Back empty, so `[` does nothing there.
 - A double-click is two clicks: each selects the row under it or seeks. Expect the selection to move.
 - In time pace the bounds play in 8 s at ×1, looping. A long bound wraps fast at ×4.
-- After any change to how the bands place units, run `devtools/verify/overlap_check.py` (about 2 s, half tile, the
-  I02C code run): no two units open at the same time share y, and each stream (the boxes of one colour key, the
+- After any change to how the bands place units, run `devtools/verify/overlap_check.py` (24 checks, half tile, the
+  I02C code run; it launches its own browser, so close yours first): no two units open at the same time share y, and each stream (the boxes of one colour key, the
   8th field of each box) keeps its lanes. It reads `window.__spineLayout()` at the fitted view only; a page without
   that contract fails.

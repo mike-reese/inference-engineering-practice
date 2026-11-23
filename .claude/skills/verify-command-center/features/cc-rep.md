@@ -42,14 +42,14 @@ Preconditions:
 - **Back to the Rep world.** Run `$CCV click --css '.ch-nav button[data-w=rep]'`. `sel` and `t` are kept.
 - **A run whose request did not complete.** Open I02C run `I02C_20261107T181031Z_5626f7` in the Rep world. Results
   show A's values (headers `6.066 ms`, TTFT `48.878 ms`, end-to-end `2860.301 ms`), `–` for B, and the flag
-  `Request B did not complete in this run (clients.B.complete is false).` Each "show me" is disabled and names the
-  missing row, for example `no response headers row for B in this run`.
+  `Request B did not complete in this run (clients.B.complete is false). Its missing values show as –.` Each
+  "show me" is disabled and names the missing row, for example `no response headers row for B in this run`.
 - **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas
 
-- The moments come from the rep's `moments.toml` through `/api/v3/reps`. An entry can name several events; "show me"
-  selects the first row of the first one.
+- The moments come from the rep's `moments.toml` through `/api/v3/reps`. An entry's `event` is the start of a row
+  name; "show me" selects the first row, in time order, of the moments' request whose name starts with it.
 - The dock tab starts as `selection` (D13's name). The bar shows it as Selected.
-- `walkthroughs.sh` checks every moment's row and time, and every split segment's value and click bounds, against
-  the store and `latency.json`.
+- `walkthroughs.sh` checks the row and time of moments 1 to 4 against the store and `latency.json`. Its split
+  checks (each segment's value and click bounds) run on the bar's Metrics tab; the Rep world's `.seg` takes no click.
