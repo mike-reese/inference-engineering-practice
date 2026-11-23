@@ -33,7 +33,8 @@ part's tier. The lens on the stage shows the architecture view and collapses.
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-stacked`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-stacked`; re-driven 2026-11-10
+  on `:7710`, session `vcc-maint-1110`.
 - Open R1 at the busiest DRAM-read sample of the ncu-tied kernels:
   `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"stacked","focus":"execution","tiers":{"execution":2,"hardware":2,"architecture":4},"t":73402310386}')"`.
 
@@ -41,7 +42,8 @@ Preconditions:
   lists 20 visible labels (re-recorded 2026-11-09 on `:7700`, session `stacked-recipe`):
   `Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz (8C/16T)`, `host RAM 62.7 GiB`, `bridge network`, `WD_BLACK SN7100 1TB`,
   `Intel Z390 chipset`, `NVIDIA GeForce RTX 5060 Ti`, `GDDR7 15.6 GiB (VRAM)`, `DMI 3.0, x4 at 8 GT/s`,
-  `PCIe Gen 3 x8`, `PCIe 8.0 GT/s PCIe x4`; the containers (`proc box on`) `server-1 container CPU 344 %`,
+  `PCIe Gen 3 x8`, `PCIe 8.0 GT/s PCIe x4`; the containers (`proc box on`; `textContent` joins the three lines with
+  newlines, `server-1\ncontainer\nCPU 344 %`) `server-1 container CPU 344 %`,
   `client-1 container CPU 13 %`, `capture-1 container CPU 0.0 %`, `trackers-1 container CPU 1.0 %`; the plates
   (`proc on`) `trtllm-serve process`, `executor worker process`, `client`, and `bridge network` (off);
   `launches GPU work` (the executor's tether); and the pulse `[Executor] _forward_step 67: 0 ctx reqs, 1 gen reqs`.

@@ -29,7 +29,8 @@ buttons ask the host runner to open a report in Nsight Systems or Nsight Compute
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-inspector`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-inspector`; re-driven
+  2026-11-10 on `:7710`, session `vcc-maint-1110`.
 - Open R1 at the send, Selected tab:
   `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"spine","focus":"execution","tiers":{"execution":2,"hardware":2,"architecture":4},"sel":{"eid":"client/sdk/measured/send#0"},"dock":{"pos":"bottom","tab":"selected","open":true}}')"`,
   then `$CCV wait --expr 'typeof __cc.sel === "number"'`.
@@ -60,8 +61,9 @@ Preconditions:
 - **Tokens.** `[data-tab=tokens]` starts `requests: warmup · measured · closer` `measured · 64 tokens · each read on
   three clocks`. Its third row reads `3 " KV" iteration 68 27.739 ms 30.304 ms 30.628 ms 3.615 ms 2.565 ms 0.323 ms ↦`;
   `$CCV click --css '.b-body [data-seek]' --nth 2` moves `t` to `73405855954` and keeps `sel`.
-- **Kernels.** `[data-tab=kernels]` starts `iteration 64 · 310 device rows (266 kernels, 44 copies and memsets) · 0
-  profiled · modules inferred (M2): 101 of 310 device rows in no module`. It holds one Nsight button:
+- **Kernels.** The tab shows the cursor's iteration. After the Tokens seek `[data-tab=kernels]` starts `iteration 69 ·
+  310 device rows (266 kernels, 44 copies and memsets) · 0 profiled · modules inferred (M2): 101 of 310 device rows
+  in no module`; at the opening cursor it starts `iteration 64` with the same counts. It holds one Nsight button:
   `$CCV eval '[...document.querySelectorAll("#bar [data-open]")].map((b) => b.textContent.trim() + " " + b.dataset.open)'`
   gives `Nsight Systems ↗ {"run":"I02A-TRACE-timeline_20261109T060522Z_ee2252","path":"trace/timeline.nsys-rep"}`.
   Do not click it (see Gotchas).
@@ -76,10 +78,12 @@ Preconditions:
 - **Transport.** From `sel` `65151` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `65152` at
   `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
   `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
-  5456 in view · 91898 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 0.000–88294.364
-  (88.294 s)`. `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
+  4 in view · 77 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 73405.856–73406.304
+  (448.3 µs)`: the bounds are the phase holding the cursor. `$CCV click --css '[data-act=play]'` plays (`playing`
+  true); click again to stop.
 - **Strips.** `$CCV click --css '.b-over' --frac 0.5,0.5`: `t` `44505584510`, the middle of the run extent
-  `[716805506, 88294363514]`. `$CCV click --css '.b-detail' --frac 0.3,0.5`: a stop lay within 6 px, so `sel` `127`
+  `[716805506, 88294363514]`; the bounds become the whole run, `[0, 88294363514]`.
+  `$CCV click --css '.b-detail' --frac 0.3,0.5`: a stop lay within 6 px, so `sel` `127` (`network frame: ACK`)
   and `t` `22710249081`. `$CCV drag --css '.b-detail' --by 120,0 --steps 6`: `t` `49196581417.85`, `sel` kept.
 - **Console.** `$CCV console`: 0 errors.
 
@@ -90,6 +94,9 @@ Preconditions:
 - The raw-record button is inside a closed `<details>`. ccv counts it as visible but cannot scroll to it or click
   it; open the summary first. Scroll the bar body with the wheel when the summary sits below the fold.
 - `.b-over` spans the run extent, which starts at the store's `extent[0]` (716.806 ms on R1), not at 0.
-- A detail click with no stop within 6 px only seeks, so `t` can be fractional.
+- A detail click with no stop within 6 px only seeks, so `t` can be fractional. The stops are the focused execution
+  tier's: the Strips numbers hold at the phase tier (at the request tier the same click only seeks, to
+  `22956535540.94`).
+- The Selected tab of a kernel row also holds an `Nsight Systems ↗` button (`#bar [data-open]`). Do not click it.
 - In time pace the bounds play in 8 s at ×1: at ×4 R1's 88 s bounds loop every 2 s.
 - The keys `[` `]` and the Back and Forward buttons walk the page's own history; the browser's Back does not.

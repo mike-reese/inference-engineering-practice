@@ -10,7 +10,8 @@ nothing.
 
 - `launch-actions` `.sh-pan .act` per action: label, `measured`, minutes, `[data-p=launch][data-v=<action>]`.
 - `launch-options` `.sh-pan [data-opt="<action>.<option>"]` inputs and selects; a bad value gets the class `bad`.
-- `launch-live` a launch switches to live mode: `__cc.session.mode` `live`, the Spine world, follow on.
+- `launch-live` a launch switches to live mode: `__cc.session.mode` `live`, follow on. From the Rep world it opens
+  the Spine world; from another world (Stacked, checked 2026-11-10) the world stays.
 - `launch-follow` `.ch-nav [data-sh=follow]` turns following the newest moment on and off.
 - `launch-dry` with `?dry_run=1`, a note in the panel, `dry run` in the header and the stage, and no job.
 
@@ -22,7 +23,8 @@ nothing.
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711`, session `m1c-skill-launch`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711`, session `m1c-skill-launch`; re-driven 2026-11-10 on `:7710`,
+  session `vcc-maint-1110`.
 - Never launch without the dry run. First check the runner honors it:
   `curl -s $CCV_APP/runner/health` must print `"dry_run": true`.
 - Open with `?dry_run=1` in the query:
@@ -42,9 +44,10 @@ Preconditions:
   must be true. Read `curl -s "$CCV_APP/runner/jobs?limit=1"`, then
   `$CCV click --css '.sh-pan [data-p=launch][data-v=off]' --after launch-live`. The runner's newest job is unchanged.
   `__cc.session.mode` is `live` with `live` `{"action":{"id":"off","label":"Measured run"},"options":{},"job":null,
-  "dry_run":true,"state":"dry run"}`; the world is `spine`; follow is on. The header reads `dry run`; the stage
-  reads `dry run: the runner checked the action and started nothing`.
-- **Follow off.** `$CCV click --css '.ch-nav [data-sh=follow]'`: `__cc.follow` is false.
+  "dry_run":true,"state":"dry run","note":null}`; the world is `spine`; follow is on. The header reads
+  `no run yet · Measured run ● Live dry run` with the button `follow live` (class `on`); the stage reads
+  `● live · dry run: the runner checked the action and started nothing`.
+- **Follow off.** `$CCV click --css '.ch-nav [data-sh=follow]'`: `__cc.follow` is false and the button loses `on`.
 - **Rep world chip.** `$CCV click --css '.ch-nav button[data-w=rep]'`: the chip reads
   `● live · Measured run · dry run, nothing started`.
 - **Console.** `$CCV console`: 0 errors.
@@ -54,4 +57,5 @@ Preconditions:
 - Without `?dry_run=1` the same click starts a GPU job on the shared machine and writes a run folder. Launch for
   real only when the task or Mike asks for a run; GPU recording is the coordinator's.
 - The page reads `dry_run` once at load. Changing the query needs a new page load.
-- `live.sh` covers what needs a real recording: the head moves, follow holds the head, the mask.
+- `live.sh` covers what needs a real recording: the head moves, follow holds the head, the mask. It makes one real
+  Launch of I02A `off`, so it records a run on the GPU: run it only when Mike asks and the GPU is free.
