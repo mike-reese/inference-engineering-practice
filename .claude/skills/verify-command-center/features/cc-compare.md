@@ -1,6 +1,6 @@
 # Compare
 
-Compare opens two runs, A and B. The Rep world shows both results side by side with `B − A` and `%` columns. The
+Compare opens two runs, A and B. The Rep world shows both results side by side with `B − A` and `%` columns when both runs use the same result file, and as two separate tables without those columns when they do not. The
 replay worlds show one side at a time, under a ribbon that names it. The header's A and B buttons switch sides. The
 cursor time is kept while it lies inside the other run. Past that run's end it moves to the end, and it stays there
 when you switch back.
@@ -9,7 +9,7 @@ when you switch back.
 
 - `cmp-pick` `.sh-pan [data-p=a][data-v=<run>]` and `[data-p=b][data-v=<run>]`; `Compare ▸` (`[data-p=compare]`)
   is disabled until A and B are two different runs.
-- `cmp-results` `#stage .rw table.res` with columns A, B, `B − A`, `%`.
+- `cmp-results` `#stage .rw table.res` with columns A, B, `B − A`, `%`. Runs with different result files (I02A and I02C) get two tables and no delta columns.
 - `cmp-ribbon` over the replay worlds: `compare · showing A · <run> · <kind> · <time>`.
 - `cmp-side` `.ch-nav .ab button[data-v=A]` (or `B`).
 

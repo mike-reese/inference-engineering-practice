@@ -10,7 +10,7 @@ nothing.
 
 - `launch-actions` `.sh-pan .act` per action: label, `measured`, minutes, `[data-p=launch][data-v=<action>]`.
 - `launch-options` `.sh-pan [data-opt="<action>.<option>"]` inputs and selects; a bad value gets the class `bad`.
-- `launch-live` a launch switches to live mode: `__cc.session.mode` `live`, the Spine world, follow on.
+- `launch-live` a launch switches to live mode: `__cc.session.mode` `live`, follow on. From the Rep world it opens Spine; any other world stays.
 - `launch-follow` `.ch-nav [data-sh=follow]` turns following the newest moment on and off.
 - `launch-dry` with `?dry_run=1`, a note in the panel, `dry run` in the header and the stage, and no job.
 
