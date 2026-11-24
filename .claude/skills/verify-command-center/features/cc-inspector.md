@@ -78,7 +78,9 @@ Preconditions:
   `$CCV click --css '.b-tabs [data-tab=tokens]'`, `$CCV wait --css '.b-body table.tokens tr[data-t]'`,
   `$CCV click --css '.b-body table.tokens tr[data-t] td:nth-child(4) [data-sel]' --nth 2`.
   `$CCV click --css '[data-act=next]'` gives `65152` at
-  `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
+  `73405857673`; `[data-act=back]` returns. The pace starts as `time`, so pick `events` first to prove the select:
+  `$CCV select --css '.b-pace' --option events` gives `pace` `events`. Then
+  `$CCV select --css '.b-pace' --option time` and
   `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
   4 in view · 77 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 73405.856–73406.304
   (448.3 µs)` (the bounds are the selected phase's unit; re-recorded 2026-11-18 on `:7710`). `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
@@ -95,5 +97,7 @@ Preconditions:
   it; open the summary first. Scroll the bar body with the wheel when the summary sits below the fold.
 - `.b-over` spans the run extent, which starts at the store's `extent[0]` (716.806 ms on R1), not at 0.
 - A detail click with no stop within 6 px only seeks, so `t` can be fractional.
-- In time pace the bounds play in 8 s at ×1: at ×4 R1's 88 s bounds loop every 2 s.
+- In time pace the bounds play in 8 s at ×1, so at ×4 they loop every 2 s, whatever their length. Play keeps the
+  bounds it starts with, and they depend on the focused tier: 448.3 µs in the Transport step, all 88 s of R1 only at
+  the request tier.
 - The keys `[` `]` and the Back and Forward buttons walk the page's own history; the browser's Back does not.
