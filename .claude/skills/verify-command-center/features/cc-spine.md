@@ -60,8 +60,10 @@ Preconditions:
   `$CCV eval '[...document.querySelectorAll(".sp2 .spine svg .axl")].map((t) => t.textContent).join(" ")'`: ticks
   2 µs apart (`73381.720 ms` to `73381.740 ms`). `$CCV wheel --css '#stage .spine svg' --dy -240 --steps 3`: ticks
   0.5 µs apart (`73381.7265 ms` to `73381.7335 ms`).
-- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 2 µs ticks return. The clicks land on an empty
-  lane, so they seek: `t` is `73381729922.63` and `sel` stays `62209`.
+- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 2 µs ticks return. The fit animates, so read the
+  ticks after it settles (`sleep 0.2` is enough); a read right after the click gave `73381.724 ms` to
+  `73381.737 ms`, mid-way. The clicks land on an empty lane, so they seek: `t` is `73381729922.63` and `sel` stays
+  `62209`.
 - **Play.** `$CCV key " "`, read `__cc`, wait 3 s, read it again: `playing` true, `t` inside the bounds, the bounds
   (`[73381721534, 73381741063]`, the phase holding the cursor) equal to those at play start, `pace` `time`, `rate`
   `1`. `$CCV key " "` stops.

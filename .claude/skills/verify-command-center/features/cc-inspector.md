@@ -49,8 +49,10 @@ Preconditions:
   `linear.py(2303)`, innermost last), kernel (CPU side) `cuLaunchKernel`, kernel `Kernel2<…>`. With
   `kernel/i70/kernel_mha#0` (decode attention, unmatched) the module step reads `none: no inferred module holds this
   kernel (M2)` and the launch call is `cudaGraphLaunch_v10000`. The code run `I02A-TRACE-code_20261103T170709Z_0ac2db`
-  has no iteration or phase rows, so its kernel path reads request, layer, its measured module frames (untagged),
-  the launch call, the kernel.
+  has no iteration, phase or layer rows (generation 10), so its kernel path reads request, its measured module frames
+  (untagged), the launch call, the kernel: with `"sel":{"id":7180,"generation":10}`, `request measured`,
+  `module tensorrt_llm/_torch/modules/embedding.py(250): forward`, `kernel (CPU side) cudaLaunchKernel`,
+  `kernel vectorized_elementwise_kernel`.
 - **At cursor.** `$CCV click --css '.b-tabs [data-tab=cursor]'`: `73378.117 ms from the run's t0 · everything true at
   the cursor`, then request `measured`, iteration `iteration 64`, phase `_fetch_new_requests`, layer `layer 24 of
   iteration 64`, module `tensorrt_llm/_torch/modules/linear.py(2303): forward` tagged `inferred (M2)`, kernel
