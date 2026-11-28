@@ -29,7 +29,7 @@ buttons ask the host runner to open a report in Nsight Systems or Nsight Compute
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-inspector`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-inspector`; re-verified 2026-11-28 on `:7710` (store `/mnt/ie-data/cc/store`).
 - Open R1 at the send, Selected tab:
   `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"spine","focus":"execution","tiers":{"execution":2,"hardware":2,"architecture":4},"sel":{"eid":"client/sdk/measured/send#0"},"dock":{"pos":"bottom","tab":"selected","open":true}}')"`,
   then `$CCV wait --expr 'typeof __cc.sel === "number"'`.
@@ -75,9 +75,9 @@ Preconditions:
   `dock-closed`; again: open.
 - **Transport.** From `sel` `65151` at `73405855954`: `$CCV click --css '[data-act=next]'` gives `65152` at
   `73405857673`; `[data-act=back]` returns. `$CCV select --css '.b-pace' --option time` and
-  `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`; `.b-grain` reads `grain: execution › phase ·
-  5456 in view · 91898 events in bounds`, `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 0.000–88294.364
-  (88.294 s)`. `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
+  `$CCV select --css '.b-rate' --option 4`: `pace` `time`, `rate` `4`. The seek left the whole-run bounds for the
+  phase unit at the cursor, so `.b-grain` reads `grain: execution › phase · 4 in view · 77 events in bounds` and
+  `.b-tlabel` reads `73405.856 / 88294.364 ms · bounds 73405.856–73406.304 (448.3 µs)`. `$CCV click --css '[data-act=play]'` plays (`playing` true); click again to stop.
 - **Strips.** `$CCV click --css '.b-over' --frac 0.5,0.5`: `t` `44505584510`, the middle of the run extent
   `[716805506, 88294363514]`. `$CCV click --css '.b-detail' --frac 0.3,0.5`: a stop lay within 6 px, so `sel` `127`
   and `t` `22710249081`. `$CCV drag --css '.b-detail' --by 120,0 --steps 6`: `t` `49196581417.85`, `sel` kept.

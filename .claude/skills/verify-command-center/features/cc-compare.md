@@ -20,7 +20,7 @@ cursor time is kept.
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-compare`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-compare`; re-verified 2026-11-28 on `:7710` (store `/mnt/ie-data/cc/store`).
 - `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"rep"}')"`.
 
 - **Open.** `$CCV click --css '.ch-nav [data-sh=open][data-v=compare]'`. The pick line reads

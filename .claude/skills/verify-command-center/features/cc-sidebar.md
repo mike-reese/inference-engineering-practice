@@ -23,7 +23,7 @@ thing it is sampled on.
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-sidebar`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-sidebar`; re-verified 2026-11-28 on `:7710` (store `/mnt/ie-data/cc/store`).
 - Open R1 at the busiest DRAM-read sample:
   `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"spine","focus":"execution","tiers":{"execution":2,"hardware":2,"architecture":4},"t":73402310386}')"`.
 

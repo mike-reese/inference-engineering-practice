@@ -27,13 +27,13 @@ part's tier. The lens on the stage shows the architecture view and collapses.
 
 ## How to get to it (user POV)
 
-- Click `Stacked` in the header, or press W.
+- Click `Stacked world` in the header, or press W.
 
 ## Driving it with ccv
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-stacked`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-stacked`; re-verified 2026-11-28 on `:7710` (store `/mnt/ie-data/cc/store`).
 - Open R1 at the busiest DRAM-read sample of the ncu-tied kernels:
   `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"stacked","focus":"execution","tiers":{"execution":2,"hardware":2,"architecture":4},"t":73402310386}')"`.
 
@@ -54,7 +54,7 @@ Preconditions:
 - **Motion while playing** (`stk-motion`). Screenshots cannot prove it; record it. At hardware tier 3 (device), the
   GPU board's box comes from its labels:
   `B=$($CCV eval '(() => { const L = [...document.querySelectorAll("#stage .sw-lbl")]; const g = L.find(e => /5060/.test(e.textContent)).getBoundingClientRect(), v = L.find(e => /VRAM/.test(e.textContent)).getBoundingClientRect(); const x0 = Math.round(g.left - 60), x1 = Math.round(v.right + 10), y1 = Math.round(g.top), y0 = Math.round(y1 - (x1 - x0) * 0.42); return `${x1-x0}x${y1-y0}+${x0}+${y0}`; })()' | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')`
-  (`514x216+1061+461` at full size). Open R1 at execution tier 2 (iteration), `t` 73402310386, click
+  (`514x216+1061+461` at full size). Open R1 at `"execution":1` (iteration; tiers are 0-based), `t` 73402310386, click
   `[data-act=play]`, then `$CCV record gpu-play --ms 3000 --box $B`. On 2026-11-09 (session `rec-proof`): 122
   frames, `moving_pairs` 121 of 121, `longest_still_ms` 0. The build before the fix gave 31 of 82 and 1271 ms, so
   the check fails when the stream freezes. The sheet shows yellow outlines on the active SMs and dots between VRAM,
