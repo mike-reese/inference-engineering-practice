@@ -9,20 +9,24 @@ inside the bounds.
 
 - `spine-step` ← → next stop, Shift ← → a stop one tier coarser, Alt ← → the next row of any process, ↑ ↓ fly.
 - `spine-lens` `.sp2 .lhead button[data-mode=hw]` (also `split`, `arch`): one or two lens panes (`.sp2 .pane`).
-- `spine-bands` `.sp2 .rl[data-band=i]`: a click sets execution tier i.
+- `spine-bands` `.sp2 .rl[data-band=i]`: a click sets execution tier i. Each label names its lane count
+  (`6 kernel2 lanes`).
+- `spine-lanes` units open at the same time stack in lanes. `.sp2 .lhead button[data-lanes=request]` (`one per
+  request`, the default) or `[data-lanes=packed]` (`reuse when free`) picks the lane rule; it persists in
+  `localStorage` `cc.spine.lanes`. When the lanes do not fit, the band area scrolls and `.sp2 .legend .fit` says so.
 - `spine-zoom` wheel on `#stage .spine svg` zooms the axis; a double-click fits it, and each of its clicks also
   selects or seeks.
 - `spine-play` Space plays every event in the bounds, looping; the bounds hold during play.
 
 ## How to get to it (user POV)
 
-- "Show me" in the Rep world opens it. Otherwise click `Spine` in the header, or press W.
+- "Show me" in the Rep world opens it. Otherwise click `Execution spine` in the header, or press W.
 
 ## Driving it with ccv
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-spine`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-spine`; re-verified 2026-11-28 on `:7710` (store `/mnt/ie-data/cc/store`).
 - Open R1 at the measured request's send:
   `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"spine","focus":"execution","tiers":{"execution":2,"hardware":2,"architecture":4},"sel":{"eid":"client/sdk/measured/send#0"}}')"`,
   then `$CCV wait --expr 'typeof __cc.sel === "number"'`.
@@ -38,16 +42,18 @@ Preconditions:
 - **Walk.** `$CCV key ArrowRight --mods alt`: `62209 component stamp: batch scheduled`, same `t`.
 - **Lens.** `$CCV click --css '.sp2 .lhead button[data-mode=hw]'`: one pane, `hardware · 3 device`. `split`: two
   panes, `architecture` and `hardware · 3 device`. `arch`: one pane, `architecture`.
-- **Band label.** `$CCV click --css '.sp2 .rl[data-band="5"]'`: `__cc.tiers.execution` is `5` and the lit label is
-  `6 kernel`. `data-band="2"` returns to `3 phase`.
+- **Band label.** At full size R1's 20 lanes do not fit, so the lower labels are hidden (`display: none`; ccv
+  reports `matched but not visible`). Scroll the bands as a user does: `$CCV wheel --css '.sp2 .gut' --dy 240 --steps
+  3`. Then `$CCV click --css '.sp2 .rl[data-band="5"]'`: `__cc.tiers.execution` is `5` and the lit label reads
+  `6 kernel2 lanes`. `data-band="2"` returns to `3 phase8 lanes`. `--dy -240` scrolls back.
 - **Zoom.** Read the axis with
   `$CCV eval '[...document.querySelectorAll(".sp2 .spine svg .axl")].map((t) => t.textContent).join(" ")'`: ticks
-  1 µs apart (`73381.720 ms` to `73381.737 ms`). `$CCV wheel --css '#stage .spine svg' --dy -240 --steps 3`: ticks
-  0.5 µs apart (`73381.7265 ms` to `73381.7325 ms`).
-- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 1 µs ticks return. The clicks also selected
-  `62210 nvtx range: _schedule` at `73381721534`.
+  2 µs apart (`73381.720 ms` to `73381.740 ms`). `$CCV wheel --css '#stage .spine svg' --dy -240 --steps 3`: ticks
+  0.5 µs apart (`73381.7265 ms` to `73381.7335 ms`).
+- **Fit.** `$CCV click --css '#stage .spine svg' --count 2`: the 2 µs ticks return. On 2026-11-28 the clicks hit
+  no unit, so they only seeked (`t` `73381729922.6`) and `sel` stayed `62209`.
 - **Play.** `$CCV key " "`, wait 3 s, read `__cc`: `playing` true, `t` inside the bounds, the bounds equal to those
-  at play start, `pace` `time`, `rate` `1`. `$CCV key " "` stops.
+  read right after the key (play start rebounds once to the unit at the cursor), `pace` `time`, `rate` `1`. `$CCV key " "` stops.
 - **Console.** `$CCV console`: 0 errors.
 
 ## Gotchas

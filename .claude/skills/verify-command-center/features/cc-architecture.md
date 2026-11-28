@@ -29,7 +29,7 @@ below it holds the request, phase and kernel rows on one time axis, and a beam j
 
 Preconditions:
 
-- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-arch`.
+- Baseline (README). Recorded on 2026-11-09 on `:7711` (store-cc), session `m1c-skill-arch`; re-verified 2026-11-28 on `:7710` (store `/mnt/ie-data/cc/store`).
 - Open R1 at the ASGI headers stamp, component tier:
   `$CCV launch --size full --url "$(view '{"session":{"mode":"replay","rep":"I02A-L1","run":"'$R1'"},"world":"architecture","focus":"architecture","tiers":{"execution":2,"hardware":2,"architecture":4},"t":73381153020}')"`.
 
@@ -43,8 +43,9 @@ Preconditions:
 - **Containers.** `$CCV key 3`: `architecture › container`, same two lines.
 - **Container samples move inside a request.** Open the run `I02A_20261109T205538Z_14d5d8` (recorded with the 100 ms
   cgroup and 50 ms NVML samplers) at `"tiers":{"execution":2,"hardware":2,"architecture":2},"t":67437000000` (its
-  measured request runs 67437 to 67672 ms) and press → twelve times, reading the server card's `[data-v=cpu]`,
-  `[data-v=mem]` and `[data-v=net]` after each. Recorded 2026-11-09: `CPU 118 %` and `↑ 175.5 KiB/s` up to 67440.1
+  measured request runs 67437 to 67672 ms) and press → twelve times, reading the server card's
+  (`#stage .card[data-sel="host/server"]`; the first card is the client's) `[data-v=cpu]`, `[data-v=mem]` and
+  `[data-v=net]` after each. Recorded 2026-11-09: `CPU 118 %` and `↑ 175.5 KiB/s` up to 67440.1
   ms, then `CPU 16 %` and `↑ 23.0 KiB/s` from 67457.1 ms; `RAM 3565` then `3566 MiB / 8192 MiB`. The memory row reads
   `RAM`, not `mem`: it is host RAM (cgroup), the GPU memory is the card's blue `GPU` line. On a run recorded before
   2026-11-09 (R1) the same steps show one Docker stats sample a second, so the values hold across a whole request.
